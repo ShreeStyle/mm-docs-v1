@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <style>
+        {
+                {
+                    {
+                    brandCSS
+                }
+            }
+        }
+
+        body {
+            font-family: var(--font-secondary), sans-serif;
+            padding: 40px;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 40px;
+            border-bottom: 3px solid var(--primary-color);
+            padding-bottom: 20px;
+        }
+
+        .logo {
+            max-height: 80px;
+        }
+
+        .invoice-title {
+            font-size: 3em;
+            color: var(--primary-color);
+            font-weight: bold;
+        }
+
+        .details {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 30px;
+        }
+
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .table th {
+            background: var(--primary-color);
+            color: #fff;
+            padding: 10px;
+            text-align: left;
+        }
+
+        .table td {
+            padding: 10px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .total-row {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: var(--accent-color);
+            text-align: right;
+            padding-top: 20px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="header">
+        <div>
+            {{#if brandKit.logo}}
+            <img src="{{brandKit.logo}}" class="logo" />
+            {{/if}}
+        </div>
+        <div class="invoice-title">INVOICE</div>
+    </div>
+
+    <div class="details">
+        <div>
+            <strong>Billed To:</strong><br>
+            {{content.billedTo}}
+        </div>
+        <div style="text-align: right;">
+            <strong>Invoice #:</strong> {{content.invoiceNumber}}<br>
+            <strong>Date:</strong> {{generatedDate}}
+        </div>
+    </div>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Description</th>
+                <th>Amount</th>
+            </tr>
+        </thead>
+        <tbody>
+            {{#each content.items}}
+            <tr>
+                <td>{{this.description}}</td>
+                <td>${{this.amount}}</td>
+            </tr>
+            {{/each}}
+        </tbody>
+    </table>
+
+    <div class="total-row">
+        Total: ${{content.total}}
+    </div>
+
+    <p style="margin-top: 50px; color: #777;">{{content.notes}}</p>
+
+</body>
+
+</html>

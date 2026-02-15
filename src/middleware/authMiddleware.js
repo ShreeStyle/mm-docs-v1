@@ -1,7 +1,11 @@
 const { verifyToken } = require("../utils/jwtUtils");
 
 const authMiddleware = (req, res, next) => {
-    const token = req.header("Authorization")?.replace("Bearer ", "");
+    const authHeader = req.header("Authorization");
+    console.log("🔍 Received Auth Header:", authHeader);
+
+    const token = authHeader?.replace("Bearer ", "");
+    console.log("🔑 Extracted Token:", token);
 
     if (!token) {
         return res.status(401).json({ message: "Access Denied: No token provided" });
@@ -12,6 +16,7 @@ const authMiddleware = (req, res, next) => {
         req.user = decoded;
         next();
     } catch (err) {
+        console.error("❌ Token Verification Failed:", err.message);
         res.status(400).json({ message: "Invalid Token" });
     }
 };

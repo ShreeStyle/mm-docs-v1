@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <style>
+        {
+                {
+                    {
+                    brandCSS
+                }
+            }
+        }
+
+        body {
+            font-family: var(--font-secondary), sans-serif;
+            padding: 40px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 4px solid var(--primary-color);
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+        }
+
+        .logo {
+            max-height: 80px;
+        }
+
+        .quote-title {
+            font-size: 2.5em;
+            color: var(--primary-color);
+            font-weight: bold;
+        }
+
+        .client-info {
+            background: #f5f5f5;
+            padding: 20px;
+            border-radius: 5px;
+            margin-bottom: 30px;
+        }
+
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+
+        .table th {
+            background: var(--primary-color);
+            color: white;
+            padding: 12px;
+            text-align: left;
+        }
+
+        .table td {
+            padding: 12px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .table tr:hover {
+            background: #f9f9f9;
+        }
+
+        .total-section {
+            text-align: right;
+            margin-top: 30px;
+            font-size: 1.3em;
+        }
+
+        .total-amount {
+            color: var(--accent-color);
+            font-weight: bold;
+            font-size: 1.5em;
+        }
+
+        .terms {
+            margin-top: 40px;
+            padding: 20px;
+            background: #f9f9f9;
+            border-left: 4px solid var(--accent-color);
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="header">
+        <div>
+            {{#if brandKit.logo}}
+            <img src="{{brandKit.logo}}" class="logo" />
+            {{/if}}
+        </div>
+        <div class="quote-title">QUOTATION</div>
+    </div>
+
+    <div class="client-info">
+        <strong>Prepared For:</strong><br>
+        {{content.clientName}}<br>
+        {{content.clientEmail}}<br>
+        <br>
+        <strong>Quote #:</strong> {{content.quoteNumber}}<br>
+        <strong>Date:</strong> {{generatedDate}}<br>
+        <strong>Valid Until:</strong> {{content.validUntil}}
+    </div>
+
+    <h2 style="color: var(--primary-color);">Project Scope</h2>
+    <p>{{content.projectDescription}}</p>
+
+    <h2 style="color: var(--primary-color);">Cost Breakdown</h2>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Item</th>
+                <th>Description</th>
+                <th>Quantity</th>
+                <th>Rate</th>
+                <th>Amount</th>
+            </tr>
+        </thead>
+        <tbody>
+            {{#each content.items}}
+            <tr>
+                <td>{{this.name}}</td>
+                <td>{{this.description}}</td>
+                <td>{{this.quantity}}</td>
+                <td>${{this.rate}}</td>
+                <td>${{this.amount}}</td>
+            </tr>
+            {{/each}}
+        </tbody>
+    </table>
+
+    <div class="total-section">
+        <div>Subtotal: ${{content.subtotal}}</div>
+        <div>Tax ({{content.taxRate}}%): ${{content.tax}}</div>
+        <div class="total-amount">Total: ${{content.total}}</div>
+    </div>
+
+    <div class="terms">
+        <h3>Terms & Conditions</h3>
+        <ul>
+            {{#each content.terms}}
+            <li>{{this}}</li>
+            {{/each}}
+        </ul>
+    </div>
+
+</body>
+
+</html>

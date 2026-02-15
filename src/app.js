@@ -9,9 +9,21 @@ app.use(express.json());
 
 const authRoutes = require("./routes/authRoutes");
 const userRoutes = require("./routes/userRoutes");
+const brandKitRoutes = require("./routes/brandKitRoutes");
+const documentRoutes = require("./routes/documentRoutes");
+const aiRoutes = require("./routes/aiRoutes");
+const publicRoutes = require("./routes/publicRoutes");
+const onboardingRoutes = require("./routes/onboardingRoutes");
+const templateRoutes = require("./routes/templateRoutes");
 
 app.use("/api/users", userRoutes);
 app.use("/api/auth", authRoutes);
+app.use("/api/brand-kit", brandKitRoutes);
+app.use("/api/documents", documentRoutes);
+app.use("/api/ai", aiRoutes);
+app.use("/api/public", publicRoutes);
+app.use("/api/onboarding", onboardingRoutes);
+app.use("/api/templates", templateRoutes);
 
 // Health Check API
 app.get("/api/health", (req, res) => {
