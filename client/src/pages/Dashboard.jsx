@@ -1,0 +1,785 @@
+import React, { useState, useRef, useEffect, useCallback } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
+import { api } from '../utils/api';
+import {
+    Search, Home, Inbox, Settings, Layers, Trash2,
+    UserPlus, ChevronDown, Plus, Sparkles, Clock,
+    Calendar, CheckSquare, MoreHorizontal, ArrowUp,
+    Paperclip, AtSign, Globe, FileText, Bot, Zap,
+    ChevronRight, Layout, LogOut
+} from 'lucide-react';
+
+const LogoIcon = () => (
+    <svg width="20" height="20" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M16 4L22 10L28 4V24C28 26.2091 26.2091 28 24 28H8C5.79086 28 4 26.2091 4 24V4L10 10L16 4Z" fill="#7C3AED" />
+    </svg>
+);
+
+export default function Dashboard() {
+    const { user, logout } = useAuth();
+    const navigate = useNavigate();
+    const [currentView, setCurrentView] = useState('Home'); // Home, Settings, Templates, Trash, Search, Inbox
+    const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+    const [aiMode, setAiMode] = useState('Ask'); // Ask, Research, Build
+    const [prompt, setPrompt] = useState('');
+    const [isGenerating, setIsGenerating] = useState(false);
+    const [generatedDoc, setGeneratedDoc] = useState(null);
+    const [searchQuery, setSearchQuery] = useState('');
+    const [sidebarWidth, setSidebarWidth] = useState(240);
+    const [isResizing, setIsResizing] = useState(false);
+    const [docs, setDocs] = useState([]);
+    const [brandKit, setBrandKit] = useState(null);
+    const [error, setError] = useState(null);
+    const sidebarRef = useRef(null);
+
+    const handleTemplateClick = (template) => {
+        setAiMode('Build');
+        setPrompt(`Create a ${template} for `);
+        setCurrentView('Home');
+        setGeneratedDoc(null);
+    };
+
+    const handleLogout = () => {
+        logout();
+        navigate('/');
+    };
+
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const fetchedDocs = await api.get('/documents');
+                setDocs(fetchedDocs);
+
+                try {
+                    const fetchedBrandKit = await api.get('/brand-kit');
+                    setBrandKit(fetchedBrandKit);
+                } catch (err) {
+                    console.log("No brand kit found or error fetching", err.message);
+                }
+            } catch (err) {
+                console.error("Error fetching documents:", err.message);
+                setError(err.message);
+            }
+        };
+        fetchData();
+    }, []);
+
+    const handleGenerate = async (e) => {
+        e.preventDefault();
+        if (!prompt.trim()) return;
+
+        setIsGenerating(true);
+        setError(null);
+        try {
+            const result = await api.post('/ai/generate-document', {
+                type: aiMode.toLowerCase(),
+                topic: prompt,
+                title: prompt.length > 30 ? prompt.substring(0, 30) + '...' : prompt
+            });
+
+            console.log("Generation result:", result);
+            setIsGenerating(false);
+            setGeneratedDoc(result.document);
+            // Refresh documents list
+            const updatedDocs = await api.get('/documents');
+            setDocs(updatedDocs);
+        } catch (err) {
+            console.error("Generation error:", err);
+            setIsGenerating(false);
+            setError(err.message || "Failed to generate document");
+        }
+    };
+
+    const toggleMobileMenu = () => setIsMobileMenuOpen(!isMobileMenuOpen);
+
+    const saveBrandKit = async (data) => {
+        try {
+            let updatedKit;
+            if (brandKit) {
+                updatedKit = await api.put('/brand-kit', data);
+            } else {
+                updatedKit = await api.post('/brand-kit', data);
+            }
+            setBrandKit(updatedKit);
+            alert("Brand Kit saved successfully! ✨");
+        } catch (err) {
+            console.error("Brand Kit save error:", err);
+            alert("Failed to save Brand Kit: " + (err.response?.data?.message || err.message));
+        }
+    };
+
+    const startResizing = useCallback((mouseDownEvent) => {
+        setIsResizing(true);
+        document.body.style.cursor = 'col-resize';
+        document.body.style.userSelect = 'none';
+    }, []);
+
+    const stopResizing = useCallback(() => {
+        setIsResizing(false);
+        document.body.style.cursor = 'default';
+        document.body.style.userSelect = 'auto';
+    }, []);
+
+    const resize = useCallback((mouseMoveEvent) => {
+        if (isResizing) {
+            const newWidth = mouseMoveEvent.clientX;
+            if (newWidth > 160 && newWidth < 480) {
+                setSidebarWidth(newWidth);
+            }
+        }
+    }, [isResizing]);
+
+    useEffect(() => {
+        window.addEventListener("mousemove", resize);
+        window.addEventListener("mouseup", stopResizing);
+        return () => {
+            window.removeEventListener("mousemove", resize);
+            window.removeEventListener("mouseup", stopResizing);
+        };
+    }, [resize, stopResizing]);
+
+    const privateDocs = {
+        'slmobbin': {
+            title: 'SLMobbin Creative Strategy',
+            icon: '👀',
+            content: 'This document outlines the core creative strategy for SLMobbin. We focus on high-impact visual storytelling and community-driven content cycles. Our goal is to maintain a consistent brand voice across all platforms while pushing the boundaries of traditional creative approaches.'
+        },
+        'vision': {
+            title: 'MM Docs – Product Vision',
+            icon: '🚀',
+            content: `1. Product Overview \nMM Docs is an AI-powered SaaS that enables businesses to create professional, brand-consistent documents in minutes instead of days.\n\n2. Problem Statement \nBusinesses struggle with slow document creation, inconsistent branding, weak language, formatting issues, and outdated templates. These inefficiencies result in lost time, reduced credibility, and missed deals.\n\n3. Solution \nMM Docs provides AI-generated, structured business documents with professional language, automatic branding, and client-ready exports.\n\n4. Target Users \nFounders, sales teams, agencies, freelancers, SMEs, and enterprises across all industries and regions.\n\n5. Core Use Cases \nBusiness proposals, quotations, company profiles, sales emails, and pitch outlines.\n\n6. Branding System \nUsers set a one-time brand kit including name, logo, color, font preference, and description. Branding is automatically applied to all documents.`
+        },
+        'welcome': {
+            title: 'Welcome to MM Docs!',
+            icon: '👋',
+            content: 'Welcome to your new workspace! MM Docs is designed to help you organize your thoughts, collaborate with your team, and generate professional documents with the help of AI. Explore the templates, start a search, or simply begin drafting your first document.'
+        },
+        'todo': {
+            title: 'Weekly To-do List',
+            icon: <FileText size={16} />,
+            content: '• Finalize the Q3 marketing budget\n• Review the new AI prompt templates\n• Synchronize with the design team on Dashboard polish\n• Draft the onboarding guide for new members\n• Team lunch on Friday'
+        },
+        'habit': {
+            title: 'Habit Tracker',
+            icon: <CheckSquare size={16} />,
+            content: 'Daily habits for peak performance:\n• 30 mins focused reading\n• 1 hour deep work session\n• Physical exercise (45 mins)\n• Hydration (3L water)\n• Zero inbox before EOD'
+        }
+    };
+
+    const renderMainContent = () => {
+        const brandColor = brandKit?.colors?.[0] || '#7c3aed';
+
+        if (generatedDoc && currentView === 'Home') {
+            const renderObjectContent = (obj) => {
+                return Object.entries(obj).map(([key, value]) => {
+                    const label = key.replace(/([A-Z])/g, ' $1').trim().toUpperCase();
+
+                    // Specialized rendering for list of objects (Table or Cards)
+                    if (Array.isArray(value) && value.length > 0 && typeof value[0] === 'object') {
+                        // Check if it's a simple key-value table (like investment or items)
+                        const keys = Object.keys(value[0]);
+                        if (keys.length <= 4) {
+                            return (
+                                <div key={key} className="doc-section-container">
+                                    <span className="doc-section-label" style={{ color: brandColor }}>{label}</span>
+                                    <table className="doc-table">
+                                        <thead>
+                                            <tr>{keys.map(k => <th key={k}>{k.toUpperCase()}</th>)}</tr>
+                                        </thead>
+                                        <tbody>
+                                            {value.map((item, i) => (
+                                                <tr key={i}>{keys.map(k => <td key={k}>{item[k]}</td>)}</tr>
+                                            ))}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            );
+                        }
+
+                        // Otherwise render as grid of cards (like methodology or methodology)
+                        return (
+                            <div key={key} className="doc-section-container">
+                                <span className="doc-section-label" style={{ color: brandColor }}>{label}</span>
+                                <div className="doc-card-grid">
+                                    {value.map((item, i) => (
+                                        <div key={i} className="doc-card">
+                                            {item.phase || item.role || item.title || item.name ? (
+                                                <div className="doc-card-title" style={{ color: brandColor }}>
+                                                    {item.phase || item.role || item.title || item.name}
+                                                </div>
+                                            ) : null}
+                                            <div className="doc-card-content">
+                                                {Object.entries(item)
+                                                    .filter(([k]) => !['phase', 'role', 'title', 'name'].includes(k))
+                                                    .map(([k, v]) => (
+                                                        <div key={k} style={{ marginBottom: '4px' }}>
+                                                            {Array.isArray(v) ? (
+                                                                <ul style={{ paddingLeft: '14px', marginTop: '4px' }}>
+                                                                    {v.map((li, idx) => <li key={idx} style={{ marginBottom: '2px' }}>{li}</li>)}
+                                                                </ul>
+                                                            ) : <p>{v}</p>}
+                                                        </div>
+                                                    ))}
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        );
+                    }
+
+                    // Nested object (like targetAudience or personalInfo)
+                    if (typeof value === 'object' && value !== null && !Array.isArray(value)) {
+                        return (
+                            <div key={key} className="doc-section-container">
+                                <span className="doc-section-label" style={{ color: brandColor }}>{label}</span>
+                                <div className="doc-card" style={{ borderLeft: `4px solid ${brandColor}` }}>
+                                    {Object.entries(value).map(([innerK, innerV]) => (
+                                        <div key={innerK} style={{ marginBottom: '8px' }}>
+                                            <span style={{ fontSize: '11px', fontWeight: '800', color: '#999', textTransform: 'uppercase' }}>{innerK}</span>
+                                            <p style={{ margin: 0, fontSize: '15px' }}>{innerV}</p>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        );
+                    }
+
+                    // Standard Array of Strings
+                    if (Array.isArray(value)) {
+                        return (
+                            <div key={key} className="doc-section-container">
+                                <span className="doc-section-label" style={{ color: brandColor }}>{label}</span>
+                                {value.map((item, i) => (
+                                    <div key={i} className="doc-list-item" style={{ '--color-brand-purple': brandColor }}>{item}</div>
+                                ))}
+                            </div>
+                        );
+                    }
+
+                    // Default string/number
+                    return (
+                        <div key={key} className="doc-section-container">
+                            <span className="doc-section-label" style={{ color: brandColor }}>{label}</span>
+                            <p style={{ margin: 0 }}>{value}</p>
+                        </div>
+                    );
+                });
+            };
+
+            return (
+                <motion.div
+                    className="document-view"
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0 }}
+                >
+                    <button className="back-btn" onClick={() => setGeneratedDoc(null)}>← Back to Home</button>
+
+                    <div className="doc-meta-header">
+                        <div>
+                            <span className="doc-brand-badge" style={{ background: brandColor }}>
+                                {brandKit?.name || "MM Docs"}
+                            </span>
+                        </div>
+                        <div style={{ fontSize: '12px', color: '#999', fontWeight: '500' }}>
+                            {new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
+                        </div>
+                    </div>
+
+                    <h1 className="doc-title" style={{ fontSize: '42px', letterSpacing: '-0.02em', marginBottom: '32px' }}>
+                        {generatedDoc.title}
+                    </h1>
+
+                    <div className="doc-content">
+                        {typeof generatedDoc.content === 'object' && generatedDoc.content !== null ?
+                            renderObjectContent(generatedDoc.content) :
+                            (typeof generatedDoc.content === 'string' ?
+                                generatedDoc.content.split('\n').map((line, i) => <p key={i}>{line}</p>) :
+                                <p>{String(generatedDoc.content)}</p>
+                            )
+                        }
+                    </div>
+
+                    <div style={{ marginTop: '80px', borderTop: '1px solid #eee', paddingTop: '20px', textAlign: 'center' }}>
+                        <p style={{ fontSize: '12px', color: '#ccc' }}>Generated with MM Docs AI • {brandKit?.name || "Professional"} Workspace</p>
+                    </div>
+                </motion.div>
+            );
+        }
+
+        if (isGenerating) {
+            return (
+                <motion.div
+                    className="generating-view"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                >
+                    <div className="ai-loader">
+                        <Sparkles className="sparkle-icon" />
+                        <h2>AI is crafting your document...</h2>
+                        <div className="progress-bar">
+                            <motion.div
+                                className="progress-fill"
+                                initial={{ width: 0 }}
+                                animate={{ width: '100%' }}
+                                transition={{ duration: 3 }}
+                            />
+                        </div>
+                    </div>
+                </motion.div>
+            );
+        }
+
+        switch (currentView) {
+            case 'Search':
+                return (
+                    <motion.div className="feature-view" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+                        <div className="view-header">
+                            <h1>Search</h1>
+                            <p>Find documents, pages, and everything in your workspace.</p>
+                        </div>
+                        <div className="search-container">
+                            <div className="search-bar-expanded">
+                                <Search size={20} />
+                                <input
+                                    type="text"
+                                    placeholder="Search for documents..."
+                                    value={searchQuery}
+                                    onChange={(e) => setSearchQuery(e.target.value)}
+                                    autoFocus
+                                />
+                            </div>
+                            <div className="search-results">
+                                {searchQuery ? (
+                                    <div className="results-list">
+                                        <div className="result-item">
+                                            <FileText size={16} />
+                                            <span>SLMobbin Creative Strat...</span>
+                                        </div>
+                                        <div className="result-item">
+                                            <Globe size={16} />
+                                            <span>Document Hub</span>
+                                        </div>
+                                    </div>
+                                ) : (
+                                    <div className="search-empty">
+                                        <Search size={48} />
+                                        <p>Type something to search your workspace</p>
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+                    </motion.div>
+                );
+            case 'Inbox':
+                return (
+                    <motion.div className="feature-view" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+                        <div className="view-header">
+                            <h1>Inbox</h1>
+                            <p>Stay updated with your latest notifications and comments.</p>
+                        </div>
+                        <div className="inbox-list">
+                            {[
+                                { title: 'Welcome to MM Docs', time: '2h ago', content: 'Explore our features and get started with AI documents.', unread: true },
+                                { title: 'Collaboration invite', time: 'Yesterday', content: 'Shree invited you to edit "Creative Strategy".', unread: false }
+                            ].map((msg, i) => (
+                                <div key={i} className={`inbox-item ${msg.unread ? 'unread' : ''}`}>
+                                    <div className="inbox-item-header">
+                                        <h4>{msg.title}</h4>
+                                        <span>{msg.time}</span>
+                                    </div>
+                                    <p>{msg.content}</p>
+                                </div>
+                            ))}
+                        </div>
+                    </motion.div>
+                );
+            case 'Settings':
+                return (
+                    <motion.div className="feature-view" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+                        <div className="view-header">
+                            <h1>Settings</h1>
+                            <p>Manage your account preferences and brand kit.</p>
+                        </div>
+                        <div className="settings-grid">
+                            <div className="settings-card">
+                                <h3>Brand Kit</h3>
+                                <p style={{ fontSize: '13px', color: '#666', marginBottom: '20px' }}>Your brand kit is automatically applied to all AI-generated documents.</p>
+                                <form className="brand-kit-form" onSubmit={(e) => {
+                                    e.preventDefault();
+                                    const formData = new FormData(e.target);
+                                    saveBrandKit({
+                                        name: formData.get('companyName'),
+                                        colors: [formData.get('brandColor'), '#ffffff'],
+                                        description: formData.get('description'),
+                                        logo: formData.get('logo'),
+                                        fonts: {
+                                            primary: formData.get('primaryFont'),
+                                            secondary: formData.get('secondaryFont')
+                                        }
+                                    });
+                                }}>
+                                    <div className="form-group" style={{ marginBottom: '15px' }}>
+                                        <label style={{ display: 'block', fontSize: '12px', fontWeight: '800', marginBottom: '8px', color: '#999', textTransform: 'uppercase' }}>Company Name</label>
+                                        <input
+                                            type="text"
+                                            name="companyName"
+                                            defaultValue={brandKit?.name || "MediaaMasala"}
+                                            style={{ width: '100%', padding: '12px', borderRadius: '8px', border: '1px solid #eee', background: '#f9f9f8' }}
+                                        />
+                                    </div>
+                                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px', marginBottom: '15px' }}>
+                                        <div className="form-group">
+                                            <label style={{ display: 'block', fontSize: '12px', fontWeight: '800', marginBottom: '8px', color: '#999', textTransform: 'uppercase' }}>Brand Color</label>
+                                            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                                                <input
+                                                    type="color"
+                                                    name="brandColor"
+                                                    defaultValue={brandKit?.colors?.[0] || "#7C3AED"}
+                                                    style={{ width: '40px', height: '40px', padding: '0', border: 'none', background: 'transparent', cursor: 'pointer' }}
+                                                />
+                                                <span style={{ fontSize: '13px', color: '#333', fontWeight: '600' }}>{brandKit?.colors?.[0] || "#7C3AED"}</span>
+                                            </div>
+                                        </div>
+                                        <div className="form-group">
+                                            <label style={{ display: 'block', fontSize: '12px', fontWeight: '800', marginBottom: '8px', color: '#999', textTransform: 'uppercase' }}>Primary Font</label>
+                                            <select
+                                                name="primaryFont"
+                                                defaultValue={brandKit?.fonts?.primary || "Inter"}
+                                                style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid #eee', background: '#f9f9f8' }}
+                                            >
+                                                <option>Inter</option>
+                                                <option>Outfit</option>
+                                                <option>Roboto</option>
+                                                <option>System Default</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div className="form-group" style={{ marginBottom: '15px' }}>
+                                        <label style={{ display: 'block', fontSize: '12px', fontWeight: '800', marginBottom: '8px', color: '#999', textTransform: 'uppercase' }}>Logo URL</label>
+                                        <input
+                                            type="text"
+                                            name="logo"
+                                            placeholder="https://example.com/logo.png"
+                                            defaultValue={brandKit?.logo || ""}
+                                            style={{ width: '100%', padding: '12px', borderRadius: '8px', border: '1px solid #eee', background: '#f9f9f8' }}
+                                        />
+                                    </div>
+                                    <div className="form-group">
+                                        <label style={{ display: 'block', fontSize: '12px', fontWeight: '800', marginBottom: '8px', color: '#999', textTransform: 'uppercase' }}>Company Description</label>
+                                        <textarea
+                                            name="description"
+                                            placeholder="Describe your brand values and tone..."
+                                            defaultValue={brandKit?.description || "AI Business Document SaaS for internal alignment, investor reference, and product execution."}
+                                            style={{ width: '100%', padding: '12px', borderRadius: '8px', border: '1px solid #eee', background: '#f9f9f8', minHeight: '100px', fontFamily: 'inherit' }}
+                                        />
+                                    </div>
+                                    <button type="submit" className="primary-btn sm" style={{ marginTop: '20px', width: '100%', padding: '12px 0' }}>Save Brand Kit ✨</button>
+                                </form>
+                            </div>
+                            <div className="settings-card">
+                                <h3>Subscription</h3>
+                                <div className="pricing-card" style={{ padding: '20px', background: '#f9f9f8', borderRadius: '12px', border: '1px solid #eee', marginTop: '20px' }}>
+                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                        <div>
+                                            <h4 style={{ margin: 0 }}>Pro Plan</h4>
+                                            <p style={{ margin: '4px 0 0', fontSize: '14px', color: '#666' }}>₹999 / month</p>
+                                        </div>
+                                        <span style={{ padding: '4px 8px', background: '#e8f5e9', color: '#2e7d32', borderRadius: '4px', fontSize: '12px', fontWeight: 'bold' }}>Active</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </motion.div>
+                );
+            case 'Templates':
+                return (
+                    <motion.div className="feature-view" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+                        <div className="view-header">
+                            <h1>Templates</h1>
+                            <p>Professional structures for every business need.</p>
+                        </div>
+                        <div className="templates-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '20px', marginTop: '20px' }}>
+                            {['Business Proposal', 'Quotation', 'Company Profile', 'Sales Email', 'Pitch Outline'].map(template => (
+                                <div
+                                    key={template}
+                                    className="template-card"
+                                    onClick={() => handleTemplateClick(template)}
+                                    style={{ padding: '20px', background: 'white', borderRadius: '12px', border: '1px solid #eee', cursor: 'pointer', transition: 'all 0.2s' }}
+                                >
+                                    <FileText size={24} color="#7c3aed" />
+                                    <h4 style={{ marginTop: '12px', marginBottom: '8px' }}>{template}</h4>
+                                    <p style={{ fontSize: '13px', color: '#666', margin: 0 }}>AI-optimized structure</p>
+                                </div>
+                            ))}
+                        </div>
+                    </motion.div>
+                );
+            case 'Trash':
+                return (
+                    <motion.div className="feature-view" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+                        <div className="view-header">
+                            <h1>Trash</h1>
+                            <p>Recently deleted entries.</p>
+                        </div>
+                        <div className="empty-state" style={{ textAlign: 'center', padding: '100px 0' }}>
+                            <Trash2 size={48} style={{ color: '#ccc', marginBottom: '16px' }} />
+                            <p style={{ color: '#999' }}>No items in trash.</p>
+                        </div>
+                    </motion.div>
+                );
+            default:
+                return (
+                    <motion.div
+                        className="home-view"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                    >
+                        <div className="greeting">
+                            <div className="greeting-icon">🪄</div>
+                            <h1>Good evening, {user?.name?.split(' ')[0]}</h1>
+                        </div>
+
+                        {/* AI Command Center */}
+                        <div className="ai-command-center">
+                            <form onSubmit={handleGenerate} className="ai-input-wrapper">
+                                <input
+                                    type="text"
+                                    placeholder="Ask or find anything from your workspace..."
+                                    value={prompt}
+                                    onChange={(e) => setPrompt(e.target.value)}
+                                />
+                                <div className="ai-input-controls">
+                                    <div className="ai-modes">
+                                        <button
+                                            type="button"
+                                            className={aiMode === 'Ask' ? 'active' : ''}
+                                            onClick={() => setAiMode('Ask')}
+                                        >Ask</button>
+                                        <button
+                                            type="button"
+                                            className={aiMode === 'Research' ? 'active' : ''}
+                                            onClick={() => setAiMode('Research')}
+                                        >Research</button>
+                                        <button
+                                            type="button"
+                                            className={aiMode === 'Build' ? 'active' : ''}
+                                            onClick={() => setAiMode('Build')}
+                                        >Build</button>
+                                    </div>
+                                    <div className="control-icons">
+                                        <Globe size={18} />
+                                        <div className="source-toggle">
+                                            <LogoIcon />
+                                            <span>All sources</span>
+                                            <ChevronDown size={14} />
+                                        </div>
+                                        <Paperclip size={18} />
+                                        <AtSign size={18} />
+                                        <button type="submit" className="send-btn" disabled={!prompt.trim()}>
+                                            <ArrowUp size={18} />
+                                        </button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+
+                        {/* Recently Visited Grid */}
+                        <section className="content-section">
+                            <div className="section-header">
+                                <Clock size={16} />
+                                <span>Recently visited</span>
+                            </div>
+                            <div className="recent-grid">
+                                {docs.length > 0 ? docs.map((doc) => (
+                                    <div key={doc._id} className="recent-card" onClick={() => setGeneratedDoc(doc)}>
+                                        <div className={`card-thumb thumb-${doc.type === 'proposal' ? 'abstract' : 'light'}`} />
+                                        <div className="card-info">
+                                            <div className="card-title-row">
+                                                <span className="card-emoji">{doc.type === 'proposal' ? '👀' : '👋'}</span>
+                                                <span className="card-name">{doc.title}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                )) : (
+                                    <div className="empty-docs-state">
+                                        <p>No documents yet. Try generating one!</p>
+                                    </div>
+                                )}
+                            </div>
+                        </section>
+
+                        {/* Upcoming Events and Tasks */}
+                        <div className="dashboard-grid-footer">
+                            <section className="footer-section">
+                                <div className="section-header">
+                                    <Calendar size={16} />
+                                    <span>Upcoming events</span>
+                                </div>
+                                <div className="event-list">
+                                    <div className="event-item">
+                                        <span className="event-date">Today July 11</span>
+                                        <span className="event-dot purple" />
+                                        <span className="event-title">Landing page</span>
+                                    </div>
+                                    <div className="event-item">
+                                        <span className="event-date">Saturday July 12</span>
+                                        <span className="event-dot purple" />
+                                        <span className="event-title">Flag Banner</span>
+                                    </div>
+                                </div>
+                            </section>
+
+                            <section className="footer-section">
+                                <div className="section-header">
+                                    <div className="header-left">
+                                        <CheckSquare size={16} />
+                                        <span>My tasks</span>
+                                    </div>
+                                    <div className="header-right">
+                                        <div className="task-controls">
+                                            <Search size={14} />
+                                            <ChevronRight size={14} />
+                                            <Plus size={14} />
+                                            <button className="new-task-btn">New task</button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div className="task-list">
+                                    <div className="task-item">
+                                        <div className="task-checkbox-group">
+                                            <div className="checkbox" />
+                                            <FileText size={14} />
+                                            <span>Landing page</span>
+                                        </div>
+                                        <span className="task-date">July 11, 2025</span>
+                                    </div>
+                                    <div className="task-item">
+                                        <div className="task-checkbox-group">
+                                            <div className="checkbox" />
+                                            <FileText size={14} />
+                                            <span>Ad Spot</span>
+                                        </div>
+                                        <span className="task-date">July 15, 2025</span>
+                                    </div>
+                                </div>
+                            </section>
+                        </div>
+                    </motion.div>
+                );
+        }
+    };
+
+    return (
+        <div className="mm-dashboard">
+            {/* Mobile Top Navigation */}
+            <div className="mobile-nav-top">
+                <button className="menu-toggle" onClick={toggleMobileMenu}>
+                    <ArrowUp className={isMobileMenuOpen ? 'rotate-180' : ''} style={{ transform: isMobileMenuOpen ? 'rotate(180deg)' : 'none' }} />
+                </button>
+                <div className="mobile-logo">MM Docs</div>
+                <div className="spacer" />
+                <Bot size={20} />
+            </div>
+
+            {/* Sidebar Overlay for Mobile */}
+            {isMobileMenuOpen && (
+                <motion.div
+                    className="sidebar-overlay"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    onClick={toggleMobileMenu}
+                />
+            )}
+
+            <aside
+                className={`mm-sidebar ${isMobileMenuOpen ? 'open' : ''}`}
+                style={{ width: isMobileMenuOpen ? undefined : `${sidebarWidth}px`, minWidth: isMobileMenuOpen ? undefined : `${sidebarWidth}px` }}
+            >
+                <div className="sidebar-resize-handle" onMouseDown={startResizing} />
+                <div className="sidebar-header">
+                    <div className="workspace-selector">
+                        <div className="workspace-icon">D</div>
+                        <span className="workspace-name">{user?.name}'s Workspace</span>
+                        <div className="workspace-chevron">
+                            <ChevronDown size={14} />
+                        </div>
+                    </div>
+                </div>
+                <div className="sidebar-main-links">
+                    <button
+                        className={`sidebar-btn ${currentView === 'Search' ? 'active' : ''}`}
+                        onClick={() => { setCurrentView('Search'); setGeneratedDoc(null); setIsMobileMenuOpen(false); }}
+                    ><Search size={18} /> Search</button>
+                    <button
+                        className={`sidebar-btn ${currentView === 'Home' ? 'active' : ''}`}
+                        onClick={() => { setCurrentView('Home'); setGeneratedDoc(null); setIsMobileMenuOpen(false); }}
+                    ><Home size={18} /> Home</button>
+                    <button
+                        className={`sidebar-btn ${currentView === 'Inbox' ? 'active' : ''}`}
+                        onClick={() => { setCurrentView('Inbox'); setGeneratedDoc(null); setIsMobileMenuOpen(false); }}
+                    ><Inbox size={18} /> Inbox</button>
+                </div>
+
+                <div className="sidebar-section">
+                    <div className="section-title">PRIVATE</div>
+                    <button className="sidebar-btn" onClick={() => { setGeneratedDoc(privateDocs['vision']); setCurrentView('Home'); setIsMobileMenuOpen(false); }}><Sparkles size={16} color="#7c3aed" /> Product Vision</button>
+                    <button className="sidebar-btn" onClick={() => { setGeneratedDoc(privateDocs['slmobbin']); setCurrentView('Home'); setIsMobileMenuOpen(false); }}><span className="emoji-icon">👀</span> SLMobbin Creative Strat...</button>
+                    <button className="sidebar-btn" onClick={() => { setGeneratedDoc(privateDocs['welcome']); setCurrentView('Home'); setIsMobileMenuOpen(false); }}><span className="emoji-icon">👋</span> Welcome to MM Docs!</button>
+                    <button className="sidebar-btn" onClick={() => { setGeneratedDoc(privateDocs['todo']); setCurrentView('Home'); setIsMobileMenuOpen(false); }}><FileText size={16} /> Weekly To-do List</button>
+                    <button className="sidebar-btn" onClick={() => { setGeneratedDoc(privateDocs['habit']); setCurrentView('Home'); setIsMobileMenuOpen(false); }}><CheckSquare size={16} /> Habit Tracker</button>
+                </div>
+
+                <div className="sidebar-section">
+                    <div className="section-title">Shared</div>
+                    <button className="sidebar-btn action-btn"><Plus size={18} /> Start collaborating</button>
+                </div>
+
+                <div className="sidebar-bottom">
+                    <button
+                        className={`sidebar-btn ${currentView === 'Settings' ? 'active' : ''}`}
+                        onClick={() => { setCurrentView('Settings'); setGeneratedDoc(null); setIsMobileMenuOpen(false); }}
+                    ><Settings size={18} /> Settings</button>
+                    <button
+                        className={`sidebar-btn ${currentView === 'Templates' ? 'active' : ''}`}
+                        onClick={() => { setCurrentView('Templates'); setGeneratedDoc(null); setIsMobileMenuOpen(false); }}
+                    ><Layers size={18} /> Templates</button>
+                    <button
+                        className={`sidebar-btn ${currentView === 'Trash' ? 'active' : ''}`}
+                        onClick={() => { setCurrentView('Trash'); setGeneratedDoc(null); setIsMobileMenuOpen(false); }}
+                    ><Trash2 size={18} /> Trash</button>
+                    <button className="sidebar-btn action-btn"><UserPlus size={18} /> Invite members</button>
+                    <button onClick={handleLogout} className="sidebar-btn logout-link" style={{ color: '#ef4444', marginTop: '12px' }}>
+                        <LogOut size={18} /> Logout
+                    </button>
+                </div>
+            </aside>
+
+            {/* Main Content Area */}
+            <main className="mm-content">
+                <header className="content-header">
+                    <div className="header-breadcrumbs">
+                        <span>{user?.name}'s Workspace</span>
+                        <ChevronRight size={14} />
+                        <span className="active">{currentView}</span>
+                    </div>
+                    <div className="header-actions">
+                        <Clock size={18} />
+                        <MoreHorizontal size={18} />
+                    </div>
+                </header>
+
+                <div className="content-scrollable">
+                    <AnimatePresence mode="wait">
+                        {renderMainContent()}
+                    </AnimatePresence>
+                </div>
+            </main>
+        </div>
+    );
+}

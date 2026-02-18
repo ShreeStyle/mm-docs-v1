@@ -4,7 +4,8 @@ const brandKitSchema = new mongoose.Schema({
     userId: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
     name: { type: String, required: true, default: "My Brand" },
     logo: { type: String, default: "" }, // URL to logo
-    colors: { type: [String], default: ["#000000", "#ffffff"] }, // Array of hex codes
+    colors: { type: [String], default: ["#7C3AED", "#ffffff"] }, // Array of hex codes
+    description: { type: String, default: "" }, // Brand overview for AI context
     fonts: {
         primary: { type: String, default: "Inter" },
         secondary: { type: String, default: "Roboto" },

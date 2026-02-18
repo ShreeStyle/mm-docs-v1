@@ -5,7 +5,7 @@ const documentSchema = new mongoose.Schema({
     title: { type: String, required: true, default: "Untitled Document" },
     type: {
         type: String,
-        enum: ["proposal", "quotation", "invoice", "resume", "marketing_brief", "profile", "other"],
+        enum: ["proposal", "quotation", "invoice", "resume", "marketing_brief", "profile", "ask", "research", "build", "other"],
         default: "other",
     },
     content: { type: Object, default: {} }, // Flexible JSON structure for AI content

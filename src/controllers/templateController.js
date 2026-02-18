@@ -90,11 +90,11 @@ exports.cloneTemplate = async (req, res) => {
 exports.getCategories = async (req, res) => {
     try {
         const categories = [
-            { id: "proposals", name: "Proposals", icon: "📄", count: 2 },
-            { id: "invoices", name: "Invoices", icon: "💰", count: 1 },
-            { id: "resumes", name: "Resumes", icon: "👤", count: 1 },
-            { id: "marketing_briefs", name: "Marketing Briefs", icon: "📊", count: 1 },
-            { id: "quotations", name: "Quotations", icon: "💼", count: 1 },
+            { id: "proposals", name: "Proposals", icon: "📄", count: 5 },
+            { id: "invoices", name: "Invoices", icon: "💰", count: 4 },
+            { id: "resumes", name: "Resumes", icon: "👤", count: 4 },
+            { id: "marketing_briefs", name: "Marketing Briefs", icon: "📊", count: 4 },
+            { id: "quotations", name: "Quotations", icon: "💼", count: 3 },
         ];
 
         res.json({ categories });

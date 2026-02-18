@@ -2,187 +2,258 @@ const { OPENAI_API_KEY } = require("../../config/config");
 const OpenAI = require("openai");
 
 const openai = new OpenAI({
-    apiKey: OPENAI_API_KEY,
+  apiKey: OPENAI_API_KEY,
 });
 
 const generateContent = async (type, topic, brandContext) => {
-    console.log(`🤖 AI Generating content for: ${type} - ${topic}`);
-    console.log(`🎨 Brand Context: ${JSON.stringify(brandContext)}`);
+  console.log(`🤖 AI Generating content for: ${type} - ${topic}`);
+  console.log(`🎨 Brand Context: ${JSON.stringify(brandContext)}`);
 
-    try {
-        let systemPrompt = "";
-        let userPrompt = "";
+  try {
+    let systemPrompt = "";
+    let userPrompt = "";
 
-        if (type === "proposal") {
-            systemPrompt = `You are a professional business proposal writer. Generate a comprehensive, persuasive proposal in JSON format. The brand is "${brandContext.name}" with a ${brandContext.tone} tone.`;
+    // Detect specific document type from topic if type is generic
+    let effectiveType = type.toLowerCase();
+    if (["ask", "research", "build", "other"].includes(effectiveType)) {
+      const topicLower = topic.toLowerCase();
+      if (topicLower.includes("resume") || topicLower.includes("cv")) effectiveType = "resume";
+      else if (topicLower.includes("proposal") || topicLower.includes("pitch")) effectiveType = "proposal";
+      else if (topicLower.includes("invoice") || topicLower.includes("bill")) effectiveType = "invoice";
+      else if (topicLower.includes("marketing brief") || topicLower.includes("campaign")) effectiveType = "marketing_brief";
+      else if (topicLower.includes("quotation") || topicLower.includes("estimate") || topicLower.includes("quote")) effectiveType = "quotation";
+      else if (topicLower.includes("profile") || topicLower.includes("about us")) effectiveType = "profile";
+    }
 
-            userPrompt = `Create a detailed business proposal for: "${topic}". 
+    if (effectiveType === "proposal") {
+      systemPrompt = `You are an elite business strategist and professional proposal writer.
+Generate a high-stakes, persuasive project proposal for "${brandContext.name}".
+The tone should be ${brandContext.tone || "Professional, confident, and authoritative"}.
+Use sophisticated business language, high-impact terminology, and clear value propositions.`;
 
-Return ONLY valid JSON with this exact structure:
+      userPrompt = `Create a detailed, multi-section proposal for: "${topic}".
+Include sections for Executive Summary, Project Objectives, Detailed Methodology (3 phases), Resource Requirements, Success Metrics, Pricing, and a Formal Conclusion.
+
+Return ONLY valid JSON with this structure:
 {
-  "title": "Proposal for [topic]",
-  "executiveSummary": "A compelling 2-3 sentence summary",
-  "methodology": ["Phase 1: ...", "Phase 2: ...", "Phase 3: ..."],
-  "pricing": [
-    {"item": "Service name", "price": "$amount"},
-    {"item": "Another service", "price": "$amount"}
+  "title": "Strategic Proposal: [Full Topic Name]",
+  "executiveSummary": "A compelling, vision-led summary (150-200 words)",
+  "objectives": ["Primary Goal...", "Secondary Goal...", "Key Outcome..."],
+  "methodology": [
+    { "phase": "I: Strategic Discovery", "details": "Comprehensive research and stakeholder alignment..." },
+    { "phase": "II: Execution Framework", "details": "Phased implementation with agile feedback loops..." },
+    { "phase": "III: Optimization & Review", "details": "Final delivery, training, and outcome measurement..." }
   ],
-  "conclusion": "A strong closing statement"
+  "investment": [
+    {"service": "Core Development & Strategy", "amount": "₹X,XXX", "justification": "High-level architectural design..."},
+    {"service": "Integration & Quality Assurance", "amount": "₹X,XXX", "justification": "Full-cycle testing and system syncing..."}
+  ],
+  "conclusion": "A visionary closing statement linking the project to long-term success."
 }`;
 
-        } else if (type === "invoice") {
-            systemPrompt = `You are a professional accountant. Generate a formal invoice in JSON format for "${brandContext.name}".`;
+    } else if (effectiveType === "resume") {
+      systemPrompt = `You are a top-tier executive career coach and professional resume writer.
+Generate an outstanding, results-oriented resume for an individual specialized in "${topic}".
+The content must be professional, punchy, and use powerful action verbs (e.g., Pioneered, Orchestrated, Optimized).`;
 
-            userPrompt = `Create an invoice for: "${topic}".
+      userPrompt = `Create a comprehensive professional resume based on: "${topic}".
+Synthesize industry-standard responsibilities, technical skills, and plausible high-impact achievements for this role.
 
-Return ONLY valid JSON with this exact structure:
+Return ONLY valid JSON with this structure:
 {
-  "invoiceNumber": "INV-[random number]",
-  "billedTo": "${topic}",
-  "items": [
-    {"description": "Service A", "amount": 1000},
-    {"description": "Service B", "amount": 500}
-  ],
-  "total": 1500,
-  "notes": "Thank you for your business!"
-}`;
-
-        } else if (type === "resume") {
-            systemPrompt = `You are a professional resume writer. Generate a compelling resume in JSON format.`;
-
-            userPrompt = `Create a professional resume for: "${topic}".
-
-Return ONLY valid JSON with this exact structure:
-{
-  "name": "Full Name",
-  "email": "email@example.com",
-  "phone": "+1 (555) 123-4567",
-  "location": "City, State",
-  "summary": "A compelling 2-3 sentence professional summary",
+  "personalInfo": { "name": "[Professional Name Placeholder]", "title": "[Target Job Title]", "contact": "professional.contact@email.com" },
+  "professionalSummary": "A punchy, 3-sentence summary highlighting core expertise and unique value.",
   "experience": [
     {
-      "title": "Job Title",
-      "company": "Company Name",
-      "period": "Jan 2020 - Present",
-      "responsibilities": ["Achievement 1", "Achievement 2", "Achievement 3"]
+      "role": "Senior [Role Title]",
+      "company": "Market Leader Inc.",
+      "period": "2020 - Present",
+      "impact": ["Quantifiable achievement 1 (e.g. Increased revenue by 25%)", "Leadership achievement...", "Innovation achievement..."]
+    },
+    {
+      "role": "[Previous Role]",
+      "company": "Innovations Group",
+      "period": "2017 - 2020",
+      "impact": ["Technical contribution...", "Efficiency improvement...", "Strategic project lead..."]
     }
   ],
-  "education": [
-    {"degree": "Bachelor of Science in Computer Science", "institution": "University Name", "year": "2019"}
-  ],
-  "skills": ["Skill 1", "Skill 2", "Skill 3", "Skill 4", "Skill 5"]
+  "coreCompetencies": ["Strategy & Execution", "Team Leadership", "Industry-Specific Skill...", "Advanced Technology..."],
+  "education": [{"degree": "Advanced Professional Degree", "institution": "Prestige Institute", "year": "2016"}]
 }`;
 
-        } else if (type === "marketing_brief") {
-            systemPrompt = `You are a marketing strategist. Generate a comprehensive marketing brief in JSON format for "${brandContext.name}".`;
+    } else if (effectiveType === "marketing_brief") {
+      systemPrompt = `You are a world-class Marketing Director and Brand Strategist.
+Generate a data-driven, creative marketing brief for "${brandContext.name}".
+Use modern marketing terminology (ROI, CTR, Persona Mapping, Omnichannel).`;
 
-            userPrompt = `Create a marketing brief for: "${topic}".
+      userPrompt = `Develop a comprehensive marketing brief for: "${topic}".
+Analyze target demographics, psychographics, competitive landscape, and multi-channel strategies.
 
-Return ONLY valid JSON with this exact structure:
+Return ONLY valid JSON with this structure:
 {
-  "title": "Marketing Campaign: [topic]",
-  "subtitle": "Strategic Marketing Plan",
-  "objective": "Clear campaign objective statement",
-  "audience": {
-    "demographics": "Age, gender, income level, etc.",
-    "psychographics": "Interests, values, lifestyle",
-    "painPoints": "What problems they face"
+  "campaignTitle": "Campaign: [Creative Title]",
+  "strategicOverview": "Brief explanation of why this campaign is needed now.",
+  "targetAudience": {
+    "persona": "Primary User Profile Name",
+    "insights": "Detailed belief/behavior that will be leveraged",
+    "demographics": "Age, Geo, Income bucket"
   },
-  "strategies": [
-    {"channel": "Social Media", "description": "Strategy description"},
-    {"channel": "Email Marketing", "description": "Strategy description"},
-    {"channel": "Content Marketing", "description": "Strategy description"},
-    {"channel": "Paid Advertising", "description": "Strategy description"}
+  "keyMessaging": ["Core Claim...", "Secondary Benefit...", "Call to Action..."],
+  "executionChannels": [
+    { "channel": "Digital Advertising", "tactic": "Retargeting and Lookalike modeling..." },
+    { "channel": "Content Engine", "tactic": "Thought leadership and short-form video..." }
   ],
-  "timeline": "3 months",
-  "budget": "$10,000"
+  "kpis": ["Customer Acquisition Cost goals", "Market Share expansion", "Engagement velocity"]
 }`;
 
-        } else if (type === "quotation") {
-            systemPrompt = `You are a professional sales consultant. Generate a detailed project quotation in JSON format for "${brandContext.name}".`;
+    } else if (effectiveType === "research") {
+      systemPrompt = `You are a specialized Market Research Analyst.
+Perform a deep-dive analysis on the specified topic. Provide structured, insightful, and data-backed content.`;
 
-            userPrompt = `Create a project quotation for: "${topic}".
+      userPrompt = `Research and analyze: "${topic}".
+Provide a clear breakdown of current trends, market challenges, and future opportunities.
 
-Return ONLY valid JSON with this exact structure:
+Return ONLY valid JSON with this structure:
 {
-  "quoteNumber": "Q-[random number]",
-  "clientName": "Client Company Name",
-  "clientEmail": "client@example.com",
-  "validUntil": "30 days from today",
-  "projectDescription": "Brief description of the project scope",
-  "items": [
-    {"name": "Item 1", "description": "Description", "quantity": 1, "rate": 1000, "amount": 1000},
-    {"name": "Item 2", "description": "Description", "quantity": 2, "rate": 500, "amount": 1000}
-  ],
-  "subtotal": 2000,
-  "taxRate": 10,
-  "tax": 200,
-  "total": 2200,
-  "terms": ["Payment due within 30 days", "50% deposit required", "Prices valid for 30 days"]
+  "marketLandscape": "Contextual overview of the industry current state.",
+  "keyTrends": ["Trend 1: Innovation in...", "Trend 2: Shift toward...", "Trend 3: Regulatory impact..."],
+  "competitiveAnalysis": "Summary of how top players are positioning themselves.",
+  "opportunities": ["Unmet need in...", "Emerging technology for...", "Optimized workflow in..."],
+  "riskAssessment": "Key blockers or challenges to watch out for."
 }`;
 
-        } else {
-            systemPrompt = `You are a professional content writer for "${brandContext.name}".`;
-            userPrompt = `Create content about: "${topic}". Return JSON with "summary" and "details" fields.`;
-        }
+    } else if (type === "ask") {
+      systemPrompt = `You are an expert consultant assisting a user from "${brandContext.name}".
+Provide a clear, structured, and highly valuable response to their inquiry.`;
 
-        const response = await openai.chat.completions.create({
-            model: "gpt-4o-mini",
-            messages: [
-                { role: "system", content: systemPrompt },
-                { role: "user", content: userPrompt }
-            ],
-            temperature: 0.7,
-            response_format: { type: "json_object" }
-        });
+      userPrompt = `Answer the following inquiry with depth and clarity: "${topic}".
 
-        const content = JSON.parse(response.choices[0].message.content);
-        console.log("✅ AI Generation Successful");
-        return content;
+Return ONLY valid JSON with this structure:
+{
+  "executiveResponse": "Direct, high-level answer to the question.",
+  "detailedBreakdown": [
+    { "point": "Critical Factor 1", "explanation": "In-depth analysis of this factor..." },
+    { "point": "Critical Factor 2", "explanation": "Practical implementation strategy..." }
+  ],
+  "proactiveAdvice": "Strategic next steps or advice related to this inquiry.",
+  "furtherReading": "Keywords or topics for deeper investigation."
+}`;
 
-    } catch (error) {
-        console.error("❌ OpenAI API Error:", error.message);
+    } else if (effectiveType === "invoice" || effectiveType === "quotation") {
+      systemPrompt = `You are a professional business accountant generating formal documents for "${brandContext.name}".`;
+      userPrompt = `Create a formal ${effectiveType} for: "${topic}". Generate professional item descriptions and competitive pricing.
+Return JSON with "title", "reference", "items" (array with name, description, amount), and "summary".`;
 
-        // Fallback to mock if API fails
-        console.log("⚠️ Falling back to mock generation...");
-        return generateMockContent(type, topic);
+    } else {
+      systemPrompt = `You are a professional content writer for "${brandContext.name}".`;
+      userPrompt = `Create a high-quality business document about: "${topic}".
+Break the content into logical sections with clear headings. Use professional business English.
+
+Return ONLY valid JSON with this structure:
+{
+  "title": "[Professional Title]",
+  "sections": [
+    { "heading": "Introduction", "content": "Professional overview..." },
+    { "heading": "Key Analysis", "content": "Detailed data and insights..." },
+    { "heading": "Recommendations", "content": "Strategic next steps..." }
+  ]
+}`;
     }
+
+    const response = await openai.chat.completions.create({
+      model: "gpt-4o-mini",
+      messages: [
+        { role: "system", content: systemPrompt },
+        { role: "user", content: userPrompt }
+      ],
+      temperature: 0.7,
+      response_format: { type: "json_object" }
+    });
+
+    const content = JSON.parse(response.choices[0].message.content);
+    console.log("✅ AI Generation Successful");
+    return content;
+
+  } catch (error) {
+    console.error("❌ OpenAI API Error:", error.message);
+    console.log("⚠️ Falling back to mock generation...");
+    // Critical: Fallback should use the effective type if possible
+    const fallbackType = ["ask", "research", "build", "other"].includes(type.toLowerCase()) ?
+      (topic.toLowerCase().includes("resume") ? "resume" :
+        topic.toLowerCase().includes("proposal") ? "proposal" :
+          topic.toLowerCase().includes("marketing brief") ? "marketing_brief" : type) : type;
+    return generateMockContent(fallbackType, topic);
+  }
 };
 
 // Fallback mock generation (in case API fails)
 const generateMockContent = (type, topic) => {
-    if (type === "proposal") {
-        return {
-            title: `Proposal for ${topic}`,
-            executiveSummary: `This proposal outlines a strategic approach to ${topic}, tailored specifically for your needs.`,
-            methodology: [
-                "Phase 1: Discovery & Research",
-                "Phase 2: Strategy & Design",
-                "Phase 3: Implementation & Launch",
-            ],
-            pricing: [
-                { item: "Consultation", price: "$500" },
-                { item: "Development", price: "$2500" },
-            ],
-            conclusion: "We look forward to partnering with you on this exciting initiative.",
-        };
-    } else if (type === "invoice") {
-        return {
-            invoiceNumber: `INV-${Date.now()}`,
-            billedTo: topic,
-            items: [
-                { description: "Service A", amount: 1000 },
-                { description: "Service B", amount: 500 }
-            ],
-            total: 1500,
-            notes: "Thank you for your business!"
-        };
-    } else {
-        return {
-            summary: `AI generated content for ${topic}.`,
-            details: "This is a generic placeholder for other document types.",
-        };
-    }
+  const topicTitle = topic.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+  const effectiveType = type.toLowerCase();
+
+  if (effectiveType === "proposal") {
+    return {
+      title: `Strategic Proposal: ${topicTitle}`,
+      executiveSummary: `This comprehensive proposal outlines a strategic framework for ${topic}, designed to maximize efficiency and drive long-term value.`,
+      objectives: ["Establish operational excellence", "Optimize resource allocation", "Achieve measurable ROI"],
+      methodology: [
+        { phase: "Ph I: Discovery", details: "Deep research into the currents state and requirements." },
+        { phase: "Ph II: Strategy", details: "Designing the core framework and alignment." },
+        { phase: "Ph III: Delivery", details: "Full implementation and quality assurance." }
+      ],
+      investment: [
+        { service: "Consultation & Strategy", amount: "₹50,000", justification: "Expert oversight and planning." },
+        { service: "Implementation", amount: "₹1,50,000", justification: "Core execution and delivery." }
+      ],
+      conclusion: "We are confident that this initiative will lead to significant strategic advantages."
+    };
+  } else if (effectiveType === "resume") {
+    return {
+      personalInfo: { name: "Professional Candidate", title: `${topicTitle} Specialist`, contact: "pro.contact@email.com" },
+      professionalSummary: `Dedicated professional with deep expertise in ${topic}, focused on driving innovation and delivering high-impact results.`,
+      experience: [
+        {
+          role: `Senior ${topicTitle} Lead`,
+          company: "Enterprise Solutions",
+          period: "2021 - Present",
+          impact: ["Pioneered new workflows", "Increased efficiency by 30%", "Led cross-functional teams"]
+        }
+      ],
+      coreCompetencies: ["Strategic Planning", "Technical Excellence", "Team Leadership"],
+      education: [{ degree: "Advanced Degree", institution: "Global University", year: "2018" }]
+    };
+  } else if (effectiveType === "marketing_brief") {
+    return {
+      campaignTitle: `Campaign: Elevate ${topicTitle}`,
+      strategicOverview: `This brief defines the strategic roadmap for the upcoming ${topic} campaign.`,
+      targetAudience: { persona: "The Motivated Professional", insights: "Seeking efficiency and growth", demographics: "25-45, Urban, Professional" },
+      keyMessaging: ["Innovative solutions", "Proven results", "Scalable growth"],
+      executionChannels: [
+        { channel: "Digital", tactic: "Social media and search optimization" },
+        { channel: "In-Person", tactic: "Interactive workshops and events" }
+      ],
+      kpis: ["20% Increase in engagement", "Lower CAC", "Brand lift"]
+    };
+  } else if (effectiveType === "invoice" || effectiveType === "quotation") {
+    return {
+      title: `Professional ${topicTitle}`,
+      reference: `REF-${Date.now().toString().slice(-6)}`,
+      items: [
+        { name: `${topicTitle} Services`, description: "Consultation and planning", amount: 2500 },
+        { name: "Project Execution", description: "Implementation and delivery", amount: 7500 }
+      ],
+      summary: "Standard professional services document."
+    };
+  } else {
+    return {
+      title: topicTitle,
+      sections: [
+        { heading: "Overview", content: `Detailed analysis and professional overview of ${topic}.` },
+        { heading: "Strategic Insights", content: `Key findings and market-aligned insights for high-impact decision making.` },
+        { heading: "Conclusion", content: `Strategic synthesis and recommended next steps for ${topic}.` }
+      ]
+    };
+  }
 };
 
 module.exports = { generateContent };

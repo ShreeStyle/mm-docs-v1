@@ -4,7 +4,15 @@ const cors = require("cors");
 const app = express();
 
 // Middlewares
-app.use(cors());
+app.use(cors({
+  origin: [
+    "http://localhost:5173",
+    "http://localhost:3000",
+    "https://graceful-luxury-693326.framer.app"
+  ],
+  methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
+  credentials: true
+}));
 app.use(express.json());
 
 const authRoutes = require("./routes/authRoutes");

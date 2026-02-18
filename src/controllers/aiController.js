@@ -11,10 +11,8 @@ exports.generateDocumentContent = async (req, res) => {
             return res.status(400).json({ message: "Type and Topic are required" });
         }
 
-        // Fetch user's brand kit for context (optional but recommended)
-        const brandKit = await BrandKit.findOne({ userId });
         const brandContext = brandKit
-            ? { name: brandKit.name, tone: "Professional" } // tone could be added to BrandKit later
+            ? { name: brandKit.name, tone: "Professional", description: brandKit.description, logo: brandKit.logo } // tone could be added to BrandKit later
             : { name: "Generic", tone: "Neutral" };
 
         // Generate Content via AI Service
@@ -45,7 +43,7 @@ exports.generateAndSaveDocument = async (req, res) => {
         // Fetch user's brand kit
         const brandKit = await BrandKit.findOne({ userId });
         const brandContext = brandKit
-            ? { name: brandKit.name, tone: "Professional" }
+            ? { name: brandKit.name, tone: "Professional", description: brandKit.description, logo: brandKit.logo }
             : { name: "Generic", tone: "Neutral" };
 
         // Generate AI content
