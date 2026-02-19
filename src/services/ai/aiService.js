@@ -26,29 +26,51 @@ const generateContent = async (type, topic, brandContext) => {
     }
 
     if (effectiveType === "proposal") {
-      systemPrompt = `You are an elite business strategist and professional proposal writer.
-Generate a high-stakes, persuasive project proposal for "${brandContext.name}".
-The tone should be ${brandContext.tone || "Professional, confident, and authoritative"}.
-Use sophisticated business language, high-impact terminology, and clear value propositions.`;
+      systemPrompt = `You are an elite business strategist and top-tier proposal writer for "${brandContext.name}".
+Your goal is to write a high-stakes, client-ready proposal that wins deals.
+The tone must be ${brandContext.tone || "Professional, confident, and persuasive"}.
+${brandContext.description ? `Brand Context: ${brandContext.description}` : ""}
 
-      userPrompt = `Create a detailed, multi-section proposal for: "${topic}".
-Include sections for Executive Summary, Project Objectives, Detailed Methodology (3 phases), Resource Requirements, Success Metrics, Pricing, and a Formal Conclusion.
+CRITICAL RULES:
+1. NO generic filler text (e.g., "We are pleased to..."). Start directly with value.
+2. Use strong, action-oriented business language.
+3. Enforce valid JSON output with NO markdown formatting.`;
+
+      userPrompt = `Create a comprehensive, professional proposal for: "${topic}".
+You MUST include these specific sections with high-quality, non-generic content:
+
+1. EXECUTIVE SUMMARY: Min 80 words. A powerful opening that restates the client's problem and your strategic solution.
+2. OBJECTIVES: 3-4 clear, measurable business goals.
+3. SCOPE: A detailed breakdown of what is INCLUDED and what is EXCLUDED.
+4. METHODOLOGY: 4 distinct phases (Discovery, Strategy, Execution, Review).
+5. DELIVERABLES: A concrete list of what the client gets.
+6. TIMELINE: Total duration and key milestones.
+7. INVESTMENT: A professional pricing table.
+8. CONCLUSION: A confident closing statement.
 
 Return ONLY valid JSON with this structure:
 {
-  "title": "Strategic Proposal: [Full Topic Name]",
-  "executiveSummary": "A compelling, vision-led summary (150-200 words)",
-  "objectives": ["Primary Goal...", "Secondary Goal...", "Key Outcome..."],
+  "title": "Strategic Proposal: [Compelling Title based on topic]",
+  "executiveSummary": "[Min 80 words vision-led summary]",
+  "objectives": ["Goal 1", "Goal 2", "Goal 3"],
+  "scope": {
+    "included": ["Feature/Service 1", "Feature/Service 2", "Feature/Service 3"],
+    "excluded": ["Out of scope item 1", "Out of scope item 2"]
+  },
   "methodology": [
-    { "phase": "I: Strategic Discovery", "details": "Comprehensive research and stakeholder alignment..." },
-    { "phase": "II: Execution Framework", "details": "Phased implementation with agile feedback loops..." },
-    { "phase": "III: Optimization & Review", "details": "Final delivery, training, and outcome measurement..." }
+    { "phase": "Phase I: [Name]", "details": "[Specific activities...]" },
+    { "phase": "Phase II: [Name]", "details": "[Specific activities...]" },
+    { "phase": "Phase III: [Name]", "details": "[Specific activities...]" },
+    { "phase": "Phase IV: [Name]", "details": "[Specific activities...]" }
   ],
+  "deliverables": ["Deliverable 1", "Deliverable 2", "Deliverable 3"],
+  "timeline": "Estimated Duration: [Weeks/Months]",
   "investment": [
-    {"service": "Core Development & Strategy", "amount": "₹X,XXX", "justification": "High-level architectural design..."},
-    {"service": "Integration & Quality Assurance", "amount": "₹X,XXX", "justification": "Full-cycle testing and system syncing..."}
+    {"service": "[Service Name]", "amount": "₹[Amount]", "justification": "[Value justification]"},
+    {"service": "[Service Name]", "amount": "₹[Amount]", "justification": "[Value justification]"}
   ],
-  "conclusion": "A visionary closing statement linking the project to long-term success."
+  "assumptions": ["Assumption 1", "Assumption 2"],
+  "conclusion": "[Professional closing statement]"
 }`;
 
     } else if (effectiveType === "resume") {
@@ -194,18 +216,26 @@ const generateMockContent = (type, topic) => {
   if (effectiveType === "proposal") {
     return {
       title: `Strategic Proposal: ${topicTitle}`,
-      executiveSummary: `This comprehensive proposal outlines a strategic framework for ${topic}, designed to maximize efficiency and drive long-term value.`,
+      executiveSummary: `This comprehensive proposal outlines a strategic framework for ${topic}, designed to maximize operational efficiency, drive measurable long-term value, and strengthen your market position. We have conducted a preliminary analysis of your current digital infrastructure and identified key opportunities for high-impact growth. Our approach prioritizes scalable architecture, user-centric design, and data-driven decision making to ensure that every investment translates into tangible business outcomes. By partnering with us, you gain access to a dedicated team of experts committed to delivering excellence and pushing the boundaries of what is possible for your brand.`,
       objectives: ["Establish operational excellence", "Optimize resource allocation", "Achieve measurable ROI"],
+      scope: {
+        included: ["Comprehensive Audit & Strategy", "Full-scale Implementation", "Quality Assurance & Testing", "User Training Session"],
+        excluded: ["Third-party software licenses", "Ongoing maintenance (unless signed)", "Content creation beyond scope"]
+      },
       methodology: [
-        { phase: "Ph I: Discovery", details: "Deep research into the currents state and requirements." },
+        { phase: "Ph I: Discovery", details: "Deep research into the current state and requirements." },
         { phase: "Ph II: Strategy", details: "Designing the core framework and alignment." },
-        { phase: "Ph III: Delivery", details: "Full implementation and quality assurance." }
+        { phase: "Ph III: Delivery", details: "Full implementation and quality assurance." },
+        { phase: "Ph IV: Review", details: "Final handover and performance optimization." }
       ],
+      deliverables: ["Strategy Document", "Implementation Roadmap", "Final Executable Assets", "Training Manual"],
+      timeline: "Estimated Duration: 6-8 Weeks",
       investment: [
         { service: "Consultation & Strategy", amount: "₹50,000", justification: "Expert oversight and planning." },
         { service: "Implementation", amount: "₹1,50,000", justification: "Core execution and delivery." }
       ],
-      conclusion: "We are confident that this initiative will lead to significant strategic advantages."
+      assumptions: ["Timely access to stakeholders", "Availability of necessary data"],
+      conclusion: "We are confident that this initiative will lead to significant strategic advantages and look forward to a successful partnership."
     };
   } else if (effectiveType === "resume") {
     return {

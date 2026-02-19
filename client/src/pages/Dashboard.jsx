@@ -141,10 +141,10 @@ export default function Dashboard() {
     }, [resize, stopResizing]);
 
     const privateDocs = {
-        'slmobbin': {
-            title: 'SLMobbin Creative Strategy',
-            icon: '👀',
-            content: 'This document outlines the core creative strategy for SLMobbin. We focus on high-impact visual storytelling and community-driven content cycles. Our goal is to maintain a consistent brand voice across all platforms while pushing the boundaries of traditional creative approaches.'
+        'strategy': {
+            title: 'Q1 Growth Strategy',
+            icon: '🎯',
+            content: 'Our Q1 strategy focuses on aggressive market penetration through AI-optimized customer acquisition. Key pillars include scaling the document template library, enhancing SEO-driven landing pages, and implementing a high-conversion onboarding flow for SME founders.'
         },
         'vision': {
             title: 'MM Docs – Product Vision',
@@ -155,16 +155,6 @@ export default function Dashboard() {
             title: 'Welcome to MM Docs!',
             icon: '👋',
             content: 'Welcome to your new workspace! MM Docs is designed to help you organize your thoughts, collaborate with your team, and generate professional documents with the help of AI. Explore the templates, start a search, or simply begin drafting your first document.'
-        },
-        'todo': {
-            title: 'Weekly To-do List',
-            icon: <FileText size={16} />,
-            content: '• Finalize the Q3 marketing budget\n• Review the new AI prompt templates\n• Synchronize with the design team on Dashboard polish\n• Draft the onboarding guide for new members\n• Team lunch on Friday'
-        },
-        'habit': {
-            title: 'Habit Tracker',
-            icon: <CheckSquare size={16} />,
-            content: 'Daily habits for peak performance:\n• 30 mins focused reading\n• 1 hour deep work session\n• Physical exercise (45 mins)\n• Hydration (3L water)\n• Zero inbox before EOD'
         }
     };
 
@@ -205,14 +195,14 @@ export default function Dashboard() {
                                 <div className="doc-card-grid">
                                     {value.map((item, i) => (
                                         <div key={i} className="doc-card">
-                                            {item.phase || item.role || item.title || item.name ? (
+                                            {item.phase || item.role || item.title || item.name || item.service ? (
                                                 <div className="doc-card-title" style={{ color: brandColor }}>
-                                                    {item.phase || item.role || item.title || item.name}
+                                                    {item.phase || item.role || item.title || item.name || item.service}
                                                 </div>
                                             ) : null}
                                             <div className="doc-card-content">
                                                 {Object.entries(item)
-                                                    .filter(([k]) => !['phase', 'role', 'title', 'name'].includes(k))
+                                                    .filter(([k]) => !['phase', 'role', 'title', 'name', 'service'].includes(k))
                                                     .map(([k, v]) => (
                                                         <div key={k} style={{ marginBottom: '4px' }}>
                                                             {Array.isArray(v) ? (
@@ -225,6 +215,29 @@ export default function Dashboard() {
                                             </div>
                                         </div>
                                     ))}
+                                </div>
+                            </div>
+                        );
+                    }
+
+                    // Specialized Scope Rendering (Included / Excluded)
+                    if (key === 'scope' && typeof value === 'object') {
+                        return (
+                            <div key={key} className="doc-section-container">
+                                <span className="doc-section-label" style={{ color: brandColor }}>PROJECT SCOPE</span>
+                                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
+                                    <div className="doc-card" style={{ borderLeft: `4px solid #10b981` }}>
+                                        <h4 style={{ margin: '0 0 10px', color: '#10b981', fontSize: '14px', textTransform: 'uppercase' }}>✅ Included</h4>
+                                        <ul style={{ paddingLeft: '16px', margin: 0 }}>
+                                            {value.included?.map((item, i) => <li key={i} style={{ marginBottom: '6px' }}>{item}</li>)}
+                                        </ul>
+                                    </div>
+                                    <div className="doc-card" style={{ borderLeft: `4px solid #ef4444` }}>
+                                        <h4 style={{ margin: '0 0 10px', color: '#ef4444', fontSize: '14px', textTransform: 'uppercase' }}>❌ Excluded</h4>
+                                        <ul style={{ paddingLeft: '16px', margin: 0 }}>
+                                            {value.excluded?.map((item, i) => <li key={i} style={{ marginBottom: '6px' }}>{item}</li>)}
+                                        </ul>
+                                    </div>
                                 </div>
                             </div>
                         );
@@ -727,12 +740,20 @@ export default function Dashboard() {
                 </div>
 
                 <div className="sidebar-section">
-                    <div className="section-title">PRIVATE</div>
+                    <div className="section-title">STRATEGY</div>
                     <button className="sidebar-btn" onClick={() => { setGeneratedDoc(privateDocs['vision']); setCurrentView('Home'); setIsMobileMenuOpen(false); }}><Sparkles size={16} color="#7c3aed" /> Product Vision</button>
-                    <button className="sidebar-btn" onClick={() => { setGeneratedDoc(privateDocs['slmobbin']); setCurrentView('Home'); setIsMobileMenuOpen(false); }}><span className="emoji-icon">👀</span> SLMobbin Creative Strat...</button>
-                    <button className="sidebar-btn" onClick={() => { setGeneratedDoc(privateDocs['welcome']); setCurrentView('Home'); setIsMobileMenuOpen(false); }}><span className="emoji-icon">👋</span> Welcome to MM Docs!</button>
-                    <button className="sidebar-btn" onClick={() => { setGeneratedDoc(privateDocs['todo']); setCurrentView('Home'); setIsMobileMenuOpen(false); }}><FileText size={16} /> Weekly To-do List</button>
-                    <button className="sidebar-btn" onClick={() => { setGeneratedDoc(privateDocs['habit']); setCurrentView('Home'); setIsMobileMenuOpen(false); }}><CheckSquare size={16} /> Habit Tracker</button>
+                    <button className="sidebar-btn" onClick={() => { setGeneratedDoc(privateDocs['strategy']); setCurrentView('Home'); setIsMobileMenuOpen(false); }}><span className="emoji-icon">🎯</span> Growth Strategy</button>
+                    <button className="sidebar-btn" onClick={() => { setGeneratedDoc(privateDocs['welcome']); setCurrentView('Home'); setIsMobileMenuOpen(false); }}><span className="emoji-icon">👋</span> Getting Started</button>
+                </div>
+
+                <div className="sidebar-section">
+                    <div className="section-title">DRAFTS</div>
+                    {docs.slice(0, 3).map(doc => (
+                        <button key={doc._id} className="sidebar-btn" onClick={() => { setGeneratedDoc(doc); setCurrentView('Home'); setIsMobileMenuOpen(false); }}>
+                            <FileText size={16} /> {doc.title.length > 20 ? doc.title.substring(0, 20) + '...' : doc.title}
+                        </button>
+                    ))}
+                    {docs.length === 0 && <p style={{ fontSize: '11px', color: '#999', padding: '0 12px' }}>No recent drafts</p>}
                 </div>
 
                 <div className="sidebar-section">
