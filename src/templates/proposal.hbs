@@ -72,43 +72,107 @@
         <img src="{{brandKit.logo}}" class="logo" />
         {{/if}}
         <h1>{{content.title}}</h1>
-        <p>Prepared for: {{topic}}</p>
+        <p><strong>Prepared for:</strong> {{content.preparedFor}} | <strong>Prepared by:</strong> {{content.preparedBy}}</p>
     </header>
 
+    {{#if content.executiveSummary}}
     <section class="section">
         <h2>Executive Summary</h2>
         <p>{{content.executiveSummary}}</p>
     </section>
+    {{/if}}
 
+    {{#if content.currentChallenges}}
     <section>
-        <h2>Methodology</h2>
+        <h2>Current Challenges</h2>
         <ul>
-            {{#each content.methodology}}
+            {{#each content.currentChallenges}}
             <li>{{this}}</li>
             {{/each}}
         </ul>
     </section>
+    {{/if}}
 
+    {{#if content.proposedSolution}}
     <section>
-        <h2>Investment</h2>
+        <h2>Proposed Solution</h2>
+        <p>{{content.proposedSolution.overview}}</p>
+        
+        <h3>Core Modules</h3>
+        <ul>
+            {{#each content.proposedSolution.coreModules}}
+            <li>{{this}}</li>
+            {{/each}}
+        </ul>
+
+        {{#if content.proposedSolution.optionalEnhancements}}
+        <h3>Optional Enhancements</h3>
+        <ul>
+            {{#each content.proposedSolution.optionalEnhancements}}
+            <li>{{this}}</li>
+            {{/each}}
+        </ul>
+        {{/if}}
+    </section>
+    {{/if}}
+
+    {{#if content.implementationApproach}}
+    <section>
+        <h2>Implementation Approach</h2>
         <table class="pricing-table">
             <tr>
-                <th>Item</th>
-                <th>Price</th>
+                <th>Phase</th>
+                <th>Description</th>
             </tr>
-            {{#each content.pricing}}
+            {{#each content.implementationApproach}}
             <tr>
-                <td>{{this.item}}</td>
-                <td>{{this.price}}</td>
+                <td><strong>{{this.phase}}</strong></td>
+                <td>{{this.description}}</td>
             </tr>
             {{/each}}
         </table>
     </section>
+    {{/if}}
 
+    {{#if content.deliverables}}
+    <section>
+        <h2>Deliverables</h2>
+        <ul>
+            {{#each content.deliverables}}
+            <li>{{this}}</li>
+            {{/each}}
+        </ul>
+    </section>
+    {{/if}}
+
+    {{#if content.expectedOutcomes}}
+    <section>
+        <h2>Expected Outcomes</h2>
+        <ul>
+            {{#each content.expectedOutcomes}}
+            <li>{{this}}</li>
+            {{/each}}
+        </ul>
+    </section>
+    {{/if}}
+
+    {{#if content.assumptions}}
+    <section>
+        <h2>Assumptions</h2>
+        <ul>
+            {{#each content.assumptions}}
+            <li>{{this}}</li>
+            {{/each}}
+        </ul>
+    </section>
+    {{/if}}
+
+    {{#if content.conclusion}}
     <section>
         <h2>Conclusion</h2>
         <p>{{content.conclusion}}</p>
     </section>
+    {{/if}}
 
 </body>
 

@@ -1,8 +1,16 @@
 const { OPENAI_API_KEY } = require("../../config/config");
 const OpenAI = require("openai");
 
+// Check if using OpenRouter (key starts with sk-or-v1-)
+const isOpenRouter = OPENAI_API_KEY && OPENAI_API_KEY.startsWith('sk-or-v1-');
+
 const openai = new OpenAI({
   apiKey: OPENAI_API_KEY,
+  baseURL: isOpenRouter ? 'https://openrouter.ai/api/v1' : undefined,
+  defaultHeaders: isOpenRouter ? {
+    'HTTP-Referer': 'http://localhost:5000',
+    'X-Title': 'MM Docs'
+  } : undefined
 });
 
 const generateContent = async (type, topic, brandContext) => {
@@ -212,12 +220,13 @@ Return ONLY valid JSON with this exact structure:
     }
 
     const response = await openai.chat.completions.create({
-      model: "gpt-4o-mini",
+      model: isOpenRouter ? "openai/gpt-4o-mini" : "gpt-4o-mini",
       messages: [
         { role: "system", content: systemPrompt },
         { role: "user", content: userPrompt }
       ],
       temperature: 0.7,
+      max_tokens: 4096,
       response_format: { type: "json_object" }
     });
 

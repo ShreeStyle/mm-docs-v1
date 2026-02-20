@@ -3,26 +3,28 @@
 
 <head>
     <style>
-        {
-                {
-                    {
-                    brandCSS
-                }
-            }
+        {{{brandCSS}}}
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
 
         body {
-            font-family: var(--font-secondary), sans-serif;
+            font-family: var(--font-secondary, 'Arial'), sans-serif;
             padding: 40px;
-            max-width: 800px;
+            max-width: 900px;
             margin: 0 auto;
+            line-height: 1.6;
+            color: #333;
         }
 
         .header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            border-bottom: 4px solid var(--primary-color);
+            border-bottom: 4px solid var(--primary-color, #2563eb);
             padding-bottom: 20px;
             margin-bottom: 30px;
         }
@@ -33,56 +35,174 @@
 
         .quote-title {
             font-size: 2.5em;
-            color: var(--primary-color);
+            color: var(--primary-color, #2563eb);
             font-weight: bold;
         }
 
-        .client-info {
-            background: #f5f5f5;
+        .document-title {
+            font-size: 1.8em;
+            color: var(--primary-color, #2563eb);
+            margin-bottom: 20px;
+            font-weight: bold;
+        }
+
+        .overview-section {
+            background: #f9fafb;
             padding: 20px;
-            border-radius: 5px;
+            border-radius: 8px;
             margin-bottom: 30px;
+            border-left: 4px solid var(--accent-color, #10b981);
+        }
+
+        .overview-section p {
+            margin-bottom: 10px;
+            text-align: justify;
+        }
+
+        h2 {
+            color: var(--primary-color, #2563eb);
+            margin-top: 30px;
+            margin-bottom: 15px;
+            font-size: 1.5em;
+            border-bottom: 2px solid var(--accent-color, #10b981);
+            padding-bottom: 8px;
+        }
+
+        h3 {
+            color: var(--primary-color, #2563eb);
+            margin-top: 20px;
+            margin-bottom: 10px;
+            font-size: 1.2em;
         }
 
         .table {
             width: 100%;
             border-collapse: collapse;
             margin: 20px 0;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
 
         .table th {
-            background: var(--primary-color);
+            background: var(--primary-color, #2563eb);
             color: white;
-            padding: 12px;
+            padding: 14px 12px;
             text-align: left;
+            font-weight: 600;
         }
 
         .table td {
             padding: 12px;
-            border-bottom: 1px solid #ddd;
+            border-bottom: 1px solid #e5e7eb;
+            vertical-align: top;
+        }
+
+        .table tr:nth-child(even) {
+            background: #f9fafb;
         }
 
         .table tr:hover {
-            background: #f9f9f9;
+            background: #f3f4f6;
+        }
+
+        .component-name {
+            font-weight: 600;
+            color: #1f2937;
+        }
+
+        .component-description {
+            color: #4b5563;
+            font-size: 0.95em;
+            line-height: 1.5;
+        }
+
+        .amount {
+            font-weight: 600;
+            color: var(--accent-color, #10b981);
+            white-space: nowrap;
         }
 
         .total-section {
             text-align: right;
             margin-top: 30px;
-            font-size: 1.3em;
+            padding: 20px;
+            background: #f9fafb;
+            border-radius: 8px;
         }
 
         .total-amount {
-            color: var(--accent-color);
+            color: var(--accent-color, #10b981);
             font-weight: bold;
-            font-size: 1.5em;
+            font-size: 2em;
+            margin-top: 10px;
         }
 
-        .terms {
-            margin-top: 40px;
+        .info-box {
+            background: #f9fafb;
             padding: 20px;
-            background: #f9f9f9;
-            border-left: 4px solid var(--accent-color);
+            border-radius: 8px;
+            margin: 20px 0;
+            border-left: 4px solid var(--accent-color, #10b981);
+        }
+
+        .info-box ul, .info-box ol {
+            margin-left: 20px;
+            margin-top: 10px;
+        }
+
+        .info-box li {
+            margin-bottom: 8px;
+            line-height: 1.5;
+        }
+
+        .phase-item {
+            background: white;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 6px;
+            border-left: 3px solid var(--primary-color, #2563eb);
+        }
+
+        .phase-title {
+            font-weight: 600;
+            color: var(--primary-color, #2563eb);
+            margin-bottom: 5px;
+        }
+
+        .phase-duration {
+            font-size: 0.9em;
+            color: #6b7280;
+            font-style: italic;
+        }
+
+        .phase-deliverables {
+            margin-top: 8px;
+            font-size: 0.95em;
+        }
+
+        .spec-item {
+            padding: 10px;
+            margin-bottom: 8px;
+            background: white;
+            border-radius: 4px;
+            border-left: 3px solid var(--accent-color, #10b981);
+        }
+
+        .footer {
+            margin-top: 50px;
+            padding-top: 20px;
+            border-top: 2px solid #e5e7eb;
+            text-align: center;
+            color: #6b7280;
+            font-size: 0.9em;
+        }
+
+        @media print {
+            body {
+                padding: 20px;
+            }
+            .page-break {
+                page-break-before: always;
+            }
         }
     </style>
 </head>
@@ -92,62 +212,171 @@
     <div class="header">
         <div>
             {{#if brandKit.logo}}
-            <img src="{{brandKit.logo}}" class="logo" />
+            <img src="{{brandKit.logo}}" class="logo" alt="Company Logo" />
+            {{else}}
+            <div style="font-size: 1.5em; font-weight: bold; color: var(--primary-color, #2563eb);">
+                {{#if brandKit.name}}{{brandKit.name}}{{else}}MM Docs{{/if}}
+            </div>
             {{/if}}
         </div>
         <div class="quote-title">QUOTATION</div>
     </div>
 
-    <div class="client-info">
-        <strong>Prepared For:</strong><br>
-        {{content.clientName}}<br>
-        {{content.clientEmail}}<br>
-        <br>
-        <strong>Quote #:</strong> {{content.quoteNumber}}<br>
-        <strong>Date:</strong> {{generatedDate}}<br>
-        <strong>Valid Until:</strong> {{content.validUntil}}
+    {{#if content.title}}
+    <div class="document-title">{{content.title}}</div>
+    {{/if}}
+
+    {{#if content.projectOverview}}
+    <div class="overview-section">
+        <h3 style="margin-top: 0;">Project Overview</h3>
+        <p>{{content.projectOverview}}</p>
     </div>
+    {{/if}}
 
-    <h2 style="color: var(--primary-color);">Project Scope</h2>
-    <p>{{content.projectDescription}}</p>
-
-    <h2 style="color: var(--primary-color);">Cost Breakdown</h2>
+    <h2>Cost Breakdown & Components</h2>
+    {{#if content.components}}
     <table class="table">
         <thead>
             <tr>
-                <th>Item</th>
-                <th>Description</th>
-                <th>Quantity</th>
-                <th>Rate</th>
-                <th>Amount</th>
+                <th style="width: 30%;">Component</th>
+                <th style="width: 55%;">Description</th>
+                <th style="width: 15%;">Amount</th>
             </tr>
         </thead>
         <tbody>
-            {{#each content.items}}
+            {{#each content.components}}
             <tr>
-                <td>{{this.name}}</td>
-                <td>{{this.description}}</td>
-                <td>{{this.quantity}}</td>
-                <td>${{this.rate}}</td>
-                <td>${{this.amount}}</td>
+                <td class="component-name">{{this.component}}</td>
+                <td class="component-description">{{this.description}}</td>
+                <td class="amount">{{this.amount}}</td>
             </tr>
             {{/each}}
         </tbody>
     </table>
+    {{/if}}
 
     <div class="total-section">
-        <div>Subtotal: ${{content.subtotal}}</div>
-        <div>Tax ({{content.taxRate}}%): ${{content.tax}}</div>
-        <div class="total-amount">Total: ${{content.total}}</div>
+        <div class="total-amount">Total: {{content.total}}</div>
     </div>
 
-    <div class="terms">
-        <h3>Terms & Conditions</h3>
+    {{#if content.scopeDetails}}
+    <div class="page-break"></div>
+    <h2>Scope Details</h2>
+    
+    {{#if content.scopeDetails.included}}
+    <div class="info-box">
+        <h3 style="margin-top: 0;">Included in Scope</h3>
         <ul>
-            {{#each content.terms}}
+            {{#each content.scopeDetails.included}}
             <li>{{this}}</li>
             {{/each}}
         </ul>
+    </div>
+    {{/if}}
+
+    {{#if content.scopeDetails.excluded}}
+    <div class="info-box">
+        <h3 style="margin-top: 0;">Excluded from Scope</h3>
+        <ul>
+            {{#each content.scopeDetails.excluded}}
+            <li>{{this}}</li>
+            {{/each}}
+        </ul>
+    </div>
+    {{/if}}
+    {{/if}}
+
+    {{#if content.technicalSpecifications}}
+    <h2>Technical Specifications</h2>
+    <div class="info-box">
+        {{#each content.technicalSpecifications}}
+        <div class="spec-item">{{this}}</div>
+        {{/each}}
+    </div>
+    {{/if}}
+
+    {{#if content.timeline}}
+    <div class="page-break"></div>
+    <h2>Project Timeline</h2>
+    {{#if content.timeline.totalDuration}}
+    <p style="margin-bottom: 20px;"><strong>Total Duration:</strong> {{content.timeline.totalDuration}}</p>
+    {{/if}}
+    
+    {{#if content.timeline.phases}}
+    {{#each content.timeline.phases}}
+    <div class="phase-item">
+        <div class="phase-title">{{this.phase}}</div>
+        {{#if this.duration}}
+        <div class="phase-duration">Duration: {{this.duration}}</div>
+        {{/if}}
+        {{#if this.deliverables}}
+        <div class="phase-deliverables">
+            <strong>Deliverables:</strong>
+            <ul style="margin-left: 20px; margin-top: 5px;">
+                {{#each this.deliverables}}
+                <li>{{this}}</li>
+                {{/each}}
+            </ul>
+        </div>
+        {{/if}}
+    </div>
+    {{/each}}
+    {{/if}}
+    {{/if}}
+
+    {{#if content.paymentTerms}}
+    <h2>Payment Terms</h2>
+    <div class="info-box">
+        <ol>
+            {{#each content.paymentTerms}}
+            <li>{{this}}</li>
+            {{/each}}
+        </ol>
+    </div>
+    {{/if}}
+
+    {{#if content.validity}}
+    <h2>Validity</h2>
+    <div class="info-box">
+        <p>{{content.validity}}</p>
+    </div>
+    {{/if}}
+
+    {{#if content.warrantyAndSupport}}
+    <h2>Warranty & Support</h2>
+    <div class="info-box">
+        <p>{{content.warrantyAndSupport}}</p>
+    </div>
+    {{/if}}
+
+    {{#if content.assumptions}}
+    <div class="page-break"></div>
+    <h2>Assumptions</h2>
+    <div class="info-box">
+        <ul>
+            {{#each content.assumptions}}
+            <li>{{this}}</li>
+            {{/each}}
+        </ul>
+    </div>
+    {{/if}}
+
+    {{#if content.termsAndConditions}}
+    <h2>Terms & Conditions</h2>
+    <div class="info-box">
+        <ol>
+            {{#each content.termsAndConditions}}
+            <li>{{this}}</li>
+            {{/each}}
+        </ol>
+    </div>
+    {{/if}}
+
+    <div class="footer">
+        <p>Generated on {{generatedDate}}</p>
+        {{#if brandKit.name}}
+        <p>{{brandKit.name}} | Professional Document Services</p>
+        {{/if}}
     </div>
 
 </body>
