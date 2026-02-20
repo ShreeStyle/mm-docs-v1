@@ -2,6 +2,7 @@ const Document = require("../models/Document");
 const BrandKit = require("../models/BrandKit");
 const renderService = require("../services/render/renderService");
 const pdfService = require("../services/render/pdfService");
+const docxService = require("../services/render/docxService");
 
 // Download a document as PDF
 exports.downloadDocument = async (req, res) => {
@@ -35,6 +36,41 @@ exports.downloadDocument = async (req, res) => {
     } catch (error) {
         console.error("PDF Download Error:", error);
         res.status(500).json({ message: "Error generating PDF", error: error.message });
+    }
+};
+
+// Download a document as DOCX
+exports.downloadDocumentDocx = async (req, res) => {
+    try {
+        const document = await Document.findOne({ _id: req.params.id, userId: req.user.id });
+        if (!document) {
+            return res.status(404).json({ message: "Document not found" });
+        }
+
+        // Fetch Brand Kit
+        let brandKit = null;
+        if (document.brandKitId) {
+            brandKit = await BrandKit.findOne({ _id: document.brandKitId, userId: req.user.id });
+        }
+        if (!brandKit) {
+            brandKit = await BrandKit.findOne({ userId: req.user.id });
+        }
+
+        // Render HTML
+        const html = await renderService.renderDocument(document, brandKit);
+
+        // Generate DOCX
+        const docx = await docxService.generateDOCX(html);
+
+        // Send as download
+        const filename = `${document.title.replace(/[^a-z0-9]/gi, '_')}.docx`;
+        res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document');
+        res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
+        res.send(docx);
+
+    } catch (error) {
+        console.error("DOCX Download Error:", error);
+        res.status(500).json({ message: "Error generating DOCX", error: error.message });
     }
 };
 

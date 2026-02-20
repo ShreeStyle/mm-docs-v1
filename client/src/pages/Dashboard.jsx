@@ -18,7 +18,7 @@ const LogoIcon = () => (
 );
 
 export default function Dashboard() {
-    const { user, logout } = useAuth();
+    const { user, logout, login, token } = useAuth();
     const navigate = useNavigate();
     const [currentView, setCurrentView] = useState('Home'); // Home, Settings, Templates, Trash, Search, Inbox
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -32,7 +32,75 @@ export default function Dashboard() {
     const [docs, setDocs] = useState([]);
     const [brandKit, setBrandKit] = useState(null);
     const [error, setError] = useState(null);
+    const [isPro, setIsPro] = useState(user?.plan === 'pro');
+    const [selectedDocType, setSelectedDocType] = useState(null);
+    const [quotationData, setQuotationData] = useState({ clientName: '', projectScope: '', amount: '' });
+    const [proposalData, setProposalData] = useState({ clientName: '', industryFocus: '', coreModules: '' });
+    const [emailData, setEmailData] = useState({ targetAudience: '', valueProposition: '', callToAction: '' });
+    const [profileData, setProfileData] = useState({ companyName: '', coreFocus: '', vision: '' });
+    const [pitchData, setPitchData] = useState({ productName: '', targetMarket: '', competitiveAdvantage: '' });
     const sidebarRef = useRef(null);
+
+    const loadRazorpayScript = () => {
+        return new Promise((resolve) => {
+            const script = document.createElement("script");
+            script.src = "https://checkout.razorpay.com/v1/checkout.js";
+            script.onload = () => resolve(true);
+            script.onerror = () => resolve(false);
+            document.body.appendChild(script);
+        });
+    };
+
+    const handleUpgrade = async () => {
+        const res = await loadRazorpayScript();
+        if (!res) {
+            alert("Razorpay SDK failed to load. Are you online?");
+            return;
+        }
+
+        try {
+            const order = await api.post('/payments/create-order', {});
+
+            const options = {
+                key: "rzp_test_YourKeyId",
+                amount: order.amount,
+                currency: order.currency,
+                name: "MM Docs",
+                description: "Pro Plan Subscription",
+                order_id: order.id,
+                handler: async function (response) {
+                    try {
+                        const verifyRes = await api.post('/payments/verify-payment', {
+                            razorpay_order_id: response.razorpay_order_id,
+                            razorpay_payment_id: response.razorpay_payment_id,
+                            razorpay_signature: response.razorpay_signature,
+                        });
+
+                        alert(verifyRes.message);
+                        setIsPro(true);
+
+                        if (user && token) {
+                            const updatedUser = { ...user, plan: 'pro' };
+                            login(updatedUser, token);
+                        }
+                    } catch (err) {
+                        alert("Payment Verification Failed!");
+                    }
+                },
+                prefill: {
+                    name: user?.name,
+                    email: user?.email,
+                },
+                theme: { color: "#7c3aed" }
+            };
+
+            const paymentObject = new window.Razorpay(options);
+            paymentObject.open();
+        } catch (error) {
+            console.error("Payment init error:", error);
+            alert("Could not initiate payment");
+        }
+    };
 
     const handleTemplateClick = (template) => {
         setAiMode('Build');
@@ -68,15 +136,35 @@ export default function Dashboard() {
 
     const handleGenerate = async (e) => {
         e.preventDefault();
-        if (!prompt.trim()) return;
+        if (!selectedDocType && !prompt.trim()) return;
 
         setIsGenerating(true);
         setError(null);
         try {
+            let finalPrompt = prompt;
+            let finalType = aiMode.toLowerCase();
+
+            if (selectedDocType === 'quotation') {
+                finalType = 'quotation';
+                finalPrompt = `Client Name: ${quotationData.clientName} | Scope: ${quotationData.projectScope} | Amount: ${quotationData.amount}`;
+            } else if (selectedDocType === 'proposal') {
+                finalType = 'proposal';
+                finalPrompt = `Client Name: ${proposalData.clientName} | Industry Focus: ${proposalData.industryFocus} | Core Modules/Services: ${proposalData.coreModules}`;
+            } else if (selectedDocType === 'email') {
+                finalType = 'sales email';
+                finalPrompt = `Target Audience: ${emailData.targetAudience} | Value Proposition: ${emailData.valueProposition} | Call to Action: ${emailData.callToAction}`;
+            } else if (selectedDocType === 'profile') {
+                finalType = 'profile';
+                finalPrompt = `Company Name/Entity: ${profileData.companyName} | Core Focus: ${profileData.coreFocus} | Vision/Goal: ${profileData.vision}`;
+            } else if (selectedDocType === 'pitch') {
+                finalType = 'pitch deck outline';
+                finalPrompt = `Product/Service Name: ${pitchData.productName} | Target Market: ${pitchData.targetMarket} | Competitive Advantage: ${pitchData.competitiveAdvantage}`;
+            }
+
             const result = await api.post('/ai/generate-document', {
-                type: aiMode.toLowerCase(),
-                topic: prompt,
-                title: prompt.length > 30 ? prompt.substring(0, 30) + '...' : prompt
+                type: finalType,
+                topic: finalPrompt,
+                title: finalPrompt.length > 30 ? finalPrompt.substring(0, 30) + '...' : finalPrompt
             });
 
             console.log("Generation result:", result);
@@ -93,6 +181,34 @@ export default function Dashboard() {
     };
 
     const toggleMobileMenu = () => setIsMobileMenuOpen(!isMobileMenuOpen);
+
+    const handleDownload = async (id, format) => {
+        try {
+            const token = localStorage.getItem('token');
+            const url = `http://localhost:5000/api/documents/${id}/${format === 'pdf' ? 'download' : 'download-docx'}`;
+
+            const response = await fetch(url, {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+
+            if (!response.ok) throw new Error('Download failed');
+
+            const blob = await response.blob();
+            const downloadUrl = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = downloadUrl;
+            a.download = `${generatedDoc.title.replace(/[^a-z0-9]/gi, '_')}.${format}`;
+            document.body.appendChild(a);
+            a.click();
+            window.URL.revokeObjectURL(downloadUrl);
+            document.body.removeChild(a);
+        } catch (err) {
+            console.error("Download Error:", err);
+            alert("Failed to download document");
+        }
+    };
 
     const saveBrandKit = async (data) => {
         try {
@@ -289,7 +405,15 @@ export default function Dashboard() {
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0 }}
                 >
-                    <button className="back-btn" onClick={() => setGeneratedDoc(null)}>← Back to Home</button>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+                        <button className="back-btn" style={{ margin: 0 }} onClick={() => setGeneratedDoc(null)}>← Back to Home</button>
+                        {generatedDoc._id && (
+                            <div style={{ display: 'flex', gap: '10px' }}>
+                                <button className="sidebar-btn" style={{ padding: '6px 12px', background: '#f1f5f9', border: '1px solid #e2e8f0', color: '#0f172a', fontWeight: '600' }} onClick={() => handleDownload(generatedDoc._id, 'pdf')}>↓ PDF</button>
+                                <button className="sidebar-btn" style={{ padding: '6px 12px', background: '#f1f5f9', border: '1px solid #e2e8f0', color: '#0f172a', fontWeight: '600' }} onClick={() => handleDownload(generatedDoc._id, 'docx')}>↓ DOCX</button>
+                            </div>
+                        )}
+                    </div>
 
                     <div className="doc-meta-header">
                         <div>
@@ -502,8 +626,13 @@ export default function Dashboard() {
                                             <h4 style={{ margin: 0 }}>Pro Plan</h4>
                                             <p style={{ margin: '4px 0 0', fontSize: '14px', color: '#666' }}>₹999 / month</p>
                                         </div>
-                                        <span style={{ padding: '4px 8px', background: '#e8f5e9', color: '#2e7d32', borderRadius: '4px', fontSize: '12px', fontWeight: 'bold' }}>Active</span>
+                                        {isPro ? (
+                                            <span style={{ padding: '4px 8px', background: '#e8f5e9', color: '#2e7d32', borderRadius: '4px', fontSize: '12px', fontWeight: 'bold' }}>Active</span>
+                                        ) : (
+                                            <button type="button" onClick={handleUpgrade} className="primary-btn sm" style={{ padding: '8px 16px' }}>Upgrade Now</button>
+                                        )}
                                     </div>
+                                    {!isPro && <p style={{ fontSize: '12px', color: '#666', marginTop: '12px', paddingBottom: '0' }}>Upgrade to unlock watermark-free exports and full AI context mapping.</p>}
                                 </div>
                             </div>
                         </div>
@@ -558,48 +687,186 @@ export default function Dashboard() {
                             <h1>Good evening, {user?.name?.split(' ')[0]}</h1>
                         </div>
 
-                        {/* AI Command Center */}
-                        <div className="ai-command-center">
-                            <form onSubmit={handleGenerate} className="ai-input-wrapper">
-                                <input
-                                    type="text"
-                                    placeholder="Ask or find anything from your workspace..."
-                                    value={prompt}
-                                    onChange={(e) => setPrompt(e.target.value)}
-                                />
-                                <div className="ai-input-controls">
-                                    <div className="ai-modes">
-                                        <button
-                                            type="button"
-                                            className={aiMode === 'Ask' ? 'active' : ''}
-                                            onClick={() => setAiMode('Ask')}
-                                        >Ask</button>
-                                        <button
-                                            type="button"
-                                            className={aiMode === 'Research' ? 'active' : ''}
-                                            onClick={() => setAiMode('Research')}
-                                        >Research</button>
-                                        <button
-                                            type="button"
-                                            className={aiMode === 'Build' ? 'active' : ''}
-                                            onClick={() => setAiMode('Build')}
-                                        >Build</button>
-                                    </div>
-                                    <div className="control-icons">
-                                        <Globe size={18} />
-                                        <div className="source-toggle">
-                                            <LogoIcon />
-                                            <span>All sources</span>
-                                            <ChevronDown size={14} />
-                                        </div>
-                                        <Paperclip size={18} />
-                                        <AtSign size={18} />
-                                        <button type="submit" className="send-btn" disabled={!prompt.trim()}>
-                                            <ArrowUp size={18} />
+                        {/* AI Command Center / Document Generator */}
+                        <div className="ai-command-center" style={{ background: '#fff', borderRadius: '16px', padding: '24px', boxShadow: '0 4px 20px rgba(0,0,0,0.05)', border: '1px solid #eee' }}>
+                            {!selectedDocType ? (
+                                <div>
+                                    <h3 style={{ margin: '0 0 16px 0', fontSize: '18px', fontWeight: '600', color: '#0f172a' }}>What would you like to create?</h3>
+                                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: '12px' }}>
+                                        <button className="doc-type-btn" onClick={() => setSelectedDocType('quotation')} style={{ padding: '16px', background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '12px', textAlign: 'left', cursor: 'pointer', transition: 'all 0.2s' }}>
+                                            <span style={{ fontSize: '24px', display: 'block', marginBottom: '8px' }}>💰</span>
+                                            <span style={{ fontWeight: '600', color: '#0f172a', display: 'block' }}>Quotation</span>
+                                            <span style={{ fontSize: '12px', color: '#64748b' }}>Detailed pricing proposals</span>
+                                        </button>
+                                        <button className="doc-type-btn" onClick={() => setSelectedDocType('proposal')} style={{ padding: '16px', background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '12px', textAlign: 'left', cursor: 'pointer', transition: 'all 0.2s' }}>
+                                            <span style={{ fontSize: '24px', display: 'block', marginBottom: '8px' }}>📄</span>
+                                            <span style={{ fontWeight: '600', color: '#0f172a', display: 'block' }}>Proposal</span>
+                                            <span style={{ fontSize: '12px', color: '#64748b' }}>Strategic business proposals</span>
+                                        </button>
+                                        <button className="doc-type-btn" onClick={() => setSelectedDocType('email')} style={{ padding: '16px', background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '12px', textAlign: 'left', cursor: 'pointer', transition: 'all 0.2s' }}>
+                                            <span style={{ fontSize: '24px', display: 'block', marginBottom: '8px' }}>✉️</span>
+                                            <span style={{ fontWeight: '600', color: '#0f172a', display: 'block' }}>Sales Email</span>
+                                            <span style={{ fontSize: '12px', color: '#64748b' }}>Conversion-optimized outreach</span>
+                                        </button>
+                                        <button className="doc-type-btn" onClick={() => setSelectedDocType('profile')} style={{ padding: '16px', background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '12px', textAlign: 'left', cursor: 'pointer', transition: 'all 0.2s' }}>
+                                            <span style={{ fontSize: '24px', display: 'block', marginBottom: '8px' }}>🏢</span>
+                                            <span style={{ fontWeight: '600', color: '#0f172a', display: 'block' }}>Company Profile</span>
+                                            <span style={{ fontSize: '12px', color: '#64748b' }}>Corporate overviews</span>
+                                        </button>
+                                        <button className="doc-type-btn" onClick={() => setSelectedDocType('pitch')} style={{ padding: '16px', background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '12px', textAlign: 'left', cursor: 'pointer', transition: 'all 0.2s' }}>
+                                            <span style={{ fontSize: '24px', display: 'block', marginBottom: '8px' }}>📊</span>
+                                            <span style={{ fontWeight: '600', color: '#0f172a', display: 'block' }}>Pitch Deck</span>
+                                            <span style={{ fontSize: '12px', color: '#64748b' }}>Investor-ready outlines</span>
+                                        </button>
+                                        <button className="doc-type-btn" onClick={() => setSelectedDocType('other')} style={{ padding: '16px', background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '12px', textAlign: 'left', cursor: 'pointer', transition: 'all 0.2s' }}>
+                                            <span style={{ fontSize: '24px', display: 'block', marginBottom: '8px' }}>⚡</span>
+                                            <span style={{ fontWeight: '600', color: '#0f172a', display: 'block' }}>Custom</span>
+                                            <span style={{ fontSize: '12px', color: '#64748b' }}>Anything else</span>
                                         </button>
                                     </div>
                                 </div>
-                            </form>
+                            ) : selectedDocType === 'quotation' ? (
+                                <form onSubmit={handleGenerate}>
+                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+                                        <h3 style={{ margin: 0, fontSize: '18px', fontWeight: '600', color: '#0f172a' }}>Create Quotation</h3>
+                                        <button type="button" onClick={() => setSelectedDocType(null)} style={{ background: 'none', border: 'none', color: '#64748b', fontSize: '14px', cursor: 'pointer' }}>← Back</button>
+                                    </div>
+                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                                        <div>
+                                            <label style={{ display: 'block', fontSize: '12px', fontWeight: '600', color: '#475569', marginBottom: '4px' }}>Client Name</label>
+                                            <input type="text" style={{ width: '100%', padding: '12px', borderRadius: '8px', border: '1px solid #e2e8f0', background: '#f8fafc' }} value={quotationData.clientName} onChange={(e) => setQuotationData({ ...quotationData, clientName: e.target.value })} placeholder="e.g. Acme Corp" required />
+                                        </div>
+                                        <div>
+                                            <label style={{ display: 'block', fontSize: '12px', fontWeight: '600', color: '#475569', marginBottom: '4px' }}>Project Scope / Description</label>
+                                            <textarea style={{ width: '100%', padding: '12px', borderRadius: '8px', border: '1px solid #e2e8f0', background: '#f8fafc', minHeight: '80px', fontFamily: 'inherit' }} value={quotationData.projectScope} onChange={(e) => setQuotationData({ ...quotationData, projectScope: e.target.value })} placeholder="e.g. Full website redesign including 10 pages and SEO setup." required />
+                                        </div>
+                                        <div>
+                                            <label style={{ display: 'block', fontSize: '12px', fontWeight: '600', color: '#475569', marginBottom: '4px' }}>Total Package Amount (optional)</label>
+                                            <input type="text" style={{ width: '100%', padding: '12px', borderRadius: '8px', border: '1px solid #e2e8f0', background: '#f8fafc' }} value={quotationData.amount} onChange={(e) => setQuotationData({ ...quotationData, amount: e.target.value })} placeholder="e.g. $5,000" />
+                                        </div>
+                                        <button type="submit" className="primary-btn" style={{ marginTop: '8px', width: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '8px' }}>
+                                            <Sparkles size={16} /> Generate Quotation
+                                        </button>
+                                    </div>
+                                </form>
+                            ) : selectedDocType === 'proposal' ? (
+                                <form onSubmit={handleGenerate}>
+                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+                                        <h3 style={{ margin: 0, fontSize: '18px', fontWeight: '600', color: '#0f172a' }}>Create Business Proposal</h3>
+                                        <button type="button" onClick={() => setSelectedDocType(null)} style={{ background: 'none', border: 'none', color: '#64748b', fontSize: '14px', cursor: 'pointer' }}>← Back</button>
+                                    </div>
+                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                                        <div>
+                                            <label style={{ display: 'block', fontSize: '12px', fontWeight: '600', color: '#475569', marginBottom: '4px' }}>Client / Prospect Name</label>
+                                            <input type="text" style={{ width: '100%', padding: '12px', borderRadius: '8px', border: '1px solid #e2e8f0', background: '#f8fafc' }} value={proposalData.clientName} onChange={(e) => setProposalData({ ...proposalData, clientName: e.target.value })} placeholder="e.g. Globex Inc." required />
+                                        </div>
+                                        <div>
+                                            <label style={{ display: 'block', fontSize: '12px', fontWeight: '600', color: '#475569', marginBottom: '4px' }}>Industry / Focus Area</label>
+                                            <input type="text" style={{ width: '100%', padding: '12px', borderRadius: '8px', border: '1px solid #e2e8f0', background: '#f8fafc' }} value={proposalData.industryFocus} onChange={(e) => setProposalData({ ...proposalData, industryFocus: e.target.value })} placeholder="e.g. Healthcare Logistics" required />
+                                        </div>
+                                        <div>
+                                            <label style={{ display: 'block', fontSize: '12px', fontWeight: '600', color: '#475569', marginBottom: '4px' }}>Core Modules / Services Offered</label>
+                                            <textarea style={{ width: '100%', padding: '12px', borderRadius: '8px', border: '1px solid #e2e8f0', background: '#f8fafc', minHeight: '80px', fontFamily: 'inherit' }} value={proposalData.coreModules} onChange={(e) => setProposalData({ ...proposalData, coreModules: e.target.value })} placeholder="e.g. Fleet tracking, predictive maintenance..." required />
+                                        </div>
+                                        <button type="submit" className="primary-btn" style={{ marginTop: '8px', width: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '8px' }}>
+                                            <Sparkles size={16} /> Generate Proposal
+                                        </button>
+                                    </div>
+                                </form>
+                            ) : selectedDocType === 'email' ? (
+                                <form onSubmit={handleGenerate}>
+                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+                                        <h3 style={{ margin: 0, fontSize: '18px', fontWeight: '600', color: '#0f172a' }}>Create Sales Email</h3>
+                                        <button type="button" onClick={() => setSelectedDocType(null)} style={{ background: 'none', border: 'none', color: '#64748b', fontSize: '14px', cursor: 'pointer' }}>← Back</button>
+                                    </div>
+                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                                        <div>
+                                            <label style={{ display: 'block', fontSize: '12px', fontWeight: '600', color: '#475569', marginBottom: '4px' }}>Target Audience</label>
+                                            <input type="text" style={{ width: '100%', padding: '12px', borderRadius: '8px', border: '1px solid #e2e8f0', background: '#f8fafc' }} value={emailData.targetAudience} onChange={(e) => setEmailData({ ...emailData, targetAudience: e.target.value })} placeholder="e.g. VP of Sales in SaaS companies" required />
+                                        </div>
+                                        <div>
+                                            <label style={{ display: 'block', fontSize: '12px', fontWeight: '600', color: '#475569', marginBottom: '4px' }}>Core Value Proposition</label>
+                                            <textarea style={{ width: '100%', padding: '12px', borderRadius: '8px', border: '1px solid #e2e8f0', background: '#f8fafc', minHeight: '80px', fontFamily: 'inherit' }} value={emailData.valueProposition} onChange={(e) => setEmailData({ ...emailData, valueProposition: e.target.value })} placeholder="e.g. Reduce churn by 15% using predictive AI." required />
+                                        </div>
+                                        <div>
+                                            <label style={{ display: 'block', fontSize: '12px', fontWeight: '600', color: '#475569', marginBottom: '4px' }}>Call to Action (CTA)</label>
+                                            <input type="text" style={{ width: '100%', padding: '12px', borderRadius: '8px', border: '1px solid #e2e8f0', background: '#f8fafc' }} value={emailData.callToAction} onChange={(e) => setEmailData({ ...emailData, callToAction: e.target.value })} placeholder="e.g. Schedule a 10-minute demo this Thursday." required />
+                                        </div>
+                                        <button type="submit" className="primary-btn" style={{ marginTop: '8px', width: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '8px' }}>
+                                            <Sparkles size={16} /> Generate Email
+                                        </button>
+                                    </div>
+                                </form>
+                            ) : selectedDocType === 'profile' ? (
+                                <form onSubmit={handleGenerate}>
+                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+                                        <h3 style={{ margin: 0, fontSize: '18px', fontWeight: '600', color: '#0f172a' }}>Create Company Profile</h3>
+                                        <button type="button" onClick={() => setSelectedDocType(null)} style={{ background: 'none', border: 'none', color: '#64748b', fontSize: '14px', cursor: 'pointer' }}>← Back</button>
+                                    </div>
+                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                                        <div>
+                                            <label style={{ display: 'block', fontSize: '12px', fontWeight: '600', color: '#475569', marginBottom: '4px' }}>Company Name / Focus Entity</label>
+                                            <input type="text" style={{ width: '100%', padding: '12px', borderRadius: '8px', border: '1px solid #e2e8f0', background: '#f8fafc' }} value={profileData.companyName} onChange={(e) => setProfileData({ ...profileData, companyName: e.target.value })} placeholder="e.g. FinTech Innovations Ltd." required />
+                                        </div>
+                                        <div>
+                                            <label style={{ display: 'block', fontSize: '12px', fontWeight: '600', color: '#475569', marginBottom: '4px' }}>Core Focus Area</label>
+                                            <textarea style={{ width: '100%', padding: '12px', borderRadius: '8px', border: '1px solid #e2e8f0', background: '#f8fafc', minHeight: '80px', fontFamily: 'inherit' }} value={profileData.coreFocus} onChange={(e) => setProfileData({ ...profileData, coreFocus: e.target.value })} placeholder="e.g. Next-generation blockchain payments for B2B." required />
+                                        </div>
+                                        <div>
+                                            <label style={{ display: 'block', fontSize: '12px', fontWeight: '600', color: '#475569', marginBottom: '4px' }}>Company Vision</label>
+                                            <input type="text" style={{ width: '100%', padding: '12px', borderRadius: '8px', border: '1px solid #e2e8f0', background: '#f8fafc' }} value={profileData.vision} onChange={(e) => setProfileData({ ...profileData, vision: e.target.value })} placeholder="e.g. To decentralize global transactions." required />
+                                        </div>
+                                        <button type="submit" className="primary-btn" style={{ marginTop: '8px', width: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '8px' }}>
+                                            <Sparkles size={16} /> Generate Profile
+                                        </button>
+                                    </div>
+                                </form>
+                            ) : selectedDocType === 'pitch' ? (
+                                <form onSubmit={handleGenerate}>
+                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+                                        <h3 style={{ margin: 0, fontSize: '18px', fontWeight: '600', color: '#0f172a' }}>Create Pitch Deck Outline</h3>
+                                        <button type="button" onClick={() => setSelectedDocType(null)} style={{ background: 'none', border: 'none', color: '#64748b', fontSize: '14px', cursor: 'pointer' }}>← Back</button>
+                                    </div>
+                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                                        <div>
+                                            <label style={{ display: 'block', fontSize: '12px', fontWeight: '600', color: '#475569', marginBottom: '4px' }}>Product / Project Name</label>
+                                            <input type="text" style={{ width: '100%', padding: '12px', borderRadius: '8px', border: '1px solid #e2e8f0', background: '#f8fafc' }} value={pitchData.productName} onChange={(e) => setPitchData({ ...pitchData, productName: e.target.value })} placeholder="e.g. SmartServe POS" required />
+                                        </div>
+                                        <div>
+                                            <label style={{ display: 'block', fontSize: '12px', fontWeight: '600', color: '#475569', marginBottom: '4px' }}>Target Market</label>
+                                            <input type="text" style={{ width: '100%', padding: '12px', borderRadius: '8px', border: '1px solid #e2e8f0', background: '#f8fafc' }} value={pitchData.targetMarket} onChange={(e) => setPitchData({ ...pitchData, targetMarket: e.target.value })} placeholder="e.g. QSRs and independent cafes." required />
+                                        </div>
+                                        <div>
+                                            <label style={{ display: 'block', fontSize: '12px', fontWeight: '600', color: '#475569', marginBottom: '4px' }}>Competitive Advantage / Innovation</label>
+                                            <textarea style={{ width: '100%', padding: '12px', borderRadius: '8px', border: '1px solid #e2e8f0', background: '#f8fafc', minHeight: '80px', fontFamily: 'inherit' }} value={pitchData.competitiveAdvantage} onChange={(e) => setPitchData({ ...pitchData, competitiveAdvantage: e.target.value })} placeholder="e.g. Cloud-first architecture with instant offline sync." required />
+                                        </div>
+                                        <button type="submit" className="primary-btn" style={{ marginTop: '8px', width: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '8px' }}>
+                                            <Sparkles size={16} /> Generate Pitch Outline
+                                        </button>
+                                    </div>
+                                </form>
+                            ) : (
+                                <form onSubmit={handleGenerate} className="ai-input-wrapper">
+                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px', position: 'absolute', top: '-40px', width: '100%' }}>
+                                        <span style={{ fontSize: '14px', fontWeight: '500', color: '#64748b' }}>Creating: {selectedDocType === 'proposal' ? 'Business Proposal' : 'Custom Document'}</span>
+                                        <button type="button" onClick={() => setSelectedDocType(null)} style={{ background: 'none', border: 'none', color: '#64748b', fontSize: '14px', cursor: 'pointer' }}>← Back</button>
+                                    </div>
+                                    <input
+                                        type="text"
+                                        placeholder={`Describe the ${selectedDocType} you want to create...`}
+                                        value={prompt}
+                                        onChange={(e) => setPrompt(e.target.value)}
+                                        style={{ width: '100%' }}
+                                    />
+                                    <div className="ai-input-controls">
+                                        <div className="control-icons" style={{ marginLeft: 'auto' }}>
+                                            <button type="submit" className="send-btn" disabled={!prompt.trim()}>
+                                                <ArrowUp size={18} />
+                                            </button>
+                                        </div>
+                                    </div>
+                                </form>
+                            )}
                         </div>
 
                         {/* Recently Visited Grid */}

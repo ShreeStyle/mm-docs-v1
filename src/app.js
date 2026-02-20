@@ -7,6 +7,7 @@ const app = express();
 app.use(cors({
   origin: [
     "http://localhost:5173",
+    "http://localhost:5174",
     "http://localhost:3000",
     "https://graceful-luxury-693326.framer.app"
   ],
@@ -23,6 +24,7 @@ const aiRoutes = require("./routes/aiRoutes");
 const publicRoutes = require("./routes/publicRoutes");
 const onboardingRoutes = require("./routes/onboardingRoutes");
 const templateRoutes = require("./routes/templateRoutes");
+const paymentRoutes = require("./routes/paymentRoutes");
 
 app.use("/api/users", userRoutes);
 app.use("/api/auth", authRoutes);
@@ -32,6 +34,7 @@ app.use("/api/ai", aiRoutes);
 app.use("/api/public", publicRoutes);
 app.use("/api/onboarding", onboardingRoutes);
 app.use("/api/templates", templateRoutes);
+app.use("/api/payments", paymentRoutes);
 
 // Health Check API
 app.get("/api/health", (req, res) => {

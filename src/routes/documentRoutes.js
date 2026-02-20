@@ -8,6 +8,7 @@ const {
     deleteDocument,
     renderDocument,
     downloadDocument,
+    downloadDocumentDocx,
 } = require("../controllers/documentController");
 const {
     createShareLink,
@@ -32,6 +33,7 @@ router.get("/", getDocuments);
 router.get("/:id", getDocumentById);
 router.get("/:id/preview", renderDocument);
 router.get("/:id/download", downloadDocument);
+router.get("/:id/download-docx", downloadDocumentDocx);
 router.post("/:id/share", createShareLink);
 router.get("/:id/analytics", getDocumentAnalytics);
 router.delete("/:id/share", deactivateShareLink);
