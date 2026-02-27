@@ -1026,6 +1026,51 @@ const generateMockContent = (type, topic) => {
       goToMarketStrategy: "A dual-pronged approach leveraging direct outbound enterprise sales and strategic channel partnerships with major consulting firms.",
       visionAndRoadmap: "Over the next 18 months, we plan to roll out full predictive AI modeling and expand vertically into the healthcare and financial sectors."
     };
+  } else if (effectiveType === "warning_letter") {
+    return {
+      title: "Employee Warning Letter",
+      issueDate: new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }),
+      refNumber: `WRN-${new Date().getFullYear()}-${String(Math.floor(Math.random() * 1000)).padStart(3, '0')}`,
+      companyName: "MM Docs",
+      companyAddress: "[Company Address - Street, City, State, PIN]",
+      companyEmail: "hr@mmdocs.com",
+      companyPhone: "+91-XXXXXXXXXX",
+      companyWebsite: "www.mmdocs.com",
+      employeeName: "[Employee Name]",
+      employeeId: "[Employee ID]",
+      position: "[Job Title]",
+      department: "[Department Name]",
+      reportingTo: "[Reporting Manager]",
+      joiningDate: "[Joining Date]",
+      warningLevel: "WRITTEN",
+      incidentDate: "[Incident Date]",
+      violationType: "[Policy Violation Type]",
+      incidentDescription: "[Detailed description of the incident or performance issue]",
+      specificViolations: [
+        "Company Code of Conduct violation",
+        "Performance standards not met",
+        "Attendance and punctuality issues",
+        "Professional behavior concerns"
+      ],
+      monitoringPeriod: "90",
+      additionalConsequences: {
+        "Training Required": "Mandatory compliance training within 30 days",
+        "Performance Review": "Weekly performance check-ins with supervisor"
+      },
+      improvementActions: [
+        "Review and acknowledge all company policies",
+        "Attend mandatory training sessions as directed",
+        "Meet performance standards consistently",
+        "Maintain professional conduct at all times",
+        "Submit weekly progress reports to supervisor"
+      ],
+      reviewDate: "[Review Date - 30 days from issue date]",
+      hrContactPerson: "HR Manager",
+      managerTitle: "Human Resources Manager",
+      hrEmail: "hr@mmdocs.com",
+      hrPhone: "+91-XXXXXXXXXX",
+      currentDate: new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })
+    };
   } else {
     return {
       title: topicTitle,

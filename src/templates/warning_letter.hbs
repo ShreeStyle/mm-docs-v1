@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Warning Letter</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            font-size: 12pt;
+            line-height: 1.6;
+            color: #000;
+            background: #fff;
+            margin: 0;
+            padding: 40px;
+            max-width: 210mm;
+            margin: 0 auto;
+        }
+        
+        .document-title {
+            text-align: center;
+            font-size: 18pt;
+            font-weight: bold;
+            margin-bottom: 40px;
+            text-decoration: underline;
+        }
+        
+        .recipient-section {
+            margin-bottom: 30px;
+        }
+        
+        .recipient-section p {
+            margin: 5px 0;
+        }
+        
+        .date {
+            margin-bottom: 30px;
+        }
+        
+        .subject {
+            margin-bottom: 30px;
+            font-weight: bold;
+        }
+        
+        .content {
+            text-align: justify;
+            margin-bottom: 30px;
+        }
+        
+        .content p {
+            margin-bottom: 15px;
+        }
+        
+        .closing {
+            margin-top: 40px;
+        }
+        
+        .signature-section {
+            margin-top: 60px;
+        }
+        
+        .signature-name {
+            font-weight: bold;
+        }
+        
+        /* Print styles */
+        @media print {
+            body {
+                padding: 20mm;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="document-title">Warning Letter</div>
+    
+    <div class="recipient-section">
+        <p><strong>To,</strong></p>
+        <p>{{employeeName}}</p>
+        <p>{{position}}, {{department}}</p>
+        <p>{{companyName}},</p>
+        <p>{{companyAddress}}</p>
+    </div>
+    
+    <div class="date">{{issueDate}}</div>
+    
+    <div class="subject">
+        <strong>Subject:</strong> Warning against {{violationType}}
+    </div>
+    
+    <div class="content">
+        <p>Dear {{#if employeeName}}{{employeeName}}{{else}}Employee{{/if}},</p>
+        
+        <p>{{incidentDescription}}</p>
+        
+        <p>You have already read our company policy and so you must be aware by now what action we can take against you regarding this. Since you are still in your training period, we suggest you improve your performance and be punctual; otherwise this can lead to termination of employment. We also expect you to be cordial towards your fellow employees and seniors and not indulge in unruly behavior.</p>
+    </div>
+    
+    <div class="closing">
+        <p>With regards,</p>
+        <p>Yours truly,</p>
+    </div>
+    
+    <div class="signature-section">
+        <p class="signature-name">{{#if hrContactPerson}}{{hrContactPerson}}{{else}}HR Manager{{/if}}</p>
+        <p>{{#if managerTitle}}{{managerTitle}}{{else}}Head, HR department{{/if}}</p>
+    </div>
+</body>
+</html>

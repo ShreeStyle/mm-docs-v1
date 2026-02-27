@@ -41,6 +41,7 @@ const getTemplateForDocumentType = (documentType) => {
         'offer_letter': 'offer_letter',
         'appointment_letter': 'appointment_letter', 
         'experience_certificate': 'experience_certificate',
+        'warning_letter': 'warning_letter',
         'nda': 'nda',
         'quotation': 'quotation',
         'invoice': 'invoice',
@@ -70,6 +71,7 @@ exports.renderDocument = async (document, brandKit) => {
         // Prepare data for template
         const data = {
             ...document.toObject(),
+            ...document.content, // Spread the content fields to root level for Handlebars
             brandKit: brandKit ? brandKit.toObject() : {},
             brandCSS,
             generatedDate: new Date().toLocaleDateString()

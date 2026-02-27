@@ -3,10 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{content.title}}</title>
+    <title>Employment Offer Letter</title>
     <style>
-        {{{brandCSS}}}
-        
         * {
             margin: 0;
             padding: 0;
@@ -14,379 +12,462 @@
         }
         
         body {
-            font-family: var(--font-primary, 'Inter', 'Arial', sans-serif);
-            line-height: 1.6;
-            color: #2d3748;
+            font-family: 'Arial', 'Helvetica', sans-serif;
+            line-height: 1.4;
+            color: #2c3e50;
             background: #ffffff;
-            font-size: 14px;
+            font-size: 11pt;
         }
         
         .document-container {
-            max-width: 800px;
+            max-width: 210mm;
             margin: 0 auto;
-            padding: 40px;
-            min-height: 100vh;
-            position: relative;
+            padding: 25mm;
+            min-height: 297mm;
+            background: white;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
         }
         
-        /* Header Section */
-        .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            margin-bottom: 40px;
+        /* Professional Header */
+        .letterhead {
+            border-bottom: 3px solid #2c3e50;
             padding-bottom: 20px;
-            border-bottom: 3px solid var(--primary-color, #1e40af);
+            margin-bottom: 30px;
         }
         
-        .company-info {
-            flex: 1;
+        .company-logo-section {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 15px;
         }
         
         .company-name {
-            font-size: 28px;
+            font-size: 24pt;
             font-weight: 700;
-            color: var(--primary-color, #1e40af);
-            margin-bottom: 8px;
-            letter-spacing: -0.5px;
+            color: #2c3e50;
+            letter-spacing: 1px;
         }
         
-        .company-tagline {
-            font-size: 14px;
-            color: #64748b;
-            font-weight: 500;
-        }
-        
-        .document-info {
+        .company-details {
+            font-size: 9pt;
+            color: #5d6d7e;
             text-align: right;
-            flex-shrink: 0;
+            line-height: 1.3;
+        }
+        
+        .company-address {
+            font-size: 9pt;
+            color: #5d6d7e;
+            margin-top: 8px;
+            line-height: 1.3;
+        }
+        
+        /* Document Header */
+        .document-header {
+            text-align: center;
+            margin: 30px 0;
         }
         
         .document-title {
-            font-size: 24px;
-            font-weight: 600;
-            color: #1a202c;
-            margin-bottom: 8px;
+            font-size: 16pt;
+            font-weight: 700;
+            color: #2c3e50;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            border-bottom: 1px solid #bdc3c7;
+            padding-bottom: 8px;
+            display: inline-block;
         }
         
-        .document-date {
-            font-size: 14px;
-            color: #64748b;
-            font-weight: 500;
+        /* Date and Reference */
+        .date-reference {
+            display: flex;
+            justify-content: space-between;
+            margin: 25px 0;
+            font-size: 10pt;
+            color: #34495e;
+        }
+        
+        /* Recipient */
+        .recipient {
+            margin: 25px 0;
+            font-size: 11pt;
+            line-height: 1.4;
+        }
+        
+        .recipient-name {
+            font-weight: 700;
+            color: #2c3e50;
+            font-size: 12pt;
+        }
+        
+        /* Subject Line */
+        .subject-line {
+            margin: 20px 0;
+            font-weight: 700;
+            color: #2c3e50;
+            font-size: 11pt;
         }
         
         /* Main Content */
-        .content-section {
-            margin-bottom: 32px;
+        .content {
+            font-size: 11pt;
+            line-height: 1.5;
+            color: #34495e;
+            text-align: justify;
         }
         
-        .section-title {
-            font-size: 18px;
-            font-weight: 600;
-            color: var(--primary-color, #1e40af);
-            margin-bottom: 16px;
-            padding-bottom: 8px;
-            border-bottom: 2px solid #e2e8f0;
-        }
-        
-        /* Candidate Info */
-        .candidate-info {
-            background: #f8fafc;
-            padding: 24px;
-            border-radius: 12px;
-            border-left: 4px solid var(--primary-color, #1e40af);
-            margin-bottom: 32px;
-        }
-        
-        .candidate-name {
-            font-size: 22px;
-            font-weight: 700;
-            color: #1a202c;
+        .content p {
             margin-bottom: 12px;
         }
         
-        .position-info {
+        /* Professional Compensation Box */
+        .compensation-package {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border: 2px solid #2c3e50;
+            border-radius: 8px;
+            padding: 25px;
+            margin: 25px 0;
+            text-align: center;
+        }
+        
+        .compensation-title {
+            font-size: 14pt;
+            font-weight: 700;
+            color: #2c3e50;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .salary-amount {
+            font-size: 20pt;
+            font-weight: 700;
+            color: #27ae60;
+            margin: 15px 0;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+        }
+        
+        .position-details {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 16px;
-            margin-top: 16px;
+            gap: 15px;
+            margin-top: 20px;
+            text-align: left;
         }
         
-        .info-item {
-            display: flex;
-            flex-direction: column;
+        .detail-item {
+            background: white;
+            padding: 12px;
+            border-radius: 4px;
+            border-left: 3px solid #3498db;
         }
         
-        .info-label {
-            font-size: 12px;
+        .detail-label {
+            font-size: 9pt;
             font-weight: 600;
-            color: #64748b;
+            color: #7f8c8d;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
             margin-bottom: 4px;
         }
         
-        .info-value {
-            font-size: 16px;
+        .detail-value {
+            font-size: 11pt;
             font-weight: 600;
-            color: #1a202c;
+            color: #2c3e50;
         }
         
-        /* Two Column Layout */
-        .two-column {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 32px;
-            margin: 32px 0;
+        /* Professional Sections */
+        .info-section {
+            margin: 20px 0;
+            border-left: 4px solid #3498db;
+            padding-left: 15px;
         }
         
-        /* Benefits Section */
-        .benefits-list {
-            list-style: none;
-            padding: 0;
+        .info-section.benefits {
+            border-left-color: #27ae60;
         }
         
-        .benefits-list li {
-            padding: 12px 0;
-            border-bottom: 1px solid #e2e8f0;
-            position: relative;
-            padding-left: 24px;
+        .info-section.terms {
+            border-left-color: #f39c12;
         }
         
-        .benefits-list li:before {
-            content: "✓";
-            position: absolute;
-            left: 0;
-            color: var(--primary-color, #1e40af);
-            font-weight: bold;
-            font-size: 16px;
+        .info-section.next-steps {
+            border-left-color: #e74c3c;
         }
         
-        .benefits-list li:last-child {
-            border-bottom: none;
-        }
-        
-        /* Terms Section */
-        .terms-list {
-            list-style: none;
-            padding: 0;
-        }
-        
-        .terms-list li {
-            padding: 8px 0;
-            padding-left: 20px;
-            position: relative;
-            font-size: 13px;
-            line-height: 1.5;
-        }
-        
-        .terms-list li:before {
-            content: "•";
-            position: absolute;
-            left: 0;
-            color: var(--primary-color, #1e40af);
-            font-weight: bold;
-        }
-        
-        /* Next Steps */
-        .steps-list {
-            list-style: none;
-            padding: 0;
-            counter-reset: step-counter;
-        }
-        
-        .steps-list li {
-            padding: 12px 0;
-            padding-left: 40px;
-            position: relative;
-            counter-increment: step-counter;
-        }
-        
-        .steps-list li:before {
-            content: counter(step-counter);
-            position: absolute;
-            left: 0;
-            top: 12px;
-            background: var(--primary-color, #1e40af);
-            color: white;
-            width: 24px;
-            height: 24px;
-            border-radius: 50%;
+        .section-title {
+            font-size: 12pt;
+            font-weight: 700;
+            color: #2c3e50;
+            margin-bottom: 10px;
             display: flex;
             align-items: center;
-            justify-content: center;
-            font-size: 12px;
-            font-weight: bold;
+            gap: 8px;
         }
+        
+        .section-content ul {
+            list-style: none;
+            padding-left: 0;
+        }
+        
+        .section-content li {
+            margin-bottom: 8px;
+            padding-left: 20px;
+            position: relative;
+            font-size: 10pt;
+            line-height: 1.4;
+        }
+        
+        .section-content li:before {
+            content: "▪";
+            position: absolute;
+            left: 0;
+            color: #3498db;
+            font-weight: bold;
+            font-size: 12pt;
+        }
+        
+        .benefits li:before { color: #27ae60; }
+        .terms li:before { color: #f39c12; }
+        .next-steps li:before { color: #e74c3c; }
         
         /* Signature Section */
         .signature-section {
-            margin-top: 48px;
-            padding-top: 32px;
-            border-top: 2px solid #e2e8f0;
+            margin-top: 40px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
         }
         
-        .signature-box {
-            background: #f8fafc;
-            padding: 24px;
-            border-radius: 12px;
+        .signature-block {
             text-align: center;
-            border: 2px dashed var(--primary-color, #1e40af);
+            padding: 20px;
+            border: 1px dashed #bdc3c7;
+            border-radius: 4px;
+            background: #fafbfc;
         }
         
-        .closing-message {
-            background: linear-gradient(135deg, var(--primary-color, #1e40af) 0%, #3b82f6 100%);
-            color: white;
-            padding: 24px;
-            border-radius: 12px;
+        .signature-title {
+            font-size: 10pt;
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 40px;
+            text-transform: uppercase;
+        }
+        
+        .signature-line {
+            border-top: 1px solid #2c3e50;
+            margin-top: 40px;
+            padding-top: 8px;
+            font-size: 9pt;
+            color: #5d6d7e;
+        }
+        
+        .signature-name {
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 4px;
+        }
+        
+        /* Professional Footer */
+        .document-footer {
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid #ecf0f1;
             text-align: center;
-            margin: 32px 0;
+            font-size: 8pt;
+            color: #95a5a6;
+            line-height: 1.3;
+        }
+        
+        .footer-contact {
+            margin-bottom: 8px;
             font-weight: 500;
         }
         
-        /* Footer */
-        .footer {
-            margin-top: 48px;
-            padding-top: 24px;
-            border-top: 1px solid #e2e8f0;
-            text-align: center;
-            font-size: 12px;
-            color: #64748b;
+        .footer-disclaimer {
+            font-style: italic;
         }
         
         /* Print Styles */
         @media print {
             .document-container {
-                padding: 20px;
+                box-shadow: none;
+                margin: 0;
+                padding: 20mm;
             }
             
             body {
-                font-size: 12px;
-            }
-            
-            .candidate-name {
-                font-size: 20px;
-            }
-            
-            .company-name {
-                font-size: 24px;
-            }
-            
-            .document-title {
-                font-size: 20px;
+                background: white;
             }
         }
     </style>
 </head>
 <body>
     <div class="document-container">
-        <!-- Header -->
-        <div class="header">
-            <div class="company-info">
-                <div class="company-name">{{content.companyName}}</div>
-                <div class="company-tagline">Professional Excellence in Every Opportunity</div>
-            </div>
-            <div class="document-info">
-                <div class="document-title">{{content.title}}</div>
-                <div class="document-date">{{content.date}}</div>
+        <!-- Professional Letterhead -->
+        <div class="letterhead">
+            <div class="company-logo-section">
+                <div>
+                    <div class="company-name">{{companyName}}</div>
+                    <div class="company-address">{{companyAddress}}</div>
+                </div>
+                <div class="company-details">
+                    {{#if companyEmail}}Email: {{companyEmail}}<br>{{/if}}
+                    {{#if companyPhone}}Phone: {{companyPhone}}<br>{{/if}}
+                    {{#if companyWebsite}}Web: {{companyWebsite}}{{/if}}
+                </div>
             </div>
         </div>
 
-        <!-- Candidate Information -->
-        <div class="candidate-info">
-            <div class="candidate-name">{{content.candidateName}}</div>
-            <div class="position-info">
-                <div class="info-item">
-                    <div class="info-label">Position</div>
-                    <div class="info-value">{{content.position}}</div>
-                </div>
-                <div class="info-item">
-                    <div class="info-label">Department</div>
-                    <div class="info-value">{{content.department}}</div>
-                </div>
-                <div class="info-item">
-                    <div class="info-label">Start Date</div>
-                    <div class="info-value">{{content.startDate}}</div>
-                </div>
-                <div class="info-item">
-                    <div class="info-label">Annual Salary</div>
-                    <div class="info-value">{{content.salary}}</div>
+        <!-- Document Title -->
+        <div class="document-header">
+            <div class="document-title">Employment Offer Letter</div>
+        </div>
+
+        <!-- Date and Reference -->
+        <div class="date-reference">
+            <div><strong>Date:</strong> {{offerDate}}</div>
+            <div><strong>Reference:</strong> {{refNumber}}</div>
+        </div>
+
+        <!-- Recipient Information -->
+        <div class="recipient">
+            <div class="recipient-name">{{candidateName}}</div>
+            {{#if candidateAddress}}<div>{{candidateAddress}}</div>{{/if}}
+            {{#if candidateEmail}}<div>{{candidateEmail}}</div>{{/if}}
+        </div>
+
+        <!-- Subject -->
+        <div class="subject-line">
+            <strong>Subject:</strong> Offer of Employment - {{position}}
+        </div>
+
+        <!-- Main Content -->
+        <div class="content">
+            <p>Dear {{candidateName}},</p>
+
+            <p>We are delighted to extend this offer of employment for the position of <strong>{{position}}</strong> with {{companyName}}. We believe that your skills, experience, and enthusiasm will be valuable additions to our team.</p>
+
+            <!-- Professional Compensation Package -->
+            <div class="compensation-package">
+                <div class="compensation-title">Compensation Package</div>
+                <div class="salary-amount">₹{{salary}} per annum</div>
+                
+                <div class="position-details">
+                    <div class="detail-item">
+                        <div class="detail-label">Position</div>
+                        <div class="detail-value">{{position}}</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Department</div>
+                        <div class="detail-value">{{department}}</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Start Date</div>
+                        <div class="detail-value">{{startDate}}</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Reporting To</div>
+                        <div class="detail-value">{{reportingTo}}</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Work Location</div>
+                        <div class="detail-value">{{workLocation}}</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Employment Type</div>
+                        <div class="detail-value">Full-time</div>
+                    </div>
                 </div>
             </div>
-            {{#if content.reportingTo}}
-            <div style="margin-top: 16px;">
-                <div class="info-label">Reporting To</div>
-                <div class="info-value">{{content.reportingTo}}</div>
-            </div>
-            {{/if}}
-        </div>
 
-        <!-- Two Column Layout -->
-        <div class="two-column">
-            <!-- Benefits -->
-            <div class="content-section">
-                <div class="section-title">Benefits & Perks</div>
-                <ul class="benefits-list">
-                    {{#each content.benefits}}
-                    <li>{{this}}</li>
-                    {{/each}}
-                </ul>
-            </div>
-
-            <!-- Work Details -->
-            <div class="content-section">
-                <div class="section-title">Work Details</div>
-                <div class="info-item" style="margin-bottom: 16px;">
-                    <div class="info-label">Working Hours</div>
-                    <div class="info-value">{{content.workingHours}}</div>
+            <!-- Benefits Section -->
+            <div class="info-section benefits">
+                <div class="section-title">
+                    <span>🎯</span> Benefits & Perks
                 </div>
-                {{#if content.workLocation}}
-                <div class="info-item">
-                    <div class="info-label">Work Location</div>
-                    <div class="info-value">{{content.workLocation}}</div>
+                <div class="section-content">
+                    <ul>
+                        <li><strong>Health Insurance:</strong> Comprehensive medical coverage for you and your family</li>
+                        <li><strong>Paid Time Off:</strong> Annual leave as per company policy</li>
+                        <li><strong>Professional Development:</strong> Training and skill enhancement opportunities</li>
+                        <li><strong>Performance Bonus:</strong> Annual performance-based incentives</li>
+                        <li><strong>Flexible Work:</strong> Hybrid work options available</li>
+                    </ul>
                 </div>
-                {{/if}}
             </div>
+
+            <!-- Terms & Conditions -->
+            <div class="info-section terms">
+                <div class="section-title">
+                    <span>📋</span> Terms & Conditions
+                </div>
+                <div class="section-content">
+                    <ul>
+                        <li>Employment is contingent upon successful completion of background verification and reference checks</li>
+                        <li>This is an at-will employment arrangement, subject to company policies</li>
+                        <li>You must sign and comply with company confidentiality and non-disclosure agreements</li>
+                        <li>Employee handbook and policies will be provided during onboarding</li>
+                        <li>Probation period of {{#if probationPeriod}}{{probationPeriod}}{{else}}90 days{{/if}} applies</li>
+                        <li>Notice period of {{#if noticePeriod}}{{noticePeriod}}{{else}}30 days{{/if}} required for resignation</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Next Steps -->
+            <div class="info-section next-steps">
+                <div class="section-title">
+                    <span>🚀</span> Next Steps
+                </div>
+                <div class="section-content">
+                    <ul>
+                        <li><strong>Accept this offer</strong> by signing and returning this letter within 7 days</li>
+                        <li><strong>Complete documentation:</strong> Submit required documents for background verification</li>
+                        <li><strong>Onboarding:</strong> Attend new employee orientation on your start date</li>
+                        <li><strong>Setup:</strong> IT equipment and workspace will be arranged before your start date</li>
+                    </ul>
+                </div>
+            </div>
+
+            <p>We are excited about the possibility of you joining our team and look forward to your positive response. Should you have any questions regarding this offer, please feel free to contact our HR department.</p>
+
+            <p><strong>Welcome to the {{companyName}} family!</strong></p>
         </div>
 
-        <!-- Terms and Conditions -->
-        <div class="content-section">
-            <div class="section-title">Terms & Conditions</div>
-            <ul class="terms-list">
-                {{#each content.termsAndConditions}}
-                <li>{{this}}</li>
-                {{/each}}
-            </ul>
-        </div>
-
-        <!-- Next Steps -->
-        <div class="content-section">
-            <div class="section-title">Next Steps</div>
-            <ul class="steps-list">
-                {{#each content.nextSteps}}
-                <li>{{this}}</li>
-                {{/each}}
-            </ul>
-        </div>
-
-        <!-- Closing Message -->
-        <div class="closing-message">
-            {{content.closingMessage}}
-        </div>
-
-        <!-- Signature Section -->
+        <!-- Professional Signature Section -->
         <div class="signature-section">
-            <div class="signature-box">
-                <p><strong>Please sign and return this letter to confirm your acceptance</strong></p>
-                <br>
-                <p>Candidate Signature: _________________________ Date: _____________</p>
+            <div class="signature-block">
+                <div class="signature-title">For {{companyName}}</div>
+                <div class="signature-line">
+                    <div class="signature-name">{{#if hrContactPerson}}{{hrContactPerson}}{{else}}HR Manager{{/if}}</div>
+                    <div>Human Resources</div>
+                    <div>Date: _____________</div>
+                </div>
+            </div>
+            <div class="signature-block">
+                <div class="signature-title">Candidate Acceptance</div>
+                <div class="signature-line">
+                    <div class="signature-name">{{candidateName}}</div>
+                    <div>Signature</div>
+                    <div>Date: _____________</div>
+                </div>
             </div>
         </div>
 
-        <!-- Footer -->
-        <div class="footer">
-            <p>{{content.contactPerson}}</p>
-            <p>This offer letter is confidential and intended solely for {{content.candidateName}}</p>
+        <!-- Professional Footer -->
+        <div class="document-footer">
+            <div class="footer-contact">
+                <strong>Contact Information:</strong> {{#if hrEmail}}{{hrEmail}}{{else}}hr@{{companyName}}.com{{/if}} | {{#if hrPhone}}{{hrPhone}}{{else}}+91-XXXXXXXXXX{{/if}}
+            </div>
+            <div class="footer-disclaimer">
+                This offer is valid for 7 days from the date of issue. This is a computer-generated document and does not require a physical signature for validity.
+            </div>
+            <div style="margin-top: 8px;">
+                Generated on {{currentDate}} | {{companyName}} - Professional HR System
+            </div>
         </div>
     </div>
 </body>

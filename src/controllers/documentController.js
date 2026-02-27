@@ -168,15 +168,84 @@ exports.updateDocument = async (req, res) => {
     }
 };
 
+// Create a new document with AI generation and template rendering
+exports.generateDocument = async (req, res) => {
+    try {
+        const { type, topic, title } = req.body;
+        const userId = req.user.id;
+
+        console.log(`🚀 Generating document: type=${type}, topic=${topic}, userId=${userId}`);
+
+        if (!type || !topic) {
+            return res.status(400).json({ message: "Type and topic are required" });
+        }
+
+        // Import AI service
+        const { generateContent } = require("../services/ai/aiService");
+        const BrandKit = require("../models/BrandKit");
+
+        // Fetch user's brand kit
+        console.log("🔍 Fetching brand kit...");
+        const brandKit = await BrandKit.findOne({ userId });
+        console.log(`🎨 Brand kit found: ${brandKit ? 'Yes' : 'No'}`);
+        
+        const brandContext = brandKit
+            ? { name: brandKit.name, tone: "Professional", description: brandKit.description, logo: brandKit.logo }
+            : { name: "MM Docs", tone: "Professional" };
+
+        // Generate AI content
+        console.log(`🤖 Generating ${type} content...`);
+        console.log(`📝 Topic: ${topic}`);
+        console.log(`🎨 Brand context: ${JSON.stringify(brandContext)}`);
+        const content = await generateContent(type, topic, brandContext);
+        console.log(`✅ AI content generated successfully`);
+        console.log(`📄 Generated content type: ${typeof content}`);
+        console.log(`📄 Generated content keys: ${Object.keys(content)}`);
+        
+        // Validate that content is an object
+        if (!content || typeof content !== 'object') {
+            throw new Error('AI service returned invalid content format');
+        }
+
+        // Auto-generate title if not provided
+        const documentTitle = title || content.title || `${type.charAt(0).toUpperCase() + type.slice(1)} - ${new Date().toLocaleDateString()}`;
+        console.log(`📝 Document title: ${documentTitle}`);
+
+        // Save document to database
+        console.log(`💾 Saving document to database...`);
+        const document = await Document.create({
+            userId,
+            title: documentTitle,
+            type,
+            content,
+            brandKitId: brandKit ? brandKit._id : null,
+        });
+
+        console.log(`✅ Document saved with ID: ${document._id}`);
+
+        res.status(201).json({
+            message: "Document generated and saved successfully! 🎉",
+            document,
+            previewUrl: `/api/documents/${document._id}/preview`,
+        });
+
+    } catch (error) {
+        console.error("❌ Document Generation Error:", error);
+        console.error("❌ Error stack:", error.stack);
+        res.status(500).json({ 
+            message: "Error generating document", 
+            error: error.message,
+            details: process.env.NODE_ENV === 'development' ? error.stack : undefined
+        });
+    }
+};
 // Delete a document
 exports.deleteDocument = async (req, res) => {
     try {
         const document = await Document.findOneAndDelete({ _id: req.params.id, userId: req.user.id });
-
         if (!document) {
             return res.status(404).json({ message: "Document not found" });
         }
-
         res.json({ message: "Document deleted successfully" });
     } catch (error) {
         res.status(500).json({ message: "Error deleting document", error: error.message });

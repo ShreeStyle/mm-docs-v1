@@ -9,6 +9,7 @@ const {
     renderDocument,
     downloadDocument,
     downloadDocumentDocx,
+    generateDocument,
 } = require("../controllers/documentController");
 const {
     createShareLink,
@@ -29,6 +30,7 @@ const authMiddleware = require("../middleware/authMiddleware");
 router.use(authMiddleware);
 
 router.post("/", createDocument);
+router.post("/generate", generateDocument);
 router.get("/", getDocuments);
 router.get("/:id", getDocumentById);
 router.get("/:id/preview", renderDocument);

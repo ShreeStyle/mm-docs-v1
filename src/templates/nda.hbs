@@ -3,244 +3,209 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{content.title}}</title>
+    <title>Non-Disclosure Agreement</title>
     <style>
-        {{{brandCSS}}}
-        
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
         body {
-            font-family: var(--font-primary, 'Times New Roman', serif);
+            font-family: 'Times New Roman', serif;
             line-height: 1.6;
-            color: #2d3748;
-            background: #ffffff;
-            font-size: 14px;
-        }
-        
-        .document-container {
+            color: #333;
             max-width: 800px;
             margin: 0 auto;
             padding: 40px;
-            min-height: 100vh;
+            background: white;
         }
-        
         .header {
             text-align: center;
             margin-bottom: 40px;
+            border-bottom: 3px solid {{#if brandKit.colors.[0]}}{{brandKit.colors.[0]}}{{else}}#dc3545{{/if}};
             padding-bottom: 20px;
-            border-bottom: 3px solid var(--primary-color, #1e40af);
         }
-        
         .document-title {
             font-size: 28px;
-            font-weight: 700;
-            color: var(--primary-color, #1e40af);
-            margin-bottom: 16px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-        
-        .parties-section {
-            background: #f8fafc;
-            padding: 24px;
-            border-radius: 12px;
-            border-left: 4px solid var(--primary-color, #1e40af);
-            margin: 32px 0;
-        }
-        
-        .party-info {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 24px;
-            margin-top: 16px;
-        }
-        
-        .party {
-            text-align: center;
-            padding: 16px;
-            background: white;
-            border-radius: 8px;
-            border: 1px solid #e2e8f0;
-        }
-        
-        .party-label {
-            font-size: 12px;
-            font-weight: 600;
-            color: #64748b;
-            text-transform: uppercase;
-            margin-bottom: 8px;
-        }
-        
-        .party-name {
-            font-size: 18px;
-            font-weight: 700;
-            color: var(--primary-color, #1e40af);
-        }
-        
-        .section {
-            margin: 32px 0;
-        }
-        
-        .section-title {
-            font-size: 18px;
-            font-weight: 600;
-            color: var(--primary-color, #1e40af);
-            margin-bottom: 16px;
-            padding-bottom: 8px;
-            border-bottom: 2px solid #e2e8f0;
-            text-transform: uppercase;
-        }
-        
-        .clause-list {
-            list-style: none;
-            padding: 0;
-            counter-reset: clause-counter;
-        }
-        
-        .clause-list li {
-            padding: 12px 0;
-            padding-left: 40px;
-            position: relative;
-            counter-increment: clause-counter;
-            border-bottom: 1px solid #f1f5f9;
-        }
-        
-        .clause-list li:before {
-            content: counter(clause-counter, decimal) ".";
-            position: absolute;
-            left: 0;
             font-weight: bold;
-            color: var(--primary-color, #1e40af);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin: 30px 0;
+            text-align: center;
+            color: {{#if brandKit.colors.[0]}}{{brandKit.colors.[0]}}{{else}}#dc3545{{/if}};
         }
-        
+        .parties-section {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        .party {
+            margin-bottom: 15px;
+            padding: 10px;
+            background: white;
+            border-left: 4px solid {{#if brandKit.colors.[0]}}{{brandKit.colors.[0]}}{{else}}#dc3545{{/if}};
+        }
+        .content {
+            margin-bottom: 30px;
+            text-align: justify;
+        }
+        .content p {
+            margin-bottom: 15px;
+        }
+        .clause {
+            margin: 20px 0;
+            padding: 15px;
+            background: #f8f9fa;
+            border-left: 4px solid #6c757d;
+        }
+        .clause h4 {
+            color: #495057;
+            margin-top: 0;
+        }
+        .important {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 5px;
+            padding: 15px;
+            margin: 20px 0;
+        }
         .signature-section {
-            margin-top: 48px;
-            padding-top: 32px;
-            border-top: 2px solid #e2e8f0;
-        }
-        
-        .signature-grid {
+            margin-top: 50px;
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 32px;
-            margin-top: 32px;
+            gap: 40px;
         }
-        
         .signature-box {
             text-align: center;
-            padding: 24px;
-            border: 2px solid var(--primary-color, #1e40af);
-            border-radius: 12px;
-        }
-        
-        .legal-notice {
-            background: #fef3c7;
-            border: 1px solid #fde68a;
-            padding: 16px;
+            border: 1px solid #dee2e6;
+            padding: 20px;
             border-radius: 8px;
-            margin: 24px 0;
-            font-size: 12px;
+        }
+        .signature-line {
+            border-top: 1px solid #333;
+            margin-top: 60px;
+            padding-top: 5px;
+        }
+        .footer {
+            margin-top: 40px;
             text-align: center;
+            font-size: 12px;
+            color: #666;
+            border-top: 1px solid #eee;
+            padding-top: 20px;
         }
     </style>
 </head>
 <body>
-    <div class="document-container">
-        <div class="header">
-            <div class="document-title">{{content.title}}</div>
-            <div style="font-size: 14px; color: #64748b;">Effective Date: {{content.effectiveDate}}</div>
-        </div>
+    <div class="header">
+        <div class="document-title">Non-Disclosure Agreement</div>
+        <p><strong>Effective Date:</strong> {{effectiveDate}}</p>
+    </div>
 
-        <div class="parties-section">
-            <div style="text-align: center; font-size: 16px; font-weight: 600; margin-bottom: 16px;">
-                Agreement Between
-            </div>
-            <div class="party-info">
-                <div class="party">
-                    <div class="party-label">Disclosing Party</div>
-                    <div class="party-name">{{content.disclosingParty}}</div>
-                </div>
-                <div class="party">
-                    <div class="party-label">Receiving Party</div>
-                    <div class="party-name">{{content.receivingParty}}</div>
-                </div>
-            </div>
+    <div class="parties-section">
+        <h3>Parties to this Agreement</h3>
+        <div class="party">
+            <h4>Disclosing Party:</h4>
+            <p><strong>{{companyName}}</strong><br>
+            {{companyAddress}}<br>
+            {{#if companyEmail}}Email: {{companyEmail}}<br>{{/if}}
+            {{#if companyPhone}}Phone: {{companyPhone}}{{/if}}</p>
         </div>
-
-        <div class="section">
-            <div class="section-title">Purpose</div>
-            <p>{{content.purpose}}</p>
+        <div class="party">
+            <h4>Receiving Party:</h4>
+            <p><strong>{{partyName}}</strong><br>
+            {{partyAddress}}<br>
+            {{#if partyEmail}}Email: {{partyEmail}}<br>{{/if}}
+            {{#if partyPhone}}Phone: {{partyPhone}}{{/if}}</p>
         </div>
+    </div>
 
-        <div class="section">
-            <div class="section-title">Confidential Information</div>
-            <ul class="clause-list">
-                {{#each content.confidentialInformation}}
-                <li>{{this}}</li>
-                {{/each}}
+    <div class="content">
+        <p><strong>WHEREAS,</strong> the Disclosing Party possesses certain confidential and proprietary information related to {{#if purpose}}{{purpose}}{{else}}business operations, technology, and trade secrets{{/if}};</p>
+
+        <p><strong>WHEREAS,</strong> the Receiving Party desires to receive and evaluate such confidential information for the purpose of {{#if purpose}}{{purpose}}{{else}}potential business collaboration{{/if}};</p>
+
+        <p><strong>NOW, THEREFORE,</strong> in consideration of the mutual covenants contained herein, the parties agree as follows:</p>
+
+        <div class="clause">
+            <h4>1. Definition of Confidential Information</h4>
+            <p>For purposes of this Agreement, "Confidential Information" shall include all information, whether written, oral, electronic, or visual, disclosed by the Disclosing Party to the Receiving Party, including but not limited to:</p>
+            <ul>
+                <li>Technical data, trade secrets, know-how, research, product plans, products, services, customers, customer lists, markets, software, developments, inventions, processes, formulas, technology, designs, drawings, engineering, hardware configuration information, marketing, finances, or other business information.</li>
+                <li>All information marked, designated or otherwise identified as "confidential" or "proprietary".</li>
+                <li>All information that would reasonably be considered confidential under the circumstances.</li>
             </ul>
         </div>
 
-        <div class="section">
-            <div class="section-title">Obligations of Receiving Party</div>
-            <ul class="clause-list">
-                {{#each content.obligations}}
-                <li>{{this}}</li>
-                {{/each}}
+        <div class="clause">
+            <h4>2. Obligations of Receiving Party</h4>
+            <p>The Receiving Party agrees to:</p>
+            <ul>
+                <li>Hold and maintain the Confidential Information in strict confidence</li>
+                <li>Not disclose the Confidential Information to any third parties without prior written consent</li>
+                <li>Use the Confidential Information solely for the purpose of {{#if purpose}}{{purpose}}{{else}}evaluating potential business opportunities{{/if}}</li>
+                <li>Take reasonable precautions to protect the confidentiality of the information</li>
+                <li>Limit access to the Confidential Information to employees or agents who have a legitimate need to know</li>
             </ul>
         </div>
 
-        <div class="section">
-            <div class="section-title">Exceptions</div>
-            <ul class="clause-list">
-                {{#each content.exceptions}}
-                <li>{{this}}</li>
-                {{/each}}
+        <div class="clause">
+            <h4>3. Exceptions</h4>
+            <p>The obligations of confidentiality shall not apply to information that:</p>
+            <ul>
+                <li>Is or becomes publicly available through no breach of this Agreement</li>
+                <li>Is rightfully received from a third party without breach of any confidentiality obligation</li>
+                <li>Is independently developed without use of or reference to Confidential Information</li>
+                <li>Is required to be disclosed by law or court order</li>
             </ul>
         </div>
 
-        <div class="section">
-            <div class="section-title">Duration & Remedies</div>
-            <p><strong>Duration:</strong> {{content.duration}}</p>
-            <br>
-            <p><strong>Remedies:</strong> {{content.remedies}}</p>
+        <div class="clause">
+            <h4>4. Term and Termination</h4>
+            <p>This Agreement shall remain in effect for a period of {{#if duration}}{{duration}} years{{else}}3 years{{/if}} from the Effective Date, unless terminated earlier by mutual written consent. The obligations of confidentiality shall survive termination of this Agreement.</p>
         </div>
 
-        <div class="legal-notice">
-            <strong>Governing Law:</strong> {{content.governingLaw}}
+        <div class="clause">
+            <h4>5. Return of Information</h4>
+            <p>Upon termination of this Agreement or upon request by the Disclosing Party, the Receiving Party shall promptly return or destroy all documents, materials, and other tangible manifestations of Confidential Information.</p>
         </div>
 
-        <div class="signature-section">
-            <div style="text-align: center; font-size: 16px; font-weight: 600; margin-bottom: 24px;">
-                Signatures
+        <div class="important">
+            <h4>⚠️ Legal Consequences</h4>
+            <p><strong>Breach of this Agreement may result in irreparable harm to the Disclosing Party. The Receiving Party acknowledges that monetary damages may be inadequate and that the Disclosing Party shall be entitled to equitable relief, including injunction and specific performance.</strong></p>
+        </div>
+
+        <div class="clause">
+            <h4>6. Governing Law</h4>
+            <p>This Agreement shall be governed by and construed in accordance with the laws of {{#if jurisdiction}}{{jurisdiction}}{{else}}India{{/if}}, without regard to its conflict of laws principles.</p>
+        </div>
+
+        <p>By signing below, the parties acknowledge that they have read, understood, and agree to be bound by the terms and conditions of this Non-Disclosure Agreement.</p>
+    </div>
+
+    <div class="signature-section">
+        <div class="signature-box">
+            <h4>Disclosing Party</h4>
+            <div class="signature-line">
+                <strong>{{companyName}}</strong><br><br>
+                Signature: ________________________<br><br>
+                Name: {{#if signatoryName}}{{signatoryName}}{{else}}[Authorized Signatory]{{/if}}<br>
+                Title: {{#if signatoryTitle}}{{signatoryTitle}}{{else}}[Title]{{/if}}<br>
+                Date: ________________________
             </div>
-            <div class="signature-grid">
-                <div class="signature-box">
-                    <p><strong>{{content.signatures.disclosingParty}}</strong></p>
-                    <br><br>
-                    <p>_________________________</p>
-                    <p>Signature</p>
-                    <br>
-                    <p>Date: _________________</p>
-                </div>
-                <div class="signature-box">
-                    <p><strong>{{content.signatures.receivingParty}}</strong></p>
-                    <br><br>
-                    <p>_________________________</p>
-                    <p>Signature</p>
-                    <br>
-                    <p>Date: _________________</p>
-                </div>
+        </div>
+        <div class="signature-box">
+            <h4>Receiving Party</h4>
+            <div class="signature-line">
+                <strong>{{partyName}}</strong><br><br>
+                Signature: ________________________<br><br>
+                Name: ________________________<br>
+                Title: ________________________<br>
+                Date: ________________________
             </div>
         </div>
+    </div>
 
-        <div style="margin-top: 32px; text-align: center; font-size: 12px; color: #64748b;">
-            <p>This document was generated on {{content.date}}</p>
-        </div>
+    <div class="footer">
+        <p><strong>Witness:</strong> This agreement was executed in the presence of witnesses on {{effectiveDate}}.</p>
+        <p>Generated on {{currentDate}} | {{companyName}} - Legal Document System</p>
     </div>
 </body>
 </html>
