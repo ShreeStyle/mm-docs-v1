@@ -7,206 +7,214 @@
     <style>
         @page {
             size: A4;
-            margin: 0;
+            margin: 1in;
         }
         
         body {
             margin: 0;
-            padding: 0;
-            font-family: 'Georgia', serif;
-            background-image: url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iODAwIiBoZWlnaHQ9IjExMDAiIHZpZXdCb3g9IjAgMCA4MDAgMTEwMCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjgwMCIgaGVpZ2h0PSIxMTAwIiBmaWxsPSIjZmRmMmY4Ii8+CjxwYXRoIGQ9Ik0wIDBoODB2MTEwSDB6IiBmaWxsPSJ1cmwoI2EpIi8+CjxwYXRoIGQ9Ik03MjAgMGg4MHYxMTAwSDcyMHoiIGZpbGw9InVybCgjYikiLz4KPHBhdGggZD0iTTAgMGg4MDB2ODBIMHoiIGZpbGw9InVybCgjYykiLz4KPHBhdGggZD0iTTAgMTAyMGg4MDB2ODBIMHoiIGZpbGw9InVybCgjZCkiLz4KPGRlZnM+CjxsaW5lYXJHcmFkaWVudCBpZD0iYSIgeDE9IjAiIHkxPSIwIiB4Mj0iMSIgeTI9IjAiPgo8c3RvcCBzdG9wLWNvbG9yPSIjZmJiNmNlIiBzdG9wLW9wYWNpdHk9IjAuOCIvPgo8c3RvcCBvZmZzZXQ9IjEiIHN0b3AtY29sb3I9IiNmOWE4ZDQiIHN0b3Atb3BhY2l0eT0iMC42Ii8+CjwvbGluZWFyR3JhZGllbnQ+CjxsaW5lYXJHcmFkaWVudCBpZD0iYiIgeDE9IjAiIHkxPSIwIiB4Mj0iMSIgeTI9IjAiPgo8c3RvcCBzdG9wLWNvbG9yPSIjZmJiNmNlIiBzdG9wLW9wYWNpdHk9IjAuOCIvPgo8c3RvcCBvZmZzZXQ9IjEiIHN0b3AtY29sb3I9IiNmOWE4ZDQiIHN0b3Atb3BhY2l0eT0iMC42Ci8+CjwvbGluZWFyR3JhZGllbnQ+CjxsaW5lYXJHcmFkaWVudCBpZD0iYyIgeDE9IjAiIHkxPSIwIiB4Mj0iMCIgeTI9IjEiPgo8c3RvcCBzdG9wLWNvbG9yPSIjZmJiNmNlIiBzdG9wLW9wYWNpdHk9IjAuOCIvPgo8c3RvcCBvZmZzZXQ9IjEiIHN0b3AtY29sb3I9IiNmOWE4ZDQiIHN0b3Atb3BhY2l0eT0iMC42Ii8+CjwvbGluZWFyR3JhZGllbnQ+CjxsaW5lYXJHcmFkaWVudCBpZD0iZCIgeDE9IjAiIHkxPSIwIiB4Mj0iMCIgeTI9IjEiPgo8c3RvcCBzdG9wLWNvbG9yPSIjZmJiNmNlIiBzdG9wLW9wYWNpdHk9IjAuOCIvPgo8c3RvcCBvZmZzZXQ9IjEiIHN0b3AtY29sb3I9IiNmOWE4ZDQiIHN0b3Atb3BhY2l0eT0iMC42Ii8+CjwvbGluZWFyR3JhZGllbnQ+CjwvZGVmcz4KPC9zdmc+');
-            background-size: cover;
-            background-repeat: no-repeat;
-            background-position: center;
-            min-height: 100vh;
-            position: relative;
-        }
-        
-        /* Floral corner decorations */
-        .floral-corner {
-            position: absolute;
-            font-size: 48px;
-            color: #f472b6;
-            opacity: 0.7;
-        }
-        
-        .top-left { top: 20px; left: 20px; }
-        .top-right { top: 20px; right: 20px; }
-        .bottom-left { bottom: 20px; left: 20px; }
-        .bottom-right { bottom: 20px; right: 20px; }
-        
-        /* Decorative border roses */
-        .border-decoration {
-            position: absolute;
-            font-size: 32px;
-            color: #f472b6;
-            opacity: 0.6;
-        }
-        
-        .top-center { top: 10px; left: 50%; transform: translateX(-50%); }
-        .bottom-center { bottom: 10px; left: 50%; transform: translateX(-50%); }
-        .left-center { left: 10px; top: 50%; transform: translateY(-50%); }
-        .right-center { right: 10px; top: 50%; transform: translateY(-50%); }
-        
-        /* Content container */
-        .content-container {
-            max-width: 650px;
+            padding: 40px;
+            font-family: 'Arial', 'Helvetica', sans-serif;
+            background-color: #ffffff;
+            color: #333333;
+            line-height: 1.6;
+            max-width: 800px;
             margin: 0 auto;
-            padding: 100px 50px;
-            position: relative;
-            z-index: 10;
         }
         
-        /* Title styling */
+        .header {
+            text-align: center;
+            border-bottom: 3px solid #dc2626;
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+        }
+        
         .document-title {
-            text-align: center;
-            font-size: 20px;
-            color: #be185d;
-            margin-bottom: 25px;
+            font-size: 28px;
             font-weight: bold;
-            text-shadow: 2px 2px 4px rgba(190, 24, 93, 0.2);
+            color: #b91c1c;
+            margin: 0;
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
         
-        /* Section headers */
+        .subtitle {
+            font-size: 16px;
+            color: #6b7280;
+            margin: 10px 0 0 0;
+            font-style: italic;
+        }
+        
         .section-header {
-            color: #ec4899;
             font-size: 20px;
             font-weight: bold;
-            margin: 25px 0 12px 0;
-            text-align: center;
-            text-shadow: 1px 1px 2px rgba(236, 72, 153, 0.3);
+            color: #b91c1c;
+            margin: 30px 0 15px 0;
+            text-transform: uppercase;
+            border-left: 4px solid #dc2626;
+            padding-left: 15px;
         }
         
-        /* Pillar headers */
-        .pillar-header {
-            color: #f472b6;
-            font-size: 18px;
+        .subsection-header {
+            font-size: 16px;
             font-weight: bold;
+            color: #374151;
             margin: 20px 0 10px 0;
             text-decoration: underline;
         }
         
-        /* Regular text */
         .content-text {
-            color: #6b7280;
-            font-size: 15px;
-            line-height: 1.7;
+            font-size: 14px;
+            color: #4b5563;
             margin-bottom: 12px;
             text-align: justify;
         }
         
-        /* Bullet points */
         .bullet-point {
-            color: #9ca3af;
-            font-size: 15px;
-            margin-left: 25px;
+            font-size: 14px;
+            color: #4b5563;
+            margin-left: 20px;
             margin-bottom: 8px;
             position: relative;
         }
         
         .bullet-point::before {
-            content: "🌸";
+            content: "•";
             position: absolute;
-            left: -25px;
-            color: #fbb6ce;
+            left: -15px;
+            color: #dc2626;
+            font-weight: bold;
         }
         
-        /* Metrics box */
         .metrics-box {
-            background: rgba(244, 114, 182, 0.1);
-            border: 2px solid rgba(244, 114, 182, 0.3);
-            border-radius: 15px;
+            background-color: #fef2f2;
+            border: 1px solid #fecaca;
+            border-left: 4px solid #dc2626;
             padding: 20px;
             margin: 25px 0;
-            text-align: center;
+            border-radius: 4px;
         }
         
         .metrics-title {
-            color: #ec4899;
             font-size: 18px;
             font-weight: bold;
+            color: #b91c1c;
             margin-bottom: 15px;
+            text-transform: uppercase;
+            text-align: center;
         }
         
         .metric-item {
-            color: #6b7280;
-            font-size: 15px;
+            font-size: 14px;
+            color: #4b5563;
             margin-bottom: 8px;
+            padding-left: 15px;
+            position: relative;
         }
         
-        /* Footer */
-        .document-footer {
+        .metric-item::before {
+            content: "▶";
+            position: absolute;
+            left: 0;
+            color: #dc2626;
+            font-size: 12px;
+        }
+        
+        .footer {
             text-align: center;
             margin-top: 40px;
-            padding: 15px;
-            border-top: 2px solid rgba(236, 72, 153, 0.3);
-            color: #ec4899;
-            font-size: 14px;
-            font-style: italic;
+            padding-top: 20px;
+            border-top: 2px solid #e5e7eb;
+            color: #6b7280;
+            font-size: 12px;
+        }
+        
+        .company-logo {
+            font-size: 18px;
+            font-weight: bold;
+            color: #b91c1c;
         }
     </style>
 </head>
 <body>
-    <!-- Floral corner decorations -->
-    <div class="floral-corner top-left">🌹</div>
-    <div class="floral-corner top-right">🌹</div>
-    <div class="floral-corner bottom-left">🌹</div>
-    <div class="floral-corner bottom-right">🌹</div>
-    
-    <!-- Border decorations -->
-    <div class="border-decoration top-center">🌸 ✨ 🌸</div>
-    <div class="border-decoration bottom-center">🌸 ✨ 🌸</div>
-    <div class="border-decoration left-center">🌺</div>
-    <div class="border-decoration right-center">🌺</div>
-    
-    <!-- Main content -->
-    <div class="content-container">
+    <div class="header">
         <h1 class="document-title">{{title}}</h1>
-        
-        <div class="section-header">✨ Visionary Strategic Framework ✨</div>
-        <div class="content-text" style="text-align: center; font-style: italic;">Our Distinguished Path to Market Leadership & Sustainable Excellence</div>
-        
-        <div class="pillar-header">🌟 Premier Market Positioning & Elite Customer Cultivation</div>
-        <div class="bullet-point">Orchestrate sophisticated market penetration through meticulously crafted AI-driven customer experiences</div>
-        <div class="bullet-point">Curate an exclusive onboarding journey that delivers immediate, transformative value to discerning business leaders</div>
-        <div class="bullet-point">Establish strategic alliances with industry luminaries and thought leaders for exponential growth</div>
-        
-        <div class="pillar-header">🌟 Product Mastery & Innovation Excellence</div>
-        <div class="bullet-point">Expand our distinguished template collection to an unparalleled library of 100+ exquisite professional documents</div>
-        <div class="bullet-point">Elevate AI generation capabilities to deliver consistently exceptional, publication-ready content</div>
-        <div class="bullet-point">Perfect our intelligent brand integration system for seamless, sophisticated document styling</div>
-        <div class="bullet-point">Pioneer collaborative features that transform team-based document creation into an art form</div>
-        
-        <div class="pillar-header">🌟 Revenue Optimization & Premium Monetization</div>
-        <div class="bullet-point">Masterfully optimize conversion pathways from complimentary to premium experiences</div>
-        <div class="bullet-point">Introduce exclusive enterprise solutions with bespoke customization and privileged API access</div>
-        <div class="bullet-point">Develop prestigious white-label offerings for elite agencies and distinguished consultants</div>
-        <div class="bullet-point">Implement sophisticated usage-based pricing models for high-caliber, volume-driven clients</div>
-        
-        <div class="pillar-header">🌟 Global Market Expansion & Cultural Sophistication</div>
-        <div class="bullet-point">Launch with distinction in premier international markets featuring culturally refined templates</div>
-        <div class="bullet-point">Develop specialized document libraries for prestigious industries (legal, healthcare, finance)</div>
-        <div class="bullet-point">Forge seamless integrations with the world's most respected business platforms</div>
-        <div class="bullet-point">Cultivate partnerships with premium business service providers and industry leaders</div>
-        
-        <div class="pillar-header">🌟 Operational Excellence & Service Distinction</div>
-        <div class="bullet-point">Scale our infrastructure with architectural elegance to support exponential growth</div>
-        <div class="bullet-point">Implement advanced analytics for profound user experience insights</div>
-        <div class="bullet-point">Establish world-class customer success programs that exceed expectations</div>
-        <div class="bullet-point">Create comprehensive developer resources that set new industry standards</div>
-        
-        <div class="metrics-box">
-            <div class="metrics-title">Distinguished Success Metrics</div>
-            <div class="metric-item">🎯 50,000+ distinguished active users by Q4 2024</div>
-            <div class="metric-item">📈 25% monthly revenue growth with sustainable excellence</div>
-            <div class="metric-item">⭐ 95% customer satisfaction reflecting our commitment to perfection</div>
-            <div class="metric-item">💎 40% premium conversion rate demonstrating exceptional value delivery</div>
-        </div>
-        
-        <div class="document-footer">
-            ✨ Strategic Excellence & Growth Mastery ✨<br>
-            MM Docs - Where Vision Meets Execution
-        </div>
+        <p class="subtitle">Strategic Growth Plan 2024-2025</p>
+    </div>
+    
+    <div class="section-header">Executive Summary</div>
+    <div class="content-text">MM Docs is positioned to become the leading AI-powered document generation platform for businesses worldwide. Our strategic focus centers on delivering exceptional value through intelligent automation, professional quality, and seamless user experience.</div>
+    
+    <div class="subsection-header">Market Opportunity</div>
+    <div class="content-text">The global document automation market is valued at $500M+ and growing at 15% annually. Key drivers include:</div>
+    <div class="bullet-point">Increasing demand for digital transformation in document workflows</div>
+    <div class="bullet-point">Rising costs of manual document creation and management</div>
+    <div class="bullet-point">Growing need for brand consistency across business communications</div>
+    <div class="bullet-point">Expansion of remote work requiring standardized documentation</div>
+    
+    <div class="subsection-header">Target Market Segments</div>
+    <div class="content-text"><strong>Primary Markets:</strong></div>
+    <div class="bullet-point">Small to Medium Businesses (SMBs) seeking professional document automation</div>
+    <div class="bullet-point">Freelancers and consultants requiring branded business documents</div>
+    <div class="bullet-point">HR departments managing employee documentation at scale</div>
+    <div class="bullet-point">Sales teams generating proposals, quotations, and contracts</div>
+    
+    <div class="content-text"><strong>Secondary Markets:</strong></div>
+    <div class="bullet-point">Legal firms requiring standardized document templates</div>
+    <div class="bullet-point">Accounting firms creating client-facing financial documents</div>
+    <div class="bullet-point">Marketing agencies managing multiple client brands</div>
+    
+    <div class="subsection-header">Competitive Advantages</div>
+    <div class="content-text"><strong>Technology Leadership:</strong></div>
+    <div class="bullet-point">Advanced AI integration with OpenRouter for superior content generation</div>
+    <div class="bullet-point">Comprehensive template library covering 25+ document categories</div>
+    <div class="bullet-point">Intelligent brand kit integration for consistent visual identity</div>
+    <div class="bullet-point">Real-time document preview and editing capabilities</div>
+    
+    <div class="content-text"><strong>User Experience Excellence:</strong></div>
+    <div class="bullet-point">Intuitive category-based document selection</div>
+    <div class="bullet-point">Detailed form inputs for precise document customization</div>
+    <div class="bullet-point">Instant PDF and DOCX export functionality</div>
+    <div class="bullet-point">Mobile-responsive design for accessibility</div>
+    
+    <div class="subsection-header">Growth Initiatives</div>
+    <div class="content-text"><strong>Phase 1 (Q1-Q2 2024): Foundation & Optimization</strong></div>
+    <div class="bullet-point">Enhance AI content quality and accuracy</div>
+    <div class="bullet-point">Expand template library to 50+ document types</div>
+    <div class="bullet-point">Implement user feedback system for continuous improvement</div>
+    <div class="bullet-point">Optimize conversion funnel from free to premium users</div>
+    
+    <div class="content-text"><strong>Phase 2 (Q3-Q4 2024): Scale & Expansion</strong></div>
+    <div class="bullet-point">Launch enterprise features with team collaboration</div>
+    <div class="bullet-point">Introduce API access for third-party integrations</div>
+    <div class="bullet-point">Develop industry-specific template collections</div>
+    <div class="bullet-point">Implement advanced analytics and reporting</div>
+    
+    <div class="content-text"><strong>Phase 3 (2025): Market Leadership</strong></div>
+    <div class="bullet-point">Multi-language support for global expansion</div>
+    <div class="bullet-point">White-label solutions for agencies and consultants</div>
+    <div class="bullet-point">Advanced AI features including document analysis</div>
+    <div class="bullet-point">Strategic partnerships with business software providers</div>
+    
+    <div class="subsection-header">Revenue Strategy</div>
+    <div class="content-text"><strong>Freemium Model:</strong></div>
+    <div class="bullet-point">Free tier: 5 documents per month with MM Docs branding</div>
+    <div class="bullet-point">Pro tier: ₹999/month for unlimited documents, brand customization</div>
+    <div class="bullet-point">Enterprise tier: Custom pricing for teams and advanced features</div>
+    
+    <div class="metrics-box">
+        <div class="metrics-title">Key Success Metrics</div>
+        <div class="metric-item">Target: 10,000 active users by Q4 2024</div>
+        <div class="metric-item">Conversion rate goal: 15% free to premium</div>
+        <div class="metric-item">Monthly recurring revenue target: ₹1.5M by end of 2024</div>
+        <div class="metric-item">Customer acquisition cost: <₹500 per premium user</div>
+        <div class="metric-item">User retention: 80% monthly retention rate</div>
+        <div class="metric-item">Document generation: 100,000+ documents created monthly</div>
+    </div>
+    
+    <div class="footer">
+        <div class="company-logo">MM Docs</div>
+        <div>Strategic Growth & Business Excellence</div>
+        <div>AI-Powered Document Solutions</div>
     </div>
 </body>
 </html>

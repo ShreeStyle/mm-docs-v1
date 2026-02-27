@@ -7,201 +7,197 @@
     <style>
         @page {
             size: A4;
-            margin: 0;
+            margin: 1in;
         }
         
         body {
             margin: 0;
-            padding: 0;
-            font-family: 'Georgia', serif;
-            background-image: url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iODAwIiBoZWlnaHQ9IjExMDAiIHZpZXdCb3g9IjAgMCA4MDAgMTEwMCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjgwMCIgaGVpZ2h0PSIxMTAwIiBmaWxsPSIjZmRmMmY4Ii8+CjxwYXRoIGQ9Ik0wIDBoODB2MTEwSDB6IiBmaWxsPSJ1cmwoI2EpIi8+CjxwYXRoIGQ9Ik03MjAgMGg4MHYxMTAwSDcyMHoiIGZpbGw9InVybCgjYikiLz4KPHBhdGggZD0iTTAgMGg4MDB2ODBIMHoiIGZpbGw9InVybCgjYykiLz4KPHBhdGggZD0iTTAgMTAyMGg4MDB2ODBIMHoiIGZpbGw9InVybCgjZCkiLz4KPGRlZnM+CjxsaW5lYXJHcmFkaWVudCBpZD0iYSIgeDE9IjAiIHkxPSIwIiB4Mj0iMSIgeTI9IjAiPgo8c3RvcCBzdG9wLWNvbG9yPSIjZmJiNmNlIiBzdG9wLW9wYWNpdHk9IjAuOCIvPgo8c3RvcCBvZmZzZXQ9IjEiIHN0b3AtY29sb3I9IiNmOWE4ZDQiIHN0b3Atb3BhY2l0eT0iMC42Ii8+CjwvbGluZWFyR3JhZGllbnQ+CjxsaW5lYXJHcmFkaWVudCBpZD0iYiIgeDE9IjAiIHkxPSIwIiB4Mj0iMSIgeTI9IjAiPgo8c3RvcCBzdG9wLWNvbG9yPSIjZmJiNmNlIiBzdG9wLW9wYWNpdHk9IjAuOCIvPgo8c3RvcCBvZmZzZXQ9IjEiIHN0b3AtY29sb3I9IiNmOWE4ZDQiIHN0b3Atb3BhY2l0eT0iMC42Ii8+CjwvbGluZWFyR3JhZGllbnQ+CjxsaW5lYXJHcmFkaWVudCBpZD0iYyIgeDE9IjAiIHkxPSIwIiB4Mj0iMCIgeTI9IjEiPgo8c3RvcCBzdG9wLWNvbG9yPSIjZmJiNmNlIiBzdG9wLW9wYWNpdHk9IjAuOCIvPgo8c3RvcCBvZmZzZXQ9IjEiIHN0b3AtY29sb3I9IiNmOWE4ZDQiIHN0b3Atb3BhY2l0eT0iMC42Ci8+CjwvbGluZWFyR3JhZGllbnQ+CjxsaW5lYXJHcmFkaWVudCBpZD0iZCIgeDE9IjAiIHkxPSIwIiB4Mj0iMCIgeTI9IjEiPgo8c3RvcCBzdG9wLWNvbG9yPSIjZmJiNmNlIiBzdG9wLW9wYWNpdHk9IjAuOCIvPgo8c3RvcCBvZmZzZXQ9IjEiIHN0b3AtY29sb3I9IiNmOWE4ZDQiIHN0b3Atb3BhY2l0eT0iMC42Ii8+CjwvbGluZWFyR3JhZGllbnQ+CjwvZGVmcz4KPC9zdmc+');
-            background-size: cover;
-            background-repeat: no-repeat;
-            background-position: center;
-            min-height: 100vh;
-            position: relative;
-        }
-        
-        /* Floral corner decorations */
-        .floral-corner {
-            position: absolute;
-            font-size: 48px;
-            color: #f472b6;
-            opacity: 0.7;
-        }
-        
-        .top-left { top: 20px; left: 20px; }
-        .top-right { top: 20px; right: 20px; }
-        .bottom-left { bottom: 20px; left: 20px; }
-        .bottom-right { bottom: 20px; right: 20px; }
-        
-        /* Decorative border roses */
-        .border-decoration {
-            position: absolute;
-            font-size: 32px;
-            color: #f472b6;
-            opacity: 0.6;
-        }
-        
-        .top-center { top: 10px; left: 50%; transform: translateX(-50%); }
-        .bottom-center { bottom: 10px; left: 50%; transform: translateX(-50%); }
-        .left-center { left: 10px; top: 50%; transform: translateY(-50%); }
-        .right-center { right: 10px; top: 50%; transform: translateY(-50%); }
-        
-        /* Content container */
-        .content-container {
-            max-width: 650px;
+            padding: 40px;
+            font-family: 'Arial', 'Helvetica', sans-serif;
+            background-color: #ffffff;
+            color: #333333;
+            line-height: 1.6;
+            max-width: 800px;
             margin: 0 auto;
-            padding: 100px 50px;
-            position: relative;
-            z-index: 10;
         }
         
-        /* Title styling */
+        .header {
+            text-align: center;
+            border-bottom: 3px solid #059669;
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+        }
+        
         .document-title {
-            text-align: center;
-            font-size: 20px;
-            color: #be185d;
-            margin-bottom: 20px;
+            font-size: 28px;
             font-weight: bold;
-            text-shadow: 2px 2px 4px rgba(190, 24, 93, 0.2);
+            color: #047857;
+            margin: 0;
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
         
-        /* Section headers */
+        .subtitle {
+            font-size: 16px;
+            color: #6b7280;
+            margin: 10px 0 0 0;
+            font-style: italic;
+        }
+        
         .section-header {
-            color: #ec4899;
-            font-size: 18px;
+            font-size: 20px;
             font-weight: bold;
-            margin: 20px 0 10px 0;
-            text-align: center;
-            text-shadow: 1px 1px 2px rgba(236, 72, 153, 0.3);
+            color: #047857;
+            margin: 30px 0 15px 0;
+            text-transform: uppercase;
+            border-left: 4px solid #059669;
+            padding-left: 15px;
         }
         
-        /* Subsection headers */
         .subsection-header {
-            color: #f472b6;
             font-size: 16px;
             font-weight: bold;
-            margin: 15px 0 8px 0;
+            color: #374151;
+            margin: 20px 0 10px 0;
             text-decoration: underline;
         }
         
-        /* Regular text */
         .content-text {
-            color: #6b7280;
             font-size: 14px;
-            line-height: 1.6;
-            margin-bottom: 10px;
+            color: #4b5563;
+            margin-bottom: 12px;
             text-align: justify;
         }
         
-        /* Bullet points */
         .bullet-point {
-            color: #9ca3af;
             font-size: 14px;
+            color: #4b5563;
             margin-left: 20px;
-            margin-bottom: 6px;
+            margin-bottom: 8px;
             position: relative;
         }
         
         .bullet-point::before {
-            content: "🌸";
+            content: "•";
             position: absolute;
-            left: -20px;
-            color: #fbb6ce;
+            left: -15px;
+            color: #059669;
+            font-weight: bold;
         }
         
-        /* Vision box */
         .vision-box {
-            background: rgba(244, 114, 182, 0.1);
-            border: 2px solid rgba(244, 114, 182, 0.3);
-            border-radius: 15px;
+            background-color: #f0fdf4;
+            border: 1px solid #bbf7d0;
+            border-left: 4px solid #059669;
             padding: 20px;
-            margin: 20px 0;
+            margin: 25px 0;
+            border-radius: 4px;
             text-align: center;
         }
         
         .vision-title {
-            color: #ec4899;
-            font-size: 16px;
+            font-size: 18px;
             font-weight: bold;
+            color: #047857;
             margin-bottom: 10px;
+            text-transform: uppercase;
         }
         
-        /* Footer */
-        .document-footer {
+        .footer {
             text-align: center;
-            margin-top: 30px;
-            padding: 15px;
-            border-top: 2px solid rgba(236, 72, 153, 0.3);
-            color: #ec4899;
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 2px solid #e5e7eb;
+            color: #6b7280;
             font-size: 12px;
-            font-style: italic;
+        }
+        
+        .company-logo {
+            font-size: 18px;
+            font-weight: bold;
+            color: #047857;
         }
     </style>
 </head>
 <body>
-    <!-- Floral corner decorations -->
-    <div class="floral-corner top-left">🌹</div>
-    <div class="floral-corner top-right">🌹</div>
-    <div class="floral-corner bottom-left">🌹</div>
-    <div class="floral-corner bottom-right">🌹</div>
-    
-    <!-- Border decorations -->
-    <div class="border-decoration top-center">🌸 ✨ 🌸</div>
-    <div class="border-decoration bottom-center">🌸 ✨ 🌸</div>
-    <div class="border-decoration left-center">🌺</div>
-    <div class="border-decoration right-center">🌺</div>
-    
-    <!-- Main content -->
-    <div class="content-container">
+    <div class="header">
         <h1 class="document-title">{{title}}</h1>
-        
-        <div class="section-header">✨ Our Distinguished Vision ✨</div>
-        <div class="content-text" style="text-align: center; font-style: italic;">Pioneering the Renaissance of Business Document Artistry</div>
-        
-        <div class="subsection-header">🌟 Exquisite Product Philosophy</div>
-        <div class="content-text">MM Docs represents the pinnacle of AI-powered document creation, where sophisticated technology meets timeless business elegance. We transform simple inspirations into masterfully crafted, brand-harmonious documents that elevate professional communications to an art form.</div>
-        
-        <div class="subsection-header">🌟 The Challenge We Elegantly Solve</div>
-        <div class="content-text">Distinguished businesses worldwide face:</div>
-        <div class="bullet-point">Laborious document creation processes that consume precious time and creative energy</div>
-        <div class="bullet-point">Inconsistent branding that diminishes professional prestige and market presence</div>
-        <div class="bullet-point">Mediocre language quality that fails to reflect organizational excellence</div>
-        <div class="bullet-point">Antiquated templates that lack contemporary sophistication and visual appeal</div>
-        
-        <div class="subsection-header">🌟 Our Sophisticated Solution</div>
-        <div class="content-text">MM Docs delivers:</div>
-        <div class="bullet-point">AI-crafted documents with eloquent, professional language that commands respect</div>
-        <div class="bullet-point">Seamless brand integration ensuring consistent visual distinction across all communications</div>
-        <div class="bullet-point">25+ meticulously curated document categories spanning HR, Legal, Sales, Finance, and Marketing excellence</div>
-        <div class="bullet-point">Instant, premium-quality PDF and DOCX exports ready for immediate professional use</div>
-        
-        <div class="subsection-header">🌟 Our Distinguished Clientele</div>
-        <div class="content-text">Premier Users Include:</div>
-        <div class="bullet-point">Visionary founders and entrepreneurs crafting exceptional business narratives</div>
-        <div class="bullet-point">Elite sales professionals generating compelling proposals and sophisticated quotations</div>
-        <div class="bullet-point">Distinguished HR departments managing comprehensive employee documentation</div>
-        <div class="bullet-point">Progressive small to medium enterprises across all prestigious industries</div>
-        
-        <div class="vision-box">
-            <div class="vision-title">Core Excellence Propositions</div>
-            <div class="content-text">🚀 Velocity: Generate sophisticated documents in under 2 minutes with remarkable precision</div>
-            <div class="content-text">✨ Quality: AI ensures consistently elegant language and impeccable structural integrity</div>
-            <div class="content-text">🎨 Distinction: Automatic application of refined company branding to every document</div>
-            <div class="content-text">📚 Comprehensiveness: Extensive library addressing every conceivable business documentation need</div>
-        </div>
-        
-        <div class="subsection-header">🌟 Future Excellence Roadmap</div>
-        <div class="bullet-point">Multi-linguistic sophistication for distinguished global expansion</div>
-        <div class="bullet-point">Advanced collaborative features enabling seamless team orchestration</div>
-        <div class="bullet-point">Premium API access for enterprise-level integrations and customization</div>
-        <div class="bullet-point">Industry-specific template libraries crafted for specialized professional needs</div>
-        
-        <div class="document-footer">
-            ✨ Visionary Excellence & Strategic Mastery ✨<br>
-            MM Docs - Where Innovation Meets Elegance
-        </div>
+        <p class="subtitle">Strategic Vision for AI-Powered Document Generation</p>
+    </div>
+    
+    <div class="section-header">Mission Statement</div>
+    <div class="content-text">To democratize professional document creation by providing businesses of all sizes with AI-powered tools that generate high-quality, branded documents in minutes, not hours.</div>
+    
+    <div class="subsection-header">Product Philosophy</div>
+    <div class="content-text">MM Docs transforms the traditional document creation process from a time-consuming, manual task into an intelligent, automated experience. We believe every business deserves access to professional-grade documentation that reflects their brand identity and communicates their message effectively.</div>
+    
+    <div class="subsection-header">Core Value Propositions</div>
+    
+    <div class="content-text"><strong>Speed & Efficiency:</strong></div>
+    <div class="bullet-point">Generate professional documents in under 2 minutes</div>
+    <div class="bullet-point">Eliminate repetitive formatting and content creation tasks</div>
+    <div class="bullet-point">Reduce document creation time by 90% compared to manual methods</div>
+    
+    <div class="content-text"><strong>Quality & Professionalism:</strong></div>
+    <div class="bullet-point">AI-powered content generation ensures consistent, professional language</div>
+    <div class="bullet-point">Comprehensive template library covers all business document needs</div>
+    <div class="bullet-point">Automatic brand integration maintains visual consistency</div>
+    
+    <div class="content-text"><strong>Accessibility & Ease of Use:</strong></div>
+    <div class="bullet-point">Intuitive interface requires no design or technical expertise</div>
+    <div class="bullet-point">Category-based navigation simplifies document selection</div>
+    <div class="bullet-point">Detailed form inputs guide users through the creation process</div>
+    
+    <div class="subsection-header">Product Capabilities</div>
+    
+    <div class="content-text"><strong>Document Categories:</strong></div>
+    <div class="bullet-point">HR & Employment: Offer letters, contracts, policies, certificates</div>
+    <div class="bullet-point">Legal & Compliance: NDAs, agreements, terms of service, privacy policies</div>
+    <div class="bullet-point">Sales & Marketing: Proposals, quotations, company profiles, pitch decks</div>
+    <div class="bullet-point">Finance & Accounting: Invoices, receipts, purchase orders, financial reports</div>
+    <div class="bullet-point">Operations & Admin: Policies, procedures, audit reports, compliance documents</div>
+    
+    <div class="content-text"><strong>AI-Powered Features:</strong></div>
+    <div class="bullet-point">Intelligent content generation based on user inputs</div>
+    <div class="bullet-point">Context-aware language adaptation for different document types</div>
+    <div class="bullet-point">Automatic formatting and structure optimization</div>
+    <div class="bullet-point">Brand-consistent styling and visual elements</div>
+    
+    <div class="subsection-header">Technical Architecture</div>
+    
+    <div class="content-text"><strong>AI Integration:</strong></div>
+    <div class="bullet-point">OpenRouter API for advanced language model access</div>
+    <div class="bullet-point">Custom prompt engineering for document-specific content</div>
+    <div class="bullet-point">Intelligent template matching and content adaptation</div>
+    
+    <div class="content-text"><strong>Brand Management:</strong></div>
+    <div class="bullet-point">Comprehensive brand kit system for logos, colors, fonts</div>
+    <div class="bullet-point">Automatic brand application across all document types</div>
+    <div class="bullet-point">Consistent visual identity maintenance</div>
+    
+    <div class="subsection-header">Target Users</div>
+    
+    <div class="content-text"><strong>Primary Users:</strong></div>
+    <div class="bullet-point">Small business owners creating professional documentation</div>
+    <div class="bullet-point">Freelancers and consultants requiring branded materials</div>
+    <div class="bullet-point">HR professionals managing employee documentation</div>
+    <div class="bullet-point">Sales teams generating client-facing documents</div>
+    
+    <div class="content-text"><strong>Use Cases:</strong></div>
+    <div class="bullet-point">Startup founder creating investor pitch decks and legal documents</div>
+    <div class="bullet-point">HR manager generating offer letters and employment contracts</div>
+    <div class="bullet-point">Sales representative creating customized proposals and quotations</div>
+    <div class="bullet-point">Consultant developing professional service agreements</div>
+    
+    <div class="vision-box">
+        <div class="vision-title">Success Vision</div>
+        <div class="content-text">By 2025, MM Docs will be recognized as the leading AI-powered document generation platform, trusted by over 100,000 businesses worldwide to create professional, branded documents that drive business success and enhance professional communication.</div>
+    </div>
+    
+    <div class="footer">
+        <div class="company-logo">MM Docs</div>
+        <div>Professional Document Generation Platform</div>
+        <div>AI-Powered Business Solutions</div>
     </div>
 </body>
 </html>
