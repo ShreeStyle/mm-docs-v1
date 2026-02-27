@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{content.title}}</title>
+    <style>
+        {{{brandCSS}}}
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: var(--font-primary, 'Inter', 'Arial', sans-serif);
+            line-height: 1.6;
+            color: #2d3748;
+            background: #ffffff;
+            font-size: 14px;
+        }
+        
+        .document-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 40px;
+            min-height: 100vh;
+            position: relative;
+        }
+        
+        /* Header Section */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 40px;
+            padding-bottom: 20px;
+            border-bottom: 3px solid var(--primary-color, #1e40af);
+        }
+        
+        .company-info {
+            flex: 1;
+        }
+        
+        .company-name {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--primary-color, #1e40af);
+            margin-bottom: 8px;
+            letter-spacing: -0.5px;
+        }
+        
+        .company-tagline {
+            font-size: 14px;
+            color: #64748b;
+            font-weight: 500;
+        }
+        
+        .document-info {
+            text-align: right;
+            flex-shrink: 0;
+        }
+        
+        .document-title {
+            font-size: 24px;
+            font-weight: 600;
+            color: #1a202c;
+            margin-bottom: 8px;
+        }
+        
+        .document-date {
+            font-size: 14px;
+            color: #64748b;
+            font-weight: 500;
+        }
+        
+        /* Main Content */
+        .content-section {
+            margin-bottom: 32px;
+        }
+        
+        .section-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--primary-color, #1e40af);
+            margin-bottom: 16px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid #e2e8f0;
+        }
+        
+        /* Candidate Info */
+        .candidate-info {
+            background: #f8fafc;
+            padding: 24px;
+            border-radius: 12px;
+            border-left: 4px solid var(--primary-color, #1e40af);
+            margin-bottom: 32px;
+        }
+        
+        .candidate-name {
+            font-size: 22px;
+            font-weight: 700;
+            color: #1a202c;
+            margin-bottom: 12px;
+        }
+        
+        .position-info {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-top: 16px;
+        }
+        
+        .info-item {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .info-label {
+            font-size: 12px;
+            font-weight: 600;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 4px;
+        }
+        
+        .info-value {
+            font-size: 16px;
+            font-weight: 600;
+            color: #1a202c;
+        }
+        
+        /* Two Column Layout */
+        .two-column {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 32px;
+            margin: 32px 0;
+        }
+        
+        /* Benefits Section */
+        .benefits-list {
+            list-style: none;
+            padding: 0;
+        }
+        
+        .benefits-list li {
+            padding: 12px 0;
+            border-bottom: 1px solid #e2e8f0;
+            position: relative;
+            padding-left: 24px;
+        }
+        
+        .benefits-list li:before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: var(--primary-color, #1e40af);
+            font-weight: bold;
+            font-size: 16px;
+        }
+        
+        .benefits-list li:last-child {
+            border-bottom: none;
+        }
+        
+        /* Terms Section */
+        .terms-list {
+            list-style: none;
+            padding: 0;
+        }
+        
+        .terms-list li {
+            padding: 8px 0;
+            padding-left: 20px;
+            position: relative;
+            font-size: 13px;
+            line-height: 1.5;
+        }
+        
+        .terms-list li:before {
+            content: "•";
+            position: absolute;
+            left: 0;
+            color: var(--primary-color, #1e40af);
+            font-weight: bold;
+        }
+        
+        /* Next Steps */
+        .steps-list {
+            list-style: none;
+            padding: 0;
+            counter-reset: step-counter;
+        }
+        
+        .steps-list li {
+            padding: 12px 0;
+            padding-left: 40px;
+            position: relative;
+            counter-increment: step-counter;
+        }
+        
+        .steps-list li:before {
+            content: counter(step-counter);
+            position: absolute;
+            left: 0;
+            top: 12px;
+            background: var(--primary-color, #1e40af);
+            color: white;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        
+        /* Signature Section */
+        .signature-section {
+            margin-top: 48px;
+            padding-top: 32px;
+            border-top: 2px solid #e2e8f0;
+        }
+        
+        .signature-box {
+            background: #f8fafc;
+            padding: 24px;
+            border-radius: 12px;
+            text-align: center;
+            border: 2px dashed var(--primary-color, #1e40af);
+        }
+        
+        .closing-message {
+            background: linear-gradient(135deg, var(--primary-color, #1e40af) 0%, #3b82f6 100%);
+            color: white;
+            padding: 24px;
+            border-radius: 12px;
+            text-align: center;
+            margin: 32px 0;
+            font-weight: 500;
+        }
+        
+        /* Footer */
+        .footer {
+            margin-top: 48px;
+            padding-top: 24px;
+            border-top: 1px solid #e2e8f0;
+            text-align: center;
+            font-size: 12px;
+            color: #64748b;
+        }
+        
+        /* Print Styles */
+        @media print {
+            .document-container {
+                padding: 20px;
+            }
+            
+            body {
+                font-size: 12px;
+            }
+            
+            .candidate-name {
+                font-size: 20px;
+            }
+            
+            .company-name {
+                font-size: 24px;
+            }
+            
+            .document-title {
+                font-size: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="document-container">
+        <!-- Header -->
+        <div class="header">
+            <div class="company-info">
+                <div class="company-name">{{content.companyName}}</div>
+                <div class="company-tagline">Professional Excellence in Every Opportunity</div>
+            </div>
+            <div class="document-info">
+                <div class="document-title">{{content.title}}</div>
+                <div class="document-date">{{content.date}}</div>
+            </div>
+        </div>
+
+        <!-- Candidate Information -->
+        <div class="candidate-info">
+            <div class="candidate-name">{{content.candidateName}}</div>
+            <div class="position-info">
+                <div class="info-item">
+                    <div class="info-label">Position</div>
+                    <div class="info-value">{{content.position}}</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Department</div>
+                    <div class="info-value">{{content.department}}</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Start Date</div>
+                    <div class="info-value">{{content.startDate}}</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Annual Salary</div>
+                    <div class="info-value">{{content.salary}}</div>
+                </div>
+            </div>
+            {{#if content.reportingTo}}
+            <div style="margin-top: 16px;">
+                <div class="info-label">Reporting To</div>
+                <div class="info-value">{{content.reportingTo}}</div>
+            </div>
+            {{/if}}
+        </div>
+
+        <!-- Two Column Layout -->
+        <div class="two-column">
+            <!-- Benefits -->
+            <div class="content-section">
+                <div class="section-title">Benefits & Perks</div>
+                <ul class="benefits-list">
+                    {{#each content.benefits}}
+                    <li>{{this}}</li>
+                    {{/each}}
+                </ul>
+            </div>
+
+            <!-- Work Details -->
+            <div class="content-section">
+                <div class="section-title">Work Details</div>
+                <div class="info-item" style="margin-bottom: 16px;">
+                    <div class="info-label">Working Hours</div>
+                    <div class="info-value">{{content.workingHours}}</div>
+                </div>
+                {{#if content.workLocation}}
+                <div class="info-item">
+                    <div class="info-label">Work Location</div>
+                    <div class="info-value">{{content.workLocation}}</div>
+                </div>
+                {{/if}}
+            </div>
+        </div>
+
+        <!-- Terms and Conditions -->
+        <div class="content-section">
+            <div class="section-title">Terms & Conditions</div>
+            <ul class="terms-list">
+                {{#each content.termsAndConditions}}
+                <li>{{this}}</li>
+                {{/each}}
+            </ul>
+        </div>
+
+        <!-- Next Steps -->
+        <div class="content-section">
+            <div class="section-title">Next Steps</div>
+            <ul class="steps-list">
+                {{#each content.nextSteps}}
+                <li>{{this}}</li>
+                {{/each}}
+            </ul>
+        </div>
+
+        <!-- Closing Message -->
+        <div class="closing-message">
+            {{content.closingMessage}}
+        </div>
+
+        <!-- Signature Section -->
+        <div class="signature-section">
+            <div class="signature-box">
+                <p><strong>Please sign and return this letter to confirm your acceptance</strong></p>
+                <br>
+                <p>Candidate Signature: _________________________ Date: _____________</p>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            <p>{{content.contactPerson}}</p>
+            <p>This offer letter is confidential and intended solely for {{content.candidateName}}</p>
+        </div>
+    </div>
+</body>
+</html>

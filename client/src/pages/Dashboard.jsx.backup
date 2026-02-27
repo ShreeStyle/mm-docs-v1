@@ -34,8 +34,8 @@ export default function Dashboard() {
     const [brandKit, setBrandKit] = useState(null);
     const [error, setError] = useState(null);
     const [isPro, setIsPro] = useState(user?.plan === 'pro');
-    const [selectedDocType, setSelectedDocType] = useState(null);
     const [selectedCategory, setSelectedCategory] = useState(null);
+    const [selectedDocType, setSelectedDocType] = useState(null);
     const [quotationData, setQuotationData] = useState({ clientName: '', projectScope: '', amount: '' });
     const [proposalData, setProposalData] = useState({ clientName: '', industryFocus: '', coreModules: '' });
     const [emailData, setEmailData] = useState({ targetAudience: '', valueProposition: '', callToAction: '' });
@@ -782,324 +782,331 @@ Seeking personalized assistance? Explore our templates collection or contact our
             );
         }
 
-        switch (currentView) {
-            case 'Search':
-                return (
-                    <motion.div className="feature-view" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-                        <div className="view-header">
-                            <h1>Search</h1>
-                            <p>Find documents, pages, and everything in your workspace.</p>
-                        </div>
-                        <div className="search-container">
-                            <div className="search-bar-expanded">
-                                <Search size={20} />
-                                <input
-                                    type="text"
-                                    placeholder="Search for documents..."
-                                    value={searchQuery}
-                                    onChange={(e) => setSearchQuery(e.target.value)}
-                                    autoFocus
-                                />
+        // Handle other views with switch statement
+        if (currentView !== 'Home') {
+            switch (currentView) {
+                case 'Search':
+                    return (
+                        <motion.div className="feature-view" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+                            <div className="view-header">
+                                <h1>Search</h1>
+                                <p>Find documents, pages, and everything in your workspace.</p>
                             </div>
-                            <div className="search-results">
-                                {searchQuery ? (
-                                    <div className="results-list">
-                                        <div className="result-item">
-                                            <FileText size={16} />
-                                            <span>SLMobbin Creative Strat...</span>
-                                        </div>
-                                        <div className="result-item">
-                                            <Globe size={16} />
-                                            <span>Document Hub</span>
-                                        </div>
-                                    </div>
-                                ) : (
-                                    <div className="search-empty">
-                                        <Search size={48} />
-                                        <p>Type something to search your workspace</p>
-                                    </div>
-                                )}
-                            </div>
-                        </div>
-                    </motion.div>
-                );
-            case 'Inbox':
-                return (
-                    <motion.div className="feature-view" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-                        <div className="view-header">
-                            <h1>Inbox</h1>
-                            <p>Stay updated with your latest notifications and comments.</p>
-                        </div>
-                        <div className="inbox-list">
-                            {[
-                                { title: 'Welcome to MM Docs', time: '2h ago', content: 'Explore our features and get started with AI documents.', unread: true },
-                                { title: 'Collaboration invite', time: 'Yesterday', content: 'Shree invited you to edit "Creative Strategy".', unread: false }
-                            ].map((msg, i) => (
-                                <div key={i} className={`inbox-item ${msg.unread ? 'unread' : ''}`}>
-                                    <div className="inbox-item-header">
-                                        <h4>{msg.title}</h4>
-                                        <span>{msg.time}</span>
-                                    </div>
-                                    <p>{msg.content}</p>
+                            <div className="search-container">
+                                <div className="search-bar-expanded">
+                                    <Search size={20} />
+                                    <input
+                                        type="text"
+                                        placeholder="Search for documents..."
+                                        value={searchQuery}
+                                        onChange={(e) => setSearchQuery(e.target.value)}
+                                        autoFocus
+                                    />
                                 </div>
-                            ))}
-                        </div>
-                    </motion.div>
-                );
-            case 'Settings':
-                return (
-                    <motion.div className="feature-view" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-                        <div className="view-header">
-                            <h1>Settings</h1>
-                            <p>Manage your account preferences and brand kit.</p>
-                        </div>
-                        <div className="settings-grid">
-                            <div className="settings-card">
-                                <h3>Brand Kit</h3>
-                                <p style={{ fontSize: '13px', color: '#666', marginBottom: '20px' }}>Your brand kit is automatically applied to all AI-generated documents.</p>
-                                <form className="brand-kit-form" onSubmit={(e) => {
-                                    e.preventDefault();
-                                    const formData = new FormData(e.target);
-                                    saveBrandKit({
-                                        name: formData.get('companyName'),
-                                        colors: [formData.get('brandColor'), '#ffffff'],
-                                        description: formData.get('description'),
-                                        logo: formData.get('logo'),
-                                        fonts: {
-                                            primary: formData.get('primaryFont'),
-                                            secondary: formData.get('secondaryFont')
-                                        }
-                                    });
-                                }}>
-                                    <div className="form-group" style={{ marginBottom: '15px' }}>
-                                        <label style={{ display: 'block', fontSize: '12px', fontWeight: '800', marginBottom: '8px', color: '#999', textTransform: 'uppercase' }}>Company Name</label>
-                                        <input
-                                            type="text"
-                                            name="companyName"
-                                            defaultValue={brandKit?.name || "MediaaMasala"}
-                                            style={{ width: '100%', padding: '12px', borderRadius: '8px', border: '1px solid #eee', background: '#f9f9f8' }}
-                                        />
-                                    </div>
-                                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px', marginBottom: '15px' }}>
-                                        <div className="form-group">
-                                            <label style={{ display: 'block', fontSize: '12px', fontWeight: '800', marginBottom: '8px', color: '#999', textTransform: 'uppercase' }}>Brand Color</label>
-                                            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                                                <input
-                                                    type="color"
-                                                    name="brandColor"
-                                                    defaultValue={brandKit?.colors?.[0] || "#7C3AED"}
-                                                    style={{ width: '40px', height: '40px', padding: '0', border: 'none', background: 'transparent', cursor: 'pointer' }}
-                                                />
-                                                <span style={{ fontSize: '13px', color: '#333', fontWeight: '600' }}>{brandKit?.colors?.[0] || "#7C3AED"}</span>
+                                <div className="search-results">
+                                    {searchQuery ? (
+                                        <div className="results-list">
+                                            <div className="result-item">
+                                                <FileText size={16} />
+                                                <span>SLMobbin Creative Strat...</span>
+                                            </div>
+                                            <div className="result-item">
+                                                <Globe size={16} />
+                                                <span>Document Hub</span>
                                             </div>
                                         </div>
-                                        <div className="form-group">
-                                            <label style={{ display: 'block', fontSize: '12px', fontWeight: '800', marginBottom: '8px', color: '#999', textTransform: 'uppercase' }}>Primary Font</label>
-                                            <select
-                                                name="primaryFont"
-                                                defaultValue={brandKit?.fonts?.primary || "Inter"}
-                                                style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid #eee', background: '#f9f9f8' }}
-                                            >
-                                                <option>Inter</option>
-                                                <option>Outfit</option>
-                                                <option>Roboto</option>
-                                                <option>System Default</option>
-                                            </select>
+                                    ) : (
+                                        <div className="search-empty">
+                                            <Search size={48} />
+                                            <p>Type something to search your workspace</p>
                                         </div>
-                                    </div>
-                                    <div className="form-group" style={{ marginBottom: '15px' }}>
-                                        <label style={{ display: 'block', fontSize: '12px', fontWeight: '800', marginBottom: '8px', color: '#999', textTransform: 'uppercase' }}>Logo URL</label>
-                                        <input
-                                            type="text"
-                                            name="logo"
-                                            placeholder="https://example.com/logo.png"
-                                            defaultValue={brandKit?.logo || ""}
-                                            style={{ width: '100%', padding: '12px', borderRadius: '8px', border: '1px solid #eee', background: '#f9f9f8' }}
-                                        />
-                                    </div>
-                                    <div className="form-group">
-                                        <label style={{ display: 'block', fontSize: '12px', fontWeight: '800', marginBottom: '8px', color: '#999', textTransform: 'uppercase' }}>Company Description</label>
-                                        <textarea
-                                            name="description"
-                                            placeholder="Describe your brand values and tone..."
-                                            defaultValue={brandKit?.description || "AI Business Document SaaS for internal alignment, investor reference, and product execution."}
-                                            style={{ width: '100%', padding: '12px', borderRadius: '8px', border: '1px solid #eee', background: '#f9f9f8', minHeight: '100px', fontFamily: 'inherit' }}
-                                        />
-                                    </div>
-                                    <button type="submit" className="primary-btn sm" style={{ marginTop: '20px', width: '100%', padding: '12px 0' }}>Save Brand Kit ✨</button>
-                                </form>
-                            </div>
-                            <div className="settings-card">
-                                <h3>Subscription</h3>
-                                <div className="pricing-card" style={{ padding: '20px', background: '#f9f9f8', borderRadius: '12px', border: '1px solid #eee', marginTop: '20px' }}>
-                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                        <div>
-                                            <h4 style={{ margin: 0 }}>Pro Plan</h4>
-                                            <p style={{ margin: '4px 0 0', fontSize: '14px', color: '#666' }}>₹999 / month</p>
-                                        </div>
-                                        {isPro ? (
-                                            <span style={{ padding: '4px 8px', background: '#e8f5e9', color: '#2e7d32', borderRadius: '4px', fontSize: '12px', fontWeight: 'bold' }}>Active</span>
-                                        ) : (
-                                            <button type="button" onClick={handleUpgrade} className="primary-btn sm" style={{ padding: '8px 16px' }}>Upgrade Now</button>
-                                        )}
-                                    </div>
-                                    {!isPro && <p style={{ fontSize: '12px', color: '#666', marginTop: '12px', paddingBottom: '0' }}>Upgrade to unlock watermark-free exports and full AI context mapping.</p>}
+                                    )}
                                 </div>
                             </div>
-                        </div>
-                    </motion.div>
-                );
-            case 'Templates':
-                return (
-                    <motion.div className="feature-view" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-                        <div className="view-header">
-                            <h1>Templates</h1>
-                            <p>Professional structures for every business need.</p>
-                        </div>
-                        <div className="templates-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '20px', marginTop: '20px' }}>
-                            {['Business Proposal', 'Quotation', 'Company Profile', 'Sales Email', 'Pitch Outline'].map(template => (
-                                <div
-                                    key={template}
-                                    className="template-card"
-                                    onClick={() => handleTemplateClick(template)}
-                                    style={{ padding: '20px', background: 'white', borderRadius: '12px', border: '1px solid #eee', cursor: 'pointer', transition: 'all 0.2s' }}
-                                >
-                                    <FileText size={24} color="#7c3aed" />
-                                    <h4 style={{ marginTop: '12px', marginBottom: '8px' }}>{template}</h4>
-                                    <p style={{ fontSize: '13px', color: '#666', margin: 0 }}>AI-optimized structure</p>
-                                </div>
-                            ))}
-                        </div>
-                    </motion.div>
-                );
-            case 'Trash':
-                return (
-                    <motion.div className="feature-view" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-                        <div className="view-header">
-                            <h1>Trash</h1>
-                            <p>Recently deleted entries.</p>
-                        </div>
-                        <div className="empty-state" style={{ textAlign: 'center', padding: '100px 0' }}>
-                            <Trash2 size={48} style={{ color: '#ccc', marginBottom: '16px' }} />
-                            <p style={{ color: '#999' }}>No items in trash.</p>
-                        </div>
-                    </motion.div>
-                );
-            case 'Documents':
-                return (
-                    <motion.div className="feature-view" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-                        <div className="view-header">
-                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                                <div>
-                                    <h1>Your Generated Documents</h1>
-                                    <p>View, download, and manage your AI-generated documents.</p>
-                                </div>
-                                <button 
-                                    onClick={() => setCurrentView('Home')}
-                                    style={{
-                                        background: '#f8fafc',
-                                        color: '#64748b',
-                                        border: '1px solid #e2e8f0',
-                                        borderRadius: '8px',
-                                        padding: '8px 16px',
-                                        fontSize: '14px',
-                                        fontWeight: '600',
-                                        cursor: 'pointer',
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        gap: '8px'
-                                    }}
-                                >
-                                    ← Back to Dashboard
-                                </button>
+                        </motion.div>
+                    );
+                case 'Inbox':
+                    return (
+                        <motion.div className="feature-view" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+                            <div className="view-header">
+                                <h1>Inbox</h1>
+                                <p>Stay updated with your latest notifications and comments.</p>
                             </div>
-                        </div>
-                        
-                        {docs && docs.length > 0 ? (
-                            <div className="documents-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '20px', marginTop: '24px' }}>
-                                {docs.map((doc) => (
-                                    <div key={doc._id} style={{
-                                        background: 'white',
-                                        border: '1px solid #e2e8f0',
-                                        borderRadius: '12px',
-                                        padding: '20px',
-                                        boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
-                                        transition: 'all 0.2s ease'
-                                    }}>
-                                        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '12px' }}>
-                                            <FileText size={20} style={{ color: '#667eea' }} />
-                                            <div>
-                                                <h3 style={{ margin: 0, fontSize: '16px', fontWeight: '600', color: '#0f172a' }}>
-                                                    {doc.title}
-                                                </h3>
-                                                <p style={{ margin: 0, fontSize: '12px', color: '#64748b', textTransform: 'capitalize' }}>
-                                                    {doc.type?.replace(/_/g, ' ')} • {new Date(doc.createdAt).toLocaleDateString()}
-                                                </p>
-                                            </div>
+                            <div className="inbox-list">
+                                {[
+                                    { title: 'Welcome to MM Docs', time: '2h ago', content: 'Explore our features and get started with AI documents.', unread: true },
+                                    { title: 'Collaboration invite', time: 'Yesterday', content: 'Shree invited you to edit "Creative Strategy".', unread: false }
+                                ].map((msg, i) => (
+                                    <div key={i} className={`inbox-item ${msg.unread ? 'unread' : ''}`}>
+                                        <div className="inbox-item-header">
+                                            <h4>{msg.title}</h4>
+                                            <span>{msg.time}</span>
                                         </div>
-                                        
-                                        <div style={{ display: 'flex', gap: '8px', marginTop: '16px' }}>
-                                            <button 
-                                                onClick={() => handleDownload(doc._id, 'pdf')}
-                                                style={{
-                                                    background: '#667eea',
-                                                    color: 'white',
-                                                    border: 'none',
-                                                    borderRadius: '6px',
-                                                    padding: '8px 12px',
-                                                    fontSize: '12px',
-                                                    fontWeight: '600',
-                                                    cursor: 'pointer',
-                                                    flex: 1
-                                                }}
-                                            >
-                                                📄 PDF
-                                            </button>
-                                            <button 
-                                                onClick={() => handleDownload(doc._id, 'docx')}
-                                                style={{
-                                                    background: '#10b981',
-                                                    color: 'white',
-                                                    border: 'none',
-                                                    borderRadius: '6px',
-                                                    padding: '8px 12px',
-                                                    fontSize: '12px',
-                                                    fontWeight: '600',
-                                                    cursor: 'pointer',
-                                                    flex: 1
-                                                }}
-                                            >
-                                                📝 DOCX
-                                            </button>
-                                        </div>
+                                        <p>{msg.content}</p>
                                     </div>
                                 ))}
                             </div>
-                        ) : (
-                            <div className="empty-state" style={{ textAlign: 'center', padding: '100px 0' }}>
-                                <FileText size={48} style={{ color: '#ccc', marginBottom: '16px' }} />
-                                <p style={{ color: '#999' }}>No documents generated yet.</p>
-                                <button 
-                                    onClick={() => setCurrentView('Home')}
-                                    style={{
-                                        background: '#667eea',
-                                        color: 'white',
-                                        border: 'none',
-                                        borderRadius: '8px',
-                                        padding: '12px 24px',
-                                        fontSize: '14px',
-                                        fontWeight: '600',
-                                        cursor: 'pointer',
-                                        marginTop: '16px'
-                                    }}
-                                >
-                                    Generate Your First Document
-                                </button>
+                        </motion.div>
+                    );
+                case 'Settings':
+                    return (
+                        <motion.div className="feature-view" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+                            <div className="view-header">
+                                <h1>Settings</h1>
+                                <p>Manage your account preferences and brand kit.</p>
                             </div>
-                        )}
-                    </motion.div>
-                );
-            default:
+                            <div className="settings-grid">
+                                <div className="settings-card">
+                                    <h3>Brand Kit</h3>
+                                    <p style={{ fontSize: '13px', color: '#666', marginBottom: '20px' }}>Your brand kit is automatically applied to all AI-generated documents.</p>
+                                    <form className="brand-kit-form" onSubmit={(e) => {
+                                        e.preventDefault();
+                                        const formData = new FormData(e.target);
+                                        saveBrandKit({
+                                            name: formData.get('companyName'),
+                                            colors: [formData.get('brandColor'), '#ffffff'],
+                                            description: formData.get('description'),
+                                            logo: formData.get('logo'),
+                                            fonts: {
+                                                primary: formData.get('primaryFont'),
+                                                secondary: formData.get('secondaryFont')
+                                            }
+                                        });
+                                    }}>
+                                        <div className="form-group" style={{ marginBottom: '15px' }}>
+                                            <label style={{ display: 'block', fontSize: '12px', fontWeight: '800', marginBottom: '8px', color: '#999', textTransform: 'uppercase' }}>Company Name</label>
+                                            <input
+                                                type="text"
+                                                name="companyName"
+                                                defaultValue={brandKit?.name || "MediaaMasala"}
+                                                style={{ width: '100%', padding: '12px', borderRadius: '8px', border: '1px solid #eee', background: '#f9f9f8' }}
+                                            />
+                                        </div>
+                                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px', marginBottom: '15px' }}>
+                                            <div className="form-group">
+                                                <label style={{ display: 'block', fontSize: '12px', fontWeight: '800', marginBottom: '8px', color: '#999', textTransform: 'uppercase' }}>Brand Color</label>
+                                                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                                                    <input
+                                                        type="color"
+                                                        name="brandColor"
+                                                        defaultValue={brandKit?.colors?.[0] || "#7C3AED"}
+                                                        style={{ width: '40px', height: '40px', padding: '0', border: 'none', background: 'transparent', cursor: 'pointer' }}
+                                                    />
+                                                    <span style={{ fontSize: '13px', color: '#333', fontWeight: '600' }}>{brandKit?.colors?.[0] || "#7C3AED"}</span>
+                                                </div>
+                                            </div>
+                                            <div className="form-group">
+                                                <label style={{ display: 'block', fontSize: '12px', fontWeight: '800', marginBottom: '8px', color: '#999', textTransform: 'uppercase' }}>Primary Font</label>
+                                                <select
+                                                    name="primaryFont"
+                                                    defaultValue={brandKit?.fonts?.primary || "Inter"}
+                                                    style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid #eee', background: '#f9f9f8' }}
+                                                >
+                                                    <option>Inter</option>
+                                                    <option>Outfit</option>
+                                                    <option>Roboto</option>
+                                                    <option>System Default</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div className="form-group" style={{ marginBottom: '15px' }}>
+                                            <label style={{ display: 'block', fontSize: '12px', fontWeight: '800', marginBottom: '8px', color: '#999', textTransform: 'uppercase' }}>Logo URL</label>
+                                            <input
+                                                type="text"
+                                                name="logo"
+                                                placeholder="https://example.com/logo.png"
+                                                defaultValue={brandKit?.logo || ""}
+                                                style={{ width: '100%', padding: '12px', borderRadius: '8px', border: '1px solid #eee', background: '#f9f9f8' }}
+                                            />
+                                        </div>
+                                        <div className="form-group">
+                                            <label style={{ display: 'block', fontSize: '12px', fontWeight: '800', marginBottom: '8px', color: '#999', textTransform: 'uppercase' }}>Company Description</label>
+                                            <textarea
+                                                name="description"
+                                                placeholder="Describe your brand values and tone..."
+                                                defaultValue={brandKit?.description || "AI Business Document SaaS for internal alignment, investor reference, and product execution."}
+                                                style={{ width: '100%', padding: '12px', borderRadius: '8px', border: '1px solid #eee', background: '#f9f9f8', minHeight: '100px', fontFamily: 'inherit' }}
+                                            />
+                                        </div>
+                                        <button type="submit" className="primary-btn sm" style={{ marginTop: '20px', width: '100%', padding: '12px 0' }}>Save Brand Kit ✨</button>
+                                    </form>
+                                </div>
+                                <div className="settings-card">
+                                    <h3>Subscription</h3>
+                                    <div className="pricing-card" style={{ padding: '20px', background: '#f9f9f8', borderRadius: '12px', border: '1px solid #eee', marginTop: '20px' }}>
+                                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                            <div>
+                                                <h4 style={{ margin: 0 }}>Pro Plan</h4>
+                                                <p style={{ margin: '4px 0 0', fontSize: '14px', color: '#666' }}>₹999 / month</p>
+                                            </div>
+                                            {isPro ? (
+                                                <span style={{ padding: '4px 8px', background: '#e8f5e9', color: '#2e7d32', borderRadius: '4px', fontSize: '12px', fontWeight: 'bold' }}>Active</span>
+                                            ) : (
+                                                <button type="button" onClick={handleUpgrade} className="primary-btn sm" style={{ padding: '8px 16px' }}>Upgrade Now</button>
+                                            )}
+                                        </div>
+                                        {!isPro && <p style={{ fontSize: '12px', color: '#666', marginTop: '12px', paddingBottom: '0' }}>Upgrade to unlock watermark-free exports and full AI context mapping.</p>}
+                                    </div>
+                                </div>
+                            </div>
+                        </motion.div>
+                    );
+                case 'Templates':
+                    return (
+                        <motion.div className="feature-view" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+                            <div className="view-header">
+                                <h1>Templates</h1>
+                                <p>Professional structures for every business need.</p>
+                            </div>
+                            <div className="templates-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '20px', marginTop: '20px' }}>
+                                {['Business Proposal', 'Quotation', 'Company Profile', 'Sales Email', 'Pitch Outline'].map(template => (
+                                    <div
+                                        key={template}
+                                        className="template-card"
+                                        onClick={() => handleTemplateClick(template)}
+                                        style={{ padding: '20px', background: 'white', borderRadius: '12px', border: '1px solid #eee', cursor: 'pointer', transition: 'all 0.2s' }}
+                                    >
+                                        <FileText size={24} color="#7c3aed" />
+                                        <h4 style={{ marginTop: '12px', marginBottom: '8px' }}>{template}</h4>
+                                        <p style={{ fontSize: '13px', color: '#666', margin: 0 }}>AI-optimized structure</p>
+                                    </div>
+                                ))}
+                            </div>
+                        </motion.div>
+                    );
+                case 'Trash':
+                    return (
+                        <motion.div className="feature-view" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+                            <div className="view-header">
+                                <h1>Trash</h1>
+                                <p>Recently deleted entries.</p>
+                            </div>
+                            <div className="empty-state" style={{ textAlign: 'center', padding: '100px 0' }}>
+                                <Trash2 size={48} style={{ color: '#ccc', marginBottom: '16px' }} />
+                                <p style={{ color: '#999' }}>No items in trash.</p>
+                            </div>
+                        </motion.div>
+                    );
+                case 'Documents':
+                    return (
+                        <motion.div className="feature-view" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+                            <div className="view-header">
+                                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                                    <div>
+                                        <h1>Your Generated Documents</h1>
+                                        <p>View, download, and manage your AI-generated documents.</p>
+                                    </div>
+                                    <button 
+                                        onClick={() => setCurrentView('Home')}
+                                        style={{
+                                            background: '#f8fafc',
+                                            color: '#64748b',
+                                            border: '1px solid #e2e8f0',
+                                            borderRadius: '8px',
+                                            padding: '8px 16px',
+                                            fontSize: '14px',
+                                            fontWeight: '600',
+                                            cursor: 'pointer',
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            gap: '8px'
+                                        }}
+                                    >
+                                        ← Back to Dashboard
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            {docs && docs.length > 0 ? (
+                                <div className="documents-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '20px', marginTop: '24px' }}>
+                                    {docs.map((doc) => (
+                                        <div key={doc._id} style={{
+                                            background: 'white',
+                                            border: '1px solid #e2e8f0',
+                                            borderRadius: '12px',
+                                            padding: '20px',
+                                            boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
+                                            transition: 'all 0.2s ease'
+                                        }}>
+                                            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '12px' }}>
+                                                <FileText size={20} style={{ color: '#667eea' }} />
+                                                <div>
+                                                    <h3 style={{ margin: 0, fontSize: '16px', fontWeight: '600', color: '#0f172a' }}>
+                                                        {doc.title}
+                                                    </h3>
+                                                    <p style={{ margin: 0, fontSize: '12px', color: '#64748b', textTransform: 'capitalize' }}>
+                                                        {doc.type?.replace(/_/g, ' ')} • {new Date(doc.createdAt).toLocaleDateString()}
+                                                    </p>
+                                                </div>
+                                            </div>
+                                            
+                                            <div style={{ display: 'flex', gap: '8px', marginTop: '16px' }}>
+                                                <button 
+                                                    onClick={() => handleDownload(doc._id, 'pdf')}
+                                                    style={{
+                                                        background: '#667eea',
+                                                        color: 'white',
+                                                        border: 'none',
+                                                        borderRadius: '6px',
+                                                        padding: '8px 12px',
+                                                        fontSize: '12px',
+                                                        fontWeight: '600',
+                                                        cursor: 'pointer',
+                                                        flex: 1
+                                                    }}
+                                                >
+                                                    PDF
+                                                </button>
+                                                <button 
+                                                    onClick={() => handleDownload(doc._id, 'docx')}
+                                                    style={{
+                                                        background: '#10b981',
+                                                        color: 'white',
+                                                        border: 'none',
+                                                        borderRadius: '6px',
+                                                        padding: '8px 12px',
+                                                        fontSize: '12px',
+                                                        fontWeight: '600',
+                                                        cursor: 'pointer',
+                                                        flex: 1
+                                                    }}
+                                                >
+                                                    DOCX
+                                                </button>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            ) : (
+                                <div className="empty-state" style={{ textAlign: 'center', padding: '100px 0' }}>
+                                    <FileText size={48} style={{ color: '#ccc', marginBottom: '16px' }} />
+                                    <p style={{ color: '#999' }}>No documents generated yet.</p>
+                                    <button 
+                                        onClick={() => setCurrentView('Home')}
+                                        style={{
+                                            background: '#667eea',
+                                            color: 'white',
+                                            border: 'none',
+                                            borderRadius: '8px',
+                                            padding: '12px 24px',
+                                            fontSize: '14px',
+                                            fontWeight: '600',
+                                            cursor: 'pointer',
+                                            marginTop: '16px'
+                                        }}
+                                    >
+                                        Generate Your First Document
+                                    </button>
+                                </div>
+                            )}
+                        </motion.div>
+                    );
+                default:
+                    return null;
+            }
+        }
+
+        // Home view content
                 return (
                     <motion.div
                         className="home-view"
@@ -1108,7 +1115,7 @@ Seeking personalized assistance? Explore our templates collection or contact our
                         exit={{ opacity: 0 }}
                     >
                         <div className="greeting">
-                            <div className="greeting-icon">✨</div>
+                            <div className="greeting-icon"><Sparkles size={24} /></div>
                             <h1>Good evening, {user?.name?.split(' ')[0]}</h1>
                             <p style={{ color: '#64748b', fontSize: '16px', marginTop: '8px' }}>MM Docs – Excellence & Strategic Mastery</p>
                         </div>
@@ -1190,7 +1197,7 @@ Seeking personalized assistance? Explore our templates collection or contact our
                                         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                                             <div>
                                                 <h3 style={{ margin: '0 0 4px 0', fontSize: '18px', fontWeight: '600', color: '#0f172a' }}>
-                                                    📄 Your Generated Documents
+                                                    Your Generated Documents
                                                 </h3>
                                                 <p style={{ margin: 0, fontSize: '14px', color: '#64748b' }}>
                                                     {docs.length === 1 
@@ -1425,11 +1432,11 @@ Seeking personalized assistance? Explore our templates collection or contact our
                                                 ← Back to Categories
                                             </button>
                                             <h2 style={{ fontSize: '24px', fontWeight: '600', color: '#0f172a', margin: 0 }}>
-                                                {selectedCategory === 'hr' && '👥 HR & Employee Documents'}
-                                                {selectedCategory === 'legal' && '⚖️ Legal & Compliance Documents'}
-                                                {selectedCategory === 'sales' && '📈 Sales & Business Documents'}
-                                                {selectedCategory === 'finance' && '💰 Finance & Accounting Documents'}
-                                                {selectedCategory === 'compliance' && '🛡️ Tax & Regulatory Documents'}
+                                                {selectedCategory === 'hr' && 'HR & Employee Documents'}
+                                                {selectedCategory === 'legal' && 'Legal & Compliance Documents'}
+                                                {selectedCategory === 'sales' && 'Sales & Business Documents'}
+                                                {selectedCategory === 'finance' && 'Finance & Accounting Documents'}
+                                                {selectedCategory === 'compliance' && 'Tax & Regulatory Documents'}
                                             </h2>
                                         </div>
                                     </div>
@@ -1452,17 +1459,17 @@ Seeking personalized assistance? Explore our templates collection or contact our
                                                     <p style={{ fontSize: '13px', color: '#6b7280', margin: 0 }}>Formal job appointments</p>
                                                 </button>
                                                 <button className="template-card" onClick={() => setSelectedDocType('experience_certificate')} style={{ padding: '20px', background: '#fefce8', border: '2px solid #fde047', borderRadius: '12px', textAlign: 'left', cursor: 'pointer', transition: 'all 0.2s' }}>
-                                                    <span style={{ fontSize: '24px', display: 'block', marginBottom: '8px' }}>🏆</span>
+                                                    <div style={{ fontSize: '24px', display: 'block', marginBottom: '8px', color: '#6b7280' }}><FileText size={24} /></div>
                                                     <h4 style={{ fontWeight: '600', color: '#0f172a', marginBottom: '4px', fontSize: '16px' }}>Experience Certificate</h4>
                                                     <p style={{ fontSize: '13px', color: '#6b7280', margin: 0 }}>Work experience validation</p>
                                                 </button>
                                                 <button className="template-card" onClick={() => setSelectedDocType('onboarding_letter')} style={{ padding: '20px', background: '#f3e8ff', border: '2px solid #c4b5fd', borderRadius: '12px', textAlign: 'left', cursor: 'pointer', transition: 'all 0.2s' }}>
-                                                    <span style={{ fontSize: '24px', display: 'block', marginBottom: '8px' }}>🎯</span>
+                                                    <div style={{ fontSize: '24px', display: 'block', marginBottom: '8px', color: '#6b7280' }}><FileText size={24} /></div>
                                                     <h4 style={{ fontWeight: '600', color: '#0f172a', marginBottom: '4px', fontSize: '16px' }}>Onboarding Letter</h4>
                                                     <p style={{ fontSize: '13px', color: '#6b7280', margin: 0 }}>Welcome new employees</p>
                                                 </button>
                                                 <button className="template-card" onClick={() => setSelectedDocType('warning_letter')} style={{ padding: '20px', background: '#fef2f2', border: '2px solid #fecaca', borderRadius: '12px', textAlign: 'left', cursor: 'pointer', transition: 'all 0.2s' }}>
-                                                    <span style={{ fontSize: '24px', display: 'block', marginBottom: '8px' }}>⚠️</span>
+                                                    <div style={{ fontSize: '24px', display: 'block', marginBottom: '8px', color: '#6b7280' }}><FileText size={24} /></div>
                                                     <h4 style={{ fontWeight: '600', color: '#0f172a', marginBottom: '4px', fontSize: '16px' }}>Warning Letter</h4>
                                                     <p style={{ fontSize: '13px', color: '#6b7280', margin: 0 }}>Employee disciplinary action</p>
                                                 </button>
@@ -1472,27 +1479,27 @@ Seeking personalized assistance? Explore our templates collection or contact our
                                         {selectedCategory === 'legal' && (
                                             <>
                                                 <button className="template-card" onClick={() => setSelectedDocType('nda')} style={{ padding: '20px', background: '#f0fdf4', border: '2px solid #bbf7d0', borderRadius: '12px', textAlign: 'left', cursor: 'pointer', transition: 'all 0.2s' }}>
-                                                    <span style={{ fontSize: '24px', display: 'block', marginBottom: '8px' }}>🔒</span>
+                                                    <div style={{ fontSize: '24px', display: 'block', marginBottom: '8px', color: '#6b7280' }}><FileText size={24} /></div>
                                                     <h4 style={{ fontWeight: '600', color: '#0f172a', marginBottom: '4px', fontSize: '16px' }}>NDA</h4>
                                                     <p style={{ fontSize: '13px', color: '#6b7280', margin: 0 }}>Non-disclosure agreements</p>
                                                 </button>
                                                 <button className="template-card" onClick={() => setSelectedDocType('service_agreement')} style={{ padding: '20px', background: '#f0f9ff', border: '2px solid #bae6fd', borderRadius: '12px', textAlign: 'left', cursor: 'pointer', transition: 'all 0.2s' }}>
-                                                    <span style={{ fontSize: '24px', display: 'block', marginBottom: '8px' }}>📄</span>
+                                                    <div style={{ fontSize: '24px', display: 'block', marginBottom: '8px', color: '#6b7280' }}><FileText size={24} /></div>
                                                     <h4 style={{ fontWeight: '600', color: '#0f172a', marginBottom: '4px', fontSize: '16px' }}>Service Agreement</h4>
                                                     <p style={{ fontSize: '13px', color: '#6b7280', margin: 0 }}>Service contracts</p>
                                                 </button>
                                                 <button className="template-card" onClick={() => setSelectedDocType('terms_of_service')} style={{ padding: '20px', background: '#fefce8', border: '2px solid #fde047', borderRadius: '12px', textAlign: 'left', cursor: 'pointer', transition: 'all 0.2s' }}>
-                                                    <span style={{ fontSize: '24px', display: 'block', marginBottom: '8px' }}>📋</span>
+                                                    <div style={{ fontSize: '24px', display: 'block', marginBottom: '8px', color: '#6b7280' }}><FileText size={24} /></div>
                                                     <h4 style={{ fontWeight: '600', color: '#0f172a', marginBottom: '4px', fontSize: '16px' }}>Terms of Service</h4>
                                                     <p style={{ fontSize: '13px', color: '#6b7280', margin: 0 }}>Platform terms</p>
                                                 </button>
                                                 <button className="template-card" onClick={() => setSelectedDocType('privacy_policy')} style={{ padding: '20px', background: '#f3e8ff', border: '2px solid #c4b5fd', borderRadius: '12px', textAlign: 'left', cursor: 'pointer', transition: 'all 0.2s' }}>
-                                                    <span style={{ fontSize: '24px', display: 'block', marginBottom: '8px' }}>🛡️</span>
+                                                    <div style={{ fontSize: '24px', display: 'block', marginBottom: '8px', color: '#6b7280' }}><FileText size={24} /></div>
                                                     <h4 style={{ fontWeight: '600', color: '#0f172a', marginBottom: '4px', fontSize: '16px' }}>Privacy Policy</h4>
                                                     <p style={{ fontSize: '13px', color: '#6b7280', margin: 0 }}>Data protection policies</p>
                                                 </button>
                                                 <button className="template-card" onClick={() => setSelectedDocType('mou')} style={{ padding: '20px', background: '#fef2f2', border: '2px solid #fecaca', borderRadius: '12px', textAlign: 'left', cursor: 'pointer', transition: 'all 0.2s' }}>
-                                                    <span style={{ fontSize: '24px', display: 'block', marginBottom: '8px' }}>🤝</span>
+                                                    <div style={{ fontSize: '24px', display: 'block', marginBottom: '8px', color: '#6b7280' }}><FileText size={24} /></div>
                                                     <h4 style={{ fontWeight: '600', color: '#0f172a', marginBottom: '4px', fontSize: '16px' }}>MOU</h4>
                                                     <p style={{ fontSize: '13px', color: '#6b7280', margin: 0 }}>Memorandum of understanding</p>
                                                 </button>
@@ -1502,27 +1509,27 @@ Seeking personalized assistance? Explore our templates collection or contact our
                                         {selectedCategory === 'sales' && (
                                             <>
                                                 <button className="template-card" onClick={() => setSelectedDocType('proposal')} style={{ padding: '20px', background: '#f0fdf4', border: '2px solid #bbf7d0', borderRadius: '12px', textAlign: 'left', cursor: 'pointer', transition: 'all 0.2s' }}>
-                                                    <span style={{ fontSize: '24px', display: 'block', marginBottom: '8px' }}>📊</span>
+                                                    <div style={{ fontSize: '24px', display: 'block', marginBottom: '8px', color: '#6b7280' }}><FileText size={24} /></div>
                                                     <h4 style={{ fontWeight: '600', color: '#0f172a', marginBottom: '4px', fontSize: '16px' }}>Business Proposal</h4>
                                                     <p style={{ fontSize: '13px', color: '#6b7280', margin: 0 }}>Project proposals</p>
                                                 </button>
                                                 <button className="template-card" onClick={() => setSelectedDocType('quotation')} style={{ padding: '20px', background: '#f0f9ff', border: '2px solid #bae6fd', borderRadius: '12px', textAlign: 'left', cursor: 'pointer', transition: 'all 0.2s' }}>
-                                                    <span style={{ fontSize: '24px', display: 'block', marginBottom: '8px' }}>💰</span>
+                                                    <div style={{ fontSize: '24px', display: 'block', marginBottom: '8px', color: '#6b7280' }}><FileText size={24} /></div>
                                                     <h4 style={{ fontWeight: '600', color: '#0f172a', marginBottom: '4px', fontSize: '16px' }}>Quotation</h4>
                                                     <p style={{ fontSize: '13px', color: '#6b7280', margin: 0 }}>Price estimates</p>
                                                 </button>
                                                 <button className="template-card" onClick={() => setSelectedDocType('email')} style={{ padding: '20px', background: '#fefce8', border: '2px solid #fde047', borderRadius: '12px', textAlign: 'left', cursor: 'pointer', transition: 'all 0.2s' }}>
-                                                    <span style={{ fontSize: '24px', display: 'block', marginBottom: '8px' }}>📧</span>
+                                                    <div style={{ fontSize: '24px', display: 'block', marginBottom: '8px', color: '#6b7280' }}><FileText size={24} /></div>
                                                     <h4 style={{ fontWeight: '600', color: '#0f172a', marginBottom: '4px', fontSize: '16px' }}>Sales Email</h4>
                                                     <p style={{ fontSize: '13px', color: '#6b7280', margin: 0 }}>Professional outreach</p>
                                                 </button>
                                                 <button className="template-card" onClick={() => setSelectedDocType('profile')} style={{ padding: '20px', background: '#f3e8ff', border: '2px solid #c4b5fd', borderRadius: '12px', textAlign: 'left', cursor: 'pointer', transition: 'all 0.2s' }}>
-                                                    <span style={{ fontSize: '24px', display: 'block', marginBottom: '8px' }}>🏢</span>
+                                                    <div style={{ fontSize: '24px', display: 'block', marginBottom: '8px', color: '#6b7280' }}><FileText size={24} /></div>
                                                     <h4 style={{ fontWeight: '600', color: '#0f172a', marginBottom: '4px', fontSize: '16px' }}>Company Profile</h4>
                                                     <p style={{ fontSize: '13px', color: '#6b7280', margin: 0 }}>Business overview</p>
                                                 </button>
                                                 <button className="template-card" onClick={() => setSelectedDocType('pitch')} style={{ padding: '20px', background: '#fef2f2', border: '2px solid #fecaca', borderRadius: '12px', textAlign: 'left', cursor: 'pointer', transition: 'all 0.2s' }}>
-                                                    <span style={{ fontSize: '24px', display: 'block', marginBottom: '8px' }}>🎯</span>
+                                                    <div style={{ fontSize: '24px', display: 'block', marginBottom: '8px', color: '#6b7280' }}><FileText size={24} /></div>
                                                     <h4 style={{ fontWeight: '600', color: '#0f172a', marginBottom: '4px', fontSize: '16px' }}>Pitch Deck</h4>
                                                     <p style={{ fontSize: '13px', color: '#6b7280', margin: 0 }}>Investor presentations</p>
                                                 </button>
@@ -1532,27 +1539,27 @@ Seeking personalized assistance? Explore our templates collection or contact our
                                         {selectedCategory === 'finance' && (
                                             <>
                                                 <button className="template-card" onClick={() => setSelectedDocType('invoice')} style={{ padding: '20px', background: '#f0fdf4', border: '2px solid #bbf7d0', borderRadius: '12px', textAlign: 'left', cursor: 'pointer', transition: 'all 0.2s' }}>
-                                                    <span style={{ fontSize: '24px', display: 'block', marginBottom: '8px' }}>🧾</span>
+                                                    <div style={{ fontSize: '24px', display: 'block', marginBottom: '8px', color: '#6b7280' }}><FileText size={24} /></div>
                                                     <h4 style={{ fontWeight: '600', color: '#0f172a', marginBottom: '4px', fontSize: '16px' }}>Invoice</h4>
                                                     <p style={{ fontSize: '13px', color: '#6b7280', margin: 0 }}>Payment requests</p>
                                                 </button>
                                                 <button className="template-card" onClick={() => setSelectedDocType('purchase_order')} style={{ padding: '20px', background: '#f0f9ff', border: '2px solid #bae6fd', borderRadius: '12px', textAlign: 'left', cursor: 'pointer', transition: 'all 0.2s' }}>
-                                                    <span style={{ fontSize: '24px', display: 'block', marginBottom: '8px' }}>📦</span>
+                                                    <div style={{ fontSize: '24px', display: 'block', marginBottom: '8px', color: '#6b7280' }}><FileText size={24} /></div>
                                                     <h4 style={{ fontWeight: '600', color: '#0f172a', marginBottom: '4px', fontSize: '16px' }}>Purchase Order</h4>
                                                     <p style={{ fontSize: '13px', color: '#6b7280', margin: 0 }}>Procurement documents</p>
                                                 </button>
                                                 <button className="template-card" onClick={() => setSelectedDocType('receipt')} style={{ padding: '20px', background: '#fefce8', border: '2px solid #fde047', borderRadius: '12px', textAlign: 'left', cursor: 'pointer', transition: 'all 0.2s' }}>
-                                                    <span style={{ fontSize: '24px', display: 'block', marginBottom: '8px' }}>🧾</span>
+                                                    <div style={{ fontSize: '24px', display: 'block', marginBottom: '8px', color: '#6b7280' }}><FileText size={24} /></div>
                                                     <h4 style={{ fontWeight: '600', color: '#0f172a', marginBottom: '4px', fontSize: '16px' }}>Receipt</h4>
                                                     <p style={{ fontSize: '13px', color: '#6b7280', margin: 0 }}>Payment confirmations</p>
                                                 </button>
                                                 <button className="template-card" onClick={() => setSelectedDocType('gst_invoice')} style={{ padding: '20px', background: '#f3e8ff', border: '2px solid #c4b5fd', borderRadius: '12px', textAlign: 'left', cursor: 'pointer', transition: 'all 0.2s' }}>
-                                                    <span style={{ fontSize: '24px', display: 'block', marginBottom: '8px' }}>📋</span>
+                                                    <div style={{ fontSize: '24px', display: 'block', marginBottom: '8px', color: '#6b7280' }}><FileText size={24} /></div>
                                                     <h4 style={{ fontWeight: '600', color: '#0f172a', marginBottom: '4px', fontSize: '16px' }}>GST Invoice</h4>
                                                     <p style={{ fontSize: '13px', color: '#6b7280', margin: 0 }}>Tax compliant invoices</p>
                                                 </button>
                                                 <button className="template-card" onClick={() => setSelectedDocType('credit_note')} style={{ padding: '20px', background: '#fef2f2', border: '2px solid #fecaca', borderRadius: '12px', textAlign: 'left', cursor: 'pointer', transition: 'all 0.2s' }}>
-                                                    <span style={{ fontSize: '24px', display: 'block', marginBottom: '8px' }}>💳</span>
+                                                    <div style={{ fontSize: '24px', display: 'block', marginBottom: '8px', color: '#6b7280' }}><FileText size={24} /></div>
                                                     <h4 style={{ fontWeight: '600', color: '#0f172a', marginBottom: '4px', fontSize: '16px' }}>Credit Note</h4>
                                                     <p style={{ fontSize: '13px', color: '#6b7280', margin: 0 }}>Payment adjustments</p>
                                                 </button>
@@ -1562,22 +1569,22 @@ Seeking personalized assistance? Explore our templates collection or contact our
                                         {selectedCategory === 'compliance' && (
                                             <>
                                                 <button className="template-card" onClick={() => setSelectedDocType('audit_report')} style={{ padding: '20px', background: '#f0fdf4', border: '2px solid #bbf7d0', borderRadius: '12px', textAlign: 'left', cursor: 'pointer', transition: 'all 0.2s' }}>
-                                                    <span style={{ fontSize: '24px', display: 'block', marginBottom: '8px' }}>📊</span>
+                                                    <div style={{ fontSize: '24px', display: 'block', marginBottom: '8px', color: '#6b7280' }}><FileText size={24} /></div>
                                                     <h4 style={{ fontWeight: '600', color: '#0f172a', marginBottom: '4px', fontSize: '16px' }}>Audit Report</h4>
                                                     <p style={{ fontSize: '13px', color: '#6b7280', margin: 0 }}>Financial audits</p>
                                                 </button>
                                                 <button className="template-card" onClick={() => setSelectedDocType('policy_document')} style={{ padding: '20px', background: '#f0f9ff', border: '2px solid #bae6fd', borderRadius: '12px', textAlign: 'left', cursor: 'pointer', transition: 'all 0.2s' }}>
-                                                    <span style={{ fontSize: '24px', display: 'block', marginBottom: '8px' }}>📋</span>
+                                                    <div style={{ fontSize: '24px', display: 'block', marginBottom: '8px', color: '#6b7280' }}><FileText size={24} /></div>
                                                     <h4 style={{ fontWeight: '600', color: '#0f172a', marginBottom: '4px', fontSize: '16px' }}>Policy Document</h4>
                                                     <p style={{ fontSize: '13px', color: '#6b7280', margin: 0 }}>Company policies</p>
                                                 </button>
                                                 <button className="template-card" onClick={() => setSelectedDocType('gst_filing')} style={{ padding: '20px', background: '#fefce8', border: '2px solid #fde047', borderRadius: '12px', textAlign: 'left', cursor: 'pointer', transition: 'all 0.2s' }}>
-                                                    <span style={{ fontSize: '24px', display: 'block', marginBottom: '8px' }}>📄</span>
+                                                    <div style={{ fontSize: '24px', display: 'block', marginBottom: '8px', color: '#6b7280' }}><FileText size={24} /></div>
                                                     <h4 style={{ fontWeight: '600', color: '#0f172a', marginBottom: '4px', fontSize: '16px' }}>GST Filing</h4>
                                                     <p style={{ fontSize: '13px', color: '#6b7280', margin: 0 }}>Tax submissions</p>
                                                 </button>
                                                 <button className="template-card" onClick={() => setSelectedDocType('regulatory_filing')} style={{ padding: '20px', background: '#f3e8ff', border: '2px solid #c4b5fd', borderRadius: '12px', textAlign: 'left', cursor: 'pointer', transition: 'all 0.2s' }}>
-                                                    <span style={{ fontSize: '24px', display: 'block', marginBottom: '8px' }}>🏛️</span>
+                                                    <div style={{ fontSize: '24px', display: 'block', marginBottom: '8px', color: '#6b7280' }}><FileText size={24} /></div>
                                                     <h4 style={{ fontWeight: '600', color: '#0f172a', marginBottom: '4px', fontSize: '16px' }}>Regulatory Filing</h4>
                                                     <p style={{ fontSize: '13px', color: '#6b7280', margin: 0 }}>Compliance documents</p>
                                                 </button>
@@ -1585,173 +1592,169 @@ Seeking personalized assistance? Explore our templates collection or contact our
                                         )}
                                     </div>
                                 </div>
-                            ) : selectedDocType === 'quotation' ? (
-                                <div>
-                                    {/* HR & Employee Documents */}
-                                    <div style={{ marginBottom: '32px' }}>
-                                        <h3 style={{ fontSize: '18px', fontWeight: '600', color: '#0f172a', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                            <span style={{ fontSize: '20px' }}>👥</span>
-                                            HR & Employee Documents
-                                        </h3>
-                                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '16px' }}>
-                                            <button className="template-card" onClick={() => setSelectedDocType('offer_letter')} style={{ padding: '20px', background: '#f0fdf4', border: '2px solid #bbf7d0', borderRadius: '12px', textAlign: 'left', cursor: 'pointer', transition: 'all 0.2s' }}>
-                                                <span style={{ fontSize: '24px', display: 'block', marginBottom: '8px' }}>📝</span>
-                                                <h4 style={{ fontWeight: '600', color: '#0f172a', marginBottom: '4px', fontSize: '16px' }}>Offer Letter</h4>
-                                                <p style={{ fontSize: '13px', color: '#64748b', margin: 0 }}>Professional employment offer with terms</p>
-                                            </button>
-                                            <button className="template-card" onClick={() => setSelectedDocType('appointment_letter')} style={{ padding: '20px', background: '#f0fdf4', border: '2px solid #bbf7d0', borderRadius: '12px', textAlign: 'left', cursor: 'pointer', transition: 'all 0.2s' }}>
-                                                <span style={{ fontSize: '24px', display: 'block', marginBottom: '8px' }}>📋</span>
-                                                <h4 style={{ fontWeight: '600', color: '#0f172a', marginBottom: '4px', fontSize: '16px' }}>Appointment Letter</h4>
-                                                <p style={{ fontSize: '13px', color: '#64748b', margin: 0 }}>Formal appointment confirmation</p>
-                                            </button>
-                                            <button className="template-card" onClick={() => setSelectedDocType('experience_certificate')} style={{ padding: '20px', background: '#f0fdf4', border: '2px solid #bbf7d0', borderRadius: '12px', textAlign: 'left', cursor: 'pointer', transition: 'all 0.2s' }}>
-                                                <span style={{ fontSize: '24px', display: 'block', marginBottom: '8px' }}>🏆</span>
-                                                <h4 style={{ fontWeight: '600', color: '#0f172a', marginBottom: '4px', fontSize: '16px' }}>Experience Certificate</h4>
-                                                <p style={{ fontSize: '13px', color: '#64748b', margin: 0 }}>Employment experience verification</p>
-                                            </button>
-                                            <button className="template-card" onClick={() => setSelectedDocType('onboarding_letter')} style={{ padding: '20px', background: '#f0fdf4', border: '2px solid #bbf7d0', borderRadius: '12px', textAlign: 'left', cursor: 'pointer', transition: 'all 0.2s' }}>
-                                                <span style={{ fontSize: '24px', display: 'block', marginBottom: '8px' }}>🎯</span>
-                                                <h4 style={{ fontWeight: '600', color: '#0f172a', marginBottom: '4px', fontSize: '16px' }}>Onboarding Letter</h4>
-                                                <p style={{ fontSize: '13px', color: '#64748b', margin: 0 }}>Welcome and first-day instructions</p>
-                                            </button>
-                                            <button className="template-card" onClick={() => setSelectedDocType('warning_letter')} style={{ padding: '20px', background: '#f0fdf4', border: '2px solid #bbf7d0', borderRadius: '12px', textAlign: 'left', cursor: 'pointer', transition: 'all 0.2s' }}>
-                                                <span style={{ fontSize: '24px', display: 'block', marginBottom: '8px' }}>⚠️</span>
-                                                <h4 style={{ fontWeight: '600', color: '#0f172a', marginBottom: '4px', fontSize: '16px' }}>Warning Letter</h4>
-                                                <p style={{ fontSize: '13px', color: '#64748b', margin: 0 }}>Formal disciplinary notice</p>
-                                            </button>
+                            ) : (
+                                // Split-screen layout with form on left and preview on right
+                                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px', minHeight: '600px' }}>
+                                    {/* Left Side - Form */}
+                                    <div style={{ 
+                                        background: 'white', 
+                                        border: '1px solid #e5e7eb', 
+                                        borderRadius: '12px', 
+                                        padding: '24px',
+                                        boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)'
+                                    }}>
+                                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+                                            <h3 style={{ margin: 0, fontSize: '18px', fontWeight: '600', color: '#0f172a' }}>
+                                                Fill Document Details
+                                            </h3>
+                                            <button type="button" onClick={() => setSelectedDocType(null)} style={{ background: 'none', border: 'none', color: '#64748b', fontSize: '14px', cursor: 'pointer' }}>← Back</button>
                                         </div>
+
+                                        {/* Simple form for all document types */}
+                                        <form onSubmit={handleGenerate}>
+                                            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                                                <div>
+                                                    <label style={{ display: 'block', fontSize: '12px', fontWeight: '600', color: '#475569', marginBottom: '6px' }}>
+                                                        Document Details
+                                                    </label>
+                                                    <textarea 
+                                                        style={{ width: '100%', padding: '12px', borderRadius: '8px', border: '1px solid #e2e8f0', background: '#f8fafc', minHeight: '120px', fontFamily: 'inherit' }} 
+                                                        value={prompt} 
+                                                        onChange={(e) => setPrompt(e.target.value)} 
+                                                        placeholder={`Describe what you need for your ${selectedDocType.replace(/_/g, ' ')}...`}
+                                                        required 
+                                                    />
+                                                </div>
+                                                <button type="submit" className="primary-btn" style={{ marginTop: '16px', width: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '8px' }}>
+                                                    <Sparkles size={16} /> Generate {selectedDocType.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
+                                                </button>
+                                            </div>
+                                        </form>
                                     </div>
 
-                                    {/* Legal & Compliance Documents */}
-                                    <div style={{ marginBottom: '32px' }}>
-                                        <h3 style={{ fontSize: '18px', fontWeight: '600', color: '#0f172a', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                            <span style={{ fontSize: '20px' }}>⚖️</span>
-                                            Legal & Compliance Documents
-                                        </h3>
-                                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '16px' }}>
-                                            <button className="template-card" onClick={() => setSelectedDocType('nda')} style={{ padding: '20px', background: '#fef3c7', border: '2px solid #fde68a', borderRadius: '12px', textAlign: 'left', cursor: 'pointer', transition: 'all 0.2s' }}>
-                                                <span style={{ fontSize: '24px', display: 'block', marginBottom: '8px' }}>🔒</span>
-                                                <h4 style={{ fontWeight: '600', color: '#0f172a', marginBottom: '4px', fontSize: '16px' }}>Non-Disclosure Agreement</h4>
-                                                <p style={{ fontSize: '13px', color: '#64748b', margin: 0 }}>Confidentiality protection agreement</p>
-                                            </button>
-                                            <button className="template-card" onClick={() => setSelectedDocType('service_agreement')} style={{ padding: '20px', background: '#fef3c7', border: '2px solid #fde68a', borderRadius: '12px', textAlign: 'left', cursor: 'pointer', transition: 'all 0.2s' }}>
-                                                <span style={{ fontSize: '24px', display: 'block', marginBottom: '8px' }}>📜</span>
-                                                <h4 style={{ fontWeight: '600', color: '#0f172a', marginBottom: '4px', fontSize: '16px' }}>Service Agreement</h4>
-                                                <p style={{ fontSize: '13px', color: '#64748b', margin: 0 }}>Professional services contract</p>
-                                            </button>
-                                            <button className="template-card" onClick={() => setSelectedDocType('terms_of_service')} style={{ padding: '20px', background: '#fef3c7', border: '2px solid #fde68a', borderRadius: '12px', textAlign: 'left', cursor: 'pointer', transition: 'all 0.2s' }}>
-                                                <span style={{ fontSize: '24px', display: 'block', marginBottom: '8px' }}>📋</span>
-                                                <h4 style={{ fontWeight: '600', color: '#0f172a', marginBottom: '4px', fontSize: '16px' }}>Terms of Service</h4>
-                                                <p style={{ fontSize: '13px', color: '#64748b', margin: 0 }}>Website/app usage terms</p>
-                                            </button>
-                                            <button className="template-card" onClick={() => setSelectedDocType('privacy_policy')} style={{ padding: '20px', background: '#fef3c7', border: '2px solid #fde68a', borderRadius: '12px', textAlign: 'left', cursor: 'pointer', transition: 'all 0.2s' }}>
-                                                <span style={{ fontSize: '24px', display: 'block', marginBottom: '8px' }}>🛡️</span>
-                                                <h4 style={{ fontWeight: '600', color: '#0f172a', marginBottom: '4px', fontSize: '16px' }}>Privacy Policy</h4>
-                                                <p style={{ fontSize: '13px', color: '#64748b', margin: 0 }}>Data protection and privacy terms</p>
-                                            </button>
-                                            <button className="template-card" onClick={() => setSelectedDocType('mou')} style={{ padding: '20px', background: '#fef3c7', border: '2px solid #fde68a', borderRadius: '12px', textAlign: 'left', cursor: 'pointer', transition: 'all 0.2s' }}>
-                                                <span style={{ fontSize: '24px', display: 'block', marginBottom: '8px' }}>🤝</span>
-                                                <h4 style={{ fontWeight: '600', color: '#0f172a', marginBottom: '4px', fontSize: '16px' }}>Memorandum of Understanding</h4>
-                                                <p style={{ fontSize: '13px', color: '#64748b', margin: 0 }}>Cooperation framework agreement</p>
-                                            </button>
+                                    {/* Right Side - Live Preview */}
+                                    <div style={{ 
+                                        background: 'white', 
+                                        border: '1px solid #e5e7eb', 
+                                        borderRadius: '12px', 
+                                        padding: '24px',
+                                        boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)',
+                                        position: 'relative'
+                                    }}>
+                                        <div style={{ 
+                                            display: 'flex', 
+                                            alignItems: 'center', 
+                                            justifyContent: 'center',
+                                            gap: '8px',
+                                            marginBottom: '20px',
+                                            padding: '8px 16px',
+                                            background: '#f0f9ff',
+                                            borderRadius: '8px',
+                                            border: '1px solid #bae6fd'
+                                        }}>
+                                            <Sparkles size={16} color="#0ea5e9" />
+                                            <span style={{ fontSize: '14px', fontWeight: '600', color: '#0ea5e9' }}>LIVE PREVIEW</span>
                                         </div>
-                                    </div>
 
-                                    {/* Sales & Business Documents */}
-                                    <div style={{ marginBottom: '32px' }}>
-                                        <h3 style={{ fontSize: '18px', fontWeight: '600', color: '#0f172a', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                            <span style={{ fontSize: '20px' }}>💼</span>
-                                            Sales & Business Documents
-                                        </h3>
-                                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '16px' }}>
-                                            <button className="template-card" onClick={() => setSelectedDocType('proposal')} style={{ padding: '20px', background: '#ede9fe', border: '2px solid #c4b5fd', borderRadius: '12px', textAlign: 'left', cursor: 'pointer', transition: 'all 0.2s' }}>
-                                                <span style={{ fontSize: '24px', display: 'block', marginBottom: '8px' }}>📄</span>
-                                                <h4 style={{ fontWeight: '600', color: '#0f172a', marginBottom: '4px', fontSize: '16px' }}>Business Proposal</h4>
-                                                <p style={{ fontSize: '13px', color: '#64748b', margin: 0 }}>Comprehensive project proposal</p>
-                                            </button>
-                                            <button className="template-card" onClick={() => setSelectedDocType('quotation')} style={{ padding: '20px', background: '#ede9fe', border: '2px solid #c4b5fd', borderRadius: '12px', textAlign: 'left', cursor: 'pointer', transition: 'all 0.2s' }}>
-                                                <span style={{ fontSize: '24px', display: 'block', marginBottom: '8px' }}>💰</span>
-                                                <h4 style={{ fontWeight: '600', color: '#0f172a', marginBottom: '4px', fontSize: '16px' }}>Quotation</h4>
-                                                <p style={{ fontSize: '13px', color: '#64748b', margin: 0 }}>Detailed pricing estimate</p>
-                                            </button>
-                                            <button className="template-card" onClick={() => setSelectedDocType('sales_contract')} style={{ padding: '20px', background: '#ede9fe', border: '2px solid #c4b5fd', borderRadius: '12px', textAlign: 'left', cursor: 'pointer', transition: 'all 0.2s' }}>
-                                                <span style={{ fontSize: '24px', display: 'block', marginBottom: '8px' }}>📝</span>
-                                                <h4 style={{ fontWeight: '600', color: '#0f172a', marginBottom: '4px', fontSize: '16px' }}>Sales Contract</h4>
-                                                <p style={{ fontSize: '13px', color: '#64748b', margin: 0 }}>Binding sales agreement</p>
-                                            </button>
-                                            <button className="template-card" onClick={() => setSelectedDocType('partnership_agreement')} style={{ padding: '20px', background: '#ede9fe', border: '2px solid #c4b5fd', borderRadius: '12px', textAlign: 'left', cursor: 'pointer', transition: 'all 0.2s' }}>
-                                                <span style={{ fontSize: '24px', display: 'block', marginBottom: '8px' }}>🤝</span>
-                                                <h4 style={{ fontWeight: '600', color: '#0f172a', marginBottom: '4px', fontSize: '16px' }}>Partnership Agreement</h4>
-                                                <p style={{ fontSize: '13px', color: '#64748b', margin: 0 }}>Strategic partnership terms</p>
-                                            </button>
-                                        </div>
-                                    </div>
+                                        {/* Document Preview */}
+                                        <div style={{ 
+                                            minHeight: '500px',
+                                            background: '#fafafa',
+                                            border: '1px solid #e5e7eb',
+                                            borderRadius: '8px',
+                                            padding: '32px',
+                                            fontFamily: 'Georgia, serif',
+                                            lineHeight: '1.6',
+                                            color: '#374151'
+                                        }}>
+                                            {/* Company Header */}
+                                            <div style={{ textAlign: 'center', marginBottom: '32px', borderBottom: '2px solid #e5e7eb', paddingBottom: '16px' }}>
+                                                <div style={{ 
+                                                    width: '40px', 
+                                                    height: '40px', 
+                                                    background: brandKit?.colors?.[0] || '#7c3aed', 
+                                                    borderRadius: '8px',
+                                                    margin: '0 auto 12px',
+                                                    display: 'flex',
+                                                    alignItems: 'center',
+                                                    justifyContent: 'center'
+                                                }}>
+                                                    <Sparkles size={20} color="white" />
+                                                </div>
+                                                <h2 style={{ margin: 0, fontSize: '20px', fontWeight: 'bold', color: '#111827' }}>
+                                                    {brandKit?.name || 'MM Docs'}
+                                                </h2>
+                                                <p style={{ margin: '4px 0 0', fontSize: '12px', color: '#6b7280' }}>
+                                                    Professional Document Generation
+                                                </p>
+                                            </div>
 
-                                    {/* Finance & Accounting Documents */}
-                                    <div style={{ marginBottom: '32px' }}>
-                                        <h3 style={{ fontSize: '18px', fontWeight: '600', color: '#0f172a', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                            <span style={{ fontSize: '20px' }}>💳</span>
-                                            Finance & Accounting Documents
-                                        </h3>
-                                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '16px' }}>
-                                            <button className="template-card" onClick={() => setSelectedDocType('invoice')} style={{ padding: '20px', background: '#ecfdf5', border: '2px solid #bbf7d0', borderRadius: '12px', textAlign: 'left', cursor: 'pointer', transition: 'all 0.2s' }}>
-                                                <span style={{ fontSize: '24px', display: 'block', marginBottom: '8px' }}>🧾</span>
-                                                <h4 style={{ fontWeight: '600', color: '#0f172a', marginBottom: '4px', fontSize: '16px' }}>Invoice</h4>
-                                                <p style={{ fontSize: '13px', color: '#64748b', margin: 0 }}>Professional billing document</p>
-                                            </button>
-                                            <button className="template-card" onClick={() => setSelectedDocType('purchase_order')} style={{ padding: '20px', background: '#ecfdf5', border: '2px solid #bbf7d0', borderRadius: '12px', textAlign: 'left', cursor: 'pointer', transition: 'all 0.2s' }}>
-                                                <span style={{ fontSize: '24px', display: 'block', marginBottom: '8px' }}>📦</span>
-                                                <h4 style={{ fontWeight: '600', color: '#0f172a', marginBottom: '4px', fontSize: '16px' }}>Purchase Order</h4>
-                                                <p style={{ fontSize: '13px', color: '#64748b', margin: 0 }}>Procurement authorization</p>
-                                            </button>
-                                            <button className="template-card" onClick={() => setSelectedDocType('gst_invoice')} style={{ padding: '20px', background: '#ecfdf5', border: '2px solid #bbf7d0', borderRadius: '12px', textAlign: 'left', cursor: 'pointer', transition: 'all 0.2s' }}>
-                                                <span style={{ fontSize: '24px', display: 'block', marginBottom: '8px' }}>📊</span>
-                                                <h4 style={{ fontWeight: '600', color: '#0f172a', marginBottom: '4px', fontSize: '16px' }}>GST Invoice</h4>
-                                                <p style={{ fontSize: '13px', color: '#64748b', margin: 0 }}>Tax-compliant billing</p>
-                                            </button>
-                                            <button className="template-card" onClick={() => setSelectedDocType('receipt')} style={{ padding: '20px', background: '#ecfdf5', border: '2px solid #bbf7d0', borderRadius: '12px', textAlign: 'left', cursor: 'pointer', transition: 'all 0.2s' }}>
-                                                <span style={{ fontSize: '24px', display: 'block', marginBottom: '8px' }}>🧾</span>
-                                                <h4 style={{ fontWeight: '600', color: '#0f172a', marginBottom: '4px', fontSize: '16px' }}>Receipt</h4>
-                                                <p style={{ fontSize: '13px', color: '#64748b', margin: 0 }}>Payment confirmation</p>
-                                            </button>
-                                            <button className="template-card" onClick={() => setSelectedDocType('credit_note')} style={{ padding: '20px', background: '#ecfdf5', border: '2px solid #bbf7d0', borderRadius: '12px', textAlign: 'left', cursor: 'pointer', transition: 'all 0.2s' }}>
-                                                <span style={{ fontSize: '24px', display: 'block', marginBottom: '8px' }}>💳</span>
-                                                <h4 style={{ fontWeight: '600', color: '#0f172a', marginBottom: '4px', fontSize: '16px' }}>Credit Note</h4>
-                                                <p style={{ fontSize: '13px', color: '#64748b', margin: 0 }}>Credit adjustment document</p>
-                                            </button>
-                                        </div>
-                                    </div>
+                                            {/* Document Title */}
+                                            <div style={{ textAlign: 'center', marginBottom: '24px' }}>
+                                                <h3 style={{ 
+                                                    margin: 0, 
+                                                    fontSize: '18px', 
+                                                    fontWeight: 'bold', 
+                                                    color: '#111827',
+                                                    textTransform: 'uppercase',
+                                                    letterSpacing: '1px'
+                                                }}>
+                                                    {selectedDocType.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
+                                                </h3>
+                                                <p style={{ margin: '8px 0 0', fontSize: '12px', color: '#6b7280' }}>
+                                                    Date: {new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}
+                                                </p>
+                                            </div>
 
-                                    {/* Marketing & Other Documents */}
-                                    <div style={{ marginBottom: '32px' }}>
-                                        <h3 style={{ fontSize: '18px', fontWeight: '600', color: '#0f172a', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                            <span style={{ fontSize: '20px' }}>📈</span>
-                                            Marketing & Other Documents
-                                        </h3>
-                                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '16px' }}>
-                                            <button className="template-card" onClick={() => setSelectedDocType('email')} style={{ padding: '20px', background: '#f0f9ff', border: '2px solid #bae6fd', borderRadius: '12px', textAlign: 'left', cursor: 'pointer', transition: 'all 0.2s' }}>
-                                                <span style={{ fontSize: '24px', display: 'block', marginBottom: '8px' }}>✉️</span>
-                                                <h4 style={{ fontWeight: '600', color: '#0f172a', marginBottom: '4px', fontSize: '16px' }}>Sales Email</h4>
-                                                <p style={{ fontSize: '13px', color: '#64748b', margin: 0 }}>Persuasive outreach email</p>
-                                            </button>
-                                            <button className="template-card" onClick={() => setSelectedDocType('profile')} style={{ padding: '20px', background: '#f0f9ff', border: '2px solid #bae6fd', borderRadius: '12px', textAlign: 'left', cursor: 'pointer', transition: 'all 0.2s' }}>
-                                                <span style={{ fontSize: '24px', display: 'block', marginBottom: '8px' }}>🏢</span>
-                                                <h4 style={{ fontWeight: '600', color: '#0f172a', marginBottom: '4px', fontSize: '16px' }}>Company Profile</h4>
-                                                <p style={{ fontSize: '13px', color: '#64748b', margin: 0 }}>Professional company overview</p>
-                                            </button>
-                                            <button className="template-card" onClick={() => setSelectedDocType('pitch')} style={{ padding: '20px', background: '#f0f9ff', border: '2px solid #bae6fd', borderRadius: '12px', textAlign: 'left', cursor: 'pointer', transition: 'all 0.2s' }}>
-                                                <span style={{ fontSize: '24px', display: 'block', marginBottom: '8px' }}>📊</span>
-                                                <h4 style={{ fontWeight: '600', color: '#0f172a', marginBottom: '4px', fontSize: '16px' }}>Pitch Deck Outline</h4>
-                                                <p style={{ fontSize: '13px', color: '#64748b', margin: 0 }}>Investor presentation structure</p>
-                                            </button>
-                                            <button className="template-card" onClick={() => setSelectedDocType('other')} style={{ padding: '20px', background: '#f0f9ff', border: '2px solid #bae6fd', borderRadius: '12px', textAlign: 'left', cursor: 'pointer', transition: 'all 0.2s' }}>
-                                                <span style={{ fontSize: '24px', display: 'block', marginBottom: '8px' }}>⚡</span>
-                                                <h4 style={{ fontWeight: '600', color: '#0f172a', marginBottom: '4px', fontSize: '16px' }}>Custom Document</h4>
-                                                <p style={{ fontSize: '13px', color: '#64748b', margin: 0 }}>AI-powered custom generation</p>
-                                            </button>
+                                            {/* Document Content Preview */}
+                                            <div style={{ marginBottom: '32px' }}>
+                                                {prompt ? (
+                                                    <div>
+                                                        <p style={{ marginBottom: '16px', fontStyle: 'italic', color: '#6b7280' }}>
+                                                            {prompt}
+                                                        </p>
+                                                        <div style={{ padding: '20px', background: '#f9fafb', borderRadius: '8px', border: '1px solid #e5e7eb' }}>
+                                                            <p style={{ margin: 0, color: '#374151' }}>
+                                                                Your AI-generated {selectedDocType.replace(/_/g, ' ')} content will appear here with professional formatting, proper structure, and your brand styling applied automatically.
+                                                            </p>
+                                                        </div>
+                                                    </div>
+                                                ) : (
+                                                    <div style={{ padding: '20px', background: '#f9fafb', borderRadius: '8px', border: '2px dashed #d1d5db' }}>
+                                                        <p style={{ margin: 0, textAlign: 'center', color: '#9ca3af' }}>
+                                                            Fill in the form on the left to see your document preview here
+                                                        </p>
+                                                    </div>
+                                                )}
+                                            </div>
+
+                                            {/* Signature Section */}
+                                            <div style={{ 
+                                                display: 'grid', 
+                                                gridTemplateColumns: '1fr 1fr', 
+                                                gap: '40px',
+                                                marginTop: '48px',
+                                                paddingTop: '24px',
+                                                borderTop: '1px solid #e5e7eb'
+                                            }}>
+                                                <div>
+                                                    <p style={{ margin: '0 0 8px', fontSize: '12px', fontWeight: 'bold', color: '#6b7280' }}>Authorized Signatory</p>
+                                                    <div style={{ height: '40px', borderBottom: '1px solid #d1d5db', marginBottom: '8px' }}></div>
+                                                    <p style={{ margin: 0, fontSize: '12px', color: '#9ca3af' }}>Signature</p>
+                                                </div>
+                                                <div>
+                                                    <p style={{ margin: '0 0 8px', fontSize: '12px', fontWeight: 'bold', color: '#6b7280' }}>
+                                                        Recipient Signature
+                                                    </p>
+                                                    <div style={{ height: '40px', borderBottom: '1px solid #d1d5db', marginBottom: '8px' }}></div>
+                                                    <p style={{ margin: 0, fontSize: '12px', color: '#9ca3af' }}>Signature</p>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
+                            )}
+                        </div>
                             ) : selectedDocType === 'quotation' ? (
                                 <form onSubmit={handleGenerate}>
                                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
@@ -1873,232 +1876,366 @@ Seeking personalized assistance? Explore our templates collection or contact our
                                     </div>
                                 </form>
                             ) : (
-                                // Specific forms for each document type
-                                <div>
-                                    {/* HR & Employee Documents Forms */}
-                                    {['offer_letter', 'appointment_letter', 'onboarding_letter', 'experience_certificate', 'warning_letter'].includes(selectedDocType) && (
-                                        <form onSubmit={handleGenerate}>
-                                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-                                                <h3 style={{ margin: 0, fontSize: '18px', fontWeight: '600', color: '#0f172a' }}>
-                                                    Create {selectedDocType.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
-                                                </h3>
-                                                <button type="button" onClick={() => setSelectedDocType(null)} style={{ background: 'none', border: 'none', color: '#64748b', fontSize: '14px', cursor: 'pointer' }}>← Back</button>
-                                            </div>
-                                            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                                                <div>
-                                                    <label style={{ display: 'block', fontSize: '12px', fontWeight: '600', color: '#475569', marginBottom: '4px' }}>Employee Name</label>
-                                                    <input type="text" style={{ width: '100%', padding: '12px', borderRadius: '8px', border: '1px solid #e2e8f0', background: '#f8fafc' }} 
-                                                        value={genericDocData.employeeName} 
-                                                        onChange={(e) => setGenericDocData({...genericDocData, employeeName: e.target.value})} 
-                                                        placeholder="Full name of employee" required />
-                                                </div>
-                                                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
-                                                    <div>
-                                                        <label style={{ display: 'block', fontSize: '12px', fontWeight: '600', color: '#475569', marginBottom: '4px' }}>Position</label>
-                                                        <input type="text" style={{ width: '100%', padding: '12px', borderRadius: '8px', border: '1px solid #e2e8f0', background: '#f8fafc' }} 
-                                                            value={genericDocData.position} 
-                                                            onChange={(e) => setGenericDocData({...genericDocData, position: e.target.value})} 
-                                                            placeholder="Job title" required />
-                                                    </div>
-                                                    <div>
-                                                        <label style={{ display: 'block', fontSize: '12px', fontWeight: '600', color: '#475569', marginBottom: '4px' }}>Department</label>
-                                                        <input type="text" style={{ width: '100%', padding: '12px', borderRadius: '8px', border: '1px solid #e2e8f0', background: '#f8fafc' }} 
-                                                            value={genericDocData.department} 
-                                                            onChange={(e) => setGenericDocData({...genericDocData, department: e.target.value})} 
-                                                            placeholder="Department name" />
-                                                    </div>
-                                                </div>
-                                                {selectedDocType === 'offer_letter' && (
-                                                    <>
-                                                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
-                                                            <div>
-                                                                <label style={{ display: 'block', fontSize: '12px', fontWeight: '600', color: '#475569', marginBottom: '4px' }}>Company Name</label>
-                                                                <input type="text" style={{ width: '100%', padding: '12px', borderRadius: '8px', border: '1px solid #e2e8f0', background: '#f8fafc' }} 
-                                                                    value={genericDocData.companyName} 
-                                                                    onChange={(e) => setGenericDocData({...genericDocData, companyName: e.target.value})} 
-                                                                    placeholder="Company name" required />
-                                                            </div>
-                                                            <div>
-                                                                <label style={{ display: 'block', fontSize: '12px', fontWeight: '600', color: '#475569', marginBottom: '4px' }}>Reporting To</label>
-                                                                <input type="text" style={{ width: '100%', padding: '12px', borderRadius: '8px', border: '1px solid #e2e8f0', background: '#f8fafc' }} 
-                                                                    value={genericDocData.reportingTo} 
-                                                                    onChange={(e) => setGenericDocData({...genericDocData, reportingTo: e.target.value})} 
-                                                                    placeholder="Direct supervisor/manager" />
-                                                            </div>
-                                                        </div>
-                                                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
-                                                            <div>
-                                                                <label style={{ display: 'block', fontSize: '12px', fontWeight: '600', color: '#475569', marginBottom: '4px' }}>Start Date</label>
-                                                                <input type="date" min="1900-01-01" max="2050-12-31" style={{ width: '100%', padding: '12px', borderRadius: '8px', border: '1px solid #e2e8f0', background: '#f8fafc' }} 
-                                                                    value={genericDocData.startDate} 
-                                                                    onChange={(e) => setGenericDocData({...genericDocData, startDate: e.target.value})} />
-                                                            </div>
-                                                            <div>
-                                                                <label style={{ display: 'block', fontSize: '12px', fontWeight: '600', color: '#475569', marginBottom: '4px' }}>Salary</label>
-                                                                <input type="number" min="0" step="1000" style={{ width: '100%', padding: '12px', borderRadius: '8px', border: '1px solid #e2e8f0', background: '#f8fafc' }} 
-                                                                    value={genericDocData.salary} 
-                                                                    onChange={(e) => setGenericDocData({...genericDocData, salary: e.target.value})} 
-                                                                    placeholder="e.g. 50000" />
-                                                            </div>
-                                                        </div>
-                                                    </>
-                                                )}
-                                                <button type="submit" className="primary-btn" style={{ marginTop: '8px', width: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '8px' }}>
-                                                    <Sparkles size={16} /> Generate {selectedDocType.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
-                                                </button>
-                                            </div>
-                                        </form>
-                                    )}
+                                // Split-screen layout with form on left and preview on right
+                                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px', minHeight: '600px' }}>
+                                    {/* Left Side - Form */}
+                                    <div style={{ 
+                                        background: 'white', 
+                                        border: '1px solid #e5e7eb', 
+                                        borderRadius: '12px', 
+                                        padding: '24px',
+                                        boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)'
+                                    }}>
+                                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+                                            <h3 style={{ margin: 0, fontSize: '18px', fontWeight: '600', color: '#0f172a' }}>
+                                                Fill Document Details
+                                            </h3>
+                                            <button type="button" onClick={() => setSelectedDocType(null)} style={{ background: 'none', border: 'none', color: '#64748b', fontSize: '14px', cursor: 'pointer' }}>← Back</button>
+                                        </div>
 
-                                    {/* Legal Documents Forms */}
-                                    {['nda', 'service_agreement', 'terms_of_service', 'privacy_policy', 'mou'].includes(selectedDocType) && (
-                                        <form onSubmit={handleGenerate}>
-                                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-                                                <h3 style={{ margin: 0, fontSize: '18px', fontWeight: '600', color: '#0f172a' }}>
-                                                    Create {selectedDocType.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
-                                                </h3>
-                                                <button type="button" onClick={() => setSelectedDocType(null)} style={{ background: 'none', border: 'none', color: '#64748b', fontSize: '14px', cursor: 'pointer' }}>← Back</button>
-                                            </div>
-                                            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                                                <div>
-                                                    <label style={{ display: 'block', fontSize: '12px', fontWeight: '600', color: '#475569', marginBottom: '4px' }}>Other Party Name</label>
-                                                    <input type="text" style={{ width: '100%', padding: '12px', borderRadius: '8px', border: '1px solid #e2e8f0', background: '#f8fafc' }} 
-                                                        value={genericDocData.partyName} 
-                                                        onChange={(e) => setGenericDocData({...genericDocData, partyName: e.target.value})} 
-                                                        placeholder="Company or individual name" required />
-                                                </div>
-                                                <div>
-                                                    <label style={{ display: 'block', fontSize: '12px', fontWeight: '600', color: '#475569', marginBottom: '4px' }}>Purpose/Scope</label>
-                                                    <textarea style={{ width: '100%', padding: '12px', borderRadius: '8px', border: '1px solid #e2e8f0', background: '#f8fafc', minHeight: '80px', fontFamily: 'inherit' }} 
-                                                        value={genericDocData.terms} 
-                                                        onChange={(e) => setGenericDocData({...genericDocData, terms: e.target.value})} 
-                                                        placeholder="Purpose of the agreement and key terms" required />
-                                                </div>
-                                                <div>
-                                                    <label style={{ display: 'block', fontSize: '12px', fontWeight: '600', color: '#475569', marginBottom: '4px' }}>Effective Date</label>
-                                                    <input type="date" min="1900-01-01" max="2050-12-31" style={{ width: '100%', padding: '12px', borderRadius: '8px', border: '1px solid #e2e8f0', background: '#f8fafc' }} 
-                                                        value={genericDocData.effectiveDate} 
-                                                        onChange={(e) => setGenericDocData({...genericDocData, effectiveDate: e.target.value})} />
-                                                </div>
-                                                <button type="submit" className="primary-btn" style={{ marginTop: '8px', width: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '8px' }}>
-                                                    <Sparkles size={16} /> Generate {selectedDocType.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
-                                                </button>
-                                            </div>
-                                        </form>
-                                    )}
-
-                                    {/* Finance Documents Forms */}
-                                    {['invoice', 'purchase_order', 'receipt', 'gst_invoice', 'credit_note'].includes(selectedDocType) && (
-                                        <form onSubmit={handleGenerate}>
-                                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-                                                <h3 style={{ margin: 0, fontSize: '18px', fontWeight: '600', color: '#0f172a' }}>
-                                                    Create {selectedDocType.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
-                                                </h3>
-                                                <button type="button" onClick={() => setSelectedDocType(null)} style={{ background: 'none', border: 'none', color: '#64748b', fontSize: '14px', cursor: 'pointer' }}>← Back</button>
-                                            </div>
-                                            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                                                <div>
-                                                    <label style={{ display: 'block', fontSize: '12px', fontWeight: '600', color: '#475569', marginBottom: '4px' }}>Client/Customer Name</label>
-                                                    <input type="text" style={{ width: '100%', padding: '12px', borderRadius: '8px', border: '1px solid #e2e8f0', background: '#f8fafc' }} 
-                                                        value={genericDocData.clientName} 
-                                                        onChange={(e) => setGenericDocData({...genericDocData, clientName: e.target.value})} 
-                                                        placeholder="Client or customer name" required />
-                                                </div>
-                                                <div>
-                                                    <label style={{ display: 'block', fontSize: '12px', fontWeight: '600', color: '#475569', marginBottom: '4px' }}>Items/Services</label>
-                                                    <textarea style={{ width: '100%', padding: '12px', borderRadius: '8px', border: '1px solid #e2e8f0', background: '#f8fafc', minHeight: '80px', fontFamily: 'inherit' }} 
-                                                        value={genericDocData.items} 
-                                                        onChange={(e) => setGenericDocData({...genericDocData, items: e.target.value})} 
-                                                        placeholder="List of items or services with quantities and rates" required />
-                                                </div>
-                                                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+                                        {/* HR & Employee Documents Forms */}
+                                        {['offer_letter', 'appointment_letter', 'onboarding_letter', 'experience_certificate', 'warning_letter'].includes(selectedDocType) && (
+                                            <form onSubmit={handleGenerate}>
+                                                <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
                                                     <div>
-                                                        <label style={{ display: 'block', fontSize: '12px', fontWeight: '600', color: '#475569', marginBottom: '4px' }}>Total Amount</label>
-                                                        <input type="number" min="0" step="0.01" style={{ width: '100%', padding: '12px', borderRadius: '8px', border: '1px solid #e2e8f0', background: '#f8fafc' }} 
-                                                            value={genericDocData.amount} 
-                                                            onChange={(e) => setGenericDocData({...genericDocData, amount: e.target.value})} 
-                                                            placeholder="e.g. 25000" required />
+                                                        <label style={{ display: 'block', fontSize: '12px', fontWeight: '600', color: '#475569', marginBottom: '6px' }}>Employee Name</label>
+                                                        <input type="text" style={{ width: '100%', padding: '12px', borderRadius: '8px', border: '1px solid #e2e8f0', background: '#f8fafc' }} 
+                                                            value={genericDocData.employeeName} 
+                                                            onChange={(e) => setGenericDocData({...genericDocData, employeeName: e.target.value})} 
+                                                            placeholder="e.g. Priya Sharma" required />
+                                                    </div>
+                                                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+                                                        <div>
+                                                            <label style={{ display: 'block', fontSize: '12px', fontWeight: '600', color: '#475569', marginBottom: '6px' }}>Position</label>
+                                                            <input type="text" style={{ width: '100%', padding: '12px', borderRadius: '8px', border: '1px solid #e2e8f0', background: '#f8fafc' }} 
+                                                                value={genericDocData.position} 
+                                                                onChange={(e) => setGenericDocData({...genericDocData, position: e.target.value})} 
+                                                                placeholder="e.g. Senior Software Engineer" required />
+                                                        </div>
+                                                        <div>
+                                                            <label style={{ display: 'block', fontSize: '12px', fontWeight: '600', color: '#475569', marginBottom: '6px' }}>Department</label>
+                                                            <input type="text" style={{ width: '100%', padding: '12px', borderRadius: '8px', border: '1px solid #e2e8f0', background: '#f8fafc' }} 
+                                                                value={genericDocData.department} 
+                                                                onChange={(e) => setGenericDocData({...genericDocData, department: e.target.value})} 
+                                                                placeholder="e.g. Engineering" />
+                                                        </div>
+                                                    </div>
+                                                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+                                                        <div>
+                                                            <label style={{ display: 'block', fontSize: '12px', fontWeight: '600', color: '#475569', marginBottom: '6px' }}>Start Date</label>
+                                                            <input type="date" min="1900-01-01" max="2050-12-31" style={{ width: '100%', padding: '12px', borderRadius: '8px', border: '1px solid #e2e8f0', background: '#f8fafc' }} 
+                                                                value={genericDocData.startDate} 
+                                                                onChange={(e) => setGenericDocData({...genericDocData, startDate: e.target.value})} />
+                                                        </div>
+                                                        <div>
+                                                            <label style={{ display: 'block', fontSize: '12px', fontWeight: '600', color: '#475569', marginBottom: '6px' }}>Annual Salary</label>
+                                                            <input type="number" min="0" step="1000" style={{ width: '100%', padding: '12px', borderRadius: '8px', border: '1px solid #e2e8f0', background: '#f8fafc' }} 
+                                                                value={genericDocData.salary} 
+                                                                onChange={(e) => setGenericDocData({...genericDocData, salary: e.target.value})} 
+                                                                placeholder="e.g. 1800000" />
+                                                        </div>
                                                     </div>
                                                     <div>
-                                                        <label style={{ display: 'block', fontSize: '12px', fontWeight: '600', color: '#475569', marginBottom: '4px' }}>Due Date</label>
+                                                        <label style={{ display: 'block', fontSize: '12px', fontWeight: '600', color: '#475569', marginBottom: '6px' }}>Reporting Manager</label>
+                                                        <input type="text" style={{ width: '100%', padding: '12px', borderRadius: '8px', border: '1px solid #e2e8f0', background: '#f8fafc' }} 
+                                                            value={genericDocData.reportingTo} 
+                                                            onChange={(e) => setGenericDocData({...genericDocData, reportingTo: e.target.value})} 
+                                                            placeholder="e.g. Rajesh Kumar, VP Engineering" />
+                                                    </div>
+                                                    <button type="submit" className="primary-btn" style={{ marginTop: '16px', width: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '8px' }}>
+                                                        <Sparkles size={16} /> Generate {selectedDocType.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
+                                                    </button>
+                                                </div>
+                                            </form>
+                                        )}
+
+                                        {/* Legal Documents Forms */}
+                                        {['nda', 'service_agreement', 'terms_of_service', 'privacy_policy', 'mou'].includes(selectedDocType) && (
+                                            <form onSubmit={handleGenerate}>
+                                                <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                                                    <div>
+                                                        <label style={{ display: 'block', fontSize: '12px', fontWeight: '600', color: '#475569', marginBottom: '6px' }}>Other Party Name</label>
+                                                        <input type="text" style={{ width: '100%', padding: '12px', borderRadius: '8px', border: '1px solid #e2e8f0', background: '#f8fafc' }} 
+                                                            value={genericDocData.partyName} 
+                                                            onChange={(e) => setGenericDocData({...genericDocData, partyName: e.target.value})} 
+                                                            placeholder="e.g. TechCorp Solutions Pvt. Ltd." required />
+                                                    </div>
+                                                    <div>
+                                                        <label style={{ display: 'block', fontSize: '12px', fontWeight: '600', color: '#475569', marginBottom: '6px' }}>Effective Date</label>
                                                         <input type="date" min="1900-01-01" max="2050-12-31" style={{ width: '100%', padding: '12px', borderRadius: '8px', border: '1px solid #e2e8f0', background: '#f8fafc' }} 
-                                                            value={genericDocData.dueDate} 
-                                                            onChange={(e) => setGenericDocData({...genericDocData, dueDate: e.target.value})} />
+                                                            value={genericDocData.effectiveDate} 
+                                                            onChange={(e) => setGenericDocData({...genericDocData, effectiveDate: e.target.value})} />
                                                     </div>
+                                                    <div>
+                                                        <label style={{ display: 'block', fontSize: '12px', fontWeight: '600', color: '#475569', marginBottom: '6px' }}>Key Terms & Purpose</label>
+                                                        <textarea style={{ width: '100%', padding: '12px', borderRadius: '8px', border: '1px solid #e2e8f0', background: '#f8fafc', minHeight: '100px', fontFamily: 'inherit' }} 
+                                                            value={genericDocData.terms} 
+                                                            onChange={(e) => setGenericDocData({...genericDocData, terms: e.target.value})} 
+                                                            placeholder="e.g. Software development partnership for mobile app project" required />
+                                                    </div>
+                                                    <button type="submit" className="primary-btn" style={{ marginTop: '16px', width: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '8px' }}>
+                                                        <Sparkles size={16} /> Generate {selectedDocType.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
+                                                    </button>
                                                 </div>
-                                                <button type="submit" className="primary-btn" style={{ marginTop: '8px', width: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '8px' }}>
-                                                    <Sparkles size={16} /> Generate {selectedDocType.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
-                                                </button>
-                                            </div>
-                                        </form>
-                                    )}
+                                            </form>
+                                        )}
 
-                                    {/* Tax & Regulatory Documents Forms */}
-                                    {['audit_report', 'policy_document', 'gst_filing', 'regulatory_filing'].includes(selectedDocType) && (
-                                        <form onSubmit={handleGenerate}>
-                                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-                                                <h3 style={{ margin: 0, fontSize: '18px', fontWeight: '600', color: '#0f172a' }}>
-                                                    Create {selectedDocType.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
-                                                </h3>
-                                                <button type="button" onClick={() => setSelectedDocType(null)} style={{ background: 'none', border: 'none', color: '#64748b', fontSize: '14px', cursor: 'pointer' }}>← Back</button>
-                                            </div>
-                                            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                                                <div>
-                                                    <label style={{ display: 'block', fontSize: '12px', fontWeight: '600', color: '#475569', marginBottom: '4px' }}>Company Name</label>
-                                                    <input type="text" style={{ width: '100%', padding: '12px', borderRadius: '8px', border: '1px solid #e2e8f0', background: '#f8fafc' }} 
-                                                        value={genericDocData.companyName} 
-                                                        onChange={(e) => setGenericDocData({...genericDocData, companyName: e.target.value})} 
-                                                        placeholder="Company name" required />
+                                        {/* Finance Documents Forms */}
+                                        {['invoice', 'purchase_order', 'receipt', 'gst_invoice', 'credit_note'].includes(selectedDocType) && (
+                                            <form onSubmit={handleGenerate}>
+                                                <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                                                    <div>
+                                                        <label style={{ display: 'block', fontSize: '12px', fontWeight: '600', color: '#475569', marginBottom: '6px' }}>Client Name</label>
+                                                        <input type="text" style={{ width: '100%', padding: '12px', borderRadius: '8px', border: '1px solid #e2e8f0', background: '#f8fafc' }} 
+                                                            value={genericDocData.clientName} 
+                                                            onChange={(e) => setGenericDocData({...genericDocData, clientName: e.target.value})} 
+                                                            placeholder="e.g. ABC Corporation" required />
+                                                    </div>
+                                                    <div>
+                                                        <label style={{ display: 'block', fontSize: '12px', fontWeight: '600', color: '#475569', marginBottom: '6px' }}>Items/Services</label>
+                                                        <textarea style={{ width: '100%', padding: '12px', borderRadius: '8px', border: '1px solid #e2e8f0', background: '#f8fafc', minHeight: '80px', fontFamily: 'inherit' }} 
+                                                            value={genericDocData.items} 
+                                                            onChange={(e) => setGenericDocData({...genericDocData, items: e.target.value})} 
+                                                            placeholder="e.g. Web development services, 3 months" required />
+                                                    </div>
+                                                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+                                                        <div>
+                                                            <label style={{ display: 'block', fontSize: '12px', fontWeight: '600', color: '#475569', marginBottom: '6px' }}>Total Amount</label>
+                                                            <input type="number" min="0" step="0.01" style={{ width: '100%', padding: '12px', borderRadius: '8px', border: '1px solid #e2e8f0', background: '#f8fafc' }} 
+                                                                value={genericDocData.amount} 
+                                                                onChange={(e) => setGenericDocData({...genericDocData, amount: e.target.value})} 
+                                                                placeholder="e.g. 250000" required />
+                                                        </div>
+                                                        <div>
+                                                            <label style={{ display: 'block', fontSize: '12px', fontWeight: '600', color: '#475569', marginBottom: '6px' }}>Due Date</label>
+                                                            <input type="date" min="1900-01-01" max="2050-12-31" style={{ width: '100%', padding: '12px', borderRadius: '8px', border: '1px solid #e2e8f0', background: '#f8fafc' }} 
+                                                                value={genericDocData.dueDate} 
+                                                                onChange={(e) => setGenericDocData({...genericDocData, dueDate: e.target.value})} />
+                                                        </div>
+                                                    </div>
+                                                    <button type="submit" className="primary-btn" style={{ marginTop: '16px', width: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '8px' }}>
+                                                        <Sparkles size={16} /> Generate {selectedDocType.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
+                                                    </button>
                                                 </div>
-                                                <div>
-                                                    <label style={{ display: 'block', fontSize: '12px', fontWeight: '600', color: '#475569', marginBottom: '4px' }}>Period/Scope</label>
-                                                    <input type="text" style={{ width: '100%', padding: '12px', borderRadius: '8px', border: '1px solid #e2e8f0', background: '#f8fafc' }} 
-                                                        value={genericDocData.period} 
-                                                        onChange={(e) => setGenericDocData({...genericDocData, period: e.target.value})} 
-                                                        placeholder="Time period or scope covered" required />
-                                                </div>
-                                                <div>
-                                                    <label style={{ display: 'block', fontSize: '12px', fontWeight: '600', color: '#475569', marginBottom: '4px' }}>Key Details</label>
-                                                    <textarea style={{ width: '100%', padding: '12px', borderRadius: '8px', border: '1px solid #e2e8f0', background: '#f8fafc', minHeight: '80px', fontFamily: 'inherit' }} 
-                                                        value={genericDocData.details} 
-                                                        onChange={(e) => setGenericDocData({...genericDocData, details: e.target.value})} 
-                                                        placeholder="Key details, findings, or requirements" required />
-                                                </div>
-                                                <button type="submit" className="primary-btn" style={{ marginTop: '8px', width: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '8px' }}>
-                                                    <Sparkles size={16} /> Generate {selectedDocType.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
-                                                </button>
-                                            </div>
-                                        </form>
-                                    )}
+                                            </form>
+                                        )}
 
-                                    {/* Generic form for other document types */}
-                                    {!['offer_letter', 'appointment_letter', 'onboarding_letter', 'experience_certificate', 'warning_letter', 'nda', 'service_agreement', 'terms_of_service', 'privacy_policy', 'mou', 'invoice', 'purchase_order', 'receipt', 'gst_invoice', 'credit_note', 'audit_report', 'policy_document', 'gst_filing', 'regulatory_filing', 'quotation', 'proposal', 'email', 'profile', 'pitch', 'sales_contract', 'partnership_agreement'].includes(selectedDocType) && (
-                                        <form onSubmit={handleGenerate}>
-                                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-                                                <h3 style={{ margin: 0, fontSize: '18px', fontWeight: '600', color: '#0f172a' }}>
-                                                    Create {selectedDocType.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
-                                                </h3>
-                                                <button type="button" onClick={() => setSelectedDocType(null)} style={{ background: 'none', border: 'none', color: '#64748b', fontSize: '14px', cursor: 'pointer' }}>← Back</button>
-                                            </div>
-                                            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                                                <div>
-                                                    <label style={{ display: 'block', fontSize: '12px', fontWeight: '600', color: '#475569', marginBottom: '4px' }}>
-                                                        Document Details
-                                                    </label>
-                                                    <textarea 
-                                                        style={{ width: '100%', padding: '12px', borderRadius: '8px', border: '1px solid #e2e8f0', background: '#f8fafc', minHeight: '100px', fontFamily: 'inherit' }} 
-                                                        value={prompt} 
-                                                        onChange={(e) => setPrompt(e.target.value)} 
-                                                        placeholder={`Describe what you need for your ${selectedDocType.replace(/_/g, ' ')}...`}
-                                                        required 
-                                                    />
+                                        {/* Generic form for other document types */}
+                                        {!['offer_letter', 'appointment_letter', 'onboarding_letter', 'experience_certificate', 'warning_letter', 'nda', 'service_agreement', 'terms_of_service', 'privacy_policy', 'mou', 'invoice', 'purchase_order', 'receipt', 'gst_invoice', 'credit_note'].includes(selectedDocType) && (
+                                            <form onSubmit={handleGenerate}>
+                                                <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                                                    <div>
+                                                        <label style={{ display: 'block', fontSize: '12px', fontWeight: '600', color: '#475569', marginBottom: '6px' }}>
+                                                            Document Details
+                                                        </label>
+                                                        <textarea 
+                                                            style={{ width: '100%', padding: '12px', borderRadius: '8px', border: '1px solid #e2e8f0', background: '#f8fafc', minHeight: '120px', fontFamily: 'inherit' }} 
+                                                            value={prompt} 
+                                                            onChange={(e) => setPrompt(e.target.value)} 
+                                                            placeholder={`Describe what you need for your ${selectedDocType.replace(/_/g, ' ')}...`}
+                                                            required 
+                                                        />
+                                                    </div>
+                                                    <button type="submit" className="primary-btn" style={{ marginTop: '16px', width: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '8px' }}>
+                                                        <Sparkles size={16} /> Generate {selectedDocType.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
+                                                    </button>
                                                 </div>
-                                                <button type="submit" className="primary-btn" style={{ marginTop: '8px', width: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '8px' }}>
-                                                    <Sparkles size={16} /> Generate {selectedDocType.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
-                                                </button>
+                                            </form>
+                                        )}
+                                    </div>
+
+                                    {/* Right Side - Live Preview */}
+                                    <div style={{ 
+                                        background: 'white', 
+                                        border: '1px solid #e5e7eb', 
+                                        borderRadius: '12px', 
+                                        padding: '24px',
+                                        boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)',
+                                        position: 'relative'
+                                    }}>
+                                        <div style={{ 
+                                            display: 'flex', 
+                                            alignItems: 'center', 
+                                            justifyContent: 'center',
+                                            gap: '8px',
+                                            marginBottom: '20px',
+                                            padding: '8px 16px',
+                                            background: '#f0f9ff',
+                                            borderRadius: '8px',
+                                            border: '1px solid #bae6fd'
+                                        }}>
+                                            <Sparkles size={16} color="#0ea5e9" />
+                                            <span style={{ fontSize: '14px', fontWeight: '600', color: '#0ea5e9' }}>LIVE PREVIEW</span>
+                                        </div>
+
+                                        {/* Document Preview */}
+                                        <div style={{ 
+                                            minHeight: '500px',
+                                            background: '#fafafa',
+                                            border: '1px solid #e5e7eb',
+                                            borderRadius: '8px',
+                                            padding: '32px',
+                                            fontFamily: 'Georgia, serif',
+                                            lineHeight: '1.6',
+                                            color: '#374151'
+                                        }}>
+                                            {/* Company Header */}
+                                            <div style={{ textAlign: 'center', marginBottom: '32px', borderBottom: '2px solid #e5e7eb', paddingBottom: '16px' }}>
+                                                <div style={{ 
+                                                    width: '40px', 
+                                                    height: '40px', 
+                                                    background: brandKit?.colors?.[0] || '#7c3aed', 
+                                                    borderRadius: '8px',
+                                                    margin: '0 auto 12px',
+                                                    display: 'flex',
+                                                    alignItems: 'center',
+                                                    justifyContent: 'center'
+                                                }}>
+                                                    <Sparkles size={20} color="white" />
+                                                </div>
+                                                <h2 style={{ margin: 0, fontSize: '20px', fontWeight: 'bold', color: '#111827' }}>
+                                                    {brandKit?.name || 'Acme Technologies Pvt. Ltd.'}
+                                                </h2>
+                                                <p style={{ margin: '4px 0 0', fontSize: '12px', color: '#6b7280' }}>
+                                                    123 Tech Park, Bangalore - 560001
+                                                </p>
                                             </div>
-                                        </form>
-                                    )}
+
+                                            {/* Document Title */}
+                                            <div style={{ textAlign: 'center', marginBottom: '24px' }}>
+                                                <h3 style={{ 
+                                                    margin: 0, 
+                                                    fontSize: '18px', 
+                                                    fontWeight: 'bold', 
+                                                    color: '#111827',
+                                                    textTransform: 'uppercase',
+                                                    letterSpacing: '1px'
+                                                }}>
+                                                    {selectedDocType.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
+                                                </h3>
+                                                <p style={{ margin: '8px 0 0', fontSize: '12px', color: '#6b7280' }}>
+                                                    Ref: DOC-2026-0090 | Date: {new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}
+                                                </p>
+                                            </div>
+
+                                            {/* Document Content Preview */}
+                                            <div style={{ marginBottom: '32px' }}>
+                                                {/* HR Documents Preview */}
+                                                {['offer_letter', 'appointment_letter', 'onboarding_letter', 'experience_certificate', 'warning_letter'].includes(selectedDocType) && (
+                                                    <div>
+                                                        <p style={{ marginBottom: '16px' }}>
+                                                            Dear <strong>{genericDocData.employeeName || '[Employee Name]'}</strong>,
+                                                        </p>
+                                                        <p style={{ marginBottom: '16px' }}>
+                                                            We are pleased to offer you the position of <strong>{genericDocData.position || '[Position]'}</strong> at {brandKit?.name || 'Acme Technologies Pvt. Ltd.'} 
+                                                            {genericDocData.salary && ` with an annual compensation of ₹${parseInt(genericDocData.salary).toLocaleString('en-IN')}`}.
+                                                        </p>
+                                                        {genericDocData.startDate && (
+                                                            <p style={{ marginBottom: '16px' }}>
+                                                                Your expected date of joining is <strong>{new Date(genericDocData.startDate).toLocaleDateString('en-GB')}</strong> with a probation period of 3 months.
+                                                            </p>
+                                                        )}
+                                                        <div style={{ marginTop: '24px' }}>
+                                                            <p style={{ fontWeight: 'bold', marginBottom: '8px' }}>Terms & Conditions:</p>
+                                                            <ul style={{ paddingLeft: '20px', margin: 0 }}>
+                                                                <li>This offer is contingent upon successful background verification.</li>
+                                                                <li>Employee agrees to the company's confidentiality and non-compete clauses.</li>
+                                                                <li>This offer is valid for 7 days from the date of issue.</li>
+                                                            </ul>
+                                                        </div>
+                                                    </div>
+                                                )}
+
+                                                {/* Legal Documents Preview */}
+                                                {['nda', 'service_agreement', 'terms_of_service', 'privacy_policy', 'mou'].includes(selectedDocType) && (
+                                                    <div>
+                                                        <p style={{ marginBottom: '16px' }}>
+                                                            This agreement is entered into between <strong>{brandKit?.name || 'Acme Technologies Pvt. Ltd.'}</strong> and <strong>{genericDocData.partyName || '[Other Party Name]'}</strong>.
+                                                        </p>
+                                                        {genericDocData.effectiveDate && (
+                                                            <p style={{ marginBottom: '16px' }}>
+                                                                <strong>Effective Date:</strong> {new Date(genericDocData.effectiveDate).toLocaleDateString('en-GB')}
+                                                            </p>
+                                                        )}
+                                                        <p style={{ marginBottom: '16px' }}>
+                                                            <strong>Purpose:</strong> {genericDocData.terms || 'This agreement outlines the terms and conditions for our business relationship.'}
+                                                        </p>
+                                                        <div style={{ marginTop: '24px' }}>
+                                                            <p style={{ fontWeight: 'bold', marginBottom: '8px' }}>Key Terms:</p>
+                                                            <ul style={{ paddingLeft: '20px', margin: 0 }}>
+                                                                <li>Both parties agree to maintain strict confidentiality.</li>
+                                                                <li>This agreement shall remain in effect for the duration specified.</li>
+                                                                <li>Any modifications must be agreed upon in writing by both parties.</li>
+                                                            </ul>
+                                                        </div>
+                                                    </div>
+                                                )}
+
+                                                {/* Finance Documents Preview */}
+                                                {['invoice', 'purchase_order', 'receipt', 'gst_invoice', 'credit_note'].includes(selectedDocType) && (
+                                                    <div>
+                                                        <p style={{ marginBottom: '16px' }}>
+                                                            <strong>Bill To:</strong> {genericDocData.clientName || '[Client Name]'}
+                                                        </p>
+                                                        <div style={{ marginBottom: '24px' }}>
+                                                            <p style={{ fontWeight: 'bold', marginBottom: '8px' }}>Description:</p>
+                                                            <p style={{ margin: 0, padding: '12px', background: '#f9fafb', borderRadius: '6px' }}>
+                                                                {genericDocData.items || 'Professional services rendered as per agreement'}
+                                                            </p>
+                                                        </div>
+                                                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '16px', background: '#f3f4f6', borderRadius: '8px' }}>
+                                                            <span style={{ fontWeight: 'bold' }}>Total Amount:</span>
+                                                            <span style={{ fontSize: '18px', fontWeight: 'bold', color: brandKit?.colors?.[0] || '#7c3aed' }}>
+                                                                ₹{genericDocData.amount ? parseInt(genericDocData.amount).toLocaleString('en-IN') : '0'}
+                                                            </span>
+                                                        </div>
+                                                        {genericDocData.dueDate && (
+                                                            <p style={{ marginTop: '16px', fontSize: '14px', color: '#6b7280' }}>
+                                                                <strong>Due Date:</strong> {new Date(genericDocData.dueDate).toLocaleDateString('en-GB')}
+                                                            </p>
+                                                        )}
+                                                    </div>
+                                                )}
+
+                                                {/* Generic Preview */}
+                                                {!['offer_letter', 'appointment_letter', 'onboarding_letter', 'experience_certificate', 'warning_letter', 'nda', 'service_agreement', 'terms_of_service', 'privacy_policy', 'mou', 'invoice', 'purchase_order', 'receipt', 'gst_invoice', 'credit_note'].includes(selectedDocType) && (
+                                                    <div>
+                                                        <p style={{ marginBottom: '16px', fontStyle: 'italic', color: '#6b7280' }}>
+                                                            {prompt || `This is a preview of your ${selectedDocType.replace(/_/g, ' ')}. Fill in the form on the left to see your content here.`}
+                                                        </p>
+                                                        <div style={{ padding: '20px', background: '#f9fafb', borderRadius: '8px', border: '2px dashed #d1d5db' }}>
+                                                            <p style={{ margin: 0, textAlign: 'center', color: '#9ca3af' }}>
+                                                                Your document content will appear here as you fill the form
+                                                            </p>
+                                                        </div>
+                                                    </div>
+                                                )}
+                                            </div>
+
+                                            {/* Signature Section */}
+                                            <div style={{ 
+                                                display: 'grid', 
+                                                gridTemplateColumns: '1fr 1fr', 
+                                                gap: '40px',
+                                                marginTop: '48px',
+                                                paddingTop: '24px',
+                                                borderTop: '1px solid #e5e7eb'
+                                            }}>
+                                                <div>
+                                                    <p style={{ margin: '0 0 8px', fontSize: '12px', fontWeight: 'bold', color: '#6b7280' }}>Authorized Signatory</p>
+                                                    <div style={{ height: '40px', borderBottom: '1px solid #d1d5db', marginBottom: '8px' }}></div>
+                                                    <p style={{ margin: 0, fontSize: '12px', color: '#9ca3af' }}>Signature</p>
+                                                </div>
+                                                <div>
+                                                    <p style={{ margin: '0 0 8px', fontSize: '12px', fontWeight: 'bold', color: '#6b7280' }}>
+                                                        {['offer_letter', 'appointment_letter', 'onboarding_letter', 'experience_certificate', 'warning_letter'].includes(selectedDocType) ? 'Employee Acceptance' : 'Recipient Signature'}
+                                                    </p>
+                                                    <div style={{ height: '40px', borderBottom: '1px solid #d1d5db', marginBottom: '8px' }}></div>
+                                                    <p style={{ margin: 0, fontSize: '12px', color: '#9ca3af' }}>Signature</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                             )}
                         </div>
@@ -2306,17 +2443,17 @@ Seeking personalized assistance? Explore our templates collection or contact our
                                 </div>
                                 <div className="event-list">
                                     <div className="event-item" style={{ cursor: 'pointer' }} onClick={() => setSelectedDocType('offer_letter')}>
-                                        <span className="event-date">📝</span>
+                                        <span className="event-date"><FileText size={16} /></span>
                                         <span className="event-dot purple" />
                                         <span className="event-title">Create Offer Letter</span>
                                     </div>
                                     <div className="event-item" style={{ cursor: 'pointer' }} onClick={() => setSelectedDocType('invoice')}>
-                                        <span className="event-date">💰</span>
+                                        <span className="event-date"><FileText size={16} /></span>
                                         <span className="event-dot purple" />
                                         <span className="event-title">Generate Invoice</span>
                                     </div>
                                     <div className="event-item" style={{ cursor: 'pointer' }} onClick={() => setSelectedDocType('proposal')}>
-                                        <span className="event-date">🎯</span>
+                                        <span className="event-date"><FileText size={16} /></span>
                                         <span className="event-dot purple" />
                                         <span className="event-title">Business Proposal</span>
                                     </div>
@@ -2415,8 +2552,8 @@ Seeking personalized assistance? Explore our templates collection or contact our
                 <div className="sidebar-section">
                     <div className="section-title">STRATEGY</div>
                     <button className="sidebar-btn" onClick={() => { setGeneratedDoc(privateDocs['vision']); setCurrentView('Home'); setIsMobileMenuOpen(false); }}><Sparkles size={16} color="#7c3aed" /> Product Vision</button>
-                    <button className="sidebar-btn" onClick={() => { setGeneratedDoc(privateDocs['strategy']); setCurrentView('Home'); setIsMobileMenuOpen(false); }}><span className="emoji-icon">🎯</span> Growth Strategy</button>
-                    <button className="sidebar-btn" onClick={() => { setGeneratedDoc(privateDocs['welcome']); setCurrentView('Home'); setIsMobileMenuOpen(false); }}><span className="emoji-icon">👋</span> Getting Started</button>
+                    <button className="sidebar-btn" onClick={() => { setGeneratedDoc(privateDocs['strategy']); setCurrentView('Home'); setIsMobileMenuOpen(false); }}><TrendingUp size={16} color="#7c3aed" /> Growth Strategy</button>
+                    <button className="sidebar-btn" onClick={() => { setGeneratedDoc(privateDocs['welcome']); setCurrentView('Home'); setIsMobileMenuOpen(false); }}><Home size={16} color="#7c3aed" /> Getting Started</button>
                 </div>
 
                 <div className="sidebar-section">

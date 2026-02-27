@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{content.title}}</title>
+    <style>
+        {{{brandCSS}}}
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: var(--font-primary, 'Inter', 'Arial', sans-serif);
+            line-height: 1.6;
+            color: #2d3748;
+            background: #ffffff;
+            font-size: 14px;
+        }
+        
+        .document-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 40px;
+            min-height: 100vh;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding-bottom: 20px;
+            border-bottom: 3px solid var(--primary-color, #1e40af);
+        }
+        
+        .company-name {
+            font-size: 32px;
+            font-weight: 700;
+            color: var(--primary-color, #1e40af);
+            margin-bottom: 8px;
+        }
+        
+        .document-title {
+            font-size: 24px;
+            font-weight: 600;
+            color: #1a202c;
+            margin: 20px 0;
+        }
+        
+        .document-date {
+            font-size: 14px;
+            color: #64748b;
+            margin-bottom: 20px;
+        }
+        
+        .employee-info {
+            background: #f8fafc;
+            padding: 24px;
+            border-radius: 12px;
+            border-left: 4px solid var(--primary-color, #1e40af);
+            margin: 32px 0;
+        }
+        
+        .employee-name {
+            font-size: 20px;
+            font-weight: 700;
+            color: #1a202c;
+            margin-bottom: 16px;
+        }
+        
+        .info-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+        
+        .info-item {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .info-label {
+            font-size: 12px;
+            font-weight: 600;
+            color: #64748b;
+            text-transform: uppercase;
+            margin-bottom: 4px;
+        }
+        
+        .info-value {
+            font-size: 16px;
+            font-weight: 600;
+            color: #1a202c;
+        }
+        
+        .section {
+            margin: 32px 0;
+        }
+        
+        .section-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--primary-color, #1e40af);
+            margin-bottom: 16px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid #e2e8f0;
+        }
+        
+        .responsibilities-list {
+            list-style: none;
+            padding: 0;
+        }
+        
+        .responsibilities-list li {
+            padding: 8px 0;
+            padding-left: 20px;
+            position: relative;
+        }
+        
+        .responsibilities-list li:before {
+            content: "▸";
+            position: absolute;
+            left: 0;
+            color: var(--primary-color, #1e40af);
+            font-weight: bold;
+        }
+        
+        .signature-section {
+            margin-top: 48px;
+            padding-top: 32px;
+            border-top: 2px solid #e2e8f0;
+            text-align: center;
+        }
+        
+        .signature-box {
+            background: #f8fafc;
+            padding: 24px;
+            border-radius: 12px;
+            border: 2px dashed var(--primary-color, #1e40af);
+        }
+    </style>
+</head>
+<body>
+    <div class="document-container">
+        <div class="header">
+            <div class="company-name">{{content.companyName}}</div>
+            <div class="document-title">{{content.title}}</div>
+            <div class="document-date">{{content.date}}</div>
+        </div>
+
+        <div class="employee-info">
+            <div class="employee-name">{{content.employeeName}}</div>
+            <div class="info-grid">
+                <div class="info-item">
+                    <div class="info-label">Position</div>
+                    <div class="info-value">{{content.position}}</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Department</div>
+                    <div class="info-value">{{content.department}}</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Employee ID</div>
+                    <div class="info-value">{{content.employeeId}}</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Appointment Date</div>
+                    <div class="info-value">{{content.appointmentDate}}</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-title">Key Responsibilities</div>
+            <ul class="responsibilities-list">
+                {{#each content.keyResponsibilities}}
+                <li>{{this}}</li>
+                {{/each}}
+            </ul>
+        </div>
+
+        <div class="section">
+            <div class="section-title">Working Conditions</div>
+            <div class="info-grid">
+                <div class="info-item">
+                    <div class="info-label">Working Hours</div>
+                    <div class="info-value">{{content.workingConditions.workingHours}}</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Location</div>
+                    <div class="info-value">{{content.workingConditions.location}}</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Probation Period</div>
+                    <div class="info-value">{{content.workingConditions.probationPeriod}}</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Base Salary</div>
+                    <div class="info-value">{{content.compensation.baseSalary}}</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <p><strong>Reporting Structure:</strong> {{content.reportingStructure}}</p>
+            <p><strong>Acknowledgment:</strong> {{content.acknowledgment}}</p>
+        </div>
+
+        <div class="signature-section">
+            <div class="signature-box">
+                <p><strong>Authorized Signatory</strong></p>
+                <br>
+                <p>{{content.authorizedSignatory}}</p>
+                <p>Date: {{content.date}}</p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

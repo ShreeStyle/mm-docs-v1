@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{title}}</title>
+    <style>
+        @page {
+            size: A4;
+            margin: 0;
+        }
+        
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Georgia', serif;
+            background-image: url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iODAwIiBoZWlnaHQ9IjExMDAiIHZpZXdCb3g9IjAgMCA4MDAgMTEwMCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjgwMCIgaGVpZ2h0PSIxMTAwIiBmaWxsPSIjZmRmMmY4Ii8+CjxwYXRoIGQ9Ik0wIDBoODB2MTEwSDB6IiBmaWxsPSJ1cmwoI2EpIi8+CjxwYXRoIGQ9Ik03MjAgMGg4MHYxMTAwSDcyMHoiIGZpbGw9InVybCgjYikiLz4KPHBhdGggZD0iTTAgMGg4MDB2ODBIMHoiIGZpbGw9InVybCgjYykiLz4KPHBhdGggZD0iTTAgMTAyMGg4MDB2ODBIMHoiIGZpbGw9InVybCgjZCkiLz4KPGRlZnM+CjxsaW5lYXJHcmFkaWVudCBpZD0iYSIgeDE9IjAiIHkxPSIwIiB4Mj0iMSIgeTI9IjAiPgo8c3RvcCBzdG9wLWNvbG9yPSIjZmJiNmNlIiBzdG9wLW9wYWNpdHk9IjAuOCIvPgo8c3RvcCBvZmZzZXQ9IjEiIHN0b3AtY29sb3I9IiNmOWE4ZDQiIHN0b3Atb3BhY2l0eT0iMC42Ii8+CjwvbGluZWFyR3JhZGllbnQ+CjxsaW5lYXJHcmFkaWVudCBpZD0iYiIgeDE9IjAiIHkxPSIwIiB4Mj0iMSIgeTI9IjAiPgo8c3RvcCBzdG9wLWNvbG9yPSIjZmJiNmNlIiBzdG9wLW9wYWNpdHk9IjAuOCIvPgo8c3RvcCBvZmZzZXQ9IjEiIHN0b3AtY29sb3I9IiNmOWE4ZDQiIHN0b3Atb3BhY2l0eT0iMC42Ii8+CjwvbGluZWFyR3JhZGllbnQ+CjxsaW5lYXJHcmFkaWVudCBpZD0iYyIgeDE9IjAiIHkxPSIwIiB4Mj0iMCIgeTI9IjEiPgo8c3RvcCBzdG9wLWNvbG9yPSIjZmJiNmNlIiBzdG9wLW9wYWNpdHk9IjAuOCIvPgo8c3RvcCBvZmZzZXQ9IjEiIHN0b3AtY29sb3I9IiNmOWE4ZDQiIHN0b3Atb3BhY2l0eT0iMC42Ii8+CjwvbGluZWFyR3JhZGllbnQ+CjxsaW5lYXJHcmFkaWVudCBpZD0iZCIgeDE9IjAiIHkxPSIwIiB4Mj0iMCIgeTI9IjEiPgo8c3RvcCBzdG9wLWNvbG9yPSIjZmJiNmNlIiBzdG9wLW9wYWNpdHk9IjAuOCIvPgo8c3RvcCBvZmZzZXQ9IjEiIHN0b3AtY29sb3I9IiNmOWE4ZDQiIHN0b3Atb3BhY2l0eT0iMC42Ii8+CjwvbGluZWFyR3JhZGllbnQ+CjwvZGVmcz4KPC9zdmc+');
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-position: center;
+            min-height: 100vh;
+            position: relative;
+        }
+        
+        /* Floral corner decorations */
+        .floral-corner {
+            position: absolute;
+            font-size: 48px;
+            color: #f472b6;
+            opacity: 0.7;
+        }
+        
+        .top-left { top: 20px; left: 20px; }
+        .top-right { top: 20px; right: 20px; }
+        .bottom-left { bottom: 20px; left: 20px; }
+        .bottom-right { bottom: 20px; right: 20px; }
+        
+        /* Decorative border roses */
+        .border-decoration {
+            position: absolute;
+            font-size: 32px;
+            color: #f472b6;
+            opacity: 0.6;
+        }
+        
+        .top-center { top: 10px; left: 50%; transform: translateX(-50%); }
+        .bottom-center { bottom: 10px; left: 50%; transform: translateX(-50%); }
+        .left-center { left: 10px; top: 50%; transform: translateY(-50%); }
+        .right-center { right: 10px; top: 50%; transform: translateY(-50%); }
+        
+        /* Content container */
+        .content-container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 120px 60px;
+            position: relative;
+            z-index: 10;
+        }
+        
+        /* Title styling */
+        .document-title {
+            text-align: center;
+            font-size: 22px;
+            color: #be185d;
+            margin-bottom: 30px;
+            font-weight: bold;
+            text-shadow: 2px 2px 4px rgba(190, 24, 93, 0.2);
+        }
+        
+        /* Section headers */
+        .section-header {
+            color: #ec4899;
+            font-size: 22px;
+            font-weight: bold;
+            margin: 30px 0 15px 0;
+            text-align: center;
+            text-shadow: 1px 1px 2px rgba(236, 72, 153, 0.3);
+        }
+        
+        /* Regular text */
+        .content-text {
+            color: #6b7280;
+            font-size: 16px;
+            line-height: 1.8;
+            margin-bottom: 15px;
+            text-align: justify;
+        }
+        
+        /* Bullet points */
+        .bullet-point {
+            color: #9ca3af;
+            font-size: 16px;
+            margin-left: 25px;
+            margin-bottom: 10px;
+            position: relative;
+        }
+        
+        .bullet-point::before {
+            content: "🌸";
+            position: absolute;
+            left: -25px;
+            color: #fbb6ce;
+        }
+        
+        /* Centered text */
+        .centered-text {
+            text-align: center;
+            color: #ec4899;
+            font-weight: bold;
+            font-size: 18px;
+            margin: 20px 0;
+        }
+        
+        /* Footer */
+        .document-footer {
+            text-align: center;
+            margin-top: 50px;
+            padding: 20px;
+            border-top: 2px solid rgba(236, 72, 153, 0.3);
+            color: #ec4899;
+            font-size: 14px;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+    <!-- Floral corner decorations -->
+    <div class="floral-corner top-left">🌹</div>
+    <div class="floral-corner top-right">🌹</div>
+    <div class="floral-corner bottom-left">🌹</div>
+    <div class="floral-corner bottom-right">🌹</div>
+    
+    <!-- Border decorations -->
+    <div class="border-decoration top-center">🌸 ✨ 🌸</div>
+    <div class="border-decoration bottom-center">🌸 ✨ 🌸</div>
+    <div class="border-decoration left-center">🌺</div>
+    <div class="border-decoration right-center">🌺</div>
+    
+    <!-- Main content -->
+    <div class="content-container">
+        <h1 class="document-title">{{title}}</h1>
+        
+        <div class="section-header">✨ Your Sophisticated Quick Start Experience ✨</div>
+        
+        <div class="section-header">🌟 Step 1: Curate Your Distinguished Brand Identity</div>
+        <div class="bullet-point">Navigate gracefully to Settings → Brand Kit</div>
+        <div class="bullet-point">Thoughtfully add your company name, elegant logo, and signature brand colors</div>
+        <div class="bullet-point">This ensures every generated document reflects your unique professional distinction</div>
+        <div class="bullet-point">Your brand essence is automatically woven into every document with artistic precision</div>
+        
+        <div class="section-header">🌟 Step 2: Select Your Document Masterpiece</div>
+        <div class="bullet-point">Explore our curated collection of 25+ sophisticated document categories</div>
+        <div class="bullet-point">Choose from our distinguished HR, Legal, Sales, Finance, or Marketing collections</div>
+        <div class="bullet-point">Each category features multiple specialized templates crafted with professional excellence</div>
+        <div class="bullet-point">Popular selections: Elegant Offer Letters, Compelling Business Proposals, Professional Invoices, Comprehensive NDAs</div>
+        
+        <div class="section-header">🌟 Step 3: Complete Our Intuitive Input Experience</div>
+        <div class="bullet-point">Provide only the essential information with remarkable ease and efficiency</div>
+        <div class="bullet-point">Our intelligent forms capture precisely what's needed for each document type</div>
+        <div class="bullet-point">Our AI handles the sophisticated language and impeccable structure</div>
+        <div class="bullet-point">Most forms require less than 60 seconds to complete with professional results</div>
+        
+        <div class="section-header">🌟 Step 4: Generate & Share Your Professional Excellence</div>
+        <div class="bullet-point">Click "Generate" and witness AI craft your distinguished professional document</div>
+        <div class="bullet-point">Review the beautifully formatted content with your branding elegantly applied</div>
+        <div class="bullet-point">Download instantly in premium PDF or DOCX format</div>
+        <div class="bullet-point">Share confidently with clients, employees, or stakeholders</div>
+        
+        <div class="section-header">✨ Distinguished Tips for Exceptional Results ✨</div>
+        <div class="bullet-point">Maintain your brand kit with regular updates for consistent professional distinction</div>
+        <div class="bullet-point">Provide specific, clear information in input forms for optimal AI performance</div>
+        <div class="bullet-point">Save frequently used information for accelerated document creation</div>
+        <div class="bullet-point">Explore diverse document types to maximize your platform investment</div>
+        
+        <div class="centered-text">Ready to create your first masterpiece?</div>
+        <div class="content-text" style="text-align: center;">Select any document type to begin your journey of professional excellence!</div>
+        
+        <div class="document-footer">
+            ✨ Crafted with Excellence by MM Docs ✨<br>
+            Where Professional Elegance Meets AI Innovation
+        </div>
+    </div>
+</body>
+</html>

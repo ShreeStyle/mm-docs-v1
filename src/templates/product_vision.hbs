@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{title}}</title>
+    <style>
+        @page {
+            size: A4;
+            margin: 0;
+        }
+        
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Georgia', serif;
+            background-image: url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iODAwIiBoZWlnaHQ9IjExMDAiIHZpZXdCb3g9IjAgMCA4MDAgMTEwMCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjgwMCIgaGVpZ2h0PSIxMTAwIiBmaWxsPSIjZmRmMmY4Ii8+CjxwYXRoIGQ9Ik0wIDBoODB2MTEwSDB6IiBmaWxsPSJ1cmwoI2EpIi8+CjxwYXRoIGQ9Ik03MjAgMGg4MHYxMTAwSDcyMHoiIGZpbGw9InVybCgjYikiLz4KPHBhdGggZD0iTTAgMGg4MDB2ODBIMHoiIGZpbGw9InVybCgjYykiLz4KPHBhdGggZD0iTTAgMTAyMGg4MDB2ODBIMHoiIGZpbGw9InVybCgjZCkiLz4KPGRlZnM+CjxsaW5lYXJHcmFkaWVudCBpZD0iYSIgeDE9IjAiIHkxPSIwIiB4Mj0iMSIgeTI9IjAiPgo8c3RvcCBzdG9wLWNvbG9yPSIjZmJiNmNlIiBzdG9wLW9wYWNpdHk9IjAuOCIvPgo8c3RvcCBvZmZzZXQ9IjEiIHN0b3AtY29sb3I9IiNmOWE4ZDQiIHN0b3Atb3BhY2l0eT0iMC42Ii8+CjwvbGluZWFyR3JhZGllbnQ+CjxsaW5lYXJHcmFkaWVudCBpZD0iYiIgeDE9IjAiIHkxPSIwIiB4Mj0iMSIgeTI9IjAiPgo8c3RvcCBzdG9wLWNvbG9yPSIjZmJiNmNlIiBzdG9wLW9wYWNpdHk9IjAuOCIvPgo8c3RvcCBvZmZzZXQ9IjEiIHN0b3AtY29sb3I9IiNmOWE4ZDQiIHN0b3Atb3BhY2l0eT0iMC42Ii8+CjwvbGluZWFyR3JhZGllbnQ+CjxsaW5lYXJHcmFkaWVudCBpZD0iYyIgeDE9IjAiIHkxPSIwIiB4Mj0iMCIgeTI9IjEiPgo8c3RvcCBzdG9wLWNvbG9yPSIjZmJiNmNlIiBzdG9wLW9wYWNpdHk9IjAuOCIvPgo8c3RvcCBvZmZzZXQ9IjEiIHN0b3AtY29sb3I9IiNmOWE4ZDQiIHN0b3Atb3BhY2l0eT0iMC42Ci8+CjwvbGluZWFyR3JhZGllbnQ+CjxsaW5lYXJHcmFkaWVudCBpZD0iZCIgeDE9IjAiIHkxPSIwIiB4Mj0iMCIgeTI9IjEiPgo8c3RvcCBzdG9wLWNvbG9yPSIjZmJiNmNlIiBzdG9wLW9wYWNpdHk9IjAuOCIvPgo8c3RvcCBvZmZzZXQ9IjEiIHN0b3AtY29sb3I9IiNmOWE4ZDQiIHN0b3Atb3BhY2l0eT0iMC42Ii8+CjwvbGluZWFyR3JhZGllbnQ+CjwvZGVmcz4KPC9zdmc+');
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-position: center;
+            min-height: 100vh;
+            position: relative;
+        }
+        
+        /* Floral corner decorations */
+        .floral-corner {
+            position: absolute;
+            font-size: 48px;
+            color: #f472b6;
+            opacity: 0.7;
+        }
+        
+        .top-left { top: 20px; left: 20px; }
+        .top-right { top: 20px; right: 20px; }
+        .bottom-left { bottom: 20px; left: 20px; }
+        .bottom-right { bottom: 20px; right: 20px; }
+        
+        /* Decorative border roses */
+        .border-decoration {
+            position: absolute;
+            font-size: 32px;
+            color: #f472b6;
+            opacity: 0.6;
+        }
+        
+        .top-center { top: 10px; left: 50%; transform: translateX(-50%); }
+        .bottom-center { bottom: 10px; left: 50%; transform: translateX(-50%); }
+        .left-center { left: 10px; top: 50%; transform: translateY(-50%); }
+        .right-center { right: 10px; top: 50%; transform: translateY(-50%); }
+        
+        /* Content container */
+        .content-container {
+            max-width: 650px;
+            margin: 0 auto;
+            padding: 100px 50px;
+            position: relative;
+            z-index: 10;
+        }
+        
+        /* Title styling */
+        .document-title {
+            text-align: center;
+            font-size: 20px;
+            color: #be185d;
+            margin-bottom: 20px;
+            font-weight: bold;
+            text-shadow: 2px 2px 4px rgba(190, 24, 93, 0.2);
+        }
+        
+        /* Section headers */
+        .section-header {
+            color: #ec4899;
+            font-size: 18px;
+            font-weight: bold;
+            margin: 20px 0 10px 0;
+            text-align: center;
+            text-shadow: 1px 1px 2px rgba(236, 72, 153, 0.3);
+        }
+        
+        /* Subsection headers */
+        .subsection-header {
+            color: #f472b6;
+            font-size: 16px;
+            font-weight: bold;
+            margin: 15px 0 8px 0;
+            text-decoration: underline;
+        }
+        
+        /* Regular text */
+        .content-text {
+            color: #6b7280;
+            font-size: 14px;
+            line-height: 1.6;
+            margin-bottom: 10px;
+            text-align: justify;
+        }
+        
+        /* Bullet points */
+        .bullet-point {
+            color: #9ca3af;
+            font-size: 14px;
+            margin-left: 20px;
+            margin-bottom: 6px;
+            position: relative;
+        }
+        
+        .bullet-point::before {
+            content: "🌸";
+            position: absolute;
+            left: -20px;
+            color: #fbb6ce;
+        }
+        
+        /* Vision box */
+        .vision-box {
+            background: rgba(244, 114, 182, 0.1);
+            border: 2px solid rgba(244, 114, 182, 0.3);
+            border-radius: 15px;
+            padding: 20px;
+            margin: 20px 0;
+            text-align: center;
+        }
+        
+        .vision-title {
+            color: #ec4899;
+            font-size: 16px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        
+        /* Footer */
+        .document-footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 15px;
+            border-top: 2px solid rgba(236, 72, 153, 0.3);
+            color: #ec4899;
+            font-size: 12px;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+    <!-- Floral corner decorations -->
+    <div class="floral-corner top-left">🌹</div>
+    <div class="floral-corner top-right">🌹</div>
+    <div class="floral-corner bottom-left">🌹</div>
+    <div class="floral-corner bottom-right">🌹</div>
+    
+    <!-- Border decorations -->
+    <div class="border-decoration top-center">🌸 ✨ 🌸</div>
+    <div class="border-decoration bottom-center">🌸 ✨ 🌸</div>
+    <div class="border-decoration left-center">🌺</div>
+    <div class="border-decoration right-center">🌺</div>
+    
+    <!-- Main content -->
+    <div class="content-container">
+        <h1 class="document-title">{{title}}</h1>
+        
+        <div class="section-header">✨ Our Distinguished Vision ✨</div>
+        <div class="content-text" style="text-align: center; font-style: italic;">Pioneering the Renaissance of Business Document Artistry</div>
+        
+        <div class="subsection-header">🌟 Exquisite Product Philosophy</div>
+        <div class="content-text">MM Docs represents the pinnacle of AI-powered document creation, where sophisticated technology meets timeless business elegance. We transform simple inspirations into masterfully crafted, brand-harmonious documents that elevate professional communications to an art form.</div>
+        
+        <div class="subsection-header">🌟 The Challenge We Elegantly Solve</div>
+        <div class="content-text">Distinguished businesses worldwide face:</div>
+        <div class="bullet-point">Laborious document creation processes that consume precious time and creative energy</div>
+        <div class="bullet-point">Inconsistent branding that diminishes professional prestige and market presence</div>
+        <div class="bullet-point">Mediocre language quality that fails to reflect organizational excellence</div>
+        <div class="bullet-point">Antiquated templates that lack contemporary sophistication and visual appeal</div>
+        
+        <div class="subsection-header">🌟 Our Sophisticated Solution</div>
+        <div class="content-text">MM Docs delivers:</div>
+        <div class="bullet-point">AI-crafted documents with eloquent, professional language that commands respect</div>
+        <div class="bullet-point">Seamless brand integration ensuring consistent visual distinction across all communications</div>
+        <div class="bullet-point">25+ meticulously curated document categories spanning HR, Legal, Sales, Finance, and Marketing excellence</div>
+        <div class="bullet-point">Instant, premium-quality PDF and DOCX exports ready for immediate professional use</div>
+        
+        <div class="subsection-header">🌟 Our Distinguished Clientele</div>
+        <div class="content-text">Premier Users Include:</div>
+        <div class="bullet-point">Visionary founders and entrepreneurs crafting exceptional business narratives</div>
+        <div class="bullet-point">Elite sales professionals generating compelling proposals and sophisticated quotations</div>
+        <div class="bullet-point">Distinguished HR departments managing comprehensive employee documentation</div>
+        <div class="bullet-point">Progressive small to medium enterprises across all prestigious industries</div>
+        
+        <div class="vision-box">
+            <div class="vision-title">Core Excellence Propositions</div>
+            <div class="content-text">🚀 Velocity: Generate sophisticated documents in under 2 minutes with remarkable precision</div>
+            <div class="content-text">✨ Quality: AI ensures consistently elegant language and impeccable structural integrity</div>
+            <div class="content-text">🎨 Distinction: Automatic application of refined company branding to every document</div>
+            <div class="content-text">📚 Comprehensiveness: Extensive library addressing every conceivable business documentation need</div>
+        </div>
+        
+        <div class="subsection-header">🌟 Future Excellence Roadmap</div>
+        <div class="bullet-point">Multi-linguistic sophistication for distinguished global expansion</div>
+        <div class="bullet-point">Advanced collaborative features enabling seamless team orchestration</div>
+        <div class="bullet-point">Premium API access for enterprise-level integrations and customization</div>
+        <div class="bullet-point">Industry-specific template libraries crafted for specialized professional needs</div>
+        
+        <div class="document-footer">
+            ✨ Visionary Excellence & Strategic Mastery ✨<br>
+            MM Docs - Where Innovation Meets Elegance
+        </div>
+    </div>
+</body>
+</html>

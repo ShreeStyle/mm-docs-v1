@@ -16,9 +16,9 @@ const loadTemplate = (templateName) => {
 const generateBrandCSS = (brandKit) => {
     if (!brandKit) return "";
 
-    const primaryColor = brandKit.colors[0] || "#000000";
-    const secondaryColor = brandKit.colors[1] || "#ffffff";
-    const accentColor = brandKit.colors[2] || primaryColor;
+    const primaryColor = brandKit.colors[0] || "#1e40af"; // Professional navy blue
+    const secondaryColor = brandKit.colors[1] || "#64748b"; // Professional gray
+    const accentColor = brandKit.colors[2] || "#3b82f6"; // Professional blue
     const logoUrl = brandKit.logo || "";
     const fontPrimary = brandKit.fonts?.primary || "Inter";
     const fontSecondary = brandKit.fonts?.secondary || "Roboto";
@@ -35,15 +35,33 @@ const generateBrandCSS = (brandKit) => {
   `;
 };
 
+// Map document types to professional templates
+const getTemplateForDocumentType = (documentType) => {
+    const templateMap = {
+        'offer_letter': 'offer_letter',
+        'appointment_letter': 'appointment_letter', 
+        'experience_certificate': 'experience_certificate',
+        'nda': 'nda',
+        'quotation': 'quotation',
+        'invoice': 'invoice',
+        'proposal': 'proposal',
+        'resume': 'resume',
+        'marketing_brief': 'marketing_brief'
+    };
+    
+    return templateMap[documentType] || 'generic';
+};
+
 exports.renderDocument = async (document, brandKit) => {
     try {
-        const templateName = document.type || "other"; // e.g., 'proposal', 'invoice'
+        const templateName = getTemplateForDocumentType(document.type);
 
         // Ensure template exists, fallback to generic if specific type missing
         let template;
         try {
             template = loadTemplate(templateName);
         } catch (e) {
+            console.log(`Template ${templateName} not found, falling back to generic`);
             template = loadTemplate("generic");
         }
 

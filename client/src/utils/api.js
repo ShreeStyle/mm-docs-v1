@@ -21,6 +21,17 @@ const apiRequest = async (endpoint, options = {}) => {
         const data = await response.json();
 
         if (!response.ok) {
+            // Handle token expiration
+            if (response.status === 401 || response.status === 400) {
+                console.warn('Authentication failed - token may be expired');
+                // Clear invalid token
+                localStorage.removeItem('token');
+                localStorage.removeItem('user');
+                // Redirect to login if we're not already there
+                if (!window.location.pathname.includes('/login')) {
+                    window.location.href = '/login';
+                }
+            }
             throw new Error(data.message || 'Something went wrong');
         }
 

@@ -8,7 +8,8 @@ const checkSubscription = async (req, res, next) => {
         }
 
         // Attach subscription status to request for easy access in controllers
-        req.user.subscriptionStatus = user.subscriptionStatus;
+        // Use 'plan' field from User model (free/pro)
+        req.user.subscriptionStatus = user.plan || "free";
         next();
     } catch (error) {
         res.status(500).json({ message: "Server Error", error: error.message });

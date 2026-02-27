@@ -16,8 +16,8 @@ export default function Login() {
     const { login } = useAuth();
     const [isLoading, setIsLoading] = useState(false);
     const [formData, setFormData] = useState({
-        email: '',
-        password: ''
+        email: 'demo@test.com',
+        password: 'demo123'
     });
 
     const handleSubmit = async (e) => {
@@ -25,22 +25,31 @@ export default function Login() {
         setIsLoading(true);
 
         try {
+            // Use the API utility instead of direct fetch
             const response = await fetch('http://localhost:5000/api/auth/login', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                },
+                credentials: 'include',
                 body: JSON.stringify(formData)
             });
 
-            const data = await response.json();
-
-            if (response.ok) {
-                login(data.user, data.token);
-                navigate('/product');
-            } else {
-                alert(data.message || 'Login failed');
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
             }
+
+            const data = await response.json();
+            console.log('Login successful:', data);
+            
+            login(data.user, data.token);
+            navigate('/product');
+            
         } catch (error) {
-            alert('Error connecting to backend');
+            console.error('Login error:', error);
+            alert(error.message || 'Error connecting to backend');
         } finally {
             setIsLoading(false);
         }

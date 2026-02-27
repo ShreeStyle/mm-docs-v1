@@ -1,5 +1,6 @@
-// Pre-built document templates that users can clone — 20 ready-to-use templates
-
+// Pre-built document templates that users can clone — 40 ready-to-use templates
+// Professional templates with side layout design for PDF generation
+[]
 const TEMPLATE_LIBRARY = {
     proposals: [
         {
@@ -985,6 +986,172 @@ const TEMPLATE_LIBRARY = {
         }
     ],
 
+    // HR & Employee Documents - Professional Templates
+    hr_documents: [
+        {
+            id: "professional_offer_letter",
+            title: "Professional Offer Letter",
+            category: "hr_documents",
+            description: "Modern offer letter with side layout design and company branding",
+            tags: ["HR", "offer letter", "employment", "professional"],
+            templateFile: "offer_letter.hbs",
+            content: {
+                title: "Employment Offer Letter",
+                companyName: "[Company Name]",
+                candidateName: "[Candidate Name]",
+                position: "[Job Position]",
+                department: "[Department]",
+                startDate: "[Start Date]",
+                salary: "[Annual Salary]",
+                reportingTo: "[Manager Name]",
+                benefits: [
+                    "Comprehensive health insurance coverage",
+                    "401(k) retirement plan with company matching",
+                    "Flexible work arrangements and remote options",
+                    "Professional development opportunities",
+                    "Paid time off and holidays"
+                ],
+                workingHours: "Monday to Friday, 9:00 AM - 5:00 PM",
+                workLocation: "[Office Location/Remote]",
+                termsAndConditions: [
+                    "Employment is contingent upon successful completion of background check",
+                    "This position is at-will employment",
+                    "Confidentiality and non-disclosure agreements apply",
+                    "Standard company policies and procedures must be followed"
+                ],
+                nextSteps: [
+                    "Sign and return this letter within 5 business days",
+                    "Complete new hire paperwork and I-9 verification",
+                    "Attend orientation session on your first day",
+                    "Meet with HR to review benefits and policies"
+                ],
+                closingMessage: "We're excited to welcome you to our team and look forward to your contributions to our continued success.",
+                contactPerson: "[HR Contact Name], Human Resources",
+                date: "[Current Date]"
+            }
+        },
+        {
+            id: "professional_appointment_letter",
+            title: "Professional Appointment Letter",
+            category: "hr_documents", 
+            description: "Formal appointment letter with clean design and structured layout",
+            tags: ["HR", "appointment", "employment", "formal"],
+            templateFile: "appointment_letter.hbs",
+            content: {
+                title: "Letter of Appointment",
+                companyName: "[Company Name]",
+                employeeName: "[Employee Name]",
+                position: "[Job Position]",
+                department: "[Department]",
+                employeeId: "[Employee ID]",
+                appointmentDate: "[Appointment Date]",
+                keyResponsibilities: [
+                    "Execute assigned tasks and projects within specified timelines",
+                    "Collaborate effectively with team members and stakeholders",
+                    "Maintain high standards of quality and professionalism",
+                    "Participate in training and development programs",
+                    "Adhere to company policies and procedures"
+                ],
+                workingConditions: {
+                    workingHours: "40 hours per week, Monday to Friday",
+                    location: "[Work Location]",
+                    probationPeriod: "6 months from start date"
+                },
+                compensation: {
+                    baseSalary: "[Annual Salary]"
+                },
+                reportingStructure: "You will report directly to [Manager Name], [Manager Title]",
+                acknowledgment: "By signing below, you acknowledge that you have read, understood, and agree to the terms of this appointment.",
+                authorizedSignatory: "[Signatory Name], [Title]",
+                date: "[Current Date]"
+            }
+        },
+        {
+            id: "professional_experience_certificate",
+            title: "Professional Experience Certificate",
+            category: "hr_documents",
+            description: "Certificate-style experience letter with decorative border and formal design",
+            tags: ["HR", "experience", "certificate", "employment"],
+            templateFile: "experience_certificate.hbs",
+            content: {
+                title: "Experience Certificate",
+                companyName: "[Company Name]",
+                employeeName: "[Employee Name]",
+                position: "[Job Position]",
+                department: "[Department]",
+                employeeId: "[Employee ID]",
+                employmentPeriod: {
+                    startDate: "[Start Date]",
+                    endDate: "[End Date]"
+                },
+                workPerformance: "During the tenure, [Employee Name] demonstrated exceptional professional competence, dedication, and integrity. Their performance consistently exceeded expectations and contributed significantly to team success.",
+                keyAchievements: [
+                    "Successfully completed all assigned projects within deadlines",
+                    "Demonstrated strong leadership and teamwork skills",
+                    "Contributed to process improvements and efficiency gains",
+                    "Maintained excellent attendance and punctuality record",
+                    "Received positive feedback from clients and colleagues"
+                ],
+                characterAssessment: "[Employee Name] is a person of good character, integrity, and professional conduct. They maintained excellent relationships with colleagues and demonstrated strong work ethics throughout their employment.",
+                reasonForLeaving: "[Reason for separation - resignation, completion of contract, etc.]",
+                recommendation: "We highly recommend [Employee Name] for future employment opportunities and wish them continued success in their career endeavors.",
+                authorizedSignatory: {
+                    name: "[Signatory Name]",
+                    designation: "[Signatory Title]",
+                    company: "[Company Name]"
+                },
+                contactForVerification: "[HR Contact Email/Phone]",
+                date: "[Current Date]"
+            }
+        }
+    ],
+
+    // Legal Documents - Professional Templates  
+    legal_documents: [
+        {
+            id: "professional_nda",
+            title: "Professional Non-Disclosure Agreement",
+            category: "legal_documents",
+            description: "Legal document styling with structured clauses and formal design",
+            tags: ["legal", "NDA", "confidentiality", "agreement"],
+            templateFile: "nda.hbs",
+            content: {
+                title: "Non-Disclosure Agreement (NDA)",
+                effectiveDate: "[Effective Date]",
+                disclosingParty: "[Disclosing Party Name]",
+                receivingParty: "[Receiving Party Name]",
+                purpose: "The purpose of this agreement is to protect confidential information that may be disclosed during [business discussions, partnership negotiations, potential collaboration, etc.]",
+                confidentialInformation: [
+                    "Technical data, trade secrets, know-how, research, product plans, products, services, customers, customer lists, markets, software, developments, inventions, processes, formulas, technology, designs, drawings, engineering, hardware configuration information, marketing, finances, or other business information",
+                    "Any information marked, designated or otherwise identified as 'confidential'",
+                    "Information that would reasonably be considered confidential under the circumstances",
+                    "All copies, notes, analyses, compilations, studies, interpretations or other documents prepared by the Receiving Party that contain Confidential Information"
+                ],
+                obligations: [
+                    "Hold and maintain the Confidential Information in strict confidence",
+                    "Not disclose the Confidential Information to any third parties without prior written consent",
+                    "Use the Confidential Information solely for the purpose stated in this agreement",
+                    "Take reasonable precautions to protect the confidentiality of the information",
+                    "Return or destroy all Confidential Information upon request or termination of discussions"
+                ],
+                exceptions: [
+                    "Information that is publicly available through no breach of this agreement",
+                    "Information that was known to the Receiving Party prior to disclosure",
+                    "Information independently developed without use of Confidential Information",
+                    "Information required to be disclosed by law or court order (with prior notice to Disclosing Party)"
+                ],
+                duration: "This agreement shall remain in effect for [duration - e.g., 3 years] from the effective date, unless terminated earlier by mutual consent.",
+                remedies: "The Receiving Party acknowledges that any breach of this agreement may cause irreparable harm, and the Disclosing Party shall be entitled to seek injunctive relief and monetary damages.",
+                governingLaw: "This agreement shall be governed by the laws of [State/Country]",
+                signatures: {
+                    disclosingParty: "[Disclosing Party Name]",
+                    receivingParty: "[Receiving Party Name]"
+                },
+                date: "[Current Date]"
+            }
+        }
+    ],
+
     pitch_outline: [
         {
             id: "pitch_investor_deck",
@@ -1109,6 +1276,7 @@ const TEMPLATE_LIBRARY = {
         }
     ]
 };
+
 
 const getAllTemplates = () => {
     const allTemplates = [];
