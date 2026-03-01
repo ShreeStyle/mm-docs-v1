@@ -5,6 +5,8 @@ import Landing from './pages/Landing';
 import Login from './pages/Login';
 import Signup from './pages/Signup';
 import Dashboard from './pages/Dashboard';
+import TemplatesPage from './pages/TemplatesPage';
+import CreateDocument from './pages/CreateDocument';
 import './styles/Dashboard.css';
 
 function App() {
@@ -16,6 +18,9 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
           <Route path="/product" element={<Dashboard />} />
+          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/dashboard/templates" element={<TemplatesPage />} />
+          <Route path="/dashboard/create-document/:templateId" element={<CreateDocument />} />
         </Routes>
       </Router>
     </AuthProvider>

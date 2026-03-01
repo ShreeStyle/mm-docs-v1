@@ -3,269 +3,243 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{content.title}}</title>
+    <title>Experience Certificate</title>
     <style>
-        {{{brandCSS}}}
-        
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
         body {
-            font-family: var(--font-primary, 'Inter', 'Arial', sans-serif);
+            font-family: 'Times New Roman', serif;
             line-height: 1.6;
-            color: #2d3748;
-            background: #ffffff;
-            font-size: 14px;
-        }
-        
-        .document-container {
+            color: #000;
             max-width: 800px;
             margin: 0 auto;
             padding: 40px;
-            min-height: 100vh;
-            border: 3px solid var(--primary-color, #1e40af);
-            border-radius: 16px;
-            margin-top: 20px;
-            margin-bottom: 20px;
+            background: white;
+            font-size: 12pt;
         }
-        
         .header {
             text-align: center;
             margin-bottom: 40px;
+            border-bottom: 2px solid #000;
             padding-bottom: 20px;
-            border-bottom: 2px solid var(--primary-color, #1e40af);
         }
-        
         .company-name {
-            font-size: 36px;
-            font-weight: 700;
-            color: var(--primary-color, #1e40af);
+            font-size: 20pt;
+            font-weight: bold;
+            color: #000;
             margin-bottom: 8px;
             text-transform: uppercase;
-            letter-spacing: 2px;
         }
-        
+        .company-address {
+            font-size: 11pt;
+            color: #000;
+            margin-bottom: 10px;
+        }
         .document-title {
-            font-size: 28px;
-            font-weight: 600;
-            color: #1a202c;
-            margin: 20px 0;
+            font-size: 18pt;
+            font-weight: bold;
             text-transform: uppercase;
-            letter-spacing: 1px;
+            letter-spacing: 3px;
+            margin: 40px 0;
+            text-align: center;
+            color: #000;
+            text-decoration: underline;
+            border: 2px solid #000;
+            padding: 15px;
         }
-        
         .certificate-number {
-            font-size: 14px;
-            color: #64748b;
-            margin-bottom: 20px;
+            text-align: right;
+            margin-bottom: 30px;
+            font-size: 11pt;
+            font-weight: bold;
         }
-        
-        .employee-section {
-            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
-            padding: 32px;
-            border-radius: 16px;
-            margin: 32px 0;
-            text-align: center;
-            border: 2px solid var(--primary-color, #1e40af);
-        }
-        
-        .employee-name {
-            font-size: 32px;
-            font-weight: 700;
-            color: var(--primary-color, #1e40af);
-            margin-bottom: 16px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-        
-        .employment-details {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 24px;
-            margin: 24px 0;
-        }
-        
-        .detail-item {
-            text-align: center;
-            padding: 16px;
-            background: white;
-            border-radius: 12px;
-            border: 1px solid #e2e8f0;
-        }
-        
-        .detail-label {
-            font-size: 12px;
-            font-weight: 600;
-            color: #64748b;
-            text-transform: uppercase;
-            margin-bottom: 8px;
-        }
-        
-        .detail-value {
-            font-size: 18px;
-            font-weight: 700;
-            color: #1a202c;
-        }
-        
-        .content-section {
-            margin: 32px 0;
+        .content {
+            margin-bottom: 30px;
             text-align: justify;
             line-height: 1.8;
         }
-        
-        .performance-text {
-            font-size: 16px;
-            margin: 24px 0;
-            padding: 24px;
-            background: #f8fafc;
-            border-left: 4px solid var(--primary-color, #1e40af);
-            border-radius: 8px;
+        .content p {
+            margin-bottom: 20px;
         }
-        
-        .achievements-section {
-            margin: 32px 0;
+        .employee-details {
+            background: #f9f9f9;
+            border: 2px solid #000;
+            padding: 20px;
+            margin: 25px 0;
         }
-        
-        .section-title {
-            font-size: 20px;
-            font-weight: 600;
-            color: var(--primary-color, #1e40af);
-            margin-bottom: 16px;
+        .details-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            border: 2px solid #000;
+        }
+        .details-table th,
+        .details-table td {
+            border: 1px solid #000;
+            padding: 12px;
+            text-align: left;
+            font-size: 11pt;
+        }
+        .details-table th {
+            background-color: #f5f5f5;
+            font-weight: bold;
+        }
+        .performance-section {
+            margin: 25px 0;
+            border: 1px solid #000;
+            padding: 20px;
+        }
+        .performance-title {
+            font-size: 12pt;
+            font-weight: bold;
+            margin-bottom: 15px;
             text-align: center;
-            text-transform: uppercase;
+            text-decoration: underline;
         }
-        
-        .achievements-list {
-            list-style: none;
-            padding: 0;
-        }
-        
-        .achievements-list li {
-            padding: 12px 0;
-            padding-left: 30px;
-            position: relative;
-            border-bottom: 1px solid #e2e8f0;
-        }
-        
-        .achievements-list li:before {
-            content: "★";
-            position: absolute;
-            left: 0;
-            color: var(--primary-color, #1e40af);
-            font-size: 18px;
-        }
-        
-        .recommendation {
-            background: linear-gradient(135deg, var(--primary-color, #1e40af) 0%, #3b82f6 100%);
-            color: white;
-            padding: 24px;
-            border-radius: 12px;
-            text-align: center;
-            margin: 32px 0;
-            font-size: 16px;
-            font-weight: 500;
-        }
-        
         .signature-section {
-            margin-top: 48px;
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 32px;
+            margin-top: 60px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
         }
-        
         .signature-box {
             text-align: center;
-            padding: 24px;
-            border: 2px dashed var(--primary-color, #1e40af);
-            border-radius: 12px;
+            width: 45%;
         }
-        
-        .date-issued {
+        .signature-line {
+            border-top: 1px solid #000;
+            margin-top: 60px;
+            padding-top: 8px;
+            font-size: 11pt;
+        }
+        .company-seal {
+            text-align: left;
+            width: 45%;
+        }
+        .seal-box {
+            border: 1px solid #000;
+            height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10pt;
+            color: #666;
+        }
+        .footer {
+            margin-top: 40px;
             text-align: center;
-            margin-top: 32px;
-            font-size: 14px;
-            color: #64748b;
+            font-size: 10pt;
+            color: #666;
+            border-top: 1px solid #ccc;
+            padding-top: 20px;
+        }
+        .verification-note {
+            background: #fff3cd;
+            border: 1px solid #ffc107;
+            padding: 15px;
+            margin: 25px 0;
+            border-radius: 5px;
+            font-size: 10pt;
         }
     </style>
 </head>
 <body>
-    <div class="document-container">
-        <div class="header">
-            <div class="company-name">{{content.companyName}}</div>
-            <div class="document-title">{{content.title}}</div>
-            <div class="certificate-number">Certificate No: EXP-{{content.employeeId}}-2024</div>
-        </div>
+    <div class="header">
+        <div class="company-name">{{companyName}}</div>
+        <div class="company-address">{{companyAddress}}</div>
+        {{#if companyPhone}}<div>Phone: {{companyPhone}} {{#if companyEmail}}| Email: {{companyEmail}}{{/if}}</div>{{/if}}
+    </div>
 
-        <div class="employee-section">
-            <div style="font-size: 18px; margin-bottom: 16px; color: #64748b;">This is to certify that</div>
-            <div class="employee-name">{{content.employeeName}}</div>
-            <div style="font-size: 16px; color: #64748b;">has been employed with our organization</div>
+    <div class="document-title">Experience Certificate</div>
+
+    <div class="certificate-number">
+        <strong>Certificate No:</strong> {{#if certificateNumber}}{{certificateNumber}}{{else}}EXP/{{currentYear}}/{{employeeId}}{{/if}}<br>
+        <strong>Date:</strong> {{currentDate}}
+    </div>
+
+    <div class="content">
+        <p><strong>TO WHOM IT MAY CONCERN</strong></p>
+
+        <p>This is to certify that <strong>{{employeeName}}</strong> was employed with {{companyName}} in the following capacity:</p>
+
+        <table class="details-table">
+            <tr>
+                <th>Employee Name</th>
+                <td>{{employeeName}}</td>
+            </tr>
+            <tr>
+                <th>Position Held</th>
+                <td>{{position}}</td>
+            </tr>
+            <tr>
+                <th>Department</th>
+                <td>{{department}}</td>
+            </tr>
+            {{#if employeeId}}
+            <tr>
+                <th>Employee ID</th>
+                <td>{{employeeId}}</td>
+            </tr>
+            {{/if}}
+            <tr>
+                <th>Date of Joining</th>
+                <td>{{joiningDate}}</td>
+            </tr>
+            <tr>
+                <th>Date of Relieving</th>
+                <td>{{relievingDate}}</td>
+            </tr>
+            <tr>
+                <th>Total Experience</th>
+                <td>{{#if totalExperience}}{{totalExperience}}{{else}}As per employment period{{/if}}</td>
+            </tr>
+        </table>
+
+        <div class="performance-section">
+            <div class="performance-title">Work Performance & Conduct</div>
+            <p>During the tenure of employment, {{employeeName}} demonstrated exceptional professionalism, dedication, and competence in their assigned responsibilities. {{#if workDescription}}{{workDescription}}{{else}}The employee consistently met performance objectives and maintained high standards of work quality.{{/if}}</p>
             
-            <div class="employment-details">
-                <div class="detail-item">
-                    <div class="detail-label">Position</div>
-                    <div class="detail-value">{{content.position}}</div>
-                </div>
-                <div class="detail-item">
-                    <div class="detail-label">Department</div>
-                    <div class="detail-value">{{content.department}}</div>
-                </div>
-                <div class="detail-item">
-                    <div class="detail-label">From</div>
-                    <div class="detail-value">{{content.employmentPeriod.startDate}}</div>
-                </div>
-                <div class="detail-item">
-                    <div class="detail-label">To</div>
-                    <div class="detail-value">{{content.employmentPeriod.endDate}}</div>
-                </div>
-            </div>
-        </div>
-
-        <div class="performance-text">
-            {{content.workPerformance}}
-        </div>
-
-        <div class="achievements-section">
-            <div class="section-title">Key Achievements</div>
-            <ul class="achievements-list">
-                {{#each content.keyAchievements}}
-                <li>{{this}}</li>
-                {{/each}}
+            <p><strong>Key Achievements:</strong></p>
+            <ul>
+                <li>Consistently exceeded performance targets and objectives</li>
+                <li>Demonstrated strong leadership and collaborative skills</li>
+                <li>Contributed significantly to departmental and organizational goals</li>
+                <li>Maintained excellent professional conduct and work ethics</li>
+                {{#if achievements}}<li>{{achievements}}</li>{{/if}}
             </ul>
         </div>
 
-        <div class="content-section">
-            <p><strong>Character Assessment:</strong> {{content.characterAssessment}}</p>
-            <br>
-            <p><strong>Reason for Leaving:</strong> {{content.reasonForLeaving}}</p>
-        </div>
+        <p>We found {{employeeName}} to be honest, hardworking, reliable, and a person of good character. {{#if gender}}{{#if (eq gender 'female')}}She{{else}}He{{/if}}{{else}}The employee{{/if}} maintained excellent relationships with colleagues, clients, and management throughout the employment period.</p>
 
-        <div class="recommendation">
-            {{content.recommendation}}
-        </div>
+        {{#if reasonForLeaving}}
+        <p><strong>Reason for Leaving:</strong> {{reasonForLeaving}}</p>
+        {{/if}}
 
-        <div class="signature-section">
-            <div class="signature-box">
-                <p><strong>Authorized Signatory</strong></p>
-                <br><br>
-                <p>{{content.authorizedSignatory.name}}</p>
-                <p>{{content.authorizedSignatory.designation}}</p>
-                <p>{{content.authorizedSignatory.company}}</p>
-            </div>
-            <div class="signature-box">
-                <p><strong>Company Seal</strong></p>
-                <br><br><br>
-                <p>Official Company Seal</p>
+        <p>We have no hesitation in recommending {{employeeName}} for future employment opportunities and wish {{#if gender}}{{#if (eq gender 'female')}}her{{else}}him{{/if}}{{else}}them{{/if}} success in all future endeavors.</p>
+
+        <div class="verification-note">
+            <strong>For Verification:</strong> This certificate can be verified by contacting our HR department at {{#if hrEmail}}{{hrEmail}}{{else}}hr@{{companyName}}.com{{/if}} or {{#if hrPhone}}{{hrPhone}}{{else}}+91-XXXXXXXXXX{{/if}}
+        </div>
+    </div>
+
+    <div class="signature-section">
+        <div class="company-seal">
+            <div><strong>Company Seal</strong></div>
+            <div class="seal-box">
+                [COMPANY SEAL]
             </div>
         </div>
-
-        <div class="date-issued">
-            <p><strong>Date of Issue:</strong> {{content.date}}</p>
-            <p><strong>Contact for Verification:</strong> {{content.contactForVerification}}</p>
+        <div class="signature-box">
+            <div class="signature-line">
+                <strong>{{#if hrContactPerson}}{{hrContactPerson}}{{else}}HR Manager{{/if}}</strong><br>
+                {{#if managerTitle}}{{managerTitle}}{{else}}Human Resources Manager{{/if}}<br>
+                {{companyName}}
+            </div>
         </div>
+    </div>
+
+    <div class="footer">
+        <p><strong>Note:</strong> This is a computer-generated certificate and is valid without signature.</p>
+        <p>{{companyName}} - Professional HR Document System</p>
+        <p>Generated on {{currentDate}}</p>
     </div>
 </body>
 </html>

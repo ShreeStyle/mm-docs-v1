@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Onboarding Letter</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 40px;
+            background: white;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            border-bottom: 3px solid #1e40af;
+            padding-bottom: 20px;
+        }
+        .company-name {
+            font-size: 28px;
+            font-weight: bold;
+            color: #1e40af;
+            margin-bottom: 5px;
+        }
+        .company-address {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 10px;
+        }
+        .document-title {
+            font-size: 24px;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin: 30px 0;
+            text-align: center;
+            color: #333;
+        }
+        .welcome-section {
+            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+            border: 2px solid #1e40af;
+            border-radius: 12px;
+            padding: 30px;
+            margin: 30px 0;
+            text-align: center;
+        }
+        .welcome-title {
+            font-size: 20px;
+            font-weight: bold;
+            color: #1e40af;
+            margin-bottom: 15px;
+        }
+        .content {
+            margin-bottom: 30px;
+            text-align: justify;
+        }
+        .content p {
+            margin-bottom: 15px;
+        }
+        .info-section {
+            margin: 25px 0;
+            border-left: 4px solid #1e40af;
+            padding-left: 20px;
+            background: #f8fafc;
+            padding: 20px;
+            border-radius: 8px;
+        }
+        .section-title {
+            font-size: 16px;
+            font-weight: bold;
+            color: #1e40af;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .checklist {
+            list-style: none;
+            padding: 0;
+        }
+        .checklist li {
+            margin-bottom: 10px;
+            padding-left: 25px;
+            position: relative;
+        }
+        .checklist li:before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: #10b981;
+            font-weight: bold;
+            font-size: 16px;
+        }
+        .schedule-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .schedule-table th,
+        .schedule-table td {
+            border: 1px solid #e5e7eb;
+            padding: 12px;
+            text-align: left;
+        }
+        .schedule-table th {
+            background-color: #1e40af;
+            color: white;
+            font-weight: bold;
+        }
+        .schedule-table tr:nth-child(even) {
+            background-color: #f9fafb;
+        }
+        .contact-info {
+            background: #fef3e2;
+            border: 1px solid #f59e0b;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 25px 0;
+        }
+        .signature-section {
+            margin-top: 50px;
+            text-align: center;
+        }
+        .footer {
+            margin-top: 40px;
+            text-align: center;
+            font-size: 12px;
+            color: #666;
+            border-top: 1px solid #eee;
+            padding-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="company-name">{{companyName}}</div>
+        <div class="company-address">{{companyAddress}}</div>
+        {{#if companyPhone}}<div>Phone: {{companyPhone}} | Email: {{companyEmail}}</div>{{/if}}
+    </div>
+
+    <div class="document-title">Welcome & Onboarding Letter</div>
+
+    <div class="welcome-section">
+        <div class="welcome-title">🎉 Welcome to {{companyName}}! 🎉</div>
+        <p style="font-size: 16px; color: #374151; margin: 0;">
+            We're excited to have you join our team as <strong>{{position}}</strong>
+        </p>
+    </div>
+
+    <div class="content">
+        <p>Dear {{employeeName}},</p>
+
+        <p>Congratulations and welcome to {{companyName}}! We are thrilled to have you join our team as <strong>{{position}}</strong> in the <strong>{{department}}</strong> department, starting from <strong>{{startDate}}</strong>.</p>
+
+        <p>This letter contains important information about your first day and the onboarding process to help you settle in smoothly and successfully.</p>
+
+        <div class="info-section">
+            <div class="section-title">
+                <span>📋</span> First Day Information
+            </div>
+            <ul class="checklist">
+                <li><strong>Date:</strong> {{startDate}}</li>
+                <li><strong>Time:</strong> {{#if startTime}}{{startTime}}{{else}}9:00 AM{{/if}}</li>
+                <li><strong>Location:</strong> {{#if workLocation}}{{workLocation}}{{else}}Main Office Reception{{/if}}</li>
+                <li><strong>Contact Person:</strong> {{#if hrContactPerson}}{{hrContactPerson}}{{else}}HR Team{{/if}}</li>
+                <li><strong>Dress Code:</strong> {{#if dressCode}}{{dressCode}}{{else}}Business Casual{{/if}}</li>
+            </ul>
+        </div>
+
+        <div class="info-section">
+            <div class="section-title">
+                <span>📄</span> Documents to Bring
+            </div>
+            <ul class="checklist">
+                <li>Original and photocopies of educational certificates</li>
+                <li>Previous employment certificates and experience letters</li>
+                <li>PAN Card, Aadhaar Card, and Passport (original + photocopy)</li>
+                <li>Bank account details and cancelled cheque</li>
+                <li>Passport-size photographs (4 copies)</li>
+                <li>Medical fitness certificate (if applicable)</li>
+                <li>Signed offer letter and appointment letter</li>
+            </ul>
+        </div>
+
+        <div class="info-section">
+            <div class="section-title">
+                <span>📅</span> First Week Schedule
+            </div>
+            <table class="schedule-table">
+                <thead>
+                    <tr>
+                        <th>Day</th>
+                        <th>Activity</th>
+                        <th>Duration</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Day 1</strong></td>
+                        <td>Welcome session, documentation, IT setup</td>
+                        <td>Full Day</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Day 2</strong></td>
+                        <td>Company orientation and policy briefing</td>
+                        <td>Half Day</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Day 3</strong></td>
+                        <td>Department introduction and team meetings</td>
+                        <td>Full Day</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Day 4-5</strong></td>
+                        <td>Role-specific training and mentorship</td>
+                        <td>Full Days</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="info-section">
+            <div class="section-title">
+                <span>🎯</span> What to Expect
+            </div>
+            <ul class="checklist">
+                <li><strong>Workspace Setup:</strong> Your desk, computer, and necessary equipment will be ready</li>
+                <li><strong>IT Access:</strong> Email account, system logins, and software access will be provided</li>
+                <li><strong>Buddy System:</strong> You'll be assigned a buddy to help you navigate your first few weeks</li>
+                <li><strong>Training Program:</strong> Comprehensive training on company processes and your role</li>
+                <li><strong>Team Introduction:</strong> Meet your colleagues and understand team dynamics</li>
+                <li><strong>Goal Setting:</strong> Discuss expectations and set initial performance goals</li>
+            </ul>
+        </div>
+
+        <div class="contact-info">
+            <div class="section-title">
+                <span>📞</span> Important Contacts
+            </div>
+            <p><strong>HR Department:</strong> {{#if hrEmail}}{{hrEmail}}{{else}}hr@{{companyName}}.com{{/if}} | {{#if hrPhone}}{{hrPhone}}{{else}}+91-XXXXXXXXXX{{/if}}</p>
+            <p><strong>IT Support:</strong> {{#if itEmail}}{{itEmail}}{{else}}it@{{companyName}}.com{{/if}} | {{#if itPhone}}{{itPhone}}{{else}}+91-XXXXXXXXXX{{/if}}</p>
+            <p><strong>Your Manager:</strong> {{reportingTo}} | {{#if managerEmail}}{{managerEmail}}{{else}}manager@{{companyName}}.com{{/if}}</p>
+        </div>
+
+        <p>We have planned an exciting onboarding journey for you that will help you understand our company culture, values, and your role in our success story. Our team is committed to supporting you every step of the way.</p>
+
+        <p>If you have any questions or concerns before your start date, please don't hesitate to reach out to our HR team.</p>
+
+        <p><strong>Once again, welcome to the {{companyName}} family! We look forward to working with you and achieving great things together.</strong></p>
+    </div>
+
+    <div class="signature-section">
+        <p><strong>Best regards,</strong></p>
+        <p style="margin-top: 40px;">
+            <strong>{{#if hrContactPerson}}{{hrContactPerson}}{{else}}HR Manager{{/if}}</strong><br>
+            Human Resources Department<br>
+            {{companyName}}
+        </p>
+    </div>
+
+    <div class="footer">
+        <p>This is a computer-generated document. For any queries, please contact HR.</p>
+        <p>Generated on {{currentDate}} | {{companyName}} - Professional Onboarding System</p>
+    </div>
+</body>
+</html>

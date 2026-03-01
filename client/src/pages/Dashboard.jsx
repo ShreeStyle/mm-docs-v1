@@ -177,10 +177,14 @@ export default function Dashboard() {
                         <button
                             key={item.id}
                             onClick={() => {
-                                setCurrentView(item.id);
-                                setSelectedCategory(null);
-                                setSelectedDocType(null);
-                                setGeneratedDoc(null);
+                                if (item.id === 'templates') {
+                                    navigate('/dashboard/templates');
+                                } else {
+                                    setCurrentView(item.id);
+                                    setSelectedCategory(null);
+                                    setSelectedDocType(null);
+                                    setGeneratedDoc(null);
+                                }
                             }}
                             style={{
                                 width: '100%',
@@ -2937,6 +2941,808 @@ HR Department
             );
         }
 
+    // Templates Page - Professional Template Management
+    const TemplatesPage = () => {
+        const [selectedCategory, setSelectedCategory] = useState('all');
+        const [selectedTemplate, setSelectedTemplate] = useState(null);
+        const [previewMode, setPreviewMode] = useState(false);
+
+        const templateCategories = {
+            all: 'All Templates',
+            hr: 'HR Documents',
+            legal: 'Legal Documents', 
+            sales: 'Sales Documents',
+            finance: 'Finance Documents',
+            compliance: 'Compliance Documents'
+        };
+
+        const templates = {
+            hr: [
+                {
+                    id: 'offer_letter',
+                    name: 'Offer Letter',
+                    description: 'Professional employment offer letter with compensation details',
+                    icon: '📄',
+                    preview: 'Employment offer with salary, benefits, and terms',
+                    fields: ['candidateName', 'position', 'salary', 'startDate', 'department'],
+                    color: '#3B82F6'
+                },
+                {
+                    id: 'appointment_letter', 
+                    name: 'Appointment Letter',
+                    description: 'Official appointment confirmation letter',
+                    icon: '📋',
+                    preview: 'Formal appointment with role details and conditions',
+                    fields: ['employeeName', 'position', 'department', 'appointmentDate'],
+                    color: '#10B981'
+                },
+                {
+                    id: 'experience_certificate',
+                    name: 'Experience Certificate',
+                    description: 'Work experience verification certificate',
+                    icon: '🏆',
+                    preview: 'Professional experience validation document',
+                    fields: ['employeeName', 'position', 'joiningDate', 'relievingDate'],
+                    color: '#F59E0B'
+                },
+                {
+                    id: 'warning_letter',
+                    name: 'Warning Letter',
+                    description: 'Employee disciplinary warning letter',
+                    icon: '⚠️',
+                    preview: 'Formal warning for policy violations',
+                    fields: ['employeeName', 'violationType', 'incidentDescription'],
+                    color: '#EF4444'
+                },
+                {
+                    id: 'onboarding_letter',
+                    name: 'Onboarding Letter',
+                    description: 'Welcome and onboarding instructions',
+                    icon: '👋',
+                    preview: 'New employee welcome and orientation guide',
+                    fields: ['employeeName', 'position', 'startDate', 'orientation'],
+                    color: '#8B5CF6'
+                }
+            ],
+            legal: [
+                {
+                    id: 'nda',
+                    name: 'Non-Disclosure Agreement',
+                    description: 'Confidentiality and non-disclosure agreement',
+                    icon: '🔒',
+                    preview: 'Legal confidentiality protection document',
+                    fields: ['partyName', 'effectiveDate', 'duration', 'purpose'],
+                    color: '#059669'
+                },
+                {
+                    id: 'service_agreement',
+                    name: 'Service Agreement',
+                    description: 'Professional service contract agreement',
+                    icon: '📝',
+                    preview: 'Comprehensive service terms and conditions',
+                    fields: ['clientName', 'serviceType', 'duration', 'terms'],
+                    color: '#7C3AED'
+                }
+            ],
+            sales: [
+                {
+                    id: 'business_proposal',
+                    name: 'Business Proposal',
+                    description: 'Professional business proposal document',
+                    icon: '💼',
+                    preview: 'Comprehensive business proposal with pricing',
+                    fields: ['clientName', 'projectTitle', 'projectValue', 'timeline'],
+                    color: '#DC2626'
+                },
+                {
+                    id: 'quotation',
+                    name: 'Quotation',
+                    description: 'Price quotation and service details',
+                    icon: '💰',
+                    preview: 'Detailed pricing and service quotation',
+                    fields: ['clientName', 'quotationNumber', 'totalAmount', 'validUntil'],
+                    color: '#EA580C'
+                }
+            ],
+            finance: [
+                {
+                    id: 'invoice',
+                    name: 'Invoice',
+                    description: 'Professional invoice for services/products',
+                    icon: '🧾',
+                    preview: 'Standard billing invoice with payment terms',
+                    fields: ['clientName', 'invoiceNumber', 'totalAmount', 'dueDate'],
+                    color: '#0891B2'
+                },
+                {
+                    id: 'gst_invoice',
+                    name: 'GST Invoice',
+                    description: 'GST compliant invoice with tax calculations',
+                    icon: '📊',
+                    preview: 'Tax compliant invoice with GST breakdown',
+                    fields: ['clientName', 'gstNumber', 'baseAmount', 'invoiceDate'],
+                    color: '#7C2D12'
+                }
+            ],
+            compliance: [
+                {
+                    id: 'audit_report',
+                    name: 'Audit Report',
+                    description: 'Financial and compliance audit report',
+                    icon: '🔍',
+                    preview: 'Comprehensive audit findings and recommendations',
+                    fields: ['auditPeriod', 'auditType', 'auditorName', 'findings'],
+                    color: '#BE185D'
+                }
+            ]
+        };
+
+        const getAllTemplates = () => {
+            if (selectedCategory === 'all') {
+                return Object.values(templates).flat();
+            }
+            return templates[selectedCategory] || [];
+        };
+
+        const handleTemplateSelect = (template) => {
+            // Find the category for this template
+            const templateCategory = Object.keys(templates).find(cat => 
+                templates[cat].some(t => t.id === template.id)
+            );
+            
+            // Set the states in the main Dashboard component
+            setSelectedCategory(templateCategory);
+            setSelectedDocType(template.id);
+            setCurrentView('create');
+        };
+
+        const handlePreviewTemplate = (template) => {
+            setSelectedTemplate(template);
+            setPreviewMode(true);
+        };
+
+        const closePreview = () => {
+            setSelectedTemplate(null);
+            setPreviewMode(false);
+        };
+
+        // Preview Modal Component
+        const PreviewModal = ({ template, onClose }) => {
+            if (!template) return null;
+
+            const sampleData = {
+                offer_letter: {
+                    candidateName: 'John Doe',
+                    position: 'Senior Software Engineer',
+                    salary: '1800000',
+                    startDate: '2024-04-01',
+                    department: 'Engineering',
+                    companyName: 'Tech Solutions Pvt Ltd',
+                    companyAddress: '123 Tech Park, Bangalore - 560001'
+                },
+                appointment_letter: {
+                    employeeName: 'Jane Smith',
+                    position: 'Marketing Manager',
+                    department: 'Marketing',
+                    appointmentDate: '2024-04-01',
+                    companyName: 'Business Corp Ltd',
+                    companyAddress: '456 Business Center, Mumbai - 400001'
+                },
+                experience_certificate: {
+                    employeeName: 'Robert Johnson',
+                    position: 'Project Manager',
+                    joiningDate: '2022-01-15',
+                    relievingDate: '2024-03-31',
+                    companyName: 'Innovation Labs',
+                    companyAddress: '789 Innovation Hub, Hyderabad - 500001'
+                },
+                warning_letter: {
+                    employeeName: 'Alex Wilson',
+                    violationType: 'Attendance Issues',
+                    incidentDescription: 'Repeated tardiness and unauthorized absences',
+                    companyName: 'Professional Services Ltd',
+                    companyAddress: '321 Corporate Plaza, Chennai - 600001'
+                }
+            };
+
+            const data = sampleData[template.id] || {};
+
+            return (
+                <div style={{
+                    position: 'fixed',
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    bottom: 0,
+                    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    zIndex: 1000
+                }}>
+                    <div style={{
+                        backgroundColor: 'white',
+                        borderRadius: '16px',
+                        padding: '32px',
+                        maxWidth: '600px',
+                        maxHeight: '80vh',
+                        overflow: 'auto',
+                        position: 'relative',
+                        boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1)'
+                    }}>
+                        {/* Close Button */}
+                        <button
+                            onClick={onClose}
+                            style={{
+                                position: 'absolute',
+                                top: '16px',
+                                right: '16px',
+                                width: '32px',
+                                height: '32px',
+                                borderRadius: '50%',
+                                border: 'none',
+                                backgroundColor: '#F3F4F6',
+                                color: '#6B7280',
+                                cursor: 'pointer',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                fontSize: '18px',
+                                fontWeight: 'bold'
+                            }}
+                        >
+                            ×
+                        </button>
+
+                        {/* Template Header */}
+                        <div style={{ marginBottom: '24px' }}>
+                            <div style={{ 
+                                display: 'flex', 
+                                alignItems: 'center', 
+                                gap: '12px',
+                                marginBottom: '16px'
+                            }}>
+                                <div style={{
+                                    fontSize: '32px'
+                                }}>
+                                    {template.icon}
+                                </div>
+                                <div>
+                                    <h3 style={{ 
+                                        fontSize: '20px', 
+                                        fontWeight: '600', 
+                                        color: '#111827', 
+                                        margin: '0 0 4px 0' 
+                                    }}>{template.name}</h3>
+                                    <p style={{ 
+                                        fontSize: '14px', 
+                                        color: '#6B7280', 
+                                        margin: 0 
+                                    }}>{template.description}</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Sample Content */}
+                        <div style={{
+                            backgroundColor: '#F9FAFB',
+                            border: '1px solid #E5E7EB',
+                            borderRadius: '8px',
+                            padding: '20px',
+                            marginBottom: '24px'
+                        }}>
+                            <h4 style={{ 
+                                fontSize: '14px', 
+                                fontWeight: '600', 
+                                color: '#374151',
+                                marginBottom: '12px'
+                            }}>Sample Preview:</h4>
+                            
+                            <div style={{
+                                fontFamily: 'Times New Roman, serif',
+                                fontSize: '12px',
+                                lineHeight: '1.6',
+                                color: '#000'
+                            }}>
+                                {template.id === 'offer_letter' && (
+                                    <div>
+                                        <div style={{ textAlign: 'center', marginBottom: '20px', borderBottom: '2px solid #000', paddingBottom: '10px' }}>
+                                            <div style={{ fontSize: '16px', fontWeight: 'bold' }}>{data.companyName}</div>
+                                            <div style={{ fontSize: '10px' }}>{data.companyAddress}</div>
+                                        </div>
+                                        <div style={{ textAlign: 'center', fontSize: '14px', fontWeight: 'bold', marginBottom: '20px', textDecoration: 'underline' }}>
+                                            OFFER LETTER
+                                        </div>
+                                        <div style={{ marginBottom: '15px' }}>
+                                            <strong>Date:</strong> {new Date().toLocaleDateString()}
+                                        </div>
+                                        <div style={{ marginBottom: '15px' }}>
+                                            <strong>To,</strong><br/>
+                                            <strong>{data.candidateName}</strong>
+                                        </div>
+                                        <div style={{ marginBottom: '15px' }}>
+                                            <strong>Subject: Offer of Employment - {data.position}</strong>
+                                        </div>
+                                        <div>
+                                            Dear {data.candidateName},<br/><br/>
+                                            We are pleased to offer you employment with {data.companyName} for the position of <strong>{data.position}</strong>...
+                                        </div>
+                                    </div>
+                                )}
+
+                                {template.id === 'appointment_letter' && (
+                                    <div>
+                                        <div style={{ textAlign: 'center', marginBottom: '20px', borderBottom: '2px solid #000', paddingBottom: '10px' }}>
+                                            <div style={{ fontSize: '16px', fontWeight: 'bold' }}>{data.companyName}</div>
+                                            <div style={{ fontSize: '10px' }}>{data.companyAddress}</div>
+                                        </div>
+                                        <div style={{ textAlign: 'center', fontSize: '14px', fontWeight: 'bold', marginBottom: '20px', textDecoration: 'underline' }}>
+                                            APPOINTMENT LETTER
+                                        </div>
+                                        <div style={{ marginBottom: '15px' }}>
+                                            <strong>Date:</strong> {data.appointmentDate}
+                                        </div>
+                                        <div style={{ marginBottom: '15px' }}>
+                                            <strong>To,</strong><br/>
+                                            <strong>{data.employeeName}</strong>
+                                        </div>
+                                        <div style={{ marginBottom: '15px' }}>
+                                            <strong>Subject: Appointment as {data.position}</strong>
+                                        </div>
+                                        <div>
+                                            Dear {data.employeeName},<br/><br/>
+                                            We are pleased to inform you that you have been appointed as <strong>{data.position}</strong> in the <strong>{data.department}</strong> department...
+                                        </div>
+                                    </div>
+                                )}
+
+                                {template.id === 'experience_certificate' && (
+                                    <div>
+                                        <div style={{ textAlign: 'center', marginBottom: '20px', borderBottom: '2px solid #000', paddingBottom: '10px' }}>
+                                            <div style={{ fontSize: '16px', fontWeight: 'bold' }}>{data.companyName}</div>
+                                            <div style={{ fontSize: '10px' }}>{data.companyAddress}</div>
+                                        </div>
+                                        <div style={{ textAlign: 'center', fontSize: '16px', fontWeight: 'bold', marginBottom: '20px', textDecoration: 'underline', border: '2px solid #000', padding: '10px' }}>
+                                            EXPERIENCE CERTIFICATE
+                                        </div>
+                                        <div style={{ marginBottom: '15px' }}>
+                                            <strong>TO WHOM IT MAY CONCERN</strong>
+                                        </div>
+                                        <div>
+                                            This is to certify that <strong>{data.employeeName}</strong> was employed with {data.companyName} as <strong>{data.position}</strong> from {data.joiningDate} to {data.relievingDate}...
+                                        </div>
+                                    </div>
+                                )}
+
+                                {template.id === 'warning_letter' && (
+                                    <div>
+                                        <div style={{ textAlign: 'center', fontSize: '16px', fontWeight: 'bold', marginBottom: '20px', textDecoration: 'underline' }}>
+                                            Warning Letter
+                                        </div>
+                                        <div style={{ marginBottom: '15px' }}>
+                                            <strong>To,</strong><br/>
+                                            {data.employeeName}<br/>
+                                            {data.companyName}
+                                        </div>
+                                        <div style={{ marginBottom: '15px' }}>
+                                            {new Date().toLocaleDateString()}
+                                        </div>
+                                        <div style={{ marginBottom: '15px' }}>
+                                            <strong>Subject:</strong> Warning against {data.violationType}
+                                        </div>
+                                        <div>
+                                            Dear {data.employeeName},<br/><br/>
+                                            {data.incidentDescription}...
+                                        </div>
+                                    </div>
+                                )}
+
+                                {!['offer_letter', 'appointment_letter', 'experience_certificate', 'warning_letter'].includes(template.id) && (
+                                    <div style={{ textAlign: 'center', color: '#6B7280', fontStyle: 'italic' }}>
+                                        Preview for {template.name} will be available soon.<br/>
+                                        This template includes: {template.fields.join(', ')}
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+
+                        {/* Required Fields */}
+                        <div style={{ marginBottom: '24px' }}>
+                            <h4 style={{ 
+                                fontSize: '14px', 
+                                fontWeight: '600', 
+                                color: '#374151',
+                                marginBottom: '8px'
+                            }}>Required Fields:</h4>
+                            <div style={{ 
+                                display: 'flex', 
+                                flexWrap: 'wrap', 
+                                gap: '6px' 
+                            }}>
+                                {template.fields.map((field) => (
+                                    <span
+                                        key={field}
+                                        style={{
+                                            backgroundColor: template.color + '15',
+                                            color: template.color,
+                                            padding: '4px 8px',
+                                            borderRadius: '6px',
+                                            fontSize: '12px',
+                                            fontWeight: '500'
+                                        }}
+                                    >
+                                        {field}
+                                    </span>
+                                ))}
+                            </div>
+                        </div>
+
+                        {/* Action Buttons */}
+                        <div style={{ 
+                            display: 'flex', 
+                            gap: '12px',
+                            justifyContent: 'flex-end'
+                        }}>
+                            <button
+                                onClick={onClose}
+                                style={{
+                                    padding: '10px 20px',
+                                    backgroundColor: 'transparent',
+                                    color: '#6B7280',
+                                    border: '1px solid #D1D5DB',
+                                    borderRadius: '8px',
+                                    fontSize: '14px',
+                                    fontWeight: '500',
+                                    cursor: 'pointer'
+                                }}
+                            >
+                                Close
+                            </button>
+                            <button
+                                onClick={() => {
+                                    handleTemplateSelect(template);
+                                    onClose();
+                                }}
+                                style={{
+                                    padding: '10px 20px',
+                                    backgroundColor: template.color,
+                                    color: 'white',
+                                    border: 'none',
+                                    borderRadius: '8px',
+                                    fontSize: '14px',
+                                    fontWeight: '600',
+                                    cursor: 'pointer'
+                                }}
+                            >
+                                Use This Template
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        return (
+            <div style={{ padding: '32px' }}>
+                {/* Header */}
+                <div style={{ marginBottom: '32px' }}>
+                    <h2 style={{ 
+                        fontSize: '28px', 
+                        fontWeight: '700', 
+                        color: '#111827', 
+                        margin: '0 0 8px 0' 
+                    }}>Document Templates</h2>
+                    <p style={{ 
+                        fontSize: '16px', 
+                        color: '#6B7280', 
+                        margin: 0 
+                    }}>Professional templates based on your reference formats</p>
+                </div>
+
+                {/* Category Filter */}
+                <div style={{ 
+                    display: 'flex', 
+                    gap: '12px', 
+                    marginBottom: '32px',
+                    flexWrap: 'wrap'
+                }}>
+                    {Object.entries(templateCategories).map(([key, label]) => (
+                        <button
+                            key={key}
+                            onClick={() => setSelectedCategory(key)}
+                            style={{
+                                padding: '8px 16px',
+                                backgroundColor: selectedCategory === key ? '#F97316' : 'white',
+                                color: selectedCategory === key ? 'white' : '#6B7280',
+                                border: '1px solid #E5E7EB',
+                                borderRadius: '8px',
+                                fontSize: '14px',
+                                fontWeight: '500',
+                                cursor: 'pointer',
+                                transition: 'all 0.2s ease'
+                            }}
+                            onMouseEnter={(e) => {
+                                if (selectedCategory !== key) {
+                                    e.target.style.borderColor = '#F97316';
+                                    e.target.style.color = '#F97316';
+                                }
+                            }}
+                            onMouseLeave={(e) => {
+                                if (selectedCategory !== key) {
+                                    e.target.style.borderColor = '#E5E7EB';
+                                    e.target.style.color = '#6B7280';
+                                }
+                            }}
+                        >
+                            {label}
+                        </button>
+                    ))}
+                </div>
+
+                {/* Templates Grid */}
+                <div style={{
+                    display: 'grid',
+                    gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))',
+                    gap: '24px'
+                }}>
+                    {getAllTemplates().map((template) => (
+                        <div
+                            key={template.id}
+                            style={{
+                                backgroundColor: 'white',
+                                border: '1px solid #E5E7EB',
+                                borderRadius: '16px',
+                                padding: '24px',
+                                boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)',
+                                transition: 'all 0.2s ease',
+                                cursor: 'pointer'
+                            }}
+                            onMouseEnter={(e) => {
+                                e.target.style.transform = 'translateY(-4px)';
+                                e.target.style.boxShadow = '0 8px 25px rgba(0, 0, 0, 0.15)';
+                                e.target.style.borderColor = template.color;
+                            }}
+                            onMouseLeave={(e) => {
+                                e.target.style.transform = 'translateY(0)';
+                                e.target.style.boxShadow = '0 1px 3px rgba(0, 0, 0, 0.1)';
+                                e.target.style.borderColor = '#E5E7EB';
+                            }}
+                        >
+                            {/* Template Header */}
+                            <div style={{ 
+                                display: 'flex', 
+                                alignItems: 'center', 
+                                gap: '12px',
+                                marginBottom: '16px'
+                            }}>
+                                <div style={{
+                                    width: '48px',
+                                    height: '48px',
+                                    borderRadius: '12px',
+                                    backgroundColor: `${template.color}15`,
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    fontSize: '24px'
+                                }}>
+                                    {template.icon}
+                                </div>
+                                <div style={{ flex: 1 }}>
+                                    <h3 style={{ 
+                                        fontSize: '16px', 
+                                        fontWeight: '600', 
+                                        color: '#111827', 
+                                        margin: '0 0 4px 0' 
+                                    }}>{template.name}</h3>
+                                    <div style={{
+                                        backgroundColor: `${template.color}15`,
+                                        color: template.color,
+                                        padding: '2px 8px',
+                                        borderRadius: '12px',
+                                        fontSize: '11px',
+                                        fontWeight: '600',
+                                        display: 'inline-block'
+                                    }}>
+                                        {templateCategories[Object.keys(templates).find(cat => 
+                                            templates[cat].some(t => t.id === template.id)
+                                        )]}
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Template Description */}
+                            <p style={{ 
+                                fontSize: '14px', 
+                                color: '#6B7280', 
+                                margin: '0 0 16px 0',
+                                lineHeight: '1.4'
+                            }}>{template.description}</p>
+
+                            {/* Template Preview */}
+                            <div style={{
+                                backgroundColor: '#F9FAFB',
+                                border: '1px solid #F3F4F6',
+                                borderRadius: '8px',
+                                padding: '12px',
+                                marginBottom: '16px'
+                            }}>
+                                <div style={{ 
+                                    fontSize: '12px', 
+                                    color: '#9CA3AF',
+                                    fontWeight: '500',
+                                    marginBottom: '4px'
+                                }}>Preview:</div>
+                                <div style={{ 
+                                    fontSize: '13px', 
+                                    color: '#374151',
+                                    fontStyle: 'italic'
+                                }}>{template.preview}</div>
+                            </div>
+
+                            {/* Required Fields */}
+                            <div style={{ marginBottom: '20px' }}>
+                                <div style={{ 
+                                    fontSize: '12px', 
+                                    color: '#9CA3AF',
+                                    fontWeight: '500',
+                                    marginBottom: '8px'
+                                }}>Required Fields:</div>
+                                <div style={{ 
+                                    display: 'flex', 
+                                    flexWrap: 'wrap', 
+                                    gap: '4px' 
+                                }}>
+                                    {template.fields.slice(0, 3).map((field) => (
+                                        <span
+                                            key={field}
+                                            style={{
+                                                backgroundColor: '#F3F4F6',
+                                                color: '#6B7280',
+                                                padding: '2px 6px',
+                                                borderRadius: '4px',
+                                                fontSize: '11px',
+                                                fontWeight: '500'
+                                            }}
+                                        >
+                                            {field}
+                                        </span>
+                                    ))}
+                                    {template.fields.length > 3 && (
+                                        <span style={{
+                                            color: '#9CA3AF',
+                                            fontSize: '11px',
+                                            fontWeight: '500'
+                                        }}>
+                                            +{template.fields.length - 3} more
+                                        </span>
+                                    )}
+                                </div>
+                            </div>
+
+                            {/* Action Buttons */}
+                            <div style={{ 
+                                display: 'flex', 
+                                gap: '8px' 
+                            }}>
+                                <button
+                                    onClick={() => handleTemplateSelect(template)}
+                                    style={{
+                                        flex: 1,
+                                        padding: '10px 16px',
+                                        backgroundColor: template.color,
+                                        color: 'white',
+                                        border: 'none',
+                                        borderRadius: '8px',
+                                        fontSize: '14px',
+                                        fontWeight: '600',
+                                        cursor: 'pointer',
+                                        transition: 'all 0.2s ease'
+                                    }}
+                                    onMouseEnter={(e) => {
+                                        e.target.style.opacity = '0.9';
+                                        e.target.style.transform = 'translateY(-1px)';
+                                    }}
+                                    onMouseLeave={(e) => {
+                                        e.target.style.opacity = '1';
+                                        e.target.style.transform = 'translateY(0)';
+                                    }}
+                                >
+                                    Use Template
+                                </button>
+                                <button
+                                    onClick={() => handlePreviewTemplate(template)}
+                                    style={{
+                                        padding: '10px 12px',
+                                        backgroundColor: 'transparent',
+                                        color: template.color,
+                                        border: `1px solid ${template.color}`,
+                                        borderRadius: '8px',
+                                        fontSize: '14px',
+                                        fontWeight: '600',
+                                        cursor: 'pointer',
+                                        transition: 'all 0.2s ease'
+                                    }}
+                                    onMouseEnter={(e) => {
+                                        e.target.style.backgroundColor = template.color;
+                                        e.target.style.color = 'white';
+                                    }}
+                                    onMouseLeave={(e) => {
+                                        e.target.style.backgroundColor = 'transparent';
+                                        e.target.style.color = template.color;
+                                    }}
+                                >
+                                    <Eye size={16} />
+                                </button>
+                            </div>
+                        </div>
+                    ))}
+                </div>
+
+                {/* Template Statistics */}
+                <div style={{
+                    marginTop: '48px',
+                    display: 'grid',
+                    gridTemplateColumns: 'repeat(4, 1fr)',
+                    gap: '24px'
+                }}>
+                    {Object.entries(templateCategories).slice(1).map(([key, label]) => {
+                        const categoryTemplates = templates[key] || [];
+                        const colors = ['#3B82F6', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6'];
+                        const colorIndex = Object.keys(templateCategories).slice(1).indexOf(key);
+                        
+                        return (
+                            <div
+                                key={key}
+                                style={{
+                                    backgroundColor: 'white',
+                                    border: '1px solid #E5E7EB',
+                                    borderRadius: '12px',
+                                    padding: '20px',
+                                    textAlign: 'center',
+                                    boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)'
+                                }}
+                            >
+                                <div style={{
+                                    width: '40px',
+                                    height: '40px',
+                                    borderRadius: '10px',
+                                    backgroundColor: `${colors[colorIndex]}15`,
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    margin: '0 auto 12px auto',
+                                    fontSize: '20px',
+                                    color: colors[colorIndex]
+                                }}>
+                                    {categoryTemplates.length}
+                                </div>
+                                <h4 style={{ 
+                                    fontSize: '14px', 
+                                    fontWeight: '600', 
+                                    color: '#111827', 
+                                    margin: '0 0 4px 0' 
+                                }}>{label}</h4>
+                                <p style={{ 
+                                    fontSize: '12px', 
+                                    color: '#6B7280', 
+                                    margin: 0 
+                                }}>Available Templates</p>
+                            </div>
+                        );
+                    })}
+                </div>
+
+                {/* Preview Modal */}
+                {previewMode && selectedTemplate && (
+                    <PreviewModal 
+                        template={selectedTemplate} 
+                        onClose={closePreview} 
+                    />
+                )}
+            </div>
+        );
+    };
+
     // Main render function
     const renderMainContent = () => {
         switch (currentView) {
@@ -2953,6 +3759,9 @@ HR Department
             case 'compliance':
                 return <ComplianceCenterPage />;
             case 'templates':
+                // Templates are handled by separate route
+                navigate('/dashboard/templates');
+                return null;
             case 'users':
             case 'settings':
                 return (

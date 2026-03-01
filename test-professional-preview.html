@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Professional Invoice Preview Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .preview-container {
+            background: white;
+            padding: 40px;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            margin: 20px 0;
+        }
+        .a4-document {
+            width: 100%;
+            max-width: 794px;
+            margin: 0 auto;
+            background: white;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+            border-radius: 8px;
+            overflow: hidden;
+            border: 1px solid #E5E7EB;
+            position: relative;
+        }
+        .document-content {
+            padding: 40px;
+            min-height: 1000px;
+            background: white;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-size: 14px;
+            line-height: 1.6;
+            color: #2c3e50;
+        }
+        .page-indicator {
+            position: absolute;
+            bottom: 10px;
+            right: 15px;
+            font-size: 10px;
+            color: #bbb;
+            font-family: monospace;
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 30px;
+        }
+        .test-section {
+            margin: 30px 0;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+        .status {
+            padding: 10px;
+            border-radius: 4px;
+            margin: 10px 0;
+        }
+        .success { background: #d4edda; color: #155724; }
+        .error { background: #f8d7da; color: #721c24; }
+        .info { background: #d1ecf1; color: #0c5460; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Professional Invoice Preview Test</h1>
+        
+        <div class="test-section">
+            <h2>Test Status</h2>
+            <div id="status" class="status info">Testing professional invoice template rendering...</div>
+        </div>
+
+        <div class="test-section">
+            <h2>Professional A4 Document Preview</h2>
+            <p>This shows how the invoice should look in the CreateDocument component:</p>
+            
+            <div class="preview-container">
+                <div class="a4-document">
+                    <div class="document-content" id="invoice-content">
+                        <!-- Invoice content will be loaded here -->
+                    </div>
+                    <div class="page-indicator">Page 1</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h2>Template Data</h2>
+            <button onclick="loadTemplate()">Load Professional Invoice Template</button>
+            <button onclick="testPreview()">Test Preview Rendering</button>
+            <pre id="template-data" style="background: #f8f9fa; padding: 15px; border-radius: 4px; overflow: auto; max-height: 300px;"></pre>
+        </div>
+    </div>
+
+    <script>
+        let templateContent = '';
+
+        async function loadTemplate() {
+            try {
+                updateStatus('Loading template from database...', 'info');
+                
+                const response = await fetch('http://localhost:5000/api/templates/invoice-001', {
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('token') || 'test-token'}`
+                    }
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    templateContent = data.data.content;
+                    document.getElementById('template-data').textContent = 
+                        `Template: ${data.data.name}\nVersion: ${data.data.metadata.version}\nContent Length: ${templateContent.length} characters\n\nFirst 500 characters:\n${templateContent.substring(0, 500)}...`;
+                    
+                    updateStatus('✅ Template loaded successfully!', 'success');
+                } else {
+                    throw new Error(data.message || 'Failed to load template');
+                }
+            } catch (error) {
+                console.error('Error loading template:', error);
+                updateStatus(`❌ Error loading template: ${error.message}`, 'error');
+            }
+        }
+
+        function testPreview() {
+            if (!templateContent) {
+                updateStatus('❌ Please load template first', 'error');
+                return;
+            }
+
+            try {
+                updateStatus('Rendering professional preview...', 'info');
+                
+                let content = templateContent;
+                
+                // Professional sample data
+                const sampleData = {
+                    clientName: 'ABC Corporation Pvt Ltd',
+                    clientAddress: '123 Business Street<br>Mumbai, Maharashtra - 400001<br>India',
+                    invoiceNumber: 'INV-2024-001',
+                    invoiceDate: new Date().toLocaleDateString('en-IN'),
+                    dueDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toLocaleDateString('en-IN'),
+                    totalAmount: '1,18,000',
+                    serviceDescription: 'Professional Software Development Services<br>• Web Application Development<br>• API Integration<br>• Database Design & Implementation',
+                    companyName: 'Your Company Ltd',
+                    companyAddress: 'Tech Park, Sector 5<br>Bangalore, Karnataka - 560001<br>India',
+                    companyPhone: '+91-9876543210',
+                    companyEmail: 'billing@yourcompany.com',
+                    gstNumber: '29ABCDE1234F1Z5',
+                    clientPhone: '+91-9876543211',
+                    clientEmail: 'contact@abccorp.com',
+                    clientGST: '27ABCDE5678G1Z2',
+                    baseAmount: '1,00,000',
+                    taxAmount: '18,000',
+                    subtotal: '1,00,000',
+                    taxRate: '18',
+                    paymentTerms: 'Net 30 days from invoice date',
+                    bankDetails: 'HDFC Bank - A/c: 1234567890, IFSC: HDFC0001234',
+                    upiId: 'yourcompany@paytm',
+                    notes: 'Thank you for choosing our services. We look forward to continued business.',
+                    quantity: '1',
+                    rate: '1,18,000',
+                    currentDate: new Date().toLocaleDateString('en-IN')
+                };
+
+                // Replace placeholders
+                Object.keys(sampleData).forEach(key => {
+                    const regex = new RegExp(`{{${key}}}`, 'g');
+                    content = content.replace(regex, sampleData[key]);
+                });
+
+                // Handle Handlebars conditionals
+                content = content.replace(/{{#if\s+[\w.]+}}([\s\S]*?){{\/if}}/g, '$1');
+                content = content.replace(/{{#unless\s+[\w.]+}}([\s\S]*?){{\/unless}}/g, '');
+                content = content.replace(/{{else}}[\s\S]*?(?={{\/if}})/g, '');
+                content = content.replace(/{{#each\s+[\w.]+}}([\s\S]*?){{\/each}}/g, '$1');
+                
+                // Remove remaining Handlebars
+                content = content.replace(/{{[^}]*}}/g, '');
+                
+                // Clean up whitespace
+                content = content.replace(/\n\s*\n\s*\n/g, '\n\n');
+
+                // Render in preview
+                document.getElementById('invoice-content').innerHTML = content;
+                
+                updateStatus('✅ Professional preview rendered successfully!', 'success');
+            } catch (error) {
+                console.error('Error rendering preview:', error);
+                updateStatus(`❌ Error rendering preview: ${error.message}`, 'error');
+            }
+        }
+
+        function updateStatus(message, type) {
+            const status = document.getElementById('status');
+            status.textContent = message;
+            status.className = `status ${type}`;
+        }
+
+        // Auto-load template on page load
+        window.addEventListener('load', () => {
+            setTimeout(loadTemplate, 1000);
+        });
+    </script>
+</body>
+</html>

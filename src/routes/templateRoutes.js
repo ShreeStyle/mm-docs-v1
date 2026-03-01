@@ -1,19 +1,18 @@
 const express = require("express");
 const router = express.Router();
-const {
-    getTemplates,
-    getTemplateDetails,
-    cloneTemplate,
-    getCategories,
-} = require("../controllers/templateController");
+const templateController = require("../controllers/templateController");
 const authMiddleware = require("../middleware/authMiddleware");
 
-// Public routes (browse templates)
-router.get("/", getTemplates);
-router.get("/categories", getCategories);
-router.get("/:templateId", getTemplateDetails);
+// Get all templates (with optional category filter)
+router.get("/", authMiddleware, templateController.getAllTemplates);
 
-// Protected routes (clone template)
-router.post("/:templateId/clone", authMiddleware, cloneTemplate);
+// Get template categories with counts
+router.get("/categories", authMiddleware, templateController.getTemplateCategories);
+
+// Get single template by ID
+router.get("/:templateId", authMiddleware, templateController.getTemplateById);
+
+// Initialize default templates (admin only - run once)
+router.post("/initialize", authMiddleware, templateController.initializeTemplates);
 
 module.exports = router;

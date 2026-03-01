@@ -1,126 +1,26 @@
-const Template = require('../models/Template');
+const mongoose = require('mongoose');
+const Template = require('./src/models/Template');
 const fs = require('fs');
 const path = require('path');
+require('dotenv').config();
 
-// Get all templates
-exports.getAllTemplates = async (req, res) => {
+const connectDB = async () => {
     try {
-        const { category } = req.query;
-        const filter = { 'metadata.isActive': true };
-        
-        if (category && category !== 'all') {
-            filter.category = category;
-        }
-
-        const templates = await Template.find(filter)
-            .select('-content') // Don't send full content in list view
-            .sort({ category: 1, name: 1 });
-
-        res.json({
-            success: true,
-            data: templates,
-            count: templates.length
-        });
+        await mongoose.connect(process.env.MONGO_URI);
+        console.log('✅ MongoDB Connected');
     } catch (error) {
-        console.error('Error fetching templates:', error);
-        res.status(500).json({
-            success: false,
-            message: 'Failed to fetch templates',
-            error: error.message
-        });
+        console.error('❌ MongoDB connection error:', error);
+        process.exit(1);
     }
 };
 
-// Get single template by ID
-exports.getTemplateById = async (req, res) => {
-    try {
-        const { templateId } = req.params;
-        
-        const template = await Template.findOne({ 
-            templateId: templateId,
-            'metadata.isActive': true 
-        });
-
-        if (!template) {
-            return res.status(404).json({
-                success: false,
-                message: 'Template not found'
-            });
-        }
-
-        // Increment usage count
-        await Template.findByIdAndUpdate(template._id, {
-            $inc: { 'metadata.usageCount': 1 }
-        });
-
-        res.json({
-            success: true,
-            data: template
-        });
-    } catch (error) {
-        console.error('Error fetching template:', error);
-        res.status(500).json({
-            success: false,
-            message: 'Failed to fetch template',
-            error: error.message
-        });
-    }
-};
-
-// Get template categories with counts
-exports.getTemplateCategories = async (req, res) => {
-    try {
-        const categories = await Template.aggregate([
-            { $match: { 'metadata.isActive': true } },
-            { 
-                $group: { 
-                    _id: '$category', 
-                    count: { $sum: 1 },
-                    templates: { $push: { templateId: '$templateId', name: '$name' } }
-                } 
-            },
-            { $sort: { _id: 1 } }
-        ]);
-
-        const categoryMap = {
-            hr: 'HR Documents',
-            legal: 'Legal Documents',
-            sales: 'Sales Documents', 
-            finance: 'Finance Documents',
-            compliance: 'Compliance Documents'
-        };
-
-        const formattedCategories = categories.map(cat => ({
-            id: cat._id,
-            name: categoryMap[cat._id] || cat._id,
-            count: cat.count,
-            templates: cat.templates
-        }));
-
-        res.json({
-            success: true,
-            data: formattedCategories
-        });
-    } catch (error) {
-        console.error('Error fetching categories:', error);
-        res.status(500).json({
-            success: false,
-            message: 'Failed to fetch categories',
-            error: error.message
-        });
-    }
-};
-
-// Initialize default templates (run once)
-exports.initializeTemplates = async (req, res) => {
+const initializeTemplates = async () => {
     try {
         // Check if templates already exist
         const existingCount = await Template.countDocuments();
         if (existingCount > 0) {
-            return res.json({
-                success: true,
-                message: `Templates already initialized. Found ${existingCount} templates.`
-            });
+            console.log(`Templates already initialized. Found ${existingCount} templates.`);
+            return;
         }
 
         const defaultTemplates = [
@@ -141,7 +41,7 @@ exports.initializeTemplates = async (req, res) => {
                     { fieldName: 'companyName', fieldType: 'text', label: 'Company Name', placeholder: 'e.g. Tech Solutions Pvt Ltd', required: true },
                     { fieldName: 'companyAddress', fieldType: 'textarea', label: 'Company Address', placeholder: 'Complete company address', required: true }
                 ],
-                content: await fs.promises.readFile(path.join(__dirname, '../templates/offer_letter.hbs'), 'utf8'),
+                content: fs.readFileSync(path.join(__dirname, 'src/templates/offer_letter.hbs'), 'utf8'),
                 placeholders: [
                     { placeholder: '{{candidateName}}', description: 'Name of the candidate', fieldMapping: 'candidateName' },
                     { placeholder: '{{position}}', description: 'Job position', fieldMapping: 'position' },
@@ -166,7 +66,7 @@ exports.initializeTemplates = async (req, res) => {
                     { fieldName: 'companyName', fieldType: 'text', label: 'Company Name', placeholder: 'e.g. Business Corp Ltd', required: true },
                     { fieldName: 'companyAddress', fieldType: 'textarea', label: 'Company Address', placeholder: 'Complete company address', required: true }
                 ],
-                content: await fs.promises.readFile(path.join(__dirname, '../templates/appointment_letter.hbs'), 'utf8'),
+                content: fs.readFileSync(path.join(__dirname, 'src/templates/appointment_letter.hbs'), 'utf8'),
                 placeholders: [
                     { placeholder: '{{employeeName}}', description: 'Name of the employee', fieldMapping: 'employeeName' },
                     { placeholder: '{{position}}', description: 'Job position', fieldMapping: 'position' },
@@ -190,7 +90,7 @@ exports.initializeTemplates = async (req, res) => {
                     { fieldName: 'companyName', fieldType: 'text', label: 'Company Name', placeholder: 'e.g. Innovation Labs', required: true },
                     { fieldName: 'companyAddress', fieldType: 'textarea', label: 'Company Address', placeholder: 'Complete company address', required: true }
                 ],
-                content: await fs.promises.readFile(path.join(__dirname, '../templates/experience_certificate.hbs'), 'utf8'),
+                content: fs.readFileSync(path.join(__dirname, 'src/templates/experience_certificate.hbs'), 'utf8'),
                 placeholders: [
                     { placeholder: '{{employeeName}}', description: 'Name of the employee', fieldMapping: 'employeeName' },
                     { placeholder: '{{position}}', description: 'Position held', fieldMapping: 'position' },
@@ -214,7 +114,7 @@ exports.initializeTemplates = async (req, res) => {
                     { fieldName: 'companyName', fieldType: 'text', label: 'Company Name', placeholder: 'e.g. Professional Services Ltd', required: true },
                     { fieldName: 'companyAddress', fieldType: 'textarea', label: 'Company Address', placeholder: 'Complete company address', required: true }
                 ],
-                content: await fs.promises.readFile(path.join(__dirname, '../templates/warning_letter.hbs'), 'utf8'),
+                content: fs.readFileSync(path.join(__dirname, 'src/templates/warning_letter.hbs'), 'utf8'),
                 placeholders: [
                     { placeholder: '{{employeeName}}', description: 'Name of the employee', fieldMapping: 'employeeName' },
                     { placeholder: '{{violationType}}', description: 'Type of violation', fieldMapping: 'violationType' },
@@ -237,7 +137,7 @@ exports.initializeTemplates = async (req, res) => {
                     { fieldName: 'companyName', fieldType: 'text', label: 'Company Name', placeholder: 'e.g. Your Company Ltd', required: true },
                     { fieldName: 'companyAddress', fieldType: 'textarea', label: 'Company Address', placeholder: 'Complete company address', required: true }
                 ],
-                content: await fs.promises.readFile(path.join(__dirname, '../templates/nda.hbs'), 'utf8'),
+                content: fs.readFileSync(path.join(__dirname, 'src/templates/nda.hbs'), 'utf8'),
                 placeholders: [
                     { placeholder: '{{partyName}}', description: 'Name of the other party', fieldMapping: 'partyName' },
                     { placeholder: '{{effectiveDate}}', description: 'Agreement effective date', fieldMapping: 'effectiveDate' },
@@ -262,7 +162,7 @@ exports.initializeTemplates = async (req, res) => {
                     { fieldName: 'companyName', fieldType: 'text', label: 'Company Name', placeholder: 'e.g. Your Business Ltd', required: true },
                     { fieldName: 'companyAddress', fieldType: 'textarea', label: 'Company Address', placeholder: 'Complete company address', required: true }
                 ],
-                content: await fs.promises.readFile(path.join(__dirname, '../templates/invoice.hbs'), 'utf8'),
+                content: fs.readFileSync(path.join(__dirname, 'src/templates/invoice.hbs'), 'utf8'),
                 placeholders: [
                     { placeholder: '{{clientName}}', description: 'Name of the client', fieldMapping: 'clientName' },
                     { placeholder: '{{invoiceNumber}}', description: 'Invoice number', fieldMapping: 'invoiceNumber' },
@@ -275,18 +175,21 @@ exports.initializeTemplates = async (req, res) => {
         // Insert all templates
         const insertedTemplates = await Template.insertMany(defaultTemplates);
 
-        res.json({
-            success: true,
-            message: `Successfully initialized ${insertedTemplates.length} templates`,
-            data: insertedTemplates.map(t => ({ templateId: t.templateId, name: t.name }))
+        console.log(`✅ Successfully initialized ${insertedTemplates.length} templates:`);
+        insertedTemplates.forEach(t => {
+            console.log(`   - ${t.name} (${t.templateId})`);
         });
 
     } catch (error) {
-        console.error('Error initializing templates:', error);
-        res.status(500).json({
-            success: false,
-            message: 'Failed to initialize templates',
-            error: error.message
-        });
+        console.error('❌ Error initializing templates:', error);
     }
 };
+
+const main = async () => {
+    await connectDB();
+    await initializeTemplates();
+    await mongoose.connection.close();
+    console.log('🔌 Database connection closed');
+};
+
+main();

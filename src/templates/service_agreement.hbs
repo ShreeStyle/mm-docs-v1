@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Service Agreement</title>
+    <style>
+        body {
+            font-family: 'Times New Roman', serif;
+            line-height: 1.6;
+            color: #000;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 40px;
+            background: white;
+            font-size: 12pt;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            border-bottom: 2px solid #000;
+            padding-bottom: 20px;
+        }
+        .company-name {
+            font-size: 20pt;
+            font-weight: bold;
+            color: #000;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+        }
+        .document-title {
+            font-size: 18pt;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin: 30px 0;
+            text-align: center;
+            color: #000;
+            text-decoration: underline;
+        }
+        .content {
+            margin-bottom: 30px;
+            text-align: justify;
+        }
+        .content p {
+            margin-bottom: 15px;
+        }
+        .terms-section {
+            margin: 25px 0;
+            border: 1px solid #000;
+            padding: 20px;
+        }
+        .terms-title {
+            font-size: 12pt;
+            font-weight: bold;
+            margin-bottom: 15px;
+            text-align: center;
+            text-decoration: underline;
+        }
+        .signature-section {
+            margin-top: 50px;
+            display: flex;
+            justify-content: space-between;
+        }
+        .signature-box {
+            text-align: center;
+            width: 45%;
+        }
+        .signature-line {
+            border-top: 1px solid #000;
+            margin-top: 60px;
+            padding-top: 8px;
+            font-size: 11pt;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="company-name">{{companyName}}</div>
+        <div>{{companyAddress}}</div>
+    </div>
+
+    <div class="document-title">Service Agreement</div>
+
+    <div class="content">
+        <p><strong>Date:</strong> {{currentDate}}</p>
+        <p><strong>Effective Date:</strong> {{effectiveDate}}</p>
+
+        <p>This Service Agreement ("Agreement") is entered into between {{companyName}} ("Service Provider") and {{clientName}} ("Client").</p>
+
+        <div class="terms-section">
+            <div class="terms-title">Terms and Conditions</div>
+            <p><strong>1. Services:</strong> {{serviceType}}</p>
+            <p><strong>2. Duration:</strong> {{duration}}</p>
+            <p><strong>3. Terms:</strong> {{terms}}</p>
+        </div>
+    </div>
+
+    <div class="signature-section">
+        <div class="signature-box">
+            <div class="signature-line">
+                <strong>{{companyName}}</strong><br>
+                Service Provider
+            </div>
+        </div>
+        <div class="signature-box">
+            <div class="signature-line">
+                <strong>{{clientName}}</strong><br>
+                Client
+            </div>
+        </div>
+    </div>
+</body>
+</html>

@@ -8,43 +8,46 @@
         body {
             font-family: 'Times New Roman', serif;
             line-height: 1.6;
-            color: #333;
+            color: #000;
             max-width: 800px;
             margin: 0 auto;
             padding: 40px;
             background: white;
+            font-size: 12pt;
         }
         .header {
             text-align: center;
             margin-bottom: 40px;
-            border-bottom: 3px solid {{#if brandKit.colors.[0]}}{{brandKit.colors.[0]}}{{else}}#1e40af{{/if}};
+            border-bottom: 2px solid #000;
             padding-bottom: 20px;
         }
         .company-name {
-            font-size: 28px;
+            font-size: 20pt;
             font-weight: bold;
-            color: {{#if brandKit.colors.[0]}}{{brandKit.colors.[0]}}{{else}}#1e40af{{/if}};
-            margin-bottom: 5px;
+            color: #000;
+            margin-bottom: 8px;
+            text-transform: uppercase;
         }
         .company-address {
-            font-size: 14px;
-            color: #666;
+            font-size: 11pt;
+            color: #000;
             margin-bottom: 10px;
         }
         .document-title {
-            font-size: 24px;
+            font-size: 16pt;
             font-weight: bold;
             text-transform: uppercase;
             letter-spacing: 2px;
             margin: 30px 0;
             text-align: center;
-            color: #333;
+            color: #000;
+            text-decoration: underline;
         }
         .date-ref {
             display: flex;
             justify-content: space-between;
             margin-bottom: 30px;
-            font-size: 14px;
+            font-size: 11pt;
         }
         .content {
             margin-bottom: 30px;
@@ -57,17 +60,17 @@
             width: 100%;
             border-collapse: collapse;
             margin: 20px 0;
-            background: #f9f9f9;
+            border: 2px solid #000;
         }
         .details-table th,
         .details-table td {
-            border: 1px solid #ddd;
+            border: 1px solid #000;
             padding: 12px;
             text-align: left;
+            font-size: 11pt;
         }
         .details-table th {
-            background-color: {{#if brandKit.colors.[0]}}{{brandKit.colors.[0]}}{{else}}#1e40af{{/if}};
-            color: white;
+            background-color: #f5f5f5;
             font-weight: bold;
         }
         .signature-section {
@@ -77,26 +80,42 @@
         }
         .signature-box {
             text-align: center;
-            width: 200px;
+            width: 45%;
         }
         .signature-line {
-            border-top: 1px solid #333;
+            border-top: 1px solid #000;
             margin-top: 60px;
             padding-top: 5px;
+            font-size: 11pt;
         }
         .footer {
             margin-top: 40px;
             text-align: center;
-            font-size: 12px;
+            font-size: 10pt;
             color: #666;
-            border-top: 1px solid #eee;
+            border-top: 1px solid #ccc;
             padding-top: 20px;
         }
-        .highlight {
-            background-color: #fff3cd;
-            padding: 15px;
-            border-left: 4px solid {{#if brandKit.colors.[0]}}{{brandKit.colors.[0]}}{{else}}#1e40af{{/if}};
-            margin: 20px 0;
+        .terms-section {
+            margin: 25px 0;
+            border: 1px solid #000;
+            padding: 20px;
+        }
+        .terms-title {
+            font-size: 12pt;
+            font-weight: bold;
+            margin-bottom: 15px;
+            text-align: center;
+            text-decoration: underline;
+        }
+        .terms-list {
+            list-style: decimal;
+            padding-left: 20px;
+        }
+        .terms-list li {
+            margin-bottom: 8px;
+            font-size: 11pt;
+            line-height: 1.4;
         }
     </style>
 </head>
@@ -104,17 +123,18 @@
     <div class="header">
         <div class="company-name">{{companyName}}</div>
         <div class="company-address">{{companyAddress}}</div>
-        {{#if companyPhone}}<div>Phone: {{companyPhone}} | Email: {{companyEmail}}</div>{{/if}}
+        {{#if companyPhone}}<div>Phone: {{companyPhone}} {{#if companyEmail}}| Email: {{companyEmail}}{{/if}}</div>{{/if}}
     </div>
 
     <div class="document-title">Appointment Letter</div>
 
     <div class="date-ref">
         <div><strong>Date:</strong> {{appointmentDate}}</div>
-        <div><strong>Ref:</strong> {{refNumber}}</div>
+        {{#if refNumber}}<div><strong>Ref:</strong> {{refNumber}}</div>{{/if}}
     </div>
 
     <div class="content">
+        <p><strong>To,</strong></p>
         <p><strong>{{employeeName}}</strong><br>
         {{#if employeeAddress}}{{employeeAddress}}{{/if}}</p>
 
@@ -126,54 +146,49 @@
 
         <p>Your appointment is subject to the terms and conditions mentioned below and as per the company policies:</p>
 
-        <div class="details-table">
-            <table class="details-table">
-                <tr>
-                    <th>Particulars</th>
-                    <th>Details</th>
-                </tr>
-                <tr>
-                    <td><strong>Employee Name</strong></td>
-                    <td>{{employeeName}}</td>
-                </tr>
-                <tr>
-                    <td><strong>Position</strong></td>
-                    <td>{{position}}</td>
-                </tr>
-                <tr>
-                    <td><strong>Department</strong></td>
-                    <td>{{department}}</td>
-                </tr>
-                <tr>
-                    <td><strong>Date of Appointment</strong></td>
-                    <td>{{appointmentDate}}</td>
-                </tr>
-                <tr>
-                    <td><strong>Reporting Manager</strong></td>
-                    <td>{{reportingTo}}</td>
-                </tr>
-                <tr>
-                    <td><strong>Work Location</strong></td>
-                    <td>{{workLocation}}</td>
-                </tr>
-                {{#if probationPeriod}}
-                <tr>
-                    <td><strong>Probation Period</strong></td>
-                    <td>{{probationPeriod}}</td>
-                </tr>
-                {{/if}}
-            </table>
-        </div>
+        <table class="details-table">
+            <tr>
+                <th>Employee Name</th>
+                <td>{{employeeName}}</td>
+            </tr>
+            <tr>
+                <th>Position</th>
+                <td>{{position}}</td>
+            </tr>
+            <tr>
+                <th>Department</th>
+                <td>{{department}}</td>
+            </tr>
+            <tr>
+                <th>Date of Appointment</th>
+                <td>{{appointmentDate}}</td>
+            </tr>
+            <tr>
+                <th>Reporting Manager</th>
+                <td>{{reportingTo}}</td>
+            </tr>
+            <tr>
+                <th>Work Location</th>
+                <td>{{workLocation}}</td>
+            </tr>
+            {{#if probationPeriod}}
+            <tr>
+                <th>Probation Period</th>
+                <td>{{probationPeriod}}</td>
+            </tr>
+            {{/if}}
+        </table>
 
-        <div class="highlight">
-            <p><strong>Terms and Conditions:</strong></p>
-            <ul>
+        <div class="terms-section">
+            <div class="terms-title">Terms and Conditions</div>
+            <ol class="terms-list">
                 <li>You will be governed by the rules, regulations, and policies of the company as amended from time to time.</li>
                 <li>You are required to maintain confidentiality of all company information and data.</li>
                 <li>Your employment is subject to satisfactory completion of probation period{{#if probationPeriod}} of {{probationPeriod}}{{/if}}.</li>
                 <li>You will be required to give {{#if noticePeriod}}{{noticePeriod}}{{else}}30 days{{/if}} notice in writing before leaving the organization.</li>
                 <li>The company reserves the right to terminate your services with appropriate notice as per company policy.</li>
-            </ul>
+                <li>You will be entitled to benefits as per company policy including health insurance and paid leave.</li>
+            </ol>
         </div>
 
         <p>We welcome you to our organization and look forward to a long and mutually beneficial association.</p>
@@ -187,8 +202,8 @@
         <div class="signature-box">
             <div class="signature-line">
                 <strong>For {{companyName}}</strong><br>
-                Authorized Signatory<br>
-                HR Department
+                {{#if hrContactPerson}}{{hrContactPerson}}{{else}}HR Manager{{/if}}<br>
+                Human Resources
             </div>
         </div>
         <div class="signature-box">
@@ -202,7 +217,7 @@
 
     <div class="footer">
         <p>This is a computer-generated document and does not require a physical signature.</p>
-        <p>Generated on {{currentDate}} | {{companyName}} - Professional Document System</p>
+        <p>{{companyName}} - Professional Document System</p>
     </div>
 </body>
 </html>
