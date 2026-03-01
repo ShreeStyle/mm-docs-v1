@@ -1,6 +1,7 @@
 // src/app.js
 const express = require("express");
 const cors = require("cors");
+const path = require("path");
 const app = express();
 
 // Middlewares
@@ -11,6 +12,9 @@ app.use(cors({
   optionsSuccessStatus: 200
 }));
 app.use(express.json());
+
+// Serve static files for uploads
+app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
 
 // Debug middleware to log all requests
 app.use((req, res, next) => {
@@ -27,6 +31,7 @@ const publicRoutes = require("./routes/publicRoutes");
 const onboardingRoutes = require("./routes/onboardingRoutes");
 const templateRoutes = require("./routes/templateRoutes");
 const paymentRoutes = require("./routes/paymentRoutes");
+const subscriptionRoutes = require("./routes/subscriptionRoutes");
 
 app.use("/api/users", userRoutes);
 app.use("/api/auth", authRoutes);
@@ -37,6 +42,7 @@ app.use("/api/public", publicRoutes);
 app.use("/api/onboarding", onboardingRoutes);
 app.use("/api/templates", templateRoutes);
 app.use("/api/payments", paymentRoutes);
+app.use("/api/subscriptions", subscriptionRoutes);
 
 // Health Check API
 app.get("/api/health", (req, res) => {

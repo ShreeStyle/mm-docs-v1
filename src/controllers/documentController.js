@@ -24,8 +24,9 @@ exports.downloadDocument = async (req, res) => {
         // Render HTML
         const html = await renderService.renderDocument(document, brandKit);
 
-        // Generate PDF
-        const pdf = await pdfService.generatePDF(html);
+        // Generate PDF with user context for watermarking
+        const user = req.userModel; // From subscription middleware
+        const pdf = await pdfService.generatePDF(html, user);
 
         // Send as download
         const filename = `${document.title.replace(/[^a-z0-9]/gi, '_')}.pdf`;
@@ -115,6 +116,13 @@ exports.createDocument = async (req, res) => {
             content,
             brandKitId,
         });
+
+        // Increment document count
+        const user = req.userModel;
+        user.documentsGeneratedThisMonth = (user.documentsGeneratedThisMonth || 0) + 1;
+        await user.save();
+
+        console.log(`📊 Document count for ${user.email}: ${user.documentsGeneratedThisMonth}`);
 
         res.status(201).json(document);
     } catch (error) {
@@ -224,11 +232,27 @@ exports.generateDocument = async (req, res) => {
 
         console.log(`✅ Document saved with ID: ${document._id}`);
 
+        // Increment document count
+        const user = req.userModel;
+        user.documentsGeneratedThisMonth = (user.documentsGeneratedThisMonth || 0) + 1;
+        await user.save();
+
+        console.log(`📊 Document count for ${user.email}: ${user.documentsGeneratedThisMonth}`);
+
+        // Get remaining documents for this month
+        const { canGenerateDocument } = require("../config/plans");
+        const limitInfo = canGenerateDocument(user);
+
         res.status(201).json({
             success: true,
             message: "Document generated and saved successfully! 🎉",
             document,
             previewUrl: `/api/documents/${document._id}/preview`,
+            usage: {
+                documentsUsed: user.documentsGeneratedThisMonth,
+                documentsRemaining: limitInfo.remaining,
+                limit: limitInfo.limit,
+            },
         });
 
     } catch (error) {

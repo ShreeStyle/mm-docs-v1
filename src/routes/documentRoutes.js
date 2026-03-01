@@ -25,17 +25,30 @@ const {
     sendDocumentEmail,
 } = require("../controllers/emailController");
 const authMiddleware = require("../middleware/authMiddleware");
+const {
+    checkSubscription,
+    checkDocumentLimit,
+    checkExportAccess,
+} = require("../middleware/subscriptionMiddleware");
 
-// All routes are protected
+// All routes are protected and check subscription
 router.use(authMiddleware);
+router.use(checkSubscription);
 
-router.post("/", createDocument);
-router.post("/generate", generateDocument);
+// Document generation with limit check
+router.post("/", checkDocumentLimit, createDocument);
+router.post("/generate", checkDocumentLimit, generateDocument);
+
+// Document listing and viewing (no limits)
 router.get("/", getDocuments);
 router.get("/:id", getDocumentById);
 router.get("/:id/preview", renderDocument);
-router.get("/:id/download", downloadDocument);
-router.get("/:id/download-docx", downloadDocumentDocx);
+
+// Export routes with format checks
+router.get("/:id/download", checkExportAccess("pdf"), downloadDocument);
+router.get("/:id/download-docx", checkExportAccess("docx"), downloadDocumentDocx);
+
+// Other document operations
 router.post("/:id/share", createShareLink);
 router.get("/:id/analytics", getDocumentAnalytics);
 router.delete("/:id/share", deactivateShareLink);

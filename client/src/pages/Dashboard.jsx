@@ -3787,7 +3787,6 @@ HR Department
             case 'compliance-center': // Renamed to avoid collision with category
                 return <ComplianceCenterPage />;
             case 'users':
-            case 'settings':
                 return (
                     <div style={{
                         padding: '32px',
@@ -3804,6 +3803,151 @@ HR Department
                             {currentView.charAt(0).toUpperCase() + currentView.slice(1)} Page
                         </h3>
                         <p style={{ fontSize: '16px', margin: 0 }}>This section is under development</p>
+                    </div>
+                );
+            case 'settings':
+                return (
+                    <div style={{ padding: '32px', maxWidth: '1200px' }}>
+                        <div style={{ marginBottom: '32px' }}>
+                            <h2 style={{ fontSize: '28px', fontWeight: '700', color: '#111827', marginBottom: '8px' }}>
+                                Settings
+                            </h2>
+                            <p style={{ fontSize: '16px', color: '#6B7280' }}>
+                                Manage your account and application preferences
+                            </p>
+                        </div>
+                        
+                        <div style={{ 
+                            display: 'grid', 
+                            gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))',
+                            gap: '24px'
+                        }}>
+                            {/* Brand Settings Card */}
+                            <motion.div
+                                whileHover={{ y: -4, boxShadow: '0 12px 24px rgba(0,0,0,0.12)' }}
+                                onClick={() => navigate('/settings/brand')}
+                                style={{
+                                    background: 'white',
+                                    borderRadius: '12px',
+                                    padding: '24px',
+                                    boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
+                                    cursor: 'pointer',
+                                    transition: 'all 0.3s ease'
+                                }}
+                            >
+                                <div style={{ 
+                                    width: '48px', 
+                                    height: '48px', 
+                                    borderRadius: '12px',
+                                    background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    marginBottom: '16px'
+                                }}>
+                                    <span style={{ fontSize: '24px' }}>🎨</span>
+                                </div>
+                                <h3 style={{ fontSize: '18px', fontWeight: '600', color: '#111827', marginBottom: '8px' }}>
+                                    Brand Kit
+                                </h3>
+                                <p style={{ fontSize: '14px', color: '#6B7280', lineHeight: '1.5' }}>
+                                    Customize your brand colors, logo, fonts, and footer details for all documents
+                                </p>
+                                <div style={{ 
+                                    marginTop: '16px', 
+                                    color: '#667eea',
+                                    fontSize: '14px',
+                                    fontWeight: '600',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    gap: '4px'
+                                }}>
+                                    Configure Branding <ChevronRight size={16} />
+                                </div>
+                            </motion.div>
+                            
+                            {/* Account Settings Card */}
+                            <motion.div
+                                whileHover={{ y: -4, boxShadow: '0 12px 24px rgba(0,0,0,0.12)' }}
+                                style={{
+                                    background: 'white',
+                                    borderRadius: '12px',
+                                    padding: '24px',
+                                    boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
+                                    cursor: 'pointer',
+                                    transition: 'all 0.3s ease',
+                                    opacity: 0.6
+                                }}
+                            >
+                                <div style={{ 
+                                    width: '48px', 
+                                    height: '48px', 
+                                    borderRadius: '12px',
+                                    background: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    marginBottom: '16px'
+                                }}>
+                                    <User size={24} color="white" />
+                                </div>
+                                <h3 style={{ fontSize: '18px', fontWeight: '600', color: '#111827', marginBottom: '8px' }}>
+                                    Account Settings
+                                </h3>
+                                <p style={{ fontSize: '14px', color: '#6B7280', lineHeight: '1.5' }}>
+                                    Manage your profile, email, password, and account preferences
+                                </p>
+                                <div style={{ 
+                                    marginTop: '16px', 
+                                    color: '#9CA3AF',
+                                    fontSize: '14px',
+                                    fontWeight: '600'
+                                }}>
+                                    Coming Soon
+                                </div>
+                            </motion.div>
+                            
+                            {/* Notifications Card */}
+                            <motion.div
+                                whileHover={{ y: -4, boxShadow: '0 12px 24px rgba(0,0,0,0.12)' }}
+                                style={{
+                                    background: 'white',
+                                    borderRadius: '12px',
+                                    padding: '24px',
+                                    boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
+                                    cursor: 'pointer',
+                                    transition: 'all 0.3s ease',
+                                    opacity: 0.6
+                                }}
+                            >
+                                <div style={{ 
+                                    width: '48px', 
+                                    height: '48px', 
+                                    borderRadius: '12px',
+                                    background: 'linear-gradient(135deg, #fa709a 0%, #fee140 100%)',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    marginBottom: '16px'
+                                }}>
+                                    <Bell size={24} color="white" />
+                                </div>
+                                <h3 style={{ fontSize: '18px', fontWeight: '600', color: '#111827', marginBottom: '8px' }}>
+                                    Notifications
+                                </h3>
+                                <p style={{ fontSize: '14px', color: '#6B7280', lineHeight: '1.5' }}>
+                                    Configure email and in-app notification preferences
+                                </p>
+                                <div style={{ 
+                                    marginTop: '16px', 
+                                    color: '#9CA3AF',
+                                    fontSize: '14px',
+                                    fontWeight: '600'
+                                }}>
+                                    Coming Soon
+                                </div>
+                            </motion.div>
+                        </div>
                     </div>
                 );
             default:

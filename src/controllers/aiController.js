@@ -1,6 +1,8 @@
 const { generateContent } = require("../services/ai/aiService");
 const BrandKit = require("../models/BrandKit");
 const Document = require("../models/Document");
+const User = require("../models/User");
+const { getAIQuality } = require("../config/plans");
 
 exports.generateDocumentContent = async (req, res) => {
     try {
@@ -11,14 +13,41 @@ exports.generateDocumentContent = async (req, res) => {
             return res.status(400).json({ message: "Type and Topic are required" });
         }
 
-        // Fetch user's brand kit
+        // Get user's subscription for AI quality
+        const user = await User.findById(userId);
+        const aiQuality = getAIQuality(user);
+        console.log(`⚡ Using ${aiQuality} AI quality for user ${userId}`);
+
+        // Fetch user's complete brand kit with all fields
         const brandKit = await BrandKit.findOne({ userId });
         const brandContext = brandKit
-            ? { name: brandKit.name, tone: "Professional", description: brandKit.description, logo: brandKit.logo }
-            : { name: "Generic", tone: "Neutral" };
+            ? {
+                name: brandKit.brandName || brandKit.name || "Your Company",
+                tone: "Strictly Professional and Formal",
+                description: brandKit.description || "",
+                logo: brandKit.logo || "",
+                primaryColor: brandKit.primaryColor || "#1e40af",
+                secondaryColor: brandKit.secondaryColor || "#64748b",
+                accentColor: brandKit.accentColor || "#3b82f6",
+                fontFamily: brandKit.fontFamily || "Inter",
+                footer: brandKit.footer || {},
+                website: brandKit.footer?.website || "",
+                email: brandKit.footer?.email || "",
+                phone: brandKit.footer?.phone || "",
+                address: brandKit.footer?.address || "",
+                customText: brandKit.footer?.customText || ""
+              }
+            : {
+                name: "Generic",
+                tone: "Strictly Professional and Formal",
+                primaryColor: "#1e40af",
+                secondaryColor: "#64748b",
+                accentColor: "#3b82f6",
+                fontFamily: "Inter"
+              };
 
         // Generate Content via AI Service
-        const content = await generateContent(type, topic, brandContext);
+        const content = await generateContent(type, topic, brandContext, {}, aiQuality);
 
         res.json({
             message: "Content generated successfully ✨",
@@ -49,18 +78,45 @@ exports.generateAndSaveDocument = async (req, res) => {
             return res.status(400).json({ message: "Type and Topic are required" });
         }
 
-        // Fetch user's brand kit
+        // Get user's subscription for AI quality
+        const user = await User.findById(userId);
+        const aiQuality = getAIQuality(user);
+        console.log(`⚡ Using ${aiQuality} AI quality for user ${userId}`);
+
+        // Fetch user's complete brand kit with all fields
         console.log("🔍 Fetching brand kit...");
         const brandKit = await BrandKit.findOne({ userId });
         console.log(`🎨 Brand kit found: ${brandKit ? 'Yes' : 'No'}`);
         
         const brandContext = brandKit
-            ? { name: brandKit.name, tone: "Professional", description: brandKit.description, logo: brandKit.logo }
-            : { name: "Generic", tone: "Neutral" };
+            ? {
+                name: brandKit.brandName || brandKit.name || "Your Company",
+                tone: "Strictly Professional and Formal",
+                description: brandKit.description || "",
+                logo: brandKit.logo || "",
+                primaryColor: brandKit.primaryColor || "#1e40af",
+                secondaryColor: brandKit.secondaryColor || "#64748b",
+                accentColor: brandKit.accentColor || "#3b82f6",
+                fontFamily: brandKit.fontFamily || "Inter",
+                footer: brandKit.footer || {},
+                website: brandKit.footer?.website || "",
+                email: brandKit.footer?.email || "",
+                phone: brandKit.footer?.phone || "",
+                address: brandKit.footer?.address || "",
+                customText: brandKit.footer?.customText || ""
+              }
+            : {
+                name: "Generic",
+                tone: "Strictly Professional and Formal",
+                primaryColor: "#1e40af",
+                secondaryColor: "#64748b",
+                accentColor: "#3b82f6",
+                fontFamily: "Inter"
+              };
 
         // Generate AI content
         console.log(`🤖 Generating ${type} for: ${topic}`);
-        const content = await generateContent(type, topic, brandContext);
+        const content = await generateContent(type, topic, brandContext, {}, aiQuality);
         console.log(`✅ AI content generated successfully`);
 
         // Auto-generate title if not provided

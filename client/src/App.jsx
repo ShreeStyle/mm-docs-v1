@@ -7,6 +7,7 @@ import Signup from './pages/Signup';
 import Dashboard from './pages/Dashboard';
 import TemplatesPage from './pages/TemplatesPage';
 import CreateDocument from './pages/CreateDocument';
+import BrandSettings from './pages/BrandSettings';
 import './styles/Dashboard.css';
 
 function App() {
@@ -21,6 +22,7 @@ function App() {
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/dashboard/templates" element={<TemplatesPage />} />
           <Route path="/dashboard/create-document/:templateId" element={<CreateDocument />} />
+          <Route path="/settings/brand" element={<BrandSettings />} />
         </Routes>
       </Router>
     </AuthProvider>

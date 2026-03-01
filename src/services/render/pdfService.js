@@ -1,9 +1,16 @@
 const puppeteer = require("puppeteer");
+const { injectWatermark } = require("../watermark/watermarkService");
 
-exports.generatePDF = async (html) => {
+exports.generatePDF = async (html, user = null) => {
     let browser;
     try {
         console.log("🖨️ Generating PDF...");
+
+        // Inject watermark if user is on free plan
+        if (user) {
+            html = injectWatermark(html, user);
+            console.log(`📄 Watermark ${user.plan === 'free' ? 'added' : 'not needed'} for ${user.email || 'user'}`);
+        }
 
         browser = await puppeteer.launch({
             headless: true,

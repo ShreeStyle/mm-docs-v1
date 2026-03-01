@@ -16,31 +16,42 @@ const openai = new OpenAI({
   } : undefined
 });
 
-const generateContent = async (type, topic, brandContext, providedData = {}) => {
+const generateContent = async (type, topic, brandContext, providedData = {}, aiQuality = "basic") => {
   console.log(`🤖 AI Generating content for: ${type} - ${topic}`);
   console.log(`🎨 Brand Context: ${JSON.stringify(brandContext)}`);
   console.log(`📋 Provided Data: ${JSON.stringify(providedData)}`);
+  console.log(`⚡ AI Quality: ${aiQuality}`);
 
   try {
     let systemPrompt = `You are MM Docs, an elite AI Business Document SaaS by MediaaMasala.
+
+CRITICAL TONE REQUIREMENT:
+🔴 MANDATORY: ALL generated content MUST be STRICTLY PROFESSIONAL, FORMAL, and BUSINESS-APPROPRIATE.
+🔴 NEVER use casual, conversational, or informal language.
+🔴 NEVER use phrases like "Hey", "Cool", "Awesome", "Great", or any colloquialisms.
+🔴 Every sentence must sound like it was written by a professional business executive or legal expert.
+🔴 Maintain corporate-level polish, structured formatting, and authoritative tone throughout.
+🔴 Use formal greetings ("Dear"), formal closings ("Sincerely", "Best regards"), and business-standard language.
+🔴 Documents should feel like they were drafted by a Fortune 500 legal/HR/finance department.
 
 Your role:
 - Generate highly detailed, comprehensive, and professional business documents
 - Never generate short, sparse, or brief documents; produce extensive and deep content
 - Follow structured business formats meticulously
-- Use clear, confident, sophisticated, human language
-- Ensure documents are client-ready, persuasive, and thorough
+- Use clear, confident, sophisticated, FORMAL business language
+- Ensure documents are client-ready, persuasive, legally appropriate, and thorough
 - Parse the provided structured input data carefully and use ALL provided information
 - PRIORITIZE PROVIDED FORM DATA over any generated placeholders or topic-based guesses
+- Intelligently select the correct document structure based on template type
 
 DOCUMENT CATEGORIES YOU SUPPORT:
-- HR & Employee Documents: Offer Letters, Appointment Letters, Experience Certificates
-- Legal & Compliance: NDAs, Service Agreements, Terms of Service, Privacy Policies
+- HR & Employee Documents: Offer Letters, Appointment Letters, Experience Certificates, Warning Letters
+- Legal & Compliance: NDAs, Service Agreements, Terms of Service, Privacy Policies, Data Processing Agreements
 - Sales & Business: Proposals, Quotations, Sales Contracts, Partnership Agreements  
-- Finance & Accounting: Invoices, Purchase Orders, Receipts, GST Invoices
-- Tax & Regulatory: GST Filings, Audit Reports, Policy Documents
-- Marketing & Communications: Sales Emails, Marketing Briefs, Company Profiles
-- Strategic Documents: Pitch Decks, Business Plans, Investment Proposals
+- Finance & Accounting: Invoices, Purchase Orders, Receipts, GST Invoices, Credit Notes
+- Tax & Regulatory: GST Filings, Audit Reports, Compliance Certificates, Policy Documents
+- Marketing & Communications: Professional Business Emails, Marketing Briefs, Company Profiles
+- Strategic Documents: Business Plans, Investment Proposals, Executive Summaries
 
 CRITICAL: When you receive structured input data (Employee: John | Position: Manager | etc.) OR provided form data (candidateName, salary, etc.), 
 use each piece of information appropriately in the document. Do not ignore any provided details.
@@ -48,20 +59,32 @@ If a value is provided in 'providedData', use it EXACTLY as is.
 
 Quality standards:
 - Deeply logical structure with extensive elaboration per section
-- Assertive, highly professional tone
+- Assertive, highly professional, formal tone (NOT casual)
 - No unnecessary fluff, but rich with professional context and strategy
-- No emojis
+- No emojis, no casual language, no informal expressions
 - No legal guarantees
+- Every section must maintain business-appropriate formality
 
-Branding:
+BRAND KIT INTEGRATION:
+The following brand identity MUST be reflected in all documents:
 - Company Name: ${brandContext.name}
-- Tone: ${brandContext.tone || "Deeply Professional and Strategic"}
+- Tone: ${brandContext.tone || "Strictly Professional and Formal"}
 - Context: ${brandContext.description || "N/A"}
+- Primary Brand Color: ${brandContext.primaryColor || "#1e40af"}
+- Secondary Color: ${brandContext.secondaryColor || "#64748b"}
+- Accent Color: ${brandContext.accentColor || "#3b82f6"}
+- Brand Font: ${brandContext.fontFamily || "Inter"}
+${brandContext.website ? `- Company Website: ${brandContext.website}` : ''}
+${brandContext.email ? `- Company Email: ${brandContext.email}` : ''}
+${brandContext.phone ? `- Company Phone: ${brandContext.phone}` : ''}
+${brandContext.address ? `- Company Address: ${brandContext.address}` : ''}
 
-You act as an expert document generator, not a chatbot.
-Do not explain what you are doing.
-Do not include commentary.
-Return ONLY valid, richly detailed JSON document content.`;
+Use the company name, contact details, and brand context naturally throughout the document.
+When generating addresses or contact sections, use the Brand Kit information provided above.
+
+REMINDER: You act as an expert professional document generator, NOT a chatbot.
+Do not explain what you are doing. Do not include commentary.
+Return ONLY valid, richly detailed, FORMALLY WRITTEN JSON document content.`;
 
     let userPrompt = "";
 
@@ -124,11 +147,18 @@ Return ONLY valid, richly detailed JSON document content.`;
       const context = { ...providedData, ...inputData };
       console.log(`📋 Consolidated context for proposal:`, context);
 
-      userPrompt = `Create a massive, highly detailed, deeply professional Business Proposal using the following context:
+      userPrompt = `Create a HIGHLY PROFESSIONAL, FORMALLY STRUCTURED Business Proposal using the following context:
       
       CONTEXT DATA:
       ${JSON.stringify(context, null, 2)}
 
+      TONE REQUIREMENT: This is a professional business proposal. Use STRICTLY FORMAL, EXECUTIVE-LEVEL language.
+      - Write as if presenting to C-level executives or board members
+      - Use sophisticated business terminology and strategic language
+      - Maintain corporate polish and authoritative tone throughout
+      - NO casual expressions, NO informal language
+      - Every section should sound like a professional consultant wrote it
+      
       Use the context data provided to fill in specific details.
       Return ONLY valid JSON with this exact structure:
       {
@@ -158,11 +188,17 @@ Return ONLY valid, richly detailed JSON document content.`;
       const context = { ...providedData, ...inputData };
       console.log(`📋 Consolidated context for quotation:`, context);
 
-      userPrompt = `Generate a highly detailed and professional Quotation using the following context:
+      userPrompt = `Generate a HIGHLY PROFESSIONAL, BUSINESS-STANDARD Quotation using the following context:
       
       CONTEXT DATA:
       ${JSON.stringify(context, null, 2)}
 
+      TONE REQUIREMENT: This is a formal business quotation. Use PROFESSIONAL, FORMAL language.
+      - Write as if from an established business
+      - Use formal business terms and structured formatting
+      - Maintain professional tone in all descriptions
+      - NO casual language
+      
       PRIORITY: If 'items' array is provided in CONTEXT DATA, use it exactly.
       Return ONLY valid JSON with this structure:
       {
@@ -194,10 +230,18 @@ Return ONLY valid, richly detailed JSON document content.`;
       const context = { ...providedData, ...inputData };
       console.log(`📋 Consolidated context for profile:`, context);
 
-      userPrompt = `Create a highly professional, Corporate Style Company Profile for an entity solving: "${topic}".
+      userPrompt = `Create a PROFESSIONALLY STRUCTURED, CORPORATE-LEVEL Company Profile using the following context:
       
       CONTEXT DATA:
       ${JSON.stringify(context, null, 2)}
+
+      TONE REQUIREMENT: This is an official corporate profile. Use FORMAL, PROFESSIONAL language.
+      - Write as if creating an official company document
+      - Use sophisticated business language and structured formatting
+      - Maintain authoritative, corporate tone throughout
+      - NO casual language
+      
+      Return ONLY valid JSON with this exact structure:
 
       Return ONLY valid JSON with this exact structure:
       {
@@ -225,11 +269,18 @@ Return ONLY valid, richly detailed JSON document content.`;
       const context = { ...providedData, ...inputData };
       console.log(`📋 Consolidated context for marketing_brief/email:`, context);
 
-      userPrompt = `Write a deeply persuasive, highly professional, and robust B2B Sales Email/Brief for: "${topic}".
+      userPrompt = `Write a PROFESSIONALLY PERSUASIVE, BUSINESS-FORMAL Marketing Brief or B2B Email using the following context:
       
       CONTEXT DATA:
       ${JSON.stringify(context, null, 2)}
 
+      TONE REQUIREMENT: This is a professional B2B business communication. Use PERSUASIVE yet FORMAL language.
+      - Write as if from a senior business development executive
+      - Use sophisticated business terminology and strategic language
+      - Balance persuasive tone with professional formality
+      - NO casual expressions, NO overly friendly language
+      - Maintain executive-level polish throughout
+      
       Return ONLY valid JSON with this exact structure:
       {
         "subject": "${context.subject || 'Strategic Alignment Opportunity'}",
@@ -254,11 +305,18 @@ Return ONLY valid, richly detailed JSON document content.`;
       const context = { ...providedData, ...inputData };
       console.log(`📋 Consolidated context for resume:`, context);
 
-      userPrompt = `Create a comprehensive professional resume using the following context:
+      userPrompt = `Create a PROFESSIONALLY STRUCTURED, EXECUTIVE-QUALITY Resume using the following context:
       
       CONTEXT DATA:
       ${JSON.stringify(context, null, 2)}
 
+      TONE REQUIREMENT: This is a professional resume/CV. Use FORMAL, PROFESSIONAL language.
+      - Write as if crafted by a professional career consultant
+      - Use sophisticated professional terminology and achievement-focused language
+      - Maintain polished, executive-level tone throughout
+      - Focus on quantifiable achievements and professional accomplishments
+      - NO casual language, NO first-person informal expressions
+      
       Return ONLY valid JSON with this exact structure:
       {
         "personalInfo": { 
@@ -298,11 +356,18 @@ Return ONLY valid, richly detailed JSON document content.`;
       const context = { ...providedData, ...inputData };
       console.log(`📋 Consolidated context for offer_letter:`, context);
 
-      userPrompt = `Generate a formal, comprehensive Employment Offer Letter using the following context:
+      userPrompt = `Generate a STRICTLY FORMAL, HIGHLY PROFESSIONAL Employment Offer Letter using the following context:
       
       CONTEXT DATA:
       ${JSON.stringify(context, null, 2)}
 
+      TONE REQUIREMENT: This is an official employment offer letter. Use FORMAL, PROFESSIONAL language throughout.
+      - Use "Dear [Candidate Name]" as the greeting
+      - Maintain corporate, business-appropriate tone in every sentence
+      - Use formal closings like "Sincerely" or "Best regards"
+      - Write as if this is being sent by a Fortune 500 HR department
+      - NO casual language, NO informal expressions
+      
       Use the context data provided to fill in specific details. If any information is missing, use professional placeholders.
       DO NOT USE GENERIC PLACEHOLDERS like "[Candidate Name]" if a name is provided in the context above.
 
@@ -342,11 +407,18 @@ Return ONLY valid, richly detailed JSON document content.`;
       const context = { ...providedData, ...inputData };
       console.log(`📋 Consolidated context for appointment_letter:`, context);
 
-      userPrompt = `Generate a formal, comprehensive Appointment Letter using the following context:
+      userPrompt = `Generate a STRICTLY FORMAL, PROFESSIONALLY STRUCTURED Appointment Letter using the following context:
       
       CONTEXT DATA:
       ${JSON.stringify(context, null, 2)}
 
+      TONE REQUIREMENT: This is an official appointment letter. Use FORMAL, CORPORATE-LEVEL language throughout.
+      - Use "Dear [Employee Name]" as the greeting
+      - Write as if issued by a professional HR department
+      - Maintain authoritative, business-appropriate tone in every sentence
+      - Use formal business language and structured formatting
+      - NO casual language, NO informal expressions
+      
       Use the context data provided to fill in specific details. If any information is missing, use professional placeholders.
       DO NOT USE GENERIC PLACEHOLDERS like "[Employee Name]" if a name is provided in the context above.
 
@@ -391,11 +463,17 @@ Return ONLY valid, richly detailed JSON document content.`;
       const context = { ...providedData, ...inputData };
       console.log(`📋 Consolidated context for experience_certificate:`, context);
 
-      userPrompt = `Generate a professional, comprehensive Experience Certificate using the following context:
+      userPrompt = `Generate a PROFESSIONAL, BUSINESS-CERTIFIED Experience Certificate using the following context:
       
       CONTEXT DATA:
       ${JSON.stringify(context, null, 2)}
 
+      TONE REQUIREMENT: This is an official employment certificate. Use FORMAL, PROFESSIONAL language.
+      - Write as if issued by a corporate HR department
+      - Use formal business terminology and structured formatting
+      - Maintain authoritative, professional tone throughout
+      - NO casual language whatsoever
+      
       Use the context data provided to fill in specific details. If any information is missing, use professional placeholders.
       DO NOT USE GENERIC PLACEHOLDERS like "[Employee Name]" if a name is provided in the context above.
 
@@ -430,11 +508,17 @@ Return ONLY valid, richly detailed JSON document content.`;
       const context = { ...providedData, ...inputData };
       console.log(`📋 Consolidated context for onboarding_letter:`, context);
 
-      userPrompt = `Generate a warm, professional Employee Onboarding Letter using the following context:
+      userPrompt = `Generate a PROFESSIONALLY STRUCTURED, BUSINESS-FORMAL Onboarding Letter using the following context:
       
       CONTEXT DATA:
       ${JSON.stringify(context, null, 2)}
 
+      TONE REQUIREMENT: This is an official onboarding welcome letter. Use WARM yet PROFESSIONAL language.
+      - Balance welcoming tone with professional formality
+      - Write as if from a professional HR team
+      - Use formal business language while being welcoming
+      - NO overly casual expressions
+      
       Use the context data provided to fill in specific details.
       Return ONLY valid JSON with this structure:
       {
@@ -469,11 +553,17 @@ Return ONLY valid, richly detailed JSON document content.`;
       const context = { ...providedData, ...inputData };
       console.log(`📋 Consolidated context for warning_letter:`, context);
 
-      userPrompt = `Generate a formal Employee Warning Letter using the following context:
+      userPrompt = `Generate a STRICTLY FORMAL, LEGALLY APPROPRIATE Warning Letter using the following context:
       
       CONTEXT DATA:
       ${JSON.stringify(context, null, 2)}
 
+      TONE REQUIREMENT: This is a formal disciplinary document. Use STRICTLY FORMAL, AUTHORITATIVE language.
+      - Write as if from a corporate HR/legal department
+      - Use formal, serious tone appropriate for disciplinary action
+      - Maintain professional, legally sound language throughout
+      - NO casual language whatsoever
+      
       Use the context data provided to fill in specific details. If any information is missing, use professional placeholders.
       DO NOT USE GENERIC PLACEHOLDERS like "[Employee Name]" if a name is provided in the context above.
 
@@ -510,11 +600,17 @@ Return ONLY valid, richly detailed JSON document content.`;
       const context = { ...providedData, ...inputData };
       console.log(`📋 Consolidated context for nda:`, context);
 
-      userPrompt = `Generate a comprehensive Non-Disclosure Agreement using the following context:
+      userPrompt = `Generate a LEGALLY PROFESSIONAL, FORMALLY STRUCTURED Non-Disclosure Agreement using the following context:
       
       CONTEXT DATA:
       ${JSON.stringify(context, null, 2)}
 
+      TONE REQUIREMENT: This is a legal contract. Use STRICTLY FORMAL, LEGALLY APPROPRIATE language.
+      - Write as if drafted by a corporate legal department
+      - Use formal legal terminology and structured clauses
+      - Maintain authoritative, professional tone throughout
+      - NO casual language whatsoever
+      
       Use the context data provided to fill in specific details.
       Return ONLY valid JSON with this structure:
       {
@@ -543,11 +639,17 @@ Return ONLY valid, richly detailed JSON document content.`;
       const context = { ...providedData, ...inputData };
       console.log(`📋 Consolidated context for service_agreement:`, context);
 
-      userPrompt = `Generate a comprehensive Service Agreement using the following context:
+      userPrompt = `Generate a LEGALLY PROFESSIONAL, FORMALLY STRUCTURED Service Agreement using the following context:
       
       CONTEXT DATA:
       ${JSON.stringify(context, null, 2)}
 
+      TONE REQUIREMENT: This is a legal service contract. Use STRICTLY FORMAL, LEGALLY APPROPRIATE language.
+      - Write as if drafted by a corporate legal team
+      - Use formal contract terminology and structured clauses
+      - Maintain authoritative, professional tone throughout
+      - NO casual language whatsoever
+      
       Use the context data provided to fill in specific details.
       Return ONLY valid JSON with this structure:
       {
@@ -576,11 +678,17 @@ Return ONLY valid, richly detailed JSON document content.`;
       const context = { ...providedData, ...inputData };
       console.log(`📋 Consolidated context for mou:`, context);
 
-      userPrompt = `Generate a Memorandum of Understanding using the following context:
+      userPrompt = `Generate a LEGALLY FORMAL, PROFESSIONALLY BINDING Memorandum of Understanding using the following context:
       
       CONTEXT DATA:
       ${JSON.stringify(context, null, 2)}
 
+      TONE REQUIREMENT: This is a formal legal agreement. Use STRICTLY FORMAL, LEGALLY APPROPRIATE language.
+      - Write as if drafted by corporate legal counsel
+      - Use formal legal terminology and structured format
+      - Maintain authoritative, professional tone throughout
+      - NO casual language whatsoever
+      
       Return ONLY valid JSON with this structure:
       {
         "title": "Memorandum of Understanding (MOU)",
@@ -607,11 +715,17 @@ Return ONLY valid, richly detailed JSON document content.`;
       const context = { ...providedData, ...inputData };
       console.log(`📋 Consolidated context for invoice:`, context);
 
-      userPrompt = `Generate a professional, detailed Invoice using the following context:
+      userPrompt = `Generate a PROFESSIONAL, BUSINESS-STANDARD Invoice using the following context:
       
       CONTEXT DATA:
       ${JSON.stringify(context, null, 2)}
 
+      TONE REQUIREMENT: This is a formal business invoice. Use PROFESSIONAL, FORMAL language.
+      - Write professionally as if from an established business
+      - Use formal business terms and structured formatting
+      - Maintain professional tone in all descriptions and notes
+      - NO casual language
+      
       PRIORITY: If 'items' array is provided in CONTEXT DATA, use it exactly.
       If 'clientName' or 'customerName' is provided, use it for the 'to' section.
 
@@ -658,11 +772,17 @@ Return ONLY valid, richly detailed JSON document content.`;
       const context = { ...providedData, ...inputData };
       console.log(`📋 Consolidated context for purchase_order:`, context);
 
-      userPrompt = `Generate a professional Purchase Order using the following context:
+      userPrompt = `Generate a PROFESSIONALLY FORMATTED, BUSINESS-STANDARD Purchase Order using the following context:
       
       CONTEXT DATA:
       ${JSON.stringify(context, null, 2)}
 
+      TONE REQUIREMENT: This is an official procurement document. Use FORMAL, PROFESSIONAL language.
+      - Write as if issued by a corporate procurement department
+      - Use formal business terms and structured formatting
+      - Maintain professional, authoritative tone throughout
+      - NO casual language
+      
       PRIORITY: If 'items' array is provided in CONTEXT DATA, use it exactly.
       If 'supplierName' is provided, use it.
 
@@ -702,11 +822,18 @@ Return ONLY valid, richly detailed JSON document content.`;
       const context = { ...providedData, ...inputData };
       console.log(`📋 Consolidated context for gst_invoice:`, context);
 
-      userPrompt = `Generate a GST-compliant Tax Invoice using the following context:
+      userPrompt = `Generate a LEGALLY COMPLIANT, PROFESSIONALLY STRUCTURED GST Tax Invoice using the following context:
       
       CONTEXT DATA:
       ${JSON.stringify(context, null, 2)}
 
+      TONE REQUIREMENT: This is an official tax invoice document. Use STRICTLY FORMAL, REGULATORY-COMPLIANT language.
+      - Write as if issued by a professional accounting department
+      - Use formal tax and accounting terminology
+      - Maintain professional, legally compliant tone throughout
+      - Ensure GST compliance standards are reflected
+      - NO casual language whatsoever
+      
       PRIORITY: If 'items' array is provided, use it. Include GST calculation (CGST/SGST/IGST).
 
       Return ONLY valid JSON with this structure:
@@ -753,11 +880,17 @@ Return ONLY valid, richly detailed JSON document content.`;
       const context = { ...providedData, ...inputData };
       console.log(`📋 Consolidated context for compliance_certificate:`, context);
 
-      userPrompt = `Generate a formal Compliance Certificate using the following context:
+      userPrompt = `Generate a REGULATORY-COMPLIANT, PROFESSIONALLY CERTIFIED Compliance Certificate using the following context:
       
       CONTEXT DATA:
       ${JSON.stringify(context, null, 2)}
 
+      TONE REQUIREMENT: This is an official regulatory certificate. Use STRICTLY FORMAL, AUTHORITATIVE language.
+      - Write as if issued by a compliance/regulatory authority
+      - Use formal regulatory terminology and official certificate language
+      - Maintain authoritative, professional tone throughout
+      - NO casual language whatsoever
+      
       Return ONLY valid JSON with this structure:
       {
         "title": "Certificate of Compliance",
@@ -785,11 +918,17 @@ Return ONLY valid, richly detailed JSON document content.`;
       const context = { ...providedData, ...inputData };
       console.log(`📋 Consolidated context for dpa:`, context);
 
-      userPrompt = `Generate a formal Data Processing Agreement (DPA) using the following context:
+      userPrompt = `Generate a LEGALLY BINDING, GDPR-COMPLIANT Data Processing Agreement using the following context:
       
       CONTEXT DATA:
       ${JSON.stringify(context, null, 2)}
 
+      TONE REQUIREMENT: This is a formal legal data privacy agreement. Use STRICTLY FORMAL, LEGALLY PRECISE language.
+      - Write as if drafted by a data privacy legal team
+      - Use formal GDPR/data protection terminology
+      - Maintain authoritative, legally compliant tone throughout
+      - NO casual language whatsoever
+      
       Return ONLY valid JSON with this structure:
       {
         "title": "Data Processing Agreement",
@@ -805,7 +944,15 @@ Return ONLY valid, richly detailed JSON document content.`;
       }`;
 
     } else {
-      userPrompt = `Create a massive, highly detailed, deeply structured, hyper-professional Pitch Deck Outline for: "${topic}".
+      userPrompt = `Create a HIGHLY DETAILED, EXECUTIVE-LEVEL Strategic Document or Pitch Deck for: "${topic}".
+      
+      TONE REQUIREMENT: This is a strategic executive document. Use FORMAL, SOPHISTICATED BUSINESS language.
+      - Write as if presenting to investors, board members, or C-level executives
+      - Use sophisticated business terminology and strategic language
+      - Maintain corporate polish and authoritative tone throughout
+      - NO casual expressions, NO informal language
+      - Every section should sound like professional strategy consultants wrote it
+      
 The output must be extensive, providing intense strategic depth for investors or board members. Do NOT give brief pointers; provide full explanatory paragraphs for every slide section.
 
 Return ONLY valid JSON with this exact structure:
@@ -830,6 +977,10 @@ Return ONLY valid JSON with this exact structure:
     console.log(`📝 System prompt length: ${systemPrompt.length}`);
     console.log(`📝 User prompt length: ${userPrompt.length}`);
 
+    // Set max_tokens based on AI quality (Free: 2000, Pro: 8000)
+    const maxTokens = aiQuality === "premium" ? 8000 : 2000;
+    console.log(`🎯 Max tokens for ${aiQuality} quality: ${maxTokens}`);
+
     const response = await openai.chat.completions.create({
       model: isOpenRouter ? "openai/gpt-4o-mini" : "gpt-4o-mini",
       messages: [
@@ -837,7 +988,7 @@ Return ONLY valid JSON with this exact structure:
         { role: "user", content: userPrompt }
       ],
       temperature: 0.7,
-      max_tokens: 4096,
+      max_tokens: maxTokens,
       response_format: { type: "json_object" }
     });
 
