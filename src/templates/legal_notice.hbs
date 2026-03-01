@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Legal Notice</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, sans-serif;
+            line-height: 1.6;
+            color: #1f2937;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 48px 40px;
+            background: white;
+            font-size: 14px;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            padding-bottom: 28px;
+            margin-bottom: 36px;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .sender-info {
+            max-width: 320px;
+        }
+
+        .sender-name {
+            font-size: 18px;
+            font-weight: 700;
+            color: #111827;
+            margin-bottom: 4px;
+        }
+
+        .sender-detail {
+            font-size: 13px;
+            color: #4b5563;
+            line-height: 1.5;
+        }
+
+        .doc-badge {
+            text-align: right;
+        }
+
+        .doc-title {
+            font-size: 28px;
+            font-weight: 800;
+            color: #dc2626;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+        }
+
+        .doc-date {
+            font-size: 13px;
+            color: #6b7280;
+            margin-top: 4px;
+        }
+
+        .doc-date strong {
+            color: #111827;
+        }
+
+        .urgency-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 9999px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            background: #fef2f2;
+            color: #dc2626;
+            margin-top: 8px;
+        }
+
+        .via-section {
+            background: #fef2f2;
+            border-radius: 8px;
+            padding: 12px 20px;
+            margin-bottom: 28px;
+            font-size: 13px;
+            font-weight: 600;
+            color: #991b1b;
+            text-align: center;
+        }
+
+        .recipient {
+            margin-bottom: 28px;
+        }
+
+        .section-label {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            color: #6b7280;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .recipient-name {
+            font-size: 16px;
+            font-weight: 600;
+            color: #111827;
+            margin-bottom: 4px;
+        }
+
+        .recipient-addr {
+            font-size: 13px;
+            color: #4b5563;
+        }
+
+        .subject {
+            background: #fef2f2;
+            border-radius: 8px;
+            padding: 16px 20px;
+            border-left: 4px solid #ef4444;
+            margin-bottom: 28px;
+            font-weight: 600;
+            color: #991b1b;
+            font-size: 14px;
+        }
+
+        .content {
+            font-size: 14px;
+            color: #374151;
+            line-height: 1.8;
+            text-align: justify;
+        }
+
+        .content p {
+            margin-bottom: 16px;
+        }
+
+        .facts-section {
+            background: #f9fafb;
+            border-radius: 8px;
+            padding: 24px;
+            margin: 24px 0;
+        }
+
+        .facts-title {
+            font-size: 13px;
+            font-weight: 600;
+            color: #111827;
+            margin-bottom: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+
+        .facts-text {
+            font-size: 13px;
+            color: #4b5563;
+            line-height: 1.7;
+        }
+
+        .demand-section {
+            background: #fffbeb;
+            border: 1px solid #fde68a;
+            border-radius: 8px;
+            padding: 24px;
+            margin: 24px 0;
+        }
+
+        .demand-title {
+            font-size: 13px;
+            font-weight: 600;
+            color: #92400e;
+            margin-bottom: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+
+        .demand-list {
+            padding-left: 20px;
+        }
+
+        .demand-list li {
+            font-size: 13px;
+            color: #78350f;
+            margin-bottom: 10px;
+            line-height: 1.6;
+        }
+
+        .consequence-box {
+            background: #fef2f2;
+            border: 1px solid #fecaca;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 24px 0;
+        }
+
+        .consequence-box h4 {
+            font-size: 13px;
+            font-weight: 600;
+            color: #991b1b;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+        }
+
+        .consequence-box p {
+            font-size: 13px;
+            color: #7f1d1d;
+            line-height: 1.6;
+        }
+
+        .deadline-box {
+            background: #111827;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 24px 0;
+            text-align: center;
+        }
+
+        .deadline-text {
+            font-size: 16px;
+            font-weight: 700;
+            color: #f9fafb;
+        }
+
+        .deadline-sub {
+            font-size: 12px;
+            color: #9ca3af;
+            margin-top: 4px;
+        }
+
+        .signature-section {
+            margin-top: 40px;
+        }
+
+        .sig-label {
+            font-size: 12px;
+            font-weight: 600;
+            color: #6b7280;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            margin-bottom: 48px;
+        }
+
+        .sig-line {
+            border-top: 1px solid #d1d5db;
+            padding-top: 8px;
+            width: 280px;
+        }
+
+        .sig-name {
+            font-size: 14px;
+            font-weight: 600;
+            color: #111827;
+        }
+
+        .sig-role {
+            font-size: 12px;
+            color: #6b7280;
+        }
+
+        .cc-section {
+            margin-top: 32px;
+            background: #f9fafb;
+            border-radius: 8px;
+            padding: 16px 20px;
+            font-size: 12px;
+            color: #6b7280;
+        }
+
+        .cc-section strong {
+            color: #111827;
+        }
+
+        .footer {
+            margin-top: 48px;
+            text-align: center;
+            padding-top: 24px;
+            border-top: 1px solid #e5e7eb;
+            color: #9ca3af;
+            font-size: 12px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="header">
+        <div class="sender-info">
+            <div class="sender-name">{{senderName}}</div>
+            <div class="sender-detail">{{{senderAddress}}}</div>
+            {{#if senderPhone}}<div class="sender-detail">Phone: {{senderPhone}}</div>{{/if}}
+            {{#if senderEmail}}<div class="sender-detail">Email: {{senderEmail}}</div>{{/if}}
+        </div>
+        <div class="doc-badge">
+            <div class="doc-title">LEGAL NOTICE</div>
+            <div class="doc-date"><strong>Date:</strong> {{noticeDate}}</div>
+            {{#if refNumber}}<div class="doc-date"><strong>Ref:</strong> {{refNumber}}</div>{{/if}}
+            <div class="urgency-badge">Urgent & Confidential</div>
+        </div>
+    </div>
+
+    <div class="via-section">Sent via Registered Post / Speed Post A.D. / Email</div>
+
+    <div class="recipient">
+        <div class="section-label">To</div>
+        <div class="recipient-name">{{recipientName}}</div>
+        <div class="recipient-addr">{{{recipientAddress}}}</div>
+    </div>
+
+    <div class="subject">Subject: {{noticeSubject}}</div>
+
+    <div class="content">
+        <p>Dear {{recipientName}},</p>
+
+        <p>Under the instructions and on behalf of my client <strong>{{#if
+                clientName}}{{clientName}}{{else}}{{senderName}}{{/if}}</strong>, I hereby serve upon you this Legal
+            Notice as follows:</p>
+
+        <div class="facts-section">
+            <div class="facts-title">Statement of Facts</div>
+            <div class="facts-text">{{{noticeDescription}}}</div>
+        </div>
+
+        <p>The above-mentioned acts/omissions on your part constitute a clear violation of the legal rights of my client
+            and are actionable under the applicable laws of India.</p>
+
+        <div class="demand-section">
+            <div class="demand-title">Demands</div>
+            <ol class="demand-list">
+                <li>You are hereby called upon to {{#if demandAction}}{{{demandAction}}}{{else}}immediately cease and
+                    desist from the above-mentioned acts and compensate my client for the damages suffered{{/if}}.</li>
+                <li>You are further required to provide a written undertaking that such acts shall not be repeated in
+                    the future.</li>
+                <li>Failing compliance with the above demands, my client shall be constrained to initiate appropriate
+                    civil and/or criminal proceedings against you, at your risk, cost, and consequences.</li>
+            </ol>
+        </div>
+
+        <div class="deadline-box">
+            <div class="deadline-text">Response Deadline: {{#if responseDeadline}}{{responseDeadline}}{{else}}15 days
+                from receipt of this notice{{/if}}</div>
+            <div class="deadline-sub">Failure to respond will result in legal proceedings without further notice</div>
+        </div>
+
+        <div class="consequence-box">
+            <h4>Legal Consequences</h4>
+            <p>Please note that if you fail to comply with the demands stated herein within the stipulated time, my
+                client shall be compelled to initiate appropriate legal proceedings before the competent
+                court/tribunal/authority, including but not limited to filing a civil suit for recovery of damages,
+                injunction, and/or criminal complaint as may be warranted by the circumstances. All costs, charges, and
+                consequences of such proceedings shall be entirely at your risk and expense.</p>
+        </div>
+
+        <p>This notice is issued without prejudice to any other rights, claims, or remedies that my client may have
+            under law, all of which are expressly reserved.</p>
+
+        <p>A copy of this notice is retained for record and future reference.</p>
+    </div>
+
+    <div class="signature-section">
+        <div class="sig-label">Issued By</div>
+        <div class="sig-line">
+            <div class="sig-name">{{senderName}}</div>
+            <div class="sig-role">{{#if senderDesignation}}{{senderDesignation}}{{else}}Advocate{{/if}}</div>
+        </div>
+    </div>
+
+    <div class="cc-section">
+        <strong>CC:</strong> Copy retained for record and evidence purposes.
+    </div>
+
+    <div class="footer">
+        <p>This is a legal document. {{#if companyName}}{{companyName}} — {{/if}}Legal Document System</p>
+    </div>
+</body>
+
+</html>

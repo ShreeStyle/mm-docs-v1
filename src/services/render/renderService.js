@@ -37,9 +37,10 @@ const generateBrandCSS = (brandKit) => {
 
 // Map document types to professional templates
 const getTemplateForDocumentType = (documentType) => {
+    // Basic mapping for backward compatibility and clean names
     const templateMap = {
         'offer_letter': 'offer_letter',
-        'appointment_letter': 'appointment_letter', 
+        'appointment_letter': 'appointment_letter',
         'experience_certificate': 'experience_certificate',
         'onboarding_letter': 'onboarding_letter',
         'warning_letter': 'warning_letter',
@@ -54,8 +55,17 @@ const getTemplateForDocumentType = (documentType) => {
         'resume': 'resume',
         'marketing_brief': 'marketing_brief'
     };
-    
-    return templateMap[documentType] || 'generic';
+
+    // If it's in the map, use it
+    if (templateMap[documentType]) return templateMap[documentType];
+
+    // Handle new template IDs (e.g., service-agreement-001 -> service_agreement)
+    // Strip version/suffixes and convert hyphens to underscores
+    let sanitizedType = documentType
+        .replace(/-[0-9]+$/, '') // Remove -001, -002 etc
+        .replace(/-/g, '_');      // Convert hyphens to underscores
+
+    return sanitizedType;
 };
 
 exports.renderDocument = async (document, brandKit) => {

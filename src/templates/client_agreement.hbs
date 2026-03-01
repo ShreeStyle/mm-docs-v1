@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Service Agreement</title>
+    <title>Client Agreement</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         * {
@@ -108,8 +108,7 @@
             margin-bottom: 10px;
         }
 
-        .clause p,
-        .clause li {
+        .clause p {
             font-size: 13px;
             color: #4b5563;
             line-height: 1.6;
@@ -123,19 +122,22 @@
 
         .clause li {
             margin-bottom: 6px;
+            font-size: 13px;
+            color: #4b5563;
+            line-height: 1.5;
         }
 
         .scope-table {
             width: 100%;
             border-collapse: collapse;
-            margin: 24px 0;
+            margin: 20px 0;
         }
 
         .scope-table th {
             background: #f9fafb;
             text-align: left;
             padding: 12px 16px;
-            font-size: 13px;
+            font-size: 12px;
             font-weight: 600;
             color: #6b7280;
             border-bottom: 1px solid #e5e7eb;
@@ -152,21 +154,30 @@
             border-bottom: 1px solid #f3f4f6;
         }
 
+        .highlight-box {
+            background: #eff6ff;
+            border: 1px solid #bfdbfe;
+            border-radius: 8px;
+            padding: 16px 20px;
+            margin: 16px 0;
+            font-size: 13px;
+            color: #1e40af;
+        }
+
         .important-box {
             background: #fef2f2;
             border: 1px solid #fecaca;
             border-radius: 8px;
-            padding: 20px;
-            margin: 24px 0;
+            padding: 16px 20px;
+            margin: 16px 0;
         }
 
         .important-box h4 {
             font-size: 13px;
             font-weight: 600;
             color: #991b1b;
-            margin-bottom: 8px;
+            margin-bottom: 6px;
             text-transform: uppercase;
-            letter-spacing: 0.04em;
         }
 
         .important-box p {
@@ -182,7 +193,7 @@
             gap: 32px;
         }
 
-        .signature-card {
+        .sig-card {
             background: #f9fafb;
             border-radius: 8px;
             padding: 24px;
@@ -194,14 +205,6 @@
             color: #111827;
             margin-bottom: 16px;
             text-transform: uppercase;
-            letter-spacing: 0.04em;
-        }
-
-        .sig-name {
-            font-size: 14px;
-            font-weight: 600;
-            color: #111827;
-            margin-bottom: 16px;
         }
 
         .sig-field {
@@ -216,7 +219,6 @@
 
         .sig-field-line {
             border-bottom: 1px solid #d1d5db;
-            min-width: 200px;
             height: 24px;
         }
 
@@ -233,138 +235,124 @@
 
 <body>
     <div class="header">
-        <div class="doc-title">Service Agreement</div>
+        <div class="doc-title">Client Agreement</div>
         <div class="doc-subtitle"><strong>Agreement Date:</strong> {{effectiveDate}} &nbsp;|&nbsp; <strong>Agreement
-                No:</strong> {{#if agreementNumber}}{{agreementNumber}}{{else}}SA-2024-001{{/if}}</div>
+                No:</strong> {{#if agreementNumber}}{{agreementNumber}}{{else}}CA-2024-001{{/if}}</div>
     </div>
 
     <div class="parties-grid">
         <div class="party-card">
-            <div class="party-label">Service Provider (First Party)</div>
+            <div class="party-label">Service Provider</div>
             <div class="party-name">{{companyName}}</div>
-            <div class="party-details">{{{companyAddress}}}{{#if companyEmail}}<br>{{companyEmail}}{{/if}}{{#if
-                companyPhone}}<br>{{companyPhone}}{{/if}}</div>
+            <div class="party-details">{{{companyAddress}}}{{#if companyEmail}}<br>{{companyEmail}}{{/if}}</div>
         </div>
         <div class="party-card">
-            <div class="party-label">Client (Second Party)</div>
+            <div class="party-label">Client</div>
             <div class="party-name">{{clientName}}</div>
-            <div class="party-details">{{{clientAddress}}}{{#if clientEmail}}<br>{{clientEmail}}{{/if}}{{#if
-                clientPhone}}<br>{{clientPhone}}{{/if}}</div>
+            <div class="party-details">{{{clientAddress}}}{{#if clientEmail}}<br>{{clientEmail}}{{/if}}</div>
         </div>
     </div>
 
     <div class="content">
-        <p>This Service Agreement ("Agreement") is entered into as of <strong>{{effectiveDate}}</strong> by and between
-            the parties identified above. Both parties agree to the following terms and conditions governing the
-            provision of services.</p>
+        <p>This Client Agreement ("Agreement") is entered into as of <strong>{{effectiveDate}}</strong> between the
+            parties identified above. This Agreement governs the business relationship and sets forth the terms under
+            which the Service Provider shall deliver services to the Client.</p>
+
+        <table class="scope-table">
+            <tr>
+                <th>Project/Service</th>
+                <td>{{{serviceDescription}}}</td>
+            </tr>
+            <tr>
+                <th>Start Date</th>
+                <td>{{effectiveDate}}</td>
+            </tr>
+            <tr>
+                <th>Duration</th>
+                <td>{{#if duration}}{{duration}}{{else}}12 months{{/if}}</td>
+            </tr>
+            <tr>
+                <th>Total Value</th>
+                <td>₹{{totalAmount}}</td>
+            </tr>
+            <tr>
+                <th>Payment Terms</th>
+                <td>{{#if paymentTerms}}{{paymentTerms}}{{else}}Net 30 days{{/if}}</td>
+            </tr>
+        </table>
 
         <div class="clause">
-            <h4>1. Scope of Services</h4>
-            <p>The Service Provider agrees to provide the following services to the Client:</p>
-            <table class="scope-table">
-                <tr>
-                    <th>Service Description</th>
-                    <td>{{{serviceDescription}}}</td>
-                </tr>
-                <tr>
-                    <th>Duration</th>
-                    <td>{{#if duration}}{{duration}}{{else}}12 months{{/if}} from the effective date</td>
-                </tr>
-                <tr>
-                    <th>Service Fee</th>
-                    <td>₹{{totalAmount}}</td>
-                </tr>
-                <tr>
-                    <th>Payment Terms</th>
-                    <td>{{#if paymentTerms}}{{paymentTerms}}{{else}}Net 30 days from invoice date{{/if}}</td>
-                </tr>
-            </table>
+            <h4>1. Scope of Engagement</h4>
+            <p>The Service Provider shall provide the services described above in accordance with the specifications
+                mutually agreed upon. Any changes to the scope must be documented through a written change order signed
+                by both parties.</p>
         </div>
 
         <div class="clause">
-            <h4>2. Obligations of Service Provider</h4>
+            <h4>2. Client Responsibilities</h4>
             <ul>
-                <li>Perform all services with due diligence, skill, and in a professional manner consistent with
-                    industry standards.</li>
-                <li>Assign qualified personnel to perform the services as described herein.</li>
-                <li>Provide regular progress reports and updates to the Client as reasonably requested.</li>
-                <li>Maintain confidentiality of all Client information and proprietary data.</li>
-                <li>Comply with all applicable laws, regulations, and industry standards in performing the services.
-                </li>
+                <li>Provide timely access to information, personnel, and resources necessary for service delivery.</li>
+                <li>Designate a primary point of contact for all project communications.</li>
+                <li>Review and provide feedback on deliverables within {{#if reviewPeriod}}{{reviewPeriod}}{{else}}5
+                    business days{{/if}}.</li>
+                <li>Make payments in accordance with the agreed payment schedule.</li>
             </ul>
         </div>
 
         <div class="clause">
-            <h4>3. Obligations of Client</h4>
-            <ul>
-                <li>Provide timely access to necessary information, systems, and personnel required for the performance
-                    of services.</li>
-                <li>Make all payments due under this Agreement within the agreed payment terms.</li>
-                <li>Designate a single point of contact for communication regarding the services.</li>
-                <li>Provide written feedback and approvals in a timely manner to avoid project delays.</li>
-            </ul>
+            <h4>3. Payment Terms</h4>
+            <p>The Client agrees to pay the Service Provider ₹{{totalAmount}} as per the agreed payment schedule.
+                Invoices are due within {{#if paymentTerms}}{{paymentTerms}}{{else}}30 days{{/if}} of receipt. Late
+                payments shall attract interest at 1.5% per month.</p>
         </div>
 
         <div class="clause">
-            <h4>4. Payment Terms</h4>
-            <p>The Client shall pay the Service Provider the agreed fee of <strong>₹{{totalAmount}}</strong> in
-                accordance with the payment schedule agreed upon. Late payments shall attract an interest of 1.5% per
-                month on the outstanding amount. All taxes, including GST, shall be borne by the Client as applicable.
-            </p>
+            <h4>4. Confidentiality</h4>
+            <p>Both parties agree to maintain strict confidentiality regarding all proprietary information, trade
+                secrets, and business data shared during the course of this engagement. This obligation survives
+                termination of this Agreement.</p>
         </div>
 
         <div class="clause">
             <h4>5. Intellectual Property</h4>
-            <p>All intellectual property rights in the deliverables created under this Agreement shall vest with the
-                Client upon full payment. The Service Provider retains the right to use general knowledge, skills, and
-                experience acquired during the performance of services.</p>
+            <p>All deliverables created specifically for the Client under this Agreement shall become the property of
+                the Client upon full payment. The Service Provider retains rights to pre-existing intellectual property,
+                tools, and methodologies used in delivering services.</p>
         </div>
 
         <div class="clause">
-            <h4>6. Confidentiality</h4>
-            <p>Both parties agree to maintain the confidentiality of all proprietary and confidential information
-                disclosed during the course of this Agreement. This obligation shall survive the termination of this
-                Agreement for a period of {{#if confidentialityPeriod}}{{confidentialityPeriod}}{{else}}3 years{{/if}}.
-            </p>
+            <h4>6. Termination</h4>
+            <p>Either party may terminate this Agreement with {{#if noticePeriod}}{{noticePeriod}}{{else}}30 days{{/if}}
+                written notice. In the event of termination, the Client shall pay for all services and work completed up
+                to the effective date of termination.</p>
         </div>
 
         <div class="clause">
-            <h4>7. Term and Termination</h4>
-            <p>This Agreement shall remain in effect for a period of {{#if duration}}{{duration}}{{else}}12
-                months{{/if}} from the effective date. Either party may terminate this Agreement with {{#if
-                noticePeriod}}{{noticePeriod}}{{else}}30 days{{/if}} prior written notice. Upon termination, the Client
-                shall pay for all services rendered up to the date of termination.</p>
-        </div>
-
-        <div class="clause">
-            <h4>8. Limitation of Liability</h4>
-            <p>Neither party shall be liable for any indirect, incidental, special, consequential, or punitive damages
-                arising out of or related to this Agreement. The Service Provider's total liability under this Agreement
-                shall not exceed the total fees paid or payable by the Client under this Agreement.</p>
+            <h4>7. Limitation of Liability</h4>
+            <p>The Service Provider's total liability shall not exceed the total fees paid under this Agreement. Neither
+                party shall be liable for indirect, special, incidental, or consequential damages.</p>
         </div>
 
         <div class="important-box">
             <h4>Dispute Resolution</h4>
-            <p>Any disputes arising out of this Agreement shall be resolved through mutual negotiation. If unresolved
-                within 30 days, the dispute shall be referred to arbitration under the Arbitration and Conciliation Act,
-                1996, with the seat of arbitration in {{#if jurisdiction}}{{jurisdiction}}{{else}}Bangalore,
-                India{{/if}}.</p>
+            <p>Any disputes shall first be resolved through good faith negotiation. If unresolved within 30 days, the
+                dispute shall be submitted to binding arbitration under the Arbitration and Conciliation Act, 1996, with
+                the seat in {{#if jurisdiction}}{{jurisdiction}}{{else}}Bangalore, India{{/if}}.</p>
         </div>
 
         <div class="clause">
-            <h4>9. Governing Law</h4>
+            <h4>8. Governing Law</h4>
             <p>This Agreement shall be governed by and construed in accordance with the laws of India. The courts of
-                {{#if jurisdiction}}{{jurisdiction}}{{else}}Bangalore{{/if}} shall have exclusive jurisdiction over any
-                legal proceedings arising from this Agreement.</p>
+                {{#if jurisdiction}}{{jurisdiction}}{{else}}Bangalore{{/if}} shall have exclusive jurisdiction.</p>
         </div>
 
-        <p>IN WITNESS WHEREOF, the parties have executed this Service Agreement as of the date first written above.</p>
+        <p><strong>IN WITNESS WHEREOF,</strong> the parties have executed this Client Agreement as of the date first
+            written above.</p>
     </div>
 
     <div class="signature-section">
-        <div class="signature-card">
+        <div class="sig-card">
             <div class="sig-title">Service Provider</div>
-            <div class="sig-name">{{companyName}}</div>
             <div class="sig-field">
                 <div class="sig-field-label">Authorized Signature</div>
                 <div class="sig-field-line"></div>
@@ -378,16 +366,14 @@
                 <div class="sig-field-line"></div>
             </div>
         </div>
-        <div class="signature-card">
+        <div class="sig-card">
             <div class="sig-title">Client</div>
-            <div class="sig-name">{{clientName}}</div>
             <div class="sig-field">
                 <div class="sig-field-label">Authorized Signature</div>
                 <div class="sig-field-line"></div>
             </div>
             <div class="sig-field">
-                <div class="sig-field-label">Name & Title</div>
-                <div class="sig-field-line"></div>
+                <div class="sig-field-label">Name: {{clientName}}</div>
             </div>
             <div class="sig-field">
                 <div class="sig-field-label">Date</div>
@@ -397,8 +383,7 @@
     </div>
 
     <div class="footer">
-        <p>This Agreement is executed in duplicate, with each party retaining one original copy.</p>
-        <p>{{companyName}} — Legal Document System</p>
+        <p>{{companyName}} — Client Agreement</p>
     </div>
 </body>
 

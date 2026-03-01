@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data Processing Agreement</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, sans-serif;
+            line-height: 1.6;
+            color: #1f2937;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 48px 40px;
+            background: white;
+            font-size: 14px;
+        }
+
+        .header {
+            text-align: center;
+            padding-bottom: 28px;
+            margin-bottom: 36px;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .doc-title {
+            font-size: 26px;
+            font-weight: 800;
+            color: #111827;
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+            margin-bottom: 4px;
+        }
+
+        .doc-subtitle {
+            font-size: 13px;
+            color: #6b7280;
+        }
+
+        .doc-subtitle strong {
+            color: #111827;
+        }
+
+        .security-badge {
+            display: inline-block;
+            padding: 4px 14px;
+            border-radius: 9999px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            background: #eff6ff;
+            color: #2563eb;
+            margin-top: 10px;
+        }
+
+        .parties-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+            margin: 28px 0;
+        }
+
+        .party-card {
+            background: #f9fafb;
+            border-radius: 8px;
+            padding: 20px;
+        }
+
+        .party-label {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            color: #6b7280;
+            font-weight: 600;
+            margin-bottom: 12px;
+        }
+
+        .party-name {
+            font-size: 16px;
+            font-weight: 600;
+            color: #111827;
+            margin-bottom: 8px;
+        }
+
+        .party-details {
+            font-size: 13px;
+            color: #4b5563;
+            line-height: 1.6;
+        }
+
+        .content {
+            font-size: 14px;
+            color: #374151;
+            line-height: 1.7;
+        }
+
+        .content p {
+            margin-bottom: 16px;
+        }
+
+        .clause {
+            margin: 20px 0;
+            padding: 20px;
+            background: #f9fafb;
+            border-radius: 8px;
+        }
+
+        .clause h4 {
+            font-size: 14px;
+            font-weight: 600;
+            color: #111827;
+            margin-bottom: 10px;
+        }
+
+        .clause p {
+            font-size: 13px;
+            color: #4b5563;
+            line-height: 1.6;
+            margin-bottom: 8px;
+        }
+
+        .clause ul,
+        .clause ol {
+            padding-left: 20px;
+        }
+
+        .clause li {
+            margin-bottom: 6px;
+            font-size: 13px;
+            color: #4b5563;
+            line-height: 1.5;
+        }
+
+        .data-details {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 16px 0;
+        }
+
+        .data-details th {
+            background: #f9fafb;
+            text-align: left;
+            padding: 10px 14px;
+            font-size: 12px;
+            font-weight: 600;
+            color: #6b7280;
+            border-bottom: 1px solid #e5e7eb;
+            text-transform: uppercase;
+            width: 35%;
+        }
+
+        .data-details td {
+            padding: 10px 14px;
+            font-size: 13px;
+            color: #111827;
+            border-bottom: 1px solid #f3f4f6;
+        }
+
+        .security-box {
+            background: #eff6ff;
+            border: 1px solid #bfdbfe;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .security-box h4 {
+            font-size: 13px;
+            font-weight: 600;
+            color: #1e40af;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+        }
+
+        .security-box ul {
+            padding-left: 20px;
+        }
+
+        .security-box li {
+            font-size: 13px;
+            color: #1e3a5f;
+            margin-bottom: 6px;
+        }
+
+        .breach-box {
+            background: #fef2f2;
+            border: 1px solid #fecaca;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .breach-box h4 {
+            font-size: 13px;
+            font-weight: 600;
+            color: #991b1b;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+        }
+
+        .breach-box p {
+            font-size: 13px;
+            color: #7f1d1d;
+            line-height: 1.6;
+        }
+
+        .signature-section {
+            margin-top: 40px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 32px;
+        }
+
+        .sig-card {
+            background: #f9fafb;
+            border-radius: 8px;
+            padding: 24px;
+        }
+
+        .sig-title {
+            font-size: 13px;
+            font-weight: 600;
+            color: #111827;
+            margin-bottom: 16px;
+            text-transform: uppercase;
+        }
+
+        .sig-field {
+            margin-bottom: 16px;
+        }
+
+        .sig-field-label {
+            font-size: 12px;
+            color: #6b7280;
+            margin-bottom: 4px;
+        }
+
+        .sig-field-line {
+            border-bottom: 1px solid #d1d5db;
+            height: 24px;
+        }
+
+        .footer {
+            margin-top: 48px;
+            text-align: center;
+            padding-top: 24px;
+            border-top: 1px solid #e5e7eb;
+            color: #9ca3af;
+            font-size: 12px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="header">
+        <div class="doc-title">Data Processing Agreement</div>
+        <div class="doc-subtitle"><strong>Effective Date:</strong> {{effectiveDate}} &nbsp;|&nbsp; <strong>Agreement
+                No:</strong> {{#if agreementNumber}}{{agreementNumber}}{{else}}DPA-2024-001{{/if}}</div>
+        <div class="security-badge">DPDP Act 2023 Compliant</div>
+    </div>
+
+    <div class="parties-grid">
+        <div class="party-card">
+            <div class="party-label">Data Controller</div>
+            <div class="party-name">{{controllerName}}</div>
+            <div class="party-details">{{{controllerAddress}}}{{#if controllerEmail}}<br>{{controllerEmail}}{{/if}}
+            </div>
+        </div>
+        <div class="party-card">
+            <div class="party-label">Data Processor</div>
+            <div class="party-name">{{processorName}}</div>
+            <div class="party-details">{{{processorAddress}}}{{#if processorEmail}}<br>{{processorEmail}}{{/if}}</div>
+        </div>
+    </div>
+
+    <div class="content">
+        <p>This Data Processing Agreement ("DPA") is entered into as part of the service agreement between the parties.
+            This DPA sets out the terms for the processing of personal data by the Data Processor on behalf of the Data
+            Controller in compliance with the Digital Personal Data Protection Act, 2023 and other applicable data
+            protection laws.</p>
+
+        <div class="clause">
+            <h4>1. Definitions</h4>
+            <ul>
+                <li><strong>"Personal Data"</strong> means any data about an individual who is identifiable by or in
+                    relation to such data.</li>
+                <li><strong>"Processing"</strong> means any operation performed on personal data including collection,
+                    storage, use, disclosure, and deletion.</li>
+                <li><strong>"Data Principal"</strong> means the individual to whom the personal data relates.</li>
+                <li><strong>"Data Breach"</strong> means unauthorized access, disclosure, or loss of personal data.</li>
+            </ul>
+        </div>
+
+        <div class="clause">
+            <h4>2. Subject Matter & Details of Processing</h4>
+            <table class="data-details">
+                <tr>
+                    <th>Purpose of Processing</th>
+                    <td>{{{processingPurpose}}}</td>
+                </tr>
+                <tr>
+                    <th>Nature of Processing</th>
+                    <td>{{#if processingNature}}{{processingNature}}{{else}}Collection, storage, analysis, and
+                        reporting{{/if}}</td>
+                </tr>
+                <tr>
+                    <th>Categories of Data</th>
+                    <td>{{#if dataCategories}}{{dataCategories}}{{else}}Personal identifiers, contact information, usage
+                        data{{/if}}</td>
+                </tr>
+                <tr>
+                    <th>Data Subjects</th>
+                    <td>{{#if dataSubjects}}{{dataSubjects}}{{else}}Employees, customers, business contacts{{/if}}</td>
+                </tr>
+                <tr>
+                    <th>Duration</th>
+                    <td>{{#if duration}}{{duration}}{{else}}Duration of the service agreement{{/if}}</td>
+                </tr>
+            </table>
+        </div>
+
+        <div class="clause">
+            <h4>3. Obligations of Data Processor</h4>
+            <ol>
+                <li>Process personal data only on documented instructions from the Data Controller.</li>
+                <li>Ensure that persons authorized to process the data have committed themselves to confidentiality.
+                </li>
+                <li>Implement appropriate technical and organizational security measures.</li>
+                <li>Not engage another processor without prior written authorization from the Data Controller.</li>
+                <li>Assist the Data Controller in fulfilling obligations related to Data Principal requests.</li>
+                <li>Delete or return all personal data upon termination of services, unless retention is required by
+                    law.</li>
+                <li>Make available all information necessary to demonstrate compliance and allow for audits.</li>
+            </ol>
+        </div>
+
+        <div class="security-box">
+            <h4>4. Security Measures</h4>
+            <p>The Data Processor shall implement the following minimum security measures:</p>
+            <ul>
+                <li>Encryption of personal data both in transit (TLS 1.2+) and at rest (AES-256)</li>
+                <li>Regular backup and disaster recovery procedures</li>
+                <li>Access control with role-based permissions and multi-factor authentication</li>
+                <li>Regular security assessments, penetration testing, and vulnerability scanning</li>
+                <li>Incident detection, response, and logging mechanisms</li>
+                <li>Physical security of data processing facilities</li>
+            </ul>
+        </div>
+
+        <div class="breach-box">
+            <h4>5. Data Breach Notification</h4>
+            <p>The Data Processor shall notify the Data Controller of any personal data breach without undue delay and
+                in any event within <strong>{{#if breachNotificationPeriod}}{{breachNotificationPeriod}}{{else}}72
+                    hours{{/if}}</strong> of becoming aware of the breach. The notification shall include the nature of
+                the breach, categories and approximate number of data subjects affected, likely consequences, and
+                measures taken to address the breach.</p>
+        </div>
+
+        <div class="clause">
+            <h4>6. Sub-Processing</h4>
+            <p>The Data Processor shall not engage any sub-processor without prior written authorization from the Data
+                Controller. Where sub-processing is authorized, the Data Processor shall impose the same data protection
+                obligations as set out in this DPA on the sub-processor.</p>
+        </div>
+
+        <div class="clause">
+            <h4>7. Data Transfers</h4>
+            <p>The Data Processor shall not transfer personal data outside India without the prior written consent of
+                the Data Controller and unless adequate safeguards are in place as required under applicable law,
+                including the Digital Personal Data Protection Act, 2023.</p>
+        </div>
+
+        <div class="clause">
+            <h4>8. Audits & Inspections</h4>
+            <p>The Data Processor shall allow the Data Controller or an authorized third-party auditor to conduct
+                inspections and audits to verify compliance with this DPA, subject to reasonable notice and during
+                normal business hours.</p>
+        </div>
+
+        <div class="clause">
+            <h4>9. Term & Termination</h4>
+            <p>This DPA shall remain in effect for the duration of the service agreement. Upon termination, the Data
+                Processor shall, at the Data Controller's choice, return or securely delete all personal data within
+                <strong>{{#if deletionPeriod}}{{deletionPeriod}}{{else}}30 days{{/if}}</strong>.</p>
+        </div>
+
+        <div class="clause">
+            <h4>10. Governing Law</h4>
+            <p>This DPA shall be governed by the laws of India, including the Digital Personal Data Protection Act, 2023
+                and the Information Technology Act, 2000. Any disputes shall be subject to the jurisdiction of courts in
+                {{#if jurisdiction}}{{jurisdiction}}{{else}}Bangalore, India{{/if}}.</p>
+        </div>
+
+        <p><strong>IN WITNESS WHEREOF,</strong> the parties have executed this Data Processing Agreement as of the date
+            first written above.</p>
+    </div>
+
+    <div class="signature-section">
+        <div class="sig-card">
+            <div class="sig-title">Data Controller</div>
+            <div class="sig-field">
+                <div class="sig-field-label">Authorized Signature</div>
+                <div class="sig-field-line"></div>
+            </div>
+            <div class="sig-field">
+                <div class="sig-field-label">Name: {{controllerName}}</div>
+            </div>
+            <div class="sig-field">
+                <div class="sig-field-label">Date</div>
+                <div class="sig-field-line"></div>
+            </div>
+        </div>
+        <div class="sig-card">
+            <div class="sig-title">Data Processor</div>
+            <div class="sig-field">
+                <div class="sig-field-label">Authorized Signature</div>
+                <div class="sig-field-line"></div>
+            </div>
+            <div class="sig-field">
+                <div class="sig-field-label">Name: {{processorName}}</div>
+            </div>
+            <div class="sig-field">
+                <div class="sig-field-label">Date</div>
+                <div class="sig-field-line"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="footer">
+        <p>Data Processing Agreement — Compliant with DPDP Act, 2023</p>
+    </div>
+</body>
+
+</html>

@@ -1,0 +1,15 @@
+{
+	"folders": [
+		{
+			"name": "aidocumentation",
+			"path": "../../.."
+		},
+		{
+			"name": "letters",
+			"path": "../../../../Desktop/letters"
+		}
+	],
+	"settings": {
+		"kiroAgent.configureMCP": "Disabled"
+	}
+}

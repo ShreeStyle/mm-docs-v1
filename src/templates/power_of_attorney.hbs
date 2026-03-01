@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Power of Attorney</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, sans-serif;
+            line-height: 1.6;
+            color: #1f2937;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 48px 40px;
+            background: white;
+            font-size: 14px;
+        }
+
+        .header {
+            text-align: center;
+            padding-bottom: 28px;
+            margin-bottom: 36px;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .doc-title {
+            font-size: 30px;
+            font-weight: 800;
+            color: #111827;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            margin-bottom: 8px;
+        }
+
+        .doc-subtitle {
+            font-size: 14px;
+            color: #6b7280;
+        }
+
+        .stamp-badge {
+            display: inline-block;
+            padding: 6px 16px;
+            border-radius: 9999px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            background: #ecfdf5;
+            color: #059669;
+            margin-top: 12px;
+        }
+
+        .parties-section {
+            margin: 28px 0;
+        }
+
+        .party-card {
+            background: #f9fafb;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 16px;
+        }
+
+        .party-label {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            color: #6b7280;
+            font-weight: 600;
+            margin-bottom: 12px;
+        }
+
+        .party-name {
+            font-size: 16px;
+            font-weight: 600;
+            color: #111827;
+            margin-bottom: 8px;
+        }
+
+        .party-details {
+            font-size: 13px;
+            color: #4b5563;
+            line-height: 1.6;
+        }
+
+        .content {
+            font-size: 14px;
+            color: #374151;
+            line-height: 1.7;
+        }
+
+        .content p {
+            margin-bottom: 16px;
+        }
+
+        .clause {
+            margin: 20px 0;
+            padding: 20px;
+            background: #f9fafb;
+            border-radius: 8px;
+        }
+
+        .clause h4 {
+            font-size: 14px;
+            font-weight: 600;
+            color: #111827;
+            margin-bottom: 10px;
+        }
+
+        .clause p {
+            font-size: 13px;
+            color: #4b5563;
+            line-height: 1.6;
+            margin-bottom: 8px;
+        }
+
+        .clause ul {
+            padding-left: 20px;
+        }
+
+        .clause li {
+            margin-bottom: 6px;
+            font-size: 13px;
+            color: #4b5563;
+            line-height: 1.5;
+        }
+
+        .powers-list {
+            background: #eff6ff;
+            border: 1px solid #bfdbfe;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .powers-list h4 {
+            font-size: 13px;
+            font-weight: 600;
+            color: #1e40af;
+            margin-bottom: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+
+        .powers-list ul {
+            padding-left: 20px;
+        }
+
+        .powers-list li {
+            font-size: 13px;
+            color: #1e3a5f;
+            margin-bottom: 8px;
+            line-height: 1.5;
+        }
+
+        .important-box {
+            background: #fef2f2;
+            border: 1px solid #fecaca;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 24px 0;
+        }
+
+        .important-box h4 {
+            font-size: 13px;
+            font-weight: 600;
+            color: #991b1b;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+        }
+
+        .important-box p {
+            font-size: 13px;
+            color: #7f1d1d;
+            line-height: 1.6;
+        }
+
+        .signature-section {
+            margin-top: 40px;
+        }
+
+        .sig-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 32px;
+        }
+
+        .sig-card {
+            background: #f9fafb;
+            border-radius: 8px;
+            padding: 24px;
+        }
+
+        .sig-title {
+            font-size: 13px;
+            font-weight: 600;
+            color: #111827;
+            margin-bottom: 16px;
+            text-transform: uppercase;
+        }
+
+        .sig-field {
+            margin-bottom: 16px;
+        }
+
+        .sig-field-label {
+            font-size: 12px;
+            color: #6b7280;
+            margin-bottom: 4px;
+        }
+
+        .sig-field-line {
+            border-bottom: 1px solid #d1d5db;
+            height: 24px;
+        }
+
+        .witness-section {
+            margin-top: 32px;
+            background: #f9fafb;
+            border-radius: 8px;
+            padding: 24px;
+        }
+
+        .witness-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+            margin-top: 16px;
+        }
+
+        .footer {
+            margin-top: 48px;
+            text-align: center;
+            padding-top: 24px;
+            border-top: 1px solid #e5e7eb;
+            color: #9ca3af;
+            font-size: 12px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="header">
+        <div class="doc-title">Power of Attorney</div>
+        <div class="doc-subtitle">General / Special Power of Attorney</div>
+        <div class="stamp-badge">Non-Judicial Stamp Paper — ₹100</div>
+    </div>
+
+    <div class="content">
+        <p>KNOW ALL MEN BY THESE PRESENTS that I/We, the undersigned, do hereby constitute, nominate, and appoint the
+            person named herein as my/our lawful Attorney to act on my/our behalf.</p>
+    </div>
+
+    <div class="parties-section">
+        <div class="party-card">
+            <div class="party-label">Principal (Grantor)</div>
+            <div class="party-name">{{principalName}}</div>
+            <div class="party-details">
+                {{{principalAddress}}}
+                {{#if principalIdType}}<br><strong>ID:</strong> {{principalIdType}} — {{principalIdNumber}}{{/if}}
+            </div>
+        </div>
+        <div class="party-card">
+            <div class="party-label">Attorney (Agent)</div>
+            <div class="party-name">{{attorneyName}}</div>
+            <div class="party-details">
+                {{{attorneyAddress}}}
+                {{#if attorneyIdType}}<br><strong>ID:</strong> {{attorneyIdType}} — {{attorneyIdNumber}}{{/if}}
+            </div>
+        </div>
+    </div>
+
+    <div class="content">
+        <div class="powers-list">
+            <h4>Powers Granted</h4>
+            <ul>
+                <li>To execute, sign, and deliver any and all documents, agreements, contracts, deeds, and instruments
+                    on behalf of the Principal.</li>
+                <li>To appear before any government authority, court, tribunal, or regulatory body and represent the
+                    Principal in all matters.</li>
+                <li>To open, operate, and close bank accounts; sign cheques, demand drafts, and authorize fund
+                    transfers.</li>
+                <li>To purchase, sell, lease, mortgage, or otherwise deal with immovable and movable property belonging
+                    to the Principal.</li>
+                <li>To institute or defend any legal proceedings, suits, claims, or appeals on behalf of the Principal.
+                </li>
+                {{#if additionalPowers}}<li>{{{additionalPowers}}}</li>{{/if}}
+            </ul>
+        </div>
+
+        <div class="clause">
+            <h4>Duration and Validity</h4>
+            <p>This Power of Attorney shall remain in full force and effect from <strong>{{effectiveDate}}</strong>
+                {{#if expiryDate}}until <strong>{{expiryDate}}</strong>{{else}}until expressly revoked in writing by the
+                Principal{{/if}}. The Principal retains the right to revoke this Power of Attorney at any time by
+                providing written notice to the Attorney.</p>
+        </div>
+
+        <div class="clause">
+            <h4>Scope and Limitations</h4>
+            <p>{{{purposeDescription}}}</p>
+            <p>The Attorney shall act in good faith and in the best interests of the Principal at all times. The
+                Attorney shall not delegate powers granted herein unless expressly authorized. All acts performed by the
+                Attorney within the scope of this Power of Attorney shall be deemed as acts of the Principal.</p>
+        </div>
+
+        <div class="important-box">
+            <h4>Legal Declaration</h4>
+            <p>I/We hereby ratify and confirm all acts lawfully done by the said Attorney pursuant to this Power of
+                Attorney. I/We declare that this Power of Attorney is given freely and voluntarily, without any
+                coercion, undue influence, or misrepresentation.</p>
+        </div>
+
+        <p><strong>IN WITNESS WHEREOF,</strong> I/We have executed this Power of Attorney on this
+            <strong>{{effectiveDate}}</strong> at {{#if executionPlace}}{{executionPlace}}{{else}}the place mentioned
+            above{{/if}}.</p>
+    </div>
+
+    <div class="signature-section">
+        <div class="sig-grid">
+            <div class="sig-card">
+                <div class="sig-title">Principal (Grantor)</div>
+                <div class="sig-field">
+                    <div class="sig-field-label">Signature</div>
+                    <div class="sig-field-line"></div>
+                </div>
+                <div class="sig-field">
+                    <div class="sig-field-label">Name: {{principalName}}</div>
+                </div>
+                <div class="sig-field">
+                    <div class="sig-field-label">Date</div>
+                    <div class="sig-field-line"></div>
+                </div>
+            </div>
+            <div class="sig-card">
+                <div class="sig-title">Attorney (Agent)</div>
+                <div class="sig-field">
+                    <div class="sig-field-label">Acceptance Signature</div>
+                    <div class="sig-field-line"></div>
+                </div>
+                <div class="sig-field">
+                    <div class="sig-field-label">Name: {{attorneyName}}</div>
+                </div>
+                <div class="sig-field">
+                    <div class="sig-field-label">Date</div>
+                    <div class="sig-field-line"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="witness-section">
+            <div class="sig-title">Witnesses</div>
+            <div class="witness-grid">
+                <div>
+                    <div class="sig-field">
+                        <div class="sig-field-label">Witness 1 — Signature</div>
+                        <div class="sig-field-line"></div>
+                    </div>
+                    <div class="sig-field">
+                        <div class="sig-field-label">Name & Address</div>
+                        <div class="sig-field-line"></div>
+                    </div>
+                </div>
+                <div>
+                    <div class="sig-field">
+                        <div class="sig-field-label">Witness 2 — Signature</div>
+                        <div class="sig-field-line"></div>
+                    </div>
+                    <div class="sig-field">
+                        <div class="sig-field-label">Name & Address</div>
+                        <div class="sig-field-line"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="footer">
+        <p>This Power of Attorney is executed on non-judicial stamp paper of appropriate value.</p>
+        <p>Legal Document System</p>
+    </div>
+</body>
+
+</html>

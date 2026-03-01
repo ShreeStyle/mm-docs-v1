@@ -16,9 +16,10 @@ const openai = new OpenAI({
   } : undefined
 });
 
-const generateContent = async (type, topic, brandContext) => {
+const generateContent = async (type, topic, brandContext, providedData = {}) => {
   console.log(`🤖 AI Generating content for: ${type} - ${topic}`);
   console.log(`🎨 Brand Context: ${JSON.stringify(brandContext)}`);
+  console.log(`📋 Provided Data: ${JSON.stringify(providedData)}`);
 
   try {
     let systemPrompt = `You are MM Docs, an elite AI Business Document SaaS by MediaaMasala.
@@ -30,6 +31,7 @@ Your role:
 - Use clear, confident, sophisticated, human language
 - Ensure documents are client-ready, persuasive, and thorough
 - Parse the provided structured input data carefully and use ALL provided information
+- PRIORITIZE PROVIDED FORM DATA over any generated placeholders or topic-based guesses
 
 DOCUMENT CATEGORIES YOU SUPPORT:
 - HR & Employee Documents: Offer Letters, Appointment Letters, Experience Certificates
@@ -40,8 +42,9 @@ DOCUMENT CATEGORIES YOU SUPPORT:
 - Marketing & Communications: Sales Emails, Marketing Briefs, Company Profiles
 - Strategic Documents: Pitch Decks, Business Plans, Investment Proposals
 
-CRITICAL: When you receive structured input data (Employee: John | Position: Manager | etc.), 
+CRITICAL: When you receive structured input data (Employee: John | Position: Manager | etc.) OR provided form data (candidateName, salary, etc.), 
 use each piece of information appropriately in the document. Do not ignore any provided details.
+If a value is provided in 'providedData', use it EXACTLY as is.
 
 Quality standards:
 - Deeply logical structure with extensive elaboration per section
@@ -65,7 +68,7 @@ Return ONLY valid, richly detailed JSON document content.`;
     // Detect specific document type from topic if type is generic
     let effectiveType = type.toLowerCase();
     console.log(`🔍 Initial type: ${type}, Effective type: ${effectiveType}`);
-    
+
     if (["ask", "research", "build", "other"].includes(effectiveType)) {
       const topicLower = topic.toLowerCase();
       // HR & Employee Documents
@@ -106,149 +109,179 @@ Return ONLY valid, richly detailed JSON document content.`;
     console.log(`📋 Topic for processing: ${topic}`);
 
     if (effectiveType === "proposal") {
-      userPrompt = `Create a massive, highly detailed, deeply professional Business Proposal for: "${topic}".
-You MUST ensure extreme depth, covering extensive industry context, granular details about specific modules, and highly elaborated expected outcomes. Every section must have substantial detail.
+      // Parse structured input data
+      const inputData = {};
+      if (topic.includes('|')) {
+        topic.split('|').forEach(pair => {
+          const [key, value] = pair.split(':').map(s => s.trim());
+          if (key && value) {
+            inputData[key.toLowerCase().replace(/\s+/g, '')] = value;
+          }
+        });
+      }
 
-Return ONLY valid JSON with this exact structure (the values must be extensively detailed paragraphs and long lists):
-{
-  "title": "Project: Implementation of [Topic / Product Name]",
-  "preparedFor": "[Target Audience/Client Placeholder]",
-  "preparedBy": "${brandContext.name}",
-  "executiveSummary": "A powerful, multi-paragraph opening outlining the strategic imperative, the current landscape, the proposed implementation, and the ultimate objective of the engagement.",
-  "currentChallenges": [
-    "Challenge 1: Describe the industry pain point in deep detail (3-4 sentences).",
-    "Challenge 2: Detail the operational inefficiency in depth.",
-    "Challenge 3: Describe competitive pressures or technological lags comprehensively.",
-    "Challenge 4: Outline financial or strategic risks currently faced."
-  ],
-  "proposedSolution": {
-    "overview": "A thorough, detailed explanation of the proposed modular, cloud-first platform/service and how it directly counters the challenges mentioned.",
-    "coreModules": [
-      "Module 1: Name - In-depth description of its functionality and direct benefit.",
-      "Module 2: Name - Extensive breakdown of how it integrates into existing workflows.",
-      "Module 3: Name - Detailed overview of features and strategic advantages.",
-      "Module 4: Name - Explanation of the technical edge and user experience benefits."
-    ],
-    "optionalEnhancements": [
-      "Enhancement 1: Deep dive into premium features and their ROI.",
-      "Enhancement 2: Details on advanced analytics or dedicated support tiers."
-    ]
-  },
-  "implementationApproach": [
-    { "phase": "Phase 1: Discovery & Strategy", "description": "Highly detailed breakdown of stakeholder interviews, current state analysis, and strategic roadmap creation." },
-    { "phase": "Phase 2: Design & Architecture", "description": "Elaborate description of system design, UI/UX conceptualization, and technical blueprinting." },
-    { "phase": "Phase 3: Development & Integration", "description": "Detailed timeline of core engineering, iterative testing, and API integrations." },
-    { "phase": "Phase 4: Quality Assurance", "description": "Comprehensive explanation of security audits, load testing, and UAT." },
-    { "phase": "Phase 5: Deployment & Optimization", "description": "Detailed go-live strategy, post-launch hypercare, and ongoing iteration plans." }
-  ],
-  "deliverables": [
-    "Deliverable 1: Comprehensive Strategy and Architecture Document",
-    "Deliverable 2: Fully deployed and configured core platform",
-    "Deliverable 3: Extensive administrative and user training manuals",
-    "Deliverable 4: Custom analytics dashboards and reporting suites"
-  ],
-  "expectedOutcomes": [
-    "Outcome 1: Highly specific, quantifiable prediction (e.g. 25-35% reduction in systematic errors resulting in $X savings).",
-    "Outcome 2: Detailed improvement in user engagement or operational speed.",
-    "Outcome 3: Long-term strategic positioning benefits and market share defense.",
-    "Outcome 4: Scalability metrics and future-proofing advantages."
-  ],
-  "assumptions": [
-    "Assumption 1: Timely and unhindered access to key stakeholders for discovery.",
-    "Assumption 2: Availability of necessary technical documentation and API access.",
-    "Assumption 3: Resource allocation from the client side for UAT sign-offs within 48 hours."
-  ],
-  "conclusion": "A deeply confident, persuasive, and visionary closing statement synthesizing the value proposition and outlining the immediate next steps to initiate the partnership."
-}`;
+      // Merge with providedData from frontend form
+      const context = { ...providedData, ...inputData };
+      console.log(`📋 Consolidated context for proposal:`, context);
 
-    } else if (effectiveType === "quotation" || effectiveType === "invoice") {
-      userPrompt = `Using the provided context and data, generate a highly detailed and professional Quotation document for: "${topic}".
+      userPrompt = `Create a massive, highly detailed, deeply professional Business Proposal using the following context:
+      
+      CONTEXT DATA:
+      ${JSON.stringify(context, null, 2)}
 
-Requirements:
-- Use a comprehensive business quotation structure
-- Provide deep, explanatory descriptions for every line item
-- DO NOT just put 1-2 words for descriptions. They must be full, descriptive sentences justifying the value.
-- Add detailed payment terms and robust validity clauses
-- Return ONLY valid JSON.
+      Use the context data provided to fill in specific details.
+      Return ONLY valid JSON with this exact structure:
+      {
+        "title": "Project: Implementation of ${context.topic || topic}",
+        "preparedFor": "${context.clientName || context.customerName || '[Target Audience/Client Placeholder]'}",
+        "preparedBy": "${context.companyName || brandContext.name}",
+        "executiveSummary": "A powerful, multi-paragraph opening statement.",
+        "proposedSolution": {
+          "overview": "A thorough, detailed explanation.",
+          "coreModules": ["Module 1", "Module 2", "Module 3"]
+        }
+      }`;
 
-Return ONLY valid JSON with this exact structure:
-{
-  "title": "Comprehensive Commercial Proposal & Pricing",
-  "components": [
-    { "component": "Strategic Discovery & Platform Setup", "description": "Extensive system configuration, environment deployment, and initial architectural alignment with existing infrastructure.", "amount": "[Realistic Amount, e.g. $15,000]" },
-    { "component": "Core Software License (Annual)", "description": "Full access to the core suite of enterprise modules including secure data processing and role-based access control.", "amount": "[Realistic Amount]" },
-    { "component": "Advanced Analytics & Reporting Module", "description": "Implementation of custom executive dashboards, predictive data models, and automated compliance reporting.", "amount": "[Realistic Amount]" },
-    { "component": "Enterprise Training & Onboarding", "description": "Comprehensive, multi-session training programs for administrative staff and end-users, including dedicated manuals.", "amount": "[Realistic Amount]" }
-  ],
-  "total": "Sum of the amounts",
-  "paymentTerms": [
-    "50% Advance Payment required to initiate project scheduling.",
-    "25% Milestone Payment upon completion of User Acceptance Testing (UAT).",
-    "25% Final Payment due Net-15 upon successful Go-Live deployment."
-  ],
-  "validity": "This quotation remains valid for 30 days from the date of issue. Prices are subject to renegotiation thereafter.",
-  "support": "Includes 6 months of hypercare and Priority Tier 1 support post-launch."
-}`;
+    } else if (effectiveType === "quotation") {
+      // Parse structured input data
+      const inputData = {};
+      if (topic.includes('|')) {
+        topic.split('|').forEach(pair => {
+          const [key, value] = pair.split(':').map(s => s.trim());
+          if (key && value) {
+            inputData[key.toLowerCase().replace(/\s+/g, '')] = value;
+          }
+        });
+      }
+
+      // Merge with providedData from frontend form
+      const context = { ...providedData, ...inputData };
+      console.log(`📋 Consolidated context for quotation:`, context);
+
+      userPrompt = `Generate a highly detailed and professional Quotation using the following context:
+      
+      CONTEXT DATA:
+      ${JSON.stringify(context, null, 2)}
+
+      PRIORITY: If 'items' array is provided in CONTEXT DATA, use it exactly.
+      Return ONLY valid JSON with this structure:
+      {
+        "title": "Commercial Quotation for ${context.topic || topic}",
+        "quoteNumber": "QTN-${Date.now().toString().slice(-6)}",
+        "date": "${new Date().toLocaleDateString('en-IN', { year: 'numeric', month: 'long', day: 'numeric' })}",
+        "client": "${context.clientName || context.customerName || context.client || '[Client Name]'}",
+        "items": ${context.items ? JSON.stringify(context.items) : `[
+          { "description": "${context.description || 'Professional Services'}", "amount": "${context.amount || 0}" }
+        ]`},
+        "total": "${context.total || context.amount || 0}",
+        "paymentTerms": ["50% advance", "50% on completion"],
+        "validity": "30 days"
+      }`;
 
     } else if (effectiveType === "profile") {
-      userPrompt = `Create a highly professional, Corporate Style Company Profile for an entity solving: "${topic}".
+      // Parse structured input data
+      const inputData = {};
+      if (topic.includes('|')) {
+        topic.split('|').forEach(pair => {
+          const [key, value] = pair.split(':').map(s => s.trim());
+          if (key && value) {
+            inputData[key.toLowerCase().replace(/\s+/g, '')] = value;
+          }
+        });
+      }
 
-Return ONLY valid JSON with this exact structure:
-{
-  "companyName": "${brandContext.name}",
-  "industry": "Primary Industry (e.g. SaaS | Technology)",
-  "founded": "2024",
-  "presence": "Global / Relevant Region",
-  "about": "A solid, corporate paragraph describing the company's focus on building intelligent, scalable solutions.",
-  "vision": "A powerful vision statement (e.g., To become a trusted digital backbone...).",
-  "mission": "An actionable mission statement.",
-  "coreCompetencies": ["Competency 1", "Competency 2", "Competency 3", "Competency 4"],
-  "differentiators": ["Differentiator 1", "Differentiator 2", "Differentiator 3", "Differentiator 4"]
-}`;
+      // Merge with providedData from frontend form
+      const context = { ...providedData, ...inputData };
+      console.log(`📋 Consolidated context for profile:`, context);
+
+      userPrompt = `Create a highly professional, Corporate Style Company Profile for an entity solving: "${topic}".
+      
+      CONTEXT DATA:
+      ${JSON.stringify(context, null, 2)}
+
+      Return ONLY valid JSON with this exact structure:
+      {
+        "companyName": "${context.companyName || context.company || brandContext.name}",
+        "industry": "${context.industry || 'Technology'}",
+        "founded": "${context.founded || '2024'}",
+        "about": "${context.about || 'A leading provider of innovative solutions.'}",
+        "vision": "${context.vision || 'To lead the industry with excellence.'}",
+        "mission": "${context.mission || 'To deliver value to our clients.'}"
+      }`;
 
     } else if (effectiveType === "marketing_brief" || effectiveType === "sales email" || topic.toLowerCase().includes("email")) {
-      userPrompt = `Write a deeply persuasive, highly professional, and robust B2B Sales Email for: "${topic}".
-DO NOT generate a short email. It must read like a bespoke, consultative outreach from a top-tier executive.
+      // Parse structured input data
+      const inputData = {};
+      if (topic.includes('|')) {
+        topic.split('|').forEach(pair => {
+          const [key, value] = pair.split(':').map(s => s.trim());
+          if (key && value) {
+            inputData[key.toLowerCase().replace(/\s+/g, '')] = value;
+          }
+        });
+      }
 
-Return ONLY valid JSON with this exact structure:
-{
-  "subject": "A compelling, thought-provoking, and highly professional subject line",
-  "greeting": "Hello [Name],",
-  "opening": "A highly customized, engaging opening paragraph (3-4 sentences) that establishes profound relevance, acknowledges their specific industry challenges, and sets a consultative tone.",
-  "valueProposition": "A robust, detailed paragraph explaining exactly how your solution fundamentally shifts their operational capability, complete with strategic context.",
-  "keyBenefits": [
-    "Benefit 1: A long sentence detailing exactly how you reduce operational inefficiencies and the resulting financial impact.",
-    "Benefit 2: A long sentence explaining how your solution drives rapid scalability without proportional overhead increases.",
-    "Benefit 3: A long sentence highlighting risk mitigation, compliance reinforcement, or technical superiority."
-  ],
-  "callToAction": "A professional, low-friction, multi-sentence request for a brief strategic alignment call to explore potential synergies.",
-  "signOff": "Warm regards,\\n${brandContext.name}\\nProviding Next-Generation Infrastructure"
-}`;
+      // Merge with providedData from frontend form
+      const context = { ...providedData, ...inputData };
+      console.log(`📋 Consolidated context for marketing_brief/email:`, context);
+
+      userPrompt = `Write a deeply persuasive, highly professional, and robust B2B Sales Email/Brief for: "${topic}".
+      
+      CONTEXT DATA:
+      ${JSON.stringify(context, null, 2)}
+
+      Return ONLY valid JSON with this exact structure:
+      {
+        "subject": "${context.subject || 'Strategic Alignment Opportunity'}",
+        "greeting": "Hello ${context.contactName || '[Name]'},",
+        "valueProposition": "A robust, detailed paragraph explaining our value.",
+        "callToAction": "A professional request for a meeting."
+      }`;
 
     } else if (effectiveType === "resume") {
-      userPrompt = `Create a comprehensive professional resume based on: "${topic}".
+      // Parse structured input data
+      const inputData = {};
+      if (topic.includes('|')) {
+        topic.split('|').forEach(pair => {
+          const [key, value] = pair.split(':').map(s => s.trim());
+          if (key && value) {
+            inputData[key.toLowerCase().replace(/\s+/g, '')] = value;
+          }
+        });
+      }
 
-Return ONLY valid JSON with this exact structure:
-{
-  "personalInfo": { "name": "[Professional Name Placeholder]", "title": "[Target Job Title]", "contact": "professional.contact@email.com" },
-  "professionalSummary": "A punchy, 3-sentence summary highlighting core expertise and unique value.",
-  "experience": [
-    {
-      "role": "Senior [Role Title]",
-      "company": "Market Leader Inc.",
-      "period": "2020 - Present",
-      "impact": ["Quantifiable achievement 1 (e.g. Increased revenue by 25%)", "Leadership achievement...", "Innovation achievement..."]
-    }
-  ],
-  "coreCompetencies": ["Strategy & Execution", "Team Leadership", "Industry-Specific Skill...", "Advanced Technology..."],
-  "education": [{"degree": "Advanced Professional Degree", "institution": "Prestige Institute", "year": "2016"}]
-}`;
+      // Merge with providedData from frontend form
+      const context = { ...providedData, ...inputData };
+      console.log(`📋 Consolidated context for resume:`, context);
 
-    // HR & Employee Documents
+      userPrompt = `Create a comprehensive professional resume using the following context:
+      
+      CONTEXT DATA:
+      ${JSON.stringify(context, null, 2)}
+
+      Return ONLY valid JSON with this exact structure:
+      {
+        "personalInfo": { 
+          "name": "${context.name || context.fullName || '[Professional Name]'} ", 
+          "title": "${context.title || context.position || '[Target Job Title]'}", 
+          "contact": "${context.contact || context.email || 'professional.contact@email.com'}" 
+        },
+        "professionalSummary": "A punchy summary.",
+        "experience": ${context.experience ? JSON.stringify(context.experience) : `[
+          {
+            "role": "${context.position || 'Senior Professional'}",
+            "company": "${context.company || 'Market Leader Inc.'}",
+            "period": "2020 - Present",
+            "impact": ["Quantifiable achievement 1", "Innovation achievement..."]
+          }
+        ]`}
+      }`;
+
+      // HR & Employee Documents
     } else if (effectiveType === "offer_letter") {
       console.log(`🏢 Processing offer letter with topic: ${topic}`);
-      
-      // Parse structured input data
+
+      // Parse structured input data from topic (pipes)
       const inputData = {};
       if (topic.includes('|')) {
         console.log(`📊 Parsing structured data from topic`);
@@ -260,50 +293,57 @@ Return ONLY valid JSON with this exact structure:
           }
         });
       }
-      console.log(`📋 Parsed input data:`, inputData);
 
-      userPrompt = `Generate a comprehensive, professional Employment Offer Letter using the provided information: "${topic}".
+      // Merge with providedData from frontend form
+      const context = { ...providedData, ...inputData };
+      console.log(`📋 Consolidated context for offer_letter:`, context);
 
-Use the structured data provided to fill in specific details. If any information is missing, use professional placeholders.
+      userPrompt = `Generate a formal, comprehensive Employment Offer Letter using the following context:
+      
+      CONTEXT DATA:
+      ${JSON.stringify(context, null, 2)}
 
-Return ONLY valid JSON with this structure:
-{
-  "title": "Employment Offer Letter",
-  "date": "${new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}",
-  "companyName": "${inputData.company || brandContext.name}",
-  "candidateName": "${inputData.employee || '[Candidate Name]'}",
-  "position": "${inputData.position || '[Job Title]'}",
-  "department": "${inputData.department || '[Department]'}",
-  "startDate": "${inputData.startdate || '[Start Date]'}",
-  "salary": "${inputData.salary || '[Annual Salary]'}",
-  "reportingTo": "${inputData.reportingto || '[Direct Supervisor/Manager Name]'}",
-  "workLocation": "[Office Location/Remote]",
-  "workingHours": "Monday to Friday, 9:00 AM to 6:00 PM",
-  "benefits": [
-    "Comprehensive health insurance coverage for employee and family",
-    "Annual paid time off (PTO) as per company policy",
-    "Professional development and training opportunities",
-    "Performance-based annual bonus eligibility",
-    "Retirement savings plan with company matching"
-  ],
-  "termsAndConditions": [
-    "Employment is contingent upon successful completion of background verification and reference checks",
-    "This is an at-will employment arrangement",
-    "Employee must sign and comply with company confidentiality and non-disclosure agreements",
-    "Employee handbook and policies will be provided during onboarding",
-    "Probationary period of 90 days applies"
-  ],
-  "nextSteps": [
-    "Please confirm your acceptance by signing and returning this letter within 7 days",
-    "Complete pre-employment documentation and background checks",
-    "Attend new employee orientation on your start date"
-  ],
-  "contactPerson": "HR Department - hr@${(inputData.company || brandContext.name).toLowerCase().replace(/\s+/g, '')}.com",
-  "closingMessage": "We are excited about the possibility of you joining our team and look forward to your positive response."
-}`;
+      Use the context data provided to fill in specific details. If any information is missing, use professional placeholders.
+      DO NOT USE GENERIC PLACEHOLDERS like "[Candidate Name]" if a name is provided in the context above.
+
+      Return ONLY valid JSON with this structure:
+      {
+        "title": "Employment Offer Letter",
+        "date": "${new Date().toLocaleDateString('en-IN', { year: 'numeric', month: 'long', day: 'numeric' })}",
+        "companyName": "${context.companyName || context.company || brandContext.name}",
+        "candidateName": "${context.candidateName || context.employee || context.candidate || '[Candidate Name]'}",
+        "position": "${context.position || '[Job Title]'}",
+        "department": "${context.department || '[Department]'}",
+        "startDate": "${context.startDate || context.startdate || '[Start Date]'}",
+        "salary": "${context.salary || '[Annual Salary]'}",
+        "reportingTo": "${context.reportingTo || context.reportingto || '[Direct Supervisor/Manager Name]'}",
+        "workLocation": "${context.workLocation || '[Office Location/Remote]'}",
+        "workingHours": "${context.workingHours || 'Monday to Friday, 9:00 AM to 6:00 PM'}",
+        "benefits": [
+          "Comprehensive health insurance coverage for employee and family",
+          "Annual paid time off (PTO) as per company policy",
+          "Professional development and training opportunities",
+          "Performance-based annual bonus eligibility",
+          "Retirement savings plan with company matching"
+        ],
+        "termsAndConditions": [
+          "Employment is contingent upon successful completion of background verification and reference checks",
+          "This is an at-will employment arrangement",
+          "Employee must sign and comply with company confidentiality and non-disclosure agreements",
+          "Employee handbook and policies will be provided during onboarding",
+          "Probationary period of 90 days applies"
+        ],
+        "nextSteps": [
+          "Please confirm your acceptance by signing and returning this letter within 7 days",
+          "Complete pre-employment documentation and background checks",
+          "Attend new employee orientation on your start date"
+        ],
+        "contactPerson": "HR Department - hr@${(context.companyName || context.company || brandContext.name).toLowerCase().replace(/\s+/g, '')}.com",
+        "closingMessage": "We are excited about the possibility of you joining our team and look forward to your positive response."
+      }`;
 
     } else if (effectiveType === "appointment_letter") {
-      // Parse structured input data
+      // Parse structured input data from topic (pipes)
       const inputData = {};
       if (topic.includes('|')) {
         topic.split('|').forEach(pair => {
@@ -314,40 +354,42 @@ Return ONLY valid JSON with this structure:
         });
       }
 
-      userPrompt = `Generate a formal Appointment Letter using the provided information: "${topic}".
+      // Merge with providedData from frontend form
+      const context = { ...providedData, ...inputData };
+      console.log(`📋 Consolidated context for appointment_letter:`, context);
 
-Return ONLY valid JSON with this structure:
-{
-  "title": "Letter of Appointment",
-  "date": "${new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}",
-  "companyName": "${brandContext.name}",
-  "employeeName": "${inputData.employee || '[Employee Name]'}",
-  "position": "${inputData.position || '[Job Title]'}",
-  "department": "${inputData.department || '[Department]'}",
-  "appointmentDate": "${inputData.startdate || '[Appointment Date]'}",
-  "salary": "${inputData.salary || '[Annual Salary]'}",
-  "employeeId": "[Employee ID to be assigned]",
-  "reportingStructure": "You will report directly to the ${inputData.department || 'Department'} Head",
-  "keyResponsibilities": [
-    "Execute core ${inputData.position || 'role'} functions with excellence and professionalism",
-    "Collaborate effectively with team members and cross-functional departments",
-    "Maintain high standards of work quality and meet established deadlines",
-    "Participate in professional development and training programs",
-    "Adhere to all company policies, procedures, and code of conduct"
-  ],
-  "workingConditions": {
-    "workingHours": "Standard business hours: 9:00 AM to 6:00 PM, Monday through Friday",
-    "location": "[Office Location/Remote Work Arrangement]",
-    "probationPeriod": "90 days from the date of joining"
-  },
-  "compensation": {
-    "baseSalary": "${inputData.salary || '[Annual Salary]'}",
-    "paymentSchedule": "Monthly salary payment on the last working day of each month",
-    "benefits": "As per company policy and employment agreement"
-  },
-  "acknowledgment": "This appointment is subject to satisfactory completion of all pre-employment requirements and adherence to company policies.",
-  "authorizedSignatory": "HR Manager, ${brandContext.name}"
-}`;
+      userPrompt = `Generate a formal, comprehensive Appointment Letter using the following context:
+      
+      CONTEXT DATA:
+      ${JSON.stringify(context, null, 2)}
+
+      Use the context data provided to fill in specific details. If any information is missing, use professional placeholders.
+      DO NOT USE GENERIC PLACEHOLDERS like "[Employee Name]" if a name is provided in the context above.
+
+      Return ONLY valid JSON with this structure:
+      {
+        "title": "Letter of Appointment",
+        "date": "${new Date().toLocaleDateString('en-IN', { year: 'numeric', month: 'long', day: 'numeric' })}",
+        "companyName": "${context.companyName || context.company || brandContext.name}",
+        "employeeName": "${context.employeeName || context.employee || context.candidate || '[Employee Name]'}",
+        "position": "${context.position || '[Job Title]'}",
+        "department": "${context.department || '[Department]'}",
+        "appointmentDate": "${context.appointmentDate || context.startdate || context.startDate || '[Appointment Date]'}",
+        "salary": "${context.salary || '[Annual Salary]'}",
+        "employeeId": "${context.employeeId || '[Employee ID to be assigned]'}",
+        "reportingStructure": "${context.reportingTo ? `You will report directly to ${context.reportingTo}` : `You will report directly to the ${context.department || 'Department'} Head`}",
+        "keyResponsibilities": [
+          "Execute core ${context.position || 'role'} functions with excellence and professionalism",
+          "Collaborate effectively with team members and cross-functional departments",
+          "Maintain high standards of work quality and meet established deadlines",
+          "Participate in professional development and training programs",
+          "Adhere to all company policies, procedures, and code of conduct"
+        ],
+        "probation": "90 days from the date of joining",
+        "noticePeriod": "30 days during probation, 60 days after confirmation",
+        "contactPerson": "HR Department - hr@${(context.companyName || context.company || brandContext.name).toLowerCase().replace(/\s+/g, '')}.com",
+        "closingMessage": "We look forward to a mutually beneficial relationship."
+      }`;
 
     } else if (effectiveType === "experience_certificate") {
       // Parse structured input data
@@ -361,38 +403,32 @@ Return ONLY valid JSON with this structure:
         });
       }
 
-      userPrompt = `Generate a professional Experience Certificate using the provided information: "${topic}".
+      // Merge with providedData from frontend form
+      const context = { ...providedData, ...inputData };
+      console.log(`📋 Consolidated context for experience_certificate:`, context);
 
-Return ONLY valid JSON with this structure:
-{
-  "title": "Experience Certificate",
-  "date": "${new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}",
-  "companyName": "${brandContext.name}",
-  "employeeName": "${inputData.employee || '[Employee Name]'}",
-  "position": "${inputData.position || '[Job Title]'}",
-  "department": "${inputData.department || '[Department]'}",
-  "employmentPeriod": {
-    "startDate": "${inputData.startdate || '[Start Date]'}",
-    "endDate": "[End Date]"
-  },
-  "employeeId": "[Employee ID]",
-  "workPerformance": "During the tenure, ${inputData.employee || 'the employee'} demonstrated exceptional professionalism, dedication, and competence in their role as ${inputData.position || 'team member'}.",
-  "keyAchievements": [
-    "Consistently met and exceeded performance targets and objectives",
-    "Demonstrated strong leadership and collaborative skills",
-    "Contributed significantly to ${inputData.department || 'department'} goals and initiatives",
-    "Maintained high standards of work quality and professional conduct"
-  ],
-  "characterAssessment": "We found ${inputData.employee || 'the employee'} to be honest, hardworking, and reliable. They maintained excellent relationships with colleagues and clients.",
-  "reasonForLeaving": "[Reason for separation - resignation/completion of contract/etc.]",
-  "recommendation": "We recommend ${inputData.employee || 'the employee'} for future employment opportunities and wish them success in their career endeavors.",
-  "contactForVerification": "For any verification or additional information, please contact HR Department at hr@${brandContext.name.toLowerCase().replace(/\s+/g, '')}.com",
-  "authorizedSignatory": {
-    "name": "[HR Manager Name]",
-    "designation": "HR Manager",
-    "company": "${brandContext.name}"
-  }
-}`;
+      userPrompt = `Generate a professional, comprehensive Experience Certificate using the following context:
+      
+      CONTEXT DATA:
+      ${JSON.stringify(context, null, 2)}
+
+      Use the context data provided to fill in specific details. If any information is missing, use professional placeholders.
+      DO NOT USE GENERIC PLACEHOLDERS like "[Employee Name]" if a name is provided in the context above.
+
+      Return ONLY valid JSON with this structure:
+      {
+        "title": "Experience Certificate",
+        "date": "${new Date().toLocaleDateString('en-IN', { year: 'numeric', month: 'long', day: 'numeric' })}",
+        "companyName": "${context.companyName || context.company || brandContext.name}",
+        "employeeName": "${context.employeeName || context.employee || context.candidate || '[Employee Name]'}",
+        "position": "${context.position || '[Job Title]'}",
+        "startDate": "${context.startDate || context.startdate || '[Start Date]'}",
+        "endDate": "${context.endDate || context.enddate || '[End Date/Present]'}",
+        "performance": "${context.performance || 'excellent'}",
+        "skills": "${context.skills || 'professionalism, dedication, and teamwork'}",
+        "contactPerson": "${context.hrName || 'HR Manager'}",
+        "certificateId": "EXP-${Date.now().toString().slice(-6)}"
+      }`;
 
     } else if (effectiveType === "onboarding_letter") {
       // Parse structured input data
@@ -406,58 +442,32 @@ Return ONLY valid JSON with this structure:
         });
       }
 
-      userPrompt = `Generate a comprehensive Employee Onboarding Letter using the provided information: "${topic}".
+      // Merge with providedData from frontend form
+      const context = { ...providedData, ...inputData };
+      console.log(`📋 Consolidated context for onboarding_letter:`, context);
 
-Return ONLY valid JSON with this structure:
-{
-  "title": "Employee Onboarding Welcome Letter",
-  "date": "${new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}",
-  "companyName": "${brandContext.name}",
-  "employeeName": "${inputData.employee || '[Employee Name]'}",
-  "position": "${inputData.position || '[Job Title]'}",
-  "department": "${inputData.department || '[Department]'}",
-  "startDate": "${inputData.startdate || '[Start Date]'}",
-  "welcomeMessage": "We are delighted to welcome you to the ${brandContext.name} family! We are excited about the skills and experience you bring to our ${inputData.department || 'team'}.",
-  "firstDayInstructions": [
-    "Report to the main reception at 9:00 AM on your first day",
-    "Bring original documents for verification (ID proof, address proof, educational certificates)",
-    "You will be provided with your employee ID card and access credentials",
-    "Your direct supervisor will conduct an orientation session"
-  ],
-  "onboardingSchedule": [
-    {
-      "day": "Day 1",
-      "activities": "Documentation completion, IT setup, workplace tour, and team introductions"
-    },
-    {
-      "day": "Week 1",
-      "activities": "Department orientation, role-specific training, and initial project assignments"
-    },
-    {
-      "day": "Month 1",
-      "activities": "Performance review, feedback session, and goal setting for probation period"
-    }
-  ],
-  "documentsRequired": [
-    "Government-issued photo ID (Aadhar/Passport/Driving License)",
-    "Address proof (Utility bill/Bank statement)",
-    "Educational certificates and transcripts",
-    "Previous employment experience letters",
-    "Passport-size photographs (2 copies)"
-  ],
-  "benefitsOverview": [
-    "Comprehensive health insurance coverage",
-    "Paid time off and sick leave as per policy",
-    "Professional development and training opportunities",
-    "Employee assistance programs and wellness initiatives"
-  ],
-  "contactInformation": {
-    "hrContact": "HR Department - hr@${brandContext.name.toLowerCase().replace(/\s+/g, '')}.com",
-    "itSupport": "IT Helpdesk - it@${brandContext.name.toLowerCase().replace(/\s+/g, '')}.com",
-    "supervisor": "${inputData.department || 'Department'} Head - [supervisor@company.com]"
-  },
-  "closingMessage": "We look forward to a successful and rewarding journey together. Welcome aboard!"
-}`;
+      userPrompt = `Generate a warm, professional Employee Onboarding Letter using the following context:
+      
+      CONTEXT DATA:
+      ${JSON.stringify(context, null, 2)}
+
+      Use the context data provided to fill in specific details.
+      Return ONLY valid JSON with this structure:
+      {
+        "title": "Employee Onboarding Welcome Letter",
+        "date": "${new Date().toLocaleDateString('en-IN', { year: 'numeric', month: 'long', day: 'numeric' })}",
+        "companyName": "${context.companyName || context.company || brandContext.name}",
+        "employeeName": "${context.employeeName || context.employee || context.candidate || '[Employee Name]'}",
+        "position": "${context.position || '[Job Title]'}",
+        "department": "${context.department || '[Department]'}",
+        "startDate": "${context.startDate || context.startdate || '[Start Date]'}",
+        "welcomeMessage": "We are delighted to welcome you to the team!",
+        "firstDayInstructions": [
+          "Report to the main reception at 9:00 AM on your first day",
+          "Bring original documents for verification",
+          "Your direct supervisor will conduct an orientation session"
+        ]
+      }`;
 
     } else if (effectiveType === "warning_letter") {
       // Parse structured input data
@@ -471,52 +481,37 @@ Return ONLY valid JSON with this structure:
         });
       }
 
-      userPrompt = `Generate a formal Employee Warning Letter using the provided information: "${topic}".
+      // Merge with providedData from frontend form
+      const context = { ...providedData, ...inputData };
+      console.log(`📋 Consolidated context for warning_letter:`, context);
 
-Return ONLY valid JSON with this structure:
-{
-  "title": "Employee Warning Letter",
-  "date": "${new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}",
-  "companyName": "${brandContext.name}",
-  "employeeName": "${inputData.employee || '[Employee Name]'}",
-  "position": "${inputData.position || '[Job Title]'}",
-  "department": "${inputData.department || '[Department]'}",
-  "employeeId": "[Employee ID]",
-  "warningType": "[Verbal Warning/Written Warning/Final Warning]",
-  "issueDescription": "This letter serves as a formal warning regarding [specific performance/conduct issue that needs to be addressed].",
-  "incidentDetails": {
-    "date": "[Date of incident/issue]",
-    "description": "Detailed description of the performance issue, policy violation, or conduct concern that has prompted this warning.",
-    "witnesses": "[If applicable - names of witnesses or documentation]"
-  },
-  "policyViolation": "This behavior/performance issue violates company policy section [X.X] regarding [specific policy area].",
-  "previousDiscussions": [
-    "Informal discussion on [date] regarding similar concerns",
-    "Previous coaching session on [date] about performance expectations"
-  ],
-  "expectationsGoingForward": [
-    "Immediate improvement in [specific area] is required",
-    "Adherence to all company policies and procedures",
-    "Professional conduct and communication with colleagues and clients",
-    "Meeting all performance standards and deadlines"
-  ],
-  "consequencesOfNonCompliance": "Failure to demonstrate immediate and sustained improvement may result in further disciplinary action, up to and including termination of employment.",
-  "supportOffered": [
-    "Additional training and resources will be provided",
-    "Regular check-ins with supervisor for progress monitoring",
-    "Access to employee assistance programs if applicable"
-  ],
-  "reviewPeriod": "Your performance will be closely monitored for the next 90 days, with formal reviews at 30, 60, and 90-day intervals.",
-  "acknowledgment": "By signing below, you acknowledge that you have received and understand this warning. Your signature does not indicate agreement with the content.",
-  "authorizedBy": {
-    "name": "[Supervisor/HR Manager Name]",
-    "designation": "[Title]",
-    "date": "${new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}"
-  }
-}`;
+      userPrompt = `Generate a formal Employee Warning Letter using the following context:
+      
+      CONTEXT DATA:
+      ${JSON.stringify(context, null, 2)}
+
+      Use the context data provided to fill in specific details. If any information is missing, use professional placeholders.
+      DO NOT USE GENERIC PLACEHOLDERS like "[Employee Name]" if a name is provided in the context above.
+
+      Return ONLY valid JSON with this structure:
+      {
+        "title": "Employee Warning Letter",
+        "date": "${new Date().toLocaleDateString('en-IN', { year: 'numeric', month: 'long', day: 'numeric' })}",
+        "companyName": "${context.companyName || context.company || brandContext.name}",
+        "employeeName": "${context.employeeName || context.employee || context.candidate || '[Employee Name]'}",
+        "position": "${context.position || '[Job Title]'}",
+        "warningType": "${context.warningType || 'Written Warning'}",
+        "issueDescription": "${context.issueDescription || 'performance concern'}",
+        "nextSteps": [
+          "Immediate improvement in performance and conduct",
+          "Adherence to all company policies",
+          "Regular reviews with supervisor"
+        ],
+        "contactPerson": "${context.hrName || 'HR Manager'}"
+      }`;
 
     } else if (effectiveType === "nda") {
-      // Parse structured input data
+      // Parse structured input data from topic (pipes)
       const inputData = {};
       if (topic.includes('|')) {
         topic.split('|').forEach(pair => {
@@ -527,44 +522,26 @@ Return ONLY valid JSON with this structure:
         });
       }
 
-      userPrompt = `Generate a comprehensive Non-Disclosure Agreement using the provided information: "${topic}".
+      // Merge with providedData from frontend form
+      const context = { ...providedData, ...inputData };
+      console.log(`📋 Consolidated context for nda:`, context);
 
-Return ONLY valid JSON with this structure:
-{
-  "title": "Non-Disclosure Agreement (NDA)",
-  "date": "${new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}",
-  "disclosingParty": "${brandContext.name}",
-  "receivingParty": "${inputData.otherparty || '[Receiving Party Name]'}",
-  "effectiveDate": "${inputData.effectivedate || '[Agreement Date]'}",
-  "purpose": "${inputData.purpose || 'Business discussions and potential collaboration opportunities'}",
-  "confidentialInformation": [
-    "Technical data, proprietary methodologies, and trade secrets",
-    "Business strategies, financial information, and operational procedures",
-    "Customer lists, supplier information, and market research data",
-    "Product development plans and intellectual property",
-    "Any information marked as confidential or that would reasonably be considered confidential"
-  ],
-  "obligations": [
-    "Maintain strict confidentiality of all disclosed information",
-    "Use confidential information solely for the stated purpose",
-    "Not disclose confidential information to third parties without prior written consent",
-    "Take reasonable precautions to protect confidential information",
-    "Return or destroy all confidential information upon request"
-  ],
-  "exceptions": [
-    "Information that is publicly available through no breach of this agreement",
-    "Information independently developed without use of confidential information",
-    "Information rightfully received from third parties without confidentiality restrictions",
-    "Information required to be disclosed by law or court order"
-  ],
-  "duration": "This agreement shall remain in effect for a period of 3 years from the effective date, unless terminated earlier by mutual consent",
-  "remedies": "The parties acknowledge that breach of this agreement may cause irreparable harm, and the disclosing party shall be entitled to seek injunctive relief and monetary damages",
-  "governingLaw": "This agreement shall be governed by and construed in accordance with the laws of [Jurisdiction]",
-  "signatures": {
-    "disclosingParty": "${brandContext.name}",
-    "receivingParty": "${inputData.otherparty || '[Receiving Party Name]'}"
-  }
-}`;
+      userPrompt = `Generate a comprehensive Non-Disclosure Agreement using the following context:
+      
+      CONTEXT DATA:
+      ${JSON.stringify(context, null, 2)}
+
+      Use the context data provided to fill in specific details.
+      Return ONLY valid JSON with this structure:
+      {
+        "title": "Non-Disclosure Agreement (NDA)",
+        "date": "${new Date().toLocaleDateString('en-IN', { year: 'numeric', month: 'long', day: 'numeric' })}",
+        "disclosingParty": "${context.disclosingParty || context.company || brandContext.name}",
+        "receivingParty": "${context.receivingParty || context.otherparty || '[Receiving Party Name]'}",
+        "effectiveDate": "${context.effectiveDate || context.effectivedate || '[Agreement Date]'}",
+        "purpose": "${context.purpose || 'Business discussions'}",
+        "governingLaw": "${context.governingLaw || 'applicable local laws'}"
+      }`;
 
     } else if (effectiveType === "service_agreement") {
       // Parse structured input data
@@ -578,38 +555,26 @@ Return ONLY valid JSON with this structure:
         });
       }
 
-      userPrompt = `Generate a comprehensive Service Agreement using the provided information: "${topic}".
+      // Merge with providedData from frontend form
+      const context = { ...providedData, ...inputData };
+      console.log(`📋 Consolidated context for service_agreement:`, context);
 
-Return ONLY valid JSON with this structure:
-{
-  "title": "Service Agreement",
-  "date": "${new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}",
-  "serviceProvider": "${brandContext.name}",
-  "client": "${inputData.otherparty || '[Client Name]'}",
-  "effectiveDate": "${inputData.effectivedate || '[Agreement Date]'}",
-  "serviceDescription": "${inputData.purpose || 'Professional services as mutually agreed upon'}",
-  "scope": [
-    "Detailed scope of services to be provided",
-    "Deliverables and milestones",
-    "Performance standards and quality metrics",
-    "Timeline and project phases"
-  ],
-  "terms": [
-    "Service provider will deliver services with professional competence",
-    "Client will provide necessary cooperation and information",
-    "All work will be performed in accordance with industry standards",
-    "Changes to scope require written agreement from both parties"
-  ],
-  "payment": {
-    "amount": "[Service Fee]",
-    "schedule": "Payment terms as agreed",
-    "lateFees": "Late payment charges may apply"
-  },
-  "duration": "This agreement shall remain in effect until completion of services or termination",
-  "termination": "Either party may terminate with 30 days written notice",
-  "liability": "Service provider's liability is limited to the amount paid for services",
-  "governingLaw": "This agreement is governed by applicable local laws"
-}`;
+      userPrompt = `Generate a comprehensive Service Agreement using the following context:
+      
+      CONTEXT DATA:
+      ${JSON.stringify(context, null, 2)}
+
+      Use the context data provided to fill in specific details.
+      Return ONLY valid JSON with this structure:
+      {
+        "title": "Service Agreement",
+        "date": "${new Date().toLocaleDateString('en-IN', { year: 'numeric', month: 'long', day: 'numeric' })}",
+        "serviceProvider": "${context.serviceProvider || context.company || brandContext.name}",
+        "client": "${context.client || context.otherparty || '[Client Name]'}",
+        "effectiveDate": "${context.effectiveDate || context.effectivedate || '[Agreement Date]'}",
+        "serviceDescription": "${context.purpose || context.serviceDescription || 'Professional services'}",
+        "paymentTerms": "${context.paymentTerms || 'As per invoice'}"
+      }`;
 
     } else if (effectiveType === "mou") {
       // Parse structured input data
@@ -623,39 +588,24 @@ Return ONLY valid JSON with this structure:
         });
       }
 
-      userPrompt = `Generate a Memorandum of Understanding using the provided information: "${topic}".
+      // Merge with providedData from frontend form
+      const context = { ...providedData, ...inputData };
+      console.log(`📋 Consolidated context for mou:`, context);
 
-Return ONLY valid JSON with this structure:
-{
-  "title": "Memorandum of Understanding (MOU)",
-  "date": "${new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}",
-  "party1": "${brandContext.name}",
-  "party2": "${inputData.otherparty || '[Second Party Name]'}",
-  "effectiveDate": "${inputData.effectivedate || '[Agreement Date]'}",
-  "purpose": "${inputData.purpose || 'Mutual cooperation and collaboration'}",
-  "objectives": [
-    "Establish framework for cooperation",
-    "Define mutual responsibilities and benefits",
-    "Create foundation for future collaboration",
-    "Promote shared goals and interests"
-  ],
-  "responsibilities": {
-    "party1": [
-      "Provide expertise and resources as agreed",
-      "Maintain confidentiality of shared information",
-      "Act in good faith throughout the collaboration"
-    ],
-    "party2": [
-      "Provide necessary cooperation and support",
-      "Share relevant information as required",
-      "Maintain professional standards"
-    ]
-  },
-  "duration": "This MOU shall remain in effect for [duration] unless terminated earlier",
-  "termination": "Either party may terminate with 60 days written notice",
-  "nonBinding": "This MOU represents intent to cooperate and is not legally binding",
-  "governingPrinciples": "Both parties agree to act in good faith and mutual respect"
-}`;
+      userPrompt = `Generate a Memorandum of Understanding using the following context:
+      
+      CONTEXT DATA:
+      ${JSON.stringify(context, null, 2)}
+
+      Return ONLY valid JSON with this structure:
+      {
+        "title": "Memorandum of Understanding (MOU)",
+        "date": "${new Date().toLocaleDateString('en-IN', { year: 'numeric', month: 'long', day: 'numeric' })}",
+        "party1": "${context.party1 || context.company || brandContext.name}",
+        "party2": "${context.party2 || context.otherparty || '[Second Party Name]'}",
+        "effectiveDate": "${context.effectiveDate || context.effectivedate || '[Agreement Date]'}",
+        "purpose": "${context.purpose || 'Mutual cooperation'}"
+      }`;
 
     } else if (effectiveType === "invoice") {
       // Parse structured input data
@@ -669,37 +619,44 @@ Return ONLY valid JSON with this structure:
         });
       }
 
-      userPrompt = `Generate a professional Invoice using the provided information: "${topic}".
+      // Merge with providedData from frontend form
+      const context = { ...providedData, ...inputData };
+      console.log(`📋 Consolidated context for invoice:`, context);
 
-Return ONLY valid JSON with this structure:
-{
-  "title": "Invoice",
-  "invoiceNumber": "INV-${Date.now().toString().slice(-6)}",
-  "invoiceDate": "${new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}",
-  "from": {
-    "company": "${brandContext.name}",
-    "address": "[Company Address]",
-    "email": "billing@${brandContext.name.toLowerCase().replace(/\s+/g, '')}.com"
-  },
-  "to": {
-    "client": "${inputData.client || '[Client Name]'}",
-    "address": "[Client Address]"
-  },
-  "items": [
-    {
-      "description": "${inputData.items || 'Professional services rendered'}",
-      "quantity": "1",
-      "rate": "${inputData.amount || '[Rate]'}",
-      "amount": "${inputData.amount || '[Amount]'}"
-    }
-  ],
-  "subtotal": "${inputData.amount || '[Subtotal]'}",
-  "tax": "[Tax Amount if applicable]",
-  "total": "${inputData.amount || '[Total Amount]'}",
-  "paymentTerms": "Payment due within 30 days of invoice date",
-  "dueDate": "${inputData.duedate || '[Due Date]'}",
-  "notes": "Thank you for your business!"
-}`;
+      userPrompt = `Generate a professional, detailed Invoice using the following context:
+      
+      CONTEXT DATA:
+      ${JSON.stringify(context, null, 2)}
+
+      PRIORITY: If 'items' array is provided in CONTEXT DATA, use it exactly.
+      If 'clientName' or 'customerName' is provided, use it for the 'to' section.
+
+      Return ONLY valid JSON with this structure:
+      {
+        "title": "Invoice",
+        "invoiceNumber": "${context.invoiceNumber || 'INV-' + Date.now().toString().slice(-6)}",
+        "invoiceDate": "${context.invoiceDate || new Date().toLocaleDateString('en-IN', { year: 'numeric', month: 'long', day: 'numeric' })}",
+        "from": {
+          "company": "${context.fromCompany || brandContext.name}",
+          "address": "${context.fromAddress || '[Company Address]'}"
+        },
+        "to": {
+          "client": "${context.toClient || context.client || context.customerName || context.clientName || '[Client Name]'}",
+          "address": "${context.toAddress || '[Client Address]'}"
+        },
+        "items": ${context.items ? JSON.stringify(context.items) : `[
+          {
+            "description": "${context.description || 'Professional Services'}",
+            "quantity": "${context.quantity || 1}",
+            "rate": "${context.rate || context.amount || 0}",
+            "amount": "${context.amount || 0}"
+          }
+        ]`},
+        "subtotal": "${context.subtotal || context.amount || 0}",
+        "tax": "${context.tax || 0}",
+        "total": "${context.total || context.amount || 0}",
+        "dueDate": "${context.dueDate || context.duedate || '[Due Date]'}"
+      }`;
 
     } else if (effectiveType === "purchase_order") {
       // Parse structured input data
@@ -713,43 +670,37 @@ Return ONLY valid JSON with this structure:
         });
       }
 
-      userPrompt = `Generate a comprehensive Purchase Order using the provided information: "${topic}".
+      // Merge with providedData from frontend form
+      const context = { ...providedData, ...inputData };
+      console.log(`📋 Consolidated context for purchase_order:`, context);
 
-Return ONLY valid JSON with this structure:
-{
-  "title": "Purchase Order",
-  "poNumber": "PO-${Date.now().toString().slice(-6)}",
-  "issueDate": "${new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}",
-  "buyer": "${brandContext.name}",
-  "supplier": "${inputData.client || '[Supplier Company Name]'}",
-  "deliveryAddress": "[Delivery Location - To be confirmed]",
-  "requestedDeliveryDate": "${inputData.duedate || '[Required Delivery Date]'}",
-  "items": [
-    {
-      "itemNumber": "1",
-      "description": "${inputData.items || 'Professional services and deliverables as specified'}",
-      "quantity": "1",
-      "unitPrice": "${inputData.amount || '[Unit Price]'}",
-      "totalPrice": "${inputData.amount || '[Line Total]'}"
-    }
-  ],
-  "subtotal": "${inputData.amount || '[Subtotal Amount]'}",
-  "tax": "[Tax Amount - As applicable]",
-  "totalAmount": "${inputData.amount || '[Total PO Amount]'}",
-  "paymentTerms": "Net 30 days from delivery and acceptance of goods/services",
-  "specialInstructions": [
-    "All items must meet specified quality standards",
-    "Delivery confirmation required upon receipt",
-    "Invoice to be submitted with delivery documentation"
-  ],
-  "terms": [
-    "This purchase order constitutes a binding agreement",
-    "Supplier must acknowledge receipt within 48 hours",
-    "Any changes must be approved in writing",
-    "Delivery must be made to the specified address during business hours"
-  ],
-  "contactPerson": "Procurement Department - procurement@${brandContext.name.toLowerCase().replace(/\s+/g, '')}.com"
-}`;
+      userPrompt = `Generate a professional Purchase Order using the following context:
+      
+      CONTEXT DATA:
+      ${JSON.stringify(context, null, 2)}
+
+      PRIORITY: If 'items' array is provided in CONTEXT DATA, use it exactly.
+      If 'supplierName' is provided, use it.
+
+      Return ONLY valid JSON with this structure:
+      {
+        "title": "Purchase Order",
+        "poNumber": "${context.poNumber || 'PO-' + Date.now().toString().slice(-6)}",
+        "issueDate": "${context.issueDate || new Date().toLocaleDateString('en-IN', { year: 'numeric', month: 'long', day: 'numeric' })}",
+        "buyer": "${context.buyer || brandContext.name}",
+        "supplier": "${context.supplier || context.supplierName || context.client || '[Supplier Name]'}",
+        "items": ${context.items ? JSON.stringify(context.items) : `[
+          {
+            "itemNumber": "1",
+            "description": "${context.items_desc || context.description || 'Goods/Services'}",
+            "quantity": "${context.quantity || 1}",
+            "unitPrice": "${context.rate || context.amount || 0}",
+            "totalPrice": "${context.amount || 0}"
+          }
+        ]`},
+        "totalAmount": "${context.total || context.amount || 0}",
+        "deliveryDate": "${context.deliveryDate || context.duedate || '[Delivery Date]'}"
+      }`;
 
     } else if (effectiveType === "gst_invoice") {
       // Parse structured input data
@@ -763,54 +714,113 @@ Return ONLY valid JSON with this structure:
         });
       }
 
-      userPrompt = `Generate a comprehensive GST-compliant Invoice using the provided information: "${topic}".
+      // Merge with providedData from frontend form
+      const context = { ...providedData, ...inputData };
+      console.log(`📋 Consolidated context for gst_invoice:`, context);
 
-Return ONLY valid JSON with this structure:
-{
-  "title": "Tax Invoice",
-  "invoiceNumber": "INV-${Date.now().toString().slice(-6)}",
-  "invoiceDate": "${new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}",
-  "supplier": {
-    "legalName": "${brandContext.name}",
-    "address": "[Supplier Address - To be updated]",
-    "gstin": "[Supplier GSTIN - To be updated]",
-    "email": "billing@${brandContext.name.toLowerCase().replace(/\s+/g, '')}.com"
-  },
-  "buyer": {
-    "legalName": "${inputData.client || '[Buyer Legal Name]'}",
-    "address": "[Buyer Address - To be confirmed]",
-    "gstin": "[Buyer GSTIN - If applicable]"
-  },
-  "items": [
-    {
-      "description": "${inputData.items || 'Professional services as per agreement'}",
-      "hsnSac": "998314",
-      "quantity": "1",
-      "rate": "${inputData.amount || '[Rate per Unit]'}",
-      "taxableValue": "${inputData.amount || '[Taxable Value]'}",
-      "cgst": "[CGST Amount - 9%]",
-      "sgst": "[SGST Amount - 9%]",
-      "totalAmount": "${inputData.amount || '[Total Line Amount]'}"
-    }
-  ],
-  "taxSummary": {
-    "totalTaxableValue": "${inputData.amount || '[Total Taxable Value]'}",
-    "totalCGST": "[Total CGST Amount]",
-    "totalSGST": "[Total SGST Amount]",
-    "totalTax": "[Total Tax Amount]",
-    "grandTotal": "[Grand Total Amount]"
-  },
-  "paymentTerms": "Payment due within 30 days of invoice date",
-  "dueDate": "${inputData.duedate || '[Payment Due Date]'}",
-  "bankDetails": {
-    "bankName": "[Bank Name]",
-    "accountNumber": "[Account Number]",
-    "ifscCode": "[IFSC Code]",
-    "accountType": "Current Account"
-  },
-  "declaration": "We declare that this invoice shows the actual price of the goods described and that all particulars are true and correct.",
-  "authorizedSignatory": "For ${brandContext.name}"
-}`;
+      userPrompt = `Generate a GST-compliant Tax Invoice using the following context:
+      
+      CONTEXT DATA:
+      ${JSON.stringify(context, null, 2)}
+
+      PRIORITY: If 'items' array is provided, use it. Include GST calculation (CGST/SGST/IGST).
+
+      Return ONLY valid JSON with this structure:
+      {
+        "title": "Tax Invoice",
+        "invoiceNumber": "${context.invoiceNumber || 'GST-INV-' + Date.now().toString().slice(-6)}",
+        "invoiceDate": "${context.invoiceDate || new Date().toLocaleDateString('en-IN', { year: 'numeric', month: 'long', day: 'numeric' })}",
+        "supplier": {
+          "legalName": "${context.supplierName || context.company || brandContext.name}",
+          "gstin": "${context.supplierGSTIN || '[Supplier GSTIN]'}",
+          "address": "${context.supplierAddress || '[Supplier Address]'}"
+        },
+        "buyer": {
+          "legalName": "${context.buyerName || context.client || context.customerName || '[Buyer Name]'}",
+          "gstin": "${context.buyerGSTIN || '[Buyer GSTIN]'}",
+          "address": "${context.buyerAddress || '[Buyer Address]'}"
+        },
+        "items": ${context.items ? JSON.stringify(context.items) : `[
+          {
+            "description": "${context.description || 'Services'}",
+            "hsnSac": "${context.hsnSac || '9983'}",
+            "quantity": "${context.quantity || 1}",
+            "rate": "${context.rate || context.amount || 0}",
+            "taxableValue": "${context.amount || 0}",
+            "cgst": "${(context.amount || 0) * 0.09}",
+            "sgst": "${(context.amount || 0) * 0.09}",
+            "total": "${(context.amount || 0) * 1.18}"
+          }
+        ]`},
+        "grandTotal": "${context.total || (context.amount || 0) * 1.18}"
+      }`;
+
+    } else if (effectiveType === "compliance_certificate") {
+      // Parse structured input data
+      const inputData = {};
+      if (topic.includes('|')) {
+        topic.split('|').forEach(pair => {
+          const [key, value] = pair.split(':').map(s => s.trim());
+          if (key && value) {
+            inputData[key.toLowerCase().replace(/\s+/g, '')] = value;
+          }
+        });
+      }
+
+      // Merge with providedData from frontend form
+      const context = { ...providedData, ...inputData };
+      console.log(`📋 Consolidated context for compliance_certificate:`, context);
+
+      userPrompt = `Generate a formal Compliance Certificate using the following context:
+      
+      CONTEXT DATA:
+      ${JSON.stringify(context, null, 2)}
+
+      Return ONLY valid JSON with this structure:
+      {
+        "title": "Certificate of Compliance",
+        "certificateNumber": "COMP-${Date.now().toString().slice(-6)}",
+        "issueDate": "${new Date().toLocaleDateString('en-IN', { year: 'numeric', month: 'long', day: 'numeric' })}",
+        "entityName": "${context.entityName || context.company || brandContext.name}",
+        "complianceType": "${context.complianceType || 'Standard Regulatory Compliance'}",
+        "validityPeriod": "${context.validity || 'One Year'}",
+        "authorizedBy": "${context.authorizedBy || 'Compliance Officer'}"
+      }`;
+
+    } else if (effectiveType === "dpa") {
+      // Parse structured input data
+      const inputData = {};
+      if (topic.includes('|')) {
+        topic.split('|').forEach(pair => {
+          const [key, value] = pair.split(':').map(s => s.trim());
+          if (key && value) {
+            inputData[key.toLowerCase().replace(/\s+/g, '')] = value;
+          }
+        });
+      }
+
+      // Merge with providedData from frontend form
+      const context = { ...providedData, ...inputData };
+      console.log(`📋 Consolidated context for dpa:`, context);
+
+      userPrompt = `Generate a formal Data Processing Agreement (DPA) using the following context:
+      
+      CONTEXT DATA:
+      ${JSON.stringify(context, null, 2)}
+
+      Return ONLY valid JSON with this structure:
+      {
+        "title": "Data Processing Agreement",
+        "date": "${new Date().toLocaleDateString('en-IN', { year: 'numeric', month: 'long', day: 'numeric' })}",
+        "controller": "${context.controller || brandContext.name}",
+        "processor": "${context.processor || context.otherparty || '[Processor Name]'}",
+        "effectiveDate": "${context.effectiveDate || '[Effective Date]'}",
+        "securityMeasures": [
+          "Encryption of personal data at rest and in transit",
+          "Regular security audits and vulnerability assessments",
+          "Strict access controls and identity management"
+        ]
+      }`;
 
     } else {
       userPrompt = `Create a massive, highly detailed, deeply structured, hyper-professional Pitch Deck Outline for: "${topic}".
@@ -851,7 +861,7 @@ Return ONLY valid JSON with this exact structure:
 
     console.log(`✅ OpenAI API response received`);
     console.log(`📄 Response content length: ${response.choices[0].message.content.length}`);
-    
+
     const content = JSON.parse(response.choices[0].message.content);
     console.log("✅ AI Generation Successful");
     return content;
@@ -860,7 +870,7 @@ Return ONLY valid JSON with this exact structure:
     console.error("❌ OpenAI API Error:", error.message);
     console.error("❌ Error Status:", error.status);
     console.error("❌ Error Code:", error.code);
-    
+
     // Provide specific error messages for common issues
     if (error.message.includes('Invalid API key') || error.message.includes('Invalid token')) {
       console.error("🔑 API Key Issue: Please check your OpenRouter API key in the .env file");
@@ -870,7 +880,7 @@ Return ONLY valid JSON with this exact structure:
     } else if (error.message.includes('model_not_found')) {
       console.error("🤖 Model Issue: The requested model may not be available on OpenRouter");
     }
-    
+
     console.log("⚠️ Falling back to mock generation...");
     // Critical: Fallback should use the effective type if possible
     const fallbackType = ["ask", "research", "build", "other"].includes(type.toLowerCase()) ?

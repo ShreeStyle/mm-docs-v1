@@ -1,116 +1,510 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Audit Report</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
         body {
-            font-family: 'Times New Roman', serif;
+            font-family: 'Inter', -apple-system, sans-serif;
             line-height: 1.6;
-            color: #000;
+            color: #1f2937;
             max-width: 800px;
             margin: 0 auto;
-            padding: 40px;
+            padding: 48px 40px;
             background: white;
-            font-size: 12pt;
+            font-size: 14px;
         }
+
         .header {
             text-align: center;
-            margin-bottom: 40px;
-            border-bottom: 2px solid #000;
-            padding-bottom: 20px;
+            padding-bottom: 28px;
+            margin-bottom: 36px;
+            border-bottom: 1px solid #e5e7eb;
         }
+
         .company-name {
-            font-size: 20pt;
-            font-weight: bold;
-            color: #000;
+            font-size: 14px;
+            font-weight: 600;
+            color: #6b7280;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
             margin-bottom: 8px;
-            text-transform: uppercase;
         }
-        .document-title {
-            font-size: 18pt;
-            font-weight: bold;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            margin: 30px 0;
-            text-align: center;
-            color: #000;
-            text-decoration: underline;
+
+        .doc-title {
+            font-size: 32px;
+            font-weight: 800;
+            color: #111827;
+            letter-spacing: -0.01em;
+            margin-bottom: 4px;
         }
+
+        .doc-subtitle {
+            font-size: 14px;
+            color: #6b7280;
+        }
+
+        .doc-subtitle strong {
+            color: #111827;
+        }
+
+        .confidential-badge {
+            display: inline-block;
+            padding: 4px 14px;
+            border-radius: 9999px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            background: #fef2f2;
+            color: #dc2626;
+            margin-top: 10px;
+        }
+
+        .meta-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+            margin-bottom: 28px;
+        }
+
+        .meta-card {
+            background: #f9fafb;
+            border-radius: 8px;
+            padding: 16px;
+        }
+
+        .meta-label {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            color: #6b7280;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .meta-name {
+            font-size: 15px;
+            font-weight: 600;
+            color: #111827;
+            margin-bottom: 4px;
+        }
+
+        .meta-detail {
+            font-size: 12px;
+            color: #4b5563;
+            line-height: 1.5;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 28px;
+        }
+
+        .info-item {
+            background: #f9fafb;
+            border-radius: 6px;
+            padding: 10px 14px;
+        }
+
+        .info-item .label {
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            color: #6b7280;
+            font-weight: 600;
+        }
+
+        .info-item .value {
+            font-size: 14px;
+            font-weight: 600;
+            color: #111827;
+            margin-top: 2px;
+        }
+
+        .section {
+            margin: 28px 0;
+        }
+
+        .section-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: #111827;
+            margin-bottom: 12px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid #e5e7eb;
+        }
+
         .content {
-            margin-bottom: 30px;
-            text-align: justify;
+            font-size: 14px;
+            color: #374151;
+            line-height: 1.7;
         }
+
         .content p {
-            margin-bottom: 15px;
+            margin-bottom: 14px;
         }
-        .details-table {
-            width: 100%;
-            border-collapse: collapse;
+
+        .finding-card {
+            background: #f9fafb;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 16px 0;
+            border-left: 4px solid #6b7280;
+        }
+
+        .finding-card.critical {
+            border-left-color: #dc2626;
+            background: #fef2f2;
+        }
+
+        .finding-card.high {
+            border-left-color: #f97316;
+            background: #fff7ed;
+        }
+
+        .finding-card.medium {
+            border-left-color: #eab308;
+            background: #fefce8;
+        }
+
+        .finding-card.low {
+            border-left-color: #22c55e;
+            background: #f0fdf4;
+        }
+
+        .finding-severity {
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            margin-bottom: 6px;
+        }
+
+        .finding-card.critical .finding-severity {
+            color: #dc2626;
+        }
+
+        .finding-card.high .finding-severity {
+            color: #f97316;
+        }
+
+        .finding-card.medium .finding-severity {
+            color: #eab308;
+        }
+
+        .finding-card.low .finding-severity {
+            color: #22c55e;
+        }
+
+        .finding-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #111827;
+            margin-bottom: 6px;
+        }
+
+        .finding-desc {
+            font-size: 13px;
+            color: #4b5563;
+            line-height: 1.6;
+        }
+
+        .summary-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr 1fr;
+            gap: 12px;
             margin: 20px 0;
-            border: 2px solid #000;
         }
-        .details-table th,
-        .details-table td {
-            border: 1px solid #000;
-            padding: 12px;
-            text-align: left;
-            font-size: 11pt;
+
+        .summary-item {
+            text-align: center;
+            padding: 16px;
+            border-radius: 8px;
         }
-        .details-table th {
-            background-color: #f5f5f5;
-            font-weight: bold;
+
+        .summary-item.critical {
+            background: #fef2f2;
         }
-        .findings-section {
-            margin: 25px 0;
-            border: 1px solid #000;
+
+        .summary-item.high {
+            background: #fff7ed;
+        }
+
+        .summary-item.medium {
+            background: #fefce8;
+        }
+
+        .summary-item.low {
+            background: #f0fdf4;
+        }
+
+        .summary-count {
+            font-size: 28px;
+            font-weight: 800;
+        }
+
+        .summary-item.critical .summary-count {
+            color: #dc2626;
+        }
+
+        .summary-item.high .summary-count {
+            color: #f97316;
+        }
+
+        .summary-item.medium .summary-count {
+            color: #eab308;
+        }
+
+        .summary-item.low .summary-count {
+            color: #22c55e;
+        }
+
+        .summary-label {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            color: #6b7280;
+            font-weight: 600;
+            margin-top: 4px;
+        }
+
+        .recommendation-list {
+            padding-left: 0;
+            list-style: none;
+        }
+
+        .recommendation-list li {
+            padding: 12px 16px;
+            margin-bottom: 8px;
+            background: #f9fafb;
+            border-radius: 8px;
+            font-size: 13px;
+            color: #374151;
+            line-height: 1.6;
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+        }
+
+        .recommendation-list li::before {
+            content: "→";
+            font-weight: 700;
+            color: #2563eb;
+            flex-shrink: 0;
+            margin-top: 1px;
+        }
+
+        .opinion-box {
+            background: #111827;
+            border-radius: 12px;
+            padding: 24px;
+            margin: 24px 0;
+            color: white;
+        }
+
+        .opinion-label {
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            color: #9ca3af;
+            margin-bottom: 8px;
+        }
+
+        .opinion-text {
+            font-size: 16px;
+            font-weight: 600;
+            line-height: 1.6;
+        }
+
+        .signature-section {
+            margin-top: 40px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 32px;
+        }
+
+        .sig-card {
+            background: #f9fafb;
+            border-radius: 8px;
             padding: 20px;
         }
-        .signature-section {
-            margin-top: 50px;
+
+        .sig-title {
+            font-size: 12px;
+            font-weight: 600;
+            color: #6b7280;
+            margin-bottom: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+
+        .sig-field {
+            margin-bottom: 12px;
+        }
+
+        .sig-field-label {
+            font-size: 12px;
+            color: #6b7280;
+            margin-bottom: 4px;
+        }
+
+        .sig-field-line {
+            border-bottom: 1px solid #d1d5db;
+            height: 20px;
+        }
+
+        .footer {
+            margin-top: 40px;
             text-align: center;
+            padding-top: 20px;
+            border-top: 1px solid #e5e7eb;
+            color: #9ca3af;
+            font-size: 11px;
         }
     </style>
 </head>
+
 <body>
     <div class="header">
         <div class="company-name">{{companyName}}</div>
-        <div>{{companyAddress}}</div>
+        <div class="doc-title">Audit Report</div>
+        <div class="doc-subtitle"><strong>Audit Period:</strong> {{auditStartDate}} to {{auditEndDate}}</div>
+        <div class="confidential-badge">Confidential</div>
     </div>
 
-    <div class="document-title">Audit Report</div>
-
-    <div class="content">
-        <table class="details-table">
-            <tr>
-                <th>Audit Period</th>
-                <td>{{auditPeriod}}</td>
-            </tr>
-            <tr>
-                <th>Audit Type</th>
-                <td>{{auditType}}</td>
-            </tr>
-            <tr>
-                <th>Auditor</th>
-                <td>{{auditorName}}</td>
-            </tr>
-            <tr>
-                <th>Audit Date</th>
-                <td>{{auditDate}}</td>
-            </tr>
-        </table>
-
-        <div class="findings-section">
-            <h3 style="text-decoration: underline; text-align: center;">Key Findings</h3>
-            <p>{{findings}}</p>
+    <div class="info-grid">
+        <div class="info-item">
+            <div class="label">Report No.</div>
+            <div class="value">{{#if reportNumber}}{{reportNumber}}{{else}}AUD-2024-001{{/if}}</div>
+        </div>
+        <div class="info-item">
+            <div class="label">Audit Type</div>
+            <div class="value">{{#if auditType}}{{auditType}}{{else}}Internal{{/if}}</div>
+        </div>
+        <div class="info-item">
+            <div class="label">Date of Report</div>
+            <div class="value">{{reportDate}}</div>
         </div>
     </div>
 
+    <div class="meta-grid">
+        <div class="meta-card">
+            <div class="meta-label">Entity Audited</div>
+            <div class="meta-name">{{#if auditedEntity}}{{auditedEntity}}{{else}}{{companyName}}{{/if}}</div>
+            <div class="meta-detail">{{#if auditedDepartment}}Department: {{auditedDepartment}}{{/if}}</div>
+        </div>
+        <div class="meta-card">
+            <div class="meta-label">Auditor</div>
+            <div class="meta-name">{{auditorName}}</div>
+            <div class="meta-detail">{{#if auditorDesignation}}{{auditorDesignation}}{{/if}}{{#if
+                auditorFirm}}<br>{{auditorFirm}}{{/if}}</div>
+        </div>
+    </div>
+
+    <div class="section">
+        <div class="section-title">Executive Summary</div>
+        <div class="content">
+            <p>{{{executiveSummary}}}</p>
+        </div>
+    </div>
+
+    <div class="section">
+        <div class="section-title">Scope of Audit</div>
+        <div class="content">
+            <p>{{{auditScope}}}</p>
+        </div>
+    </div>
+
+    <div class="section">
+        <div class="section-title">Findings Summary</div>
+        <div class="summary-grid">
+            <div class="summary-item critical">
+                <div class="summary-count">{{#if criticalCount}}{{criticalCount}}{{else}}0{{/if}}</div>
+                <div class="summary-label">Critical</div>
+            </div>
+            <div class="summary-item high">
+                <div class="summary-count">{{#if highCount}}{{highCount}}{{else}}0{{/if}}</div>
+                <div class="summary-label">High</div>
+            </div>
+            <div class="summary-item medium">
+                <div class="summary-count">{{#if mediumCount}}{{mediumCount}}{{else}}0{{/if}}</div>
+                <div class="summary-label">Medium</div>
+            </div>
+            <div class="summary-item low">
+                <div class="summary-count">{{#if lowCount}}{{lowCount}}{{else}}0{{/if}}</div>
+                <div class="summary-label">Low</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="section">
+        <div class="section-title">Detailed Findings</div>
+        <div class="content">
+            <p>{{{detailedFindings}}}</p>
+        </div>
+    </div>
+
+    <div class="section">
+        <div class="section-title">Recommendations</div>
+        <div class="content">
+            <p>{{{recommendations}}}</p>
+        </div>
+    </div>
+
+    <div class="opinion-box">
+        <div class="opinion-label">Auditor's Opinion</div>
+        <div class="opinion-text">{{#if auditorOpinion}}{{{auditorOpinion}}}{{else}}Based on the audit procedures
+            performed and evidence obtained, we provide a qualified opinion on the effectiveness of internal controls
+            and compliance with applicable policies and regulations during the audit period.{{/if}}</div>
+    </div>
+
     <div class="signature-section">
-        <p><strong>{{auditorName}}</strong></p>
-        <p>Certified Auditor</p>
-        <p>Date: {{auditDate}}</p>
+        <div class="sig-card">
+            <div class="sig-title">Lead Auditor</div>
+            <div class="sig-field">
+                <div class="sig-field-label">Signature</div>
+                <div class="sig-field-line"></div>
+            </div>
+            <div class="sig-field">
+                <div class="sig-field-label">Name: {{auditorName}}</div>
+            </div>
+            <div class="sig-field">
+                <div class="sig-field-label">Date</div>
+                <div class="sig-field-line"></div>
+            </div>
+        </div>
+        <div class="sig-card">
+            <div class="sig-title">Management Acknowledgment</div>
+            <div class="sig-field">
+                <div class="sig-field-label">Signature</div>
+                <div class="sig-field-line"></div>
+            </div>
+            <div class="sig-field">
+                <div class="sig-field-label">Name & Title</div>
+                <div class="sig-field-line"></div>
+            </div>
+            <div class="sig-field">
+                <div class="sig-field-label">Date</div>
+                <div class="sig-field-line"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="footer">
+        <p>This report is intended solely for the use of {{companyName}} management. {{companyName}} — Compliance</p>
     </div>
 </body>
+
 </html>

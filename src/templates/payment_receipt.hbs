@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment Receipt</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, sans-serif;
+            line-height: 1.5;
+            color: #1f2937;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 40px;
+            background: white;
+            font-size: 13px;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            padding-bottom: 24px;
+            margin-bottom: 28px;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .company-name {
+            font-size: 22px;
+            font-weight: 700;
+            color: #111827;
+            margin-bottom: 6px;
+        }
+
+        .company-detail {
+            font-size: 12px;
+            color: #4b5563;
+            line-height: 1.5;
+        }
+
+        .doc-badge {
+            text-align: right;
+        }
+
+        .doc-title {
+            font-size: 30px;
+            font-weight: 800;
+            color: #e5e7eb;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+        }
+
+        .paid-badge {
+            display: inline-block;
+            padding: 6px 18px;
+            border-radius: 9999px;
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            background: #ecfdf5;
+            color: #059669;
+            margin-top: 8px;
+            border: 2px solid #059669;
+        }
+
+        .receipt-meta {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+
+        .receipt-meta-item {
+            background: #f9fafb;
+            border-radius: 6px;
+            padding: 10px 14px;
+        }
+
+        .receipt-meta-item .label {
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            color: #6b7280;
+            font-weight: 600;
+        }
+
+        .receipt-meta-item .value {
+            font-size: 14px;
+            font-weight: 600;
+            color: #111827;
+            margin-top: 2px;
+        }
+
+        .parties-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+            margin-bottom: 24px;
+        }
+
+        .party-card {
+            background: #f9fafb;
+            border-radius: 8px;
+            padding: 16px;
+        }
+
+        .party-label {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            color: #6b7280;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .party-name {
+            font-size: 15px;
+            font-weight: 600;
+            color: #111827;
+            margin-bottom: 4px;
+        }
+
+        .party-detail {
+            font-size: 12px;
+            color: #4b5563;
+            line-height: 1.5;
+        }
+
+        .amount-box {
+            background: #111827;
+            border-radius: 12px;
+            padding: 24px;
+            margin: 24px 0;
+            text-align: center;
+            color: white;
+        }
+
+        .amount-label {
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            color: #9ca3af;
+            margin-bottom: 4px;
+        }
+
+        .amount-value {
+            font-size: 36px;
+            font-weight: 800;
+            letter-spacing: -0.02em;
+        }
+
+        .amount-words {
+            font-size: 12px;
+            color: #9ca3af;
+            margin-top: 6px;
+        }
+
+        .payment-details {
+            background: #f9fafb;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 24px 0;
+        }
+
+        .payment-title {
+            font-size: 11px;
+            font-weight: 600;
+            color: #111827;
+            margin-bottom: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+
+        .payment-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+        }
+
+        .payment-item {
+            display: flex;
+            gap: 8px;
+            font-size: 13px;
+            padding: 4px 0;
+        }
+
+        .payment-item .label {
+            color: #6b7280;
+            min-width: 140px;
+        }
+
+        .payment-item .value {
+            color: #111827;
+            font-weight: 500;
+        }
+
+        .description-section {
+            margin: 24px 0;
+        }
+
+        .desc-title {
+            font-size: 11px;
+            font-weight: 600;
+            color: #6b7280;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+
+        .desc-text {
+            font-size: 14px;
+            color: #374151;
+            line-height: 1.7;
+            padding: 12px 16px;
+            background: #f9fafb;
+            border-radius: 8px;
+        }
+
+        .note-section {
+            background: #ecfdf5;
+            border-radius: 8px;
+            padding: 16px 20px;
+            margin: 24px 0;
+            font-size: 13px;
+            color: #065f46;
+        }
+
+        .note-section strong {
+            color: #064e3b;
+        }
+
+        .signature-section {
+            margin-top: 40px;
+            display: flex;
+            justify-content: flex-end;
+        }
+
+        .sig-block {
+            text-align: right;
+        }
+
+        .sig-label {
+            font-size: 11px;
+            color: #6b7280;
+            margin-bottom: 40px;
+        }
+
+        .sig-line {
+            border-top: 1px solid #d1d5db;
+            padding-top: 6px;
+            min-width: 220px;
+        }
+
+        .sig-name {
+            font-size: 13px;
+            font-weight: 600;
+            color: #111827;
+        }
+
+        .sig-role {
+            font-size: 11px;
+            color: #6b7280;
+        }
+
+        .footer {
+            margin-top: 40px;
+            text-align: center;
+            padding-top: 20px;
+            border-top: 1px solid #e5e7eb;
+            color: #9ca3af;
+            font-size: 11px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="header">
+        <div>
+            <div class="company-name">{{companyName}}</div>
+            <div class="company-detail">{{{companyAddress}}}</div>
+            {{#if companyPhone}}<div class="company-detail">Phone: {{companyPhone}}</div>{{/if}}
+            {{#if companyEmail}}<div class="company-detail">Email: {{companyEmail}}</div>{{/if}}
+        </div>
+        <div class="doc-badge">
+            <div class="doc-title">RECEIPT</div>
+            <div class="paid-badge">✓ Paid</div>
+        </div>
+    </div>
+
+    <div class="receipt-meta">
+        <div class="receipt-meta-item">
+            <div class="label">Receipt No.</div>
+            <div class="value">{{receiptNumber}}</div>
+        </div>
+        <div class="receipt-meta-item">
+            <div class="label">Date</div>
+            <div class="value">{{receiptDate}}</div>
+        </div>
+        <div class="receipt-meta-item">
+            <div class="label">Invoice Ref.</div>
+            <div class="value">{{#if invoiceNumber}}{{invoiceNumber}}{{else}}—{{/if}}</div>
+        </div>
+    </div>
+
+    <div class="parties-grid">
+        <div class="party-card">
+            <div class="party-label">Received From</div>
+            <div class="party-name">{{clientName}}</div>
+            <div class="party-detail">{{{clientAddress}}}</div>
+        </div>
+        <div class="party-card">
+            <div class="party-label">Received By</div>
+            <div class="party-name">{{companyName}}</div>
+            <div class="party-detail">{{{companyAddress}}}</div>
+        </div>
+    </div>
+
+    <div class="amount-box">
+        <div class="amount-label">Amount Received</div>
+        <div class="amount-value">₹{{totalAmount}}</div>
+        {{#if amountInWords}}<div class="amount-words">{{amountInWords}}</div>{{/if}}
+    </div>
+
+    <div class="payment-details">
+        <div class="payment-title">Payment Details</div>
+        <div class="payment-grid">
+            <div class="payment-item"><span class="label">Payment Method:</span><span class="value">{{#if
+                    paymentMethod}}{{paymentMethod}}{{else}}Bank Transfer{{/if}}</span></div>
+            <div class="payment-item"><span class="label">Payment Date:</span><span class="value">{{receiptDate}}</span>
+            </div>
+            {{#if transactionId}}<div class="payment-item"><span class="label">Transaction ID:</span><span
+                    class="value">{{transactionId}}</span></div>{{/if}}
+            {{#if bankName}}<div class="payment-item"><span class="label">Bank:</span><span
+                    class="value">{{bankName}}</span></div>{{/if}}
+            {{#if chequeNumber}}<div class="payment-item"><span class="label">Cheque No:</span><span
+                    class="value">{{chequeNumber}}</span></div>{{/if}}
+        </div>
+    </div>
+
+    <div class="description-section">
+        <div class="desc-title">Payment For</div>
+        <div class="desc-text">{{{serviceDescription}}}</div>
+    </div>
+
+    <div class="note-section">
+        <strong>Note:</strong> This receipt confirms the payment received. Please retain this receipt for your records.
+        No further claims are outstanding against this payment.
+    </div>
+
+    <div class="signature-section">
+        <div class="sig-block">
+            <div class="sig-label">For {{companyName}}</div>
+            <div class="sig-line">
+                <div class="sig-name">Authorized Signatory</div>
+                <div class="sig-role">Accounts Department</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="footer">
+        <p>This is a system-generated receipt. {{companyName}}</p>
+    </div>
+</body>
+
+</html>

@@ -1,135 +1,261 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Non-Disclosure Agreement</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
         body {
-            font-family: 'Times New Roman', serif;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             line-height: 1.6;
-            color: #333;
+            color: #1f2937;
             max-width: 800px;
             margin: 0 auto;
-            padding: 40px;
+            padding: 48px 40px;
             background: white;
+            font-size: 14px;
         }
+
         .header {
             text-align: center;
-            margin-bottom: 40px;
-            border-bottom: 3px solid {{#if brandKit.colors.[0]}}{{brandKit.colors.[0]}}{{else}}#dc3545{{/if}};
-            padding-bottom: 20px;
+            padding-bottom: 28px;
+            margin-bottom: 36px;
+            border-bottom: 1px solid #e5e7eb;
         }
-        .document-title {
+
+        .doc-title {
             font-size: 28px;
-            font-weight: bold;
+            font-weight: 800;
+            color: #111827;
             text-transform: uppercase;
-            letter-spacing: 2px;
-            margin: 30px 0;
-            text-align: center;
-            color: {{#if brandKit.colors.[0]}}{{brandKit.colors.[0]}}{{else}}#dc3545{{/if}};
+            letter-spacing: 0.04em;
+            margin-bottom: 8px;
         }
+
+        .doc-subtitle {
+            font-size: 13px;
+            color: #6b7280;
+        }
+
+        .doc-subtitle strong {
+            color: #111827;
+        }
+
         .parties-section {
-            background: #f8f9fa;
-            border: 1px solid #dee2e6;
-            border-radius: 8px;
-            padding: 20px;
-            margin: 20px 0;
+            margin: 28px 0;
         }
-        .party {
-            margin-bottom: 15px;
-            padding: 10px;
-            background: white;
-            border-left: 4px solid {{#if brandKit.colors.[0]}}{{brandKit.colors.[0]}}{{else}}#dc3545{{/if}};
-        }
-        .content {
-            margin-bottom: 30px;
-            text-align: justify;
-        }
-        .content p {
-            margin-bottom: 15px;
-        }
-        .clause {
-            margin: 20px 0;
-            padding: 15px;
-            background: #f8f9fa;
-            border-left: 4px solid #6c757d;
-        }
-        .clause h4 {
-            color: #495057;
-            margin-top: 0;
-        }
-        .important {
-            background: #fff3cd;
-            border: 1px solid #ffeaa7;
-            border-radius: 5px;
-            padding: 15px;
-            margin: 20px 0;
-        }
-        .signature-section {
-            margin-top: 50px;
+
+        .parties-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 40px;
+            gap: 24px;
         }
-        .signature-box {
-            text-align: center;
-            border: 1px solid #dee2e6;
+
+        .party-card {
+            background: #f9fafb;
+            border-radius: 8px;
             padding: 20px;
+        }
+
+        .party-label {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            color: #6b7280;
+            font-weight: 600;
+            margin-bottom: 12px;
+        }
+
+        .party-name {
+            font-size: 16px;
+            font-weight: 600;
+            color: #111827;
+            margin-bottom: 8px;
+        }
+
+        .party-details {
+            font-size: 13px;
+            color: #4b5563;
+            line-height: 1.6;
+        }
+
+        .content {
+            font-size: 14px;
+            color: #374151;
+            line-height: 1.7;
+        }
+
+        .content p {
+            margin-bottom: 16px;
+        }
+
+        .clause {
+            margin: 20px 0;
+            padding: 20px;
+            background: #f9fafb;
             border-radius: 8px;
         }
-        .signature-line {
-            border-top: 1px solid #333;
-            margin-top: 60px;
-            padding-top: 5px;
+
+        .clause h4 {
+            font-size: 14px;
+            font-weight: 600;
+            color: #111827;
+            margin-bottom: 10px;
         }
-        .footer {
+
+        .clause p {
+            font-size: 13px;
+            color: #4b5563;
+            line-height: 1.6;
+            margin-bottom: 8px;
+        }
+
+        .clause ul {
+            padding-left: 20px;
+        }
+
+        .clause li {
+            margin-bottom: 6px;
+            font-size: 13px;
+            color: #4b5563;
+            line-height: 1.5;
+        }
+
+        .important-box {
+            background: #fef2f2;
+            border: 1px solid #fecaca;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 24px 0;
+        }
+
+        .important-box h4 {
+            font-size: 13px;
+            font-weight: 600;
+            color: #991b1b;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+
+        .important-box p {
+            font-size: 13px;
+            color: #7f1d1d;
+            line-height: 1.6;
+        }
+
+        .signature-section {
             margin-top: 40px;
-            text-align: center;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 32px;
+        }
+
+        .signature-card {
+            background: #f9fafb;
+            border-radius: 8px;
+            padding: 24px;
+        }
+
+        .sig-title {
+            font-size: 13px;
+            font-weight: 600;
+            color: #111827;
+            margin-bottom: 16px;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+
+        .sig-name {
+            font-size: 14px;
+            font-weight: 600;
+            color: #111827;
+            margin-bottom: 16px;
+        }
+
+        .sig-field {
+            margin-bottom: 16px;
+        }
+
+        .sig-field-label {
             font-size: 12px;
-            color: #666;
-            border-top: 1px solid #eee;
-            padding-top: 20px;
+            color: #6b7280;
+            margin-bottom: 4px;
+        }
+
+        .sig-field-line {
+            border-bottom: 1px solid #d1d5db;
+            min-width: 200px;
+            height: 24px;
+        }
+
+        .footer {
+            margin-top: 48px;
+            text-align: center;
+            padding-top: 24px;
+            border-top: 1px solid #e5e7eb;
+            color: #9ca3af;
+            font-size: 12px;
         }
     </style>
 </head>
+
 <body>
     <div class="header">
-        <div class="document-title">Non-Disclosure Agreement</div>
-        <p><strong>Effective Date:</strong> {{effectiveDate}}</p>
+        <div class="doc-title">Non-Disclosure Agreement</div>
+        <div class="doc-subtitle"><strong>Effective Date:</strong> {{effectiveDate}}</div>
     </div>
 
     <div class="parties-section">
-        <h3>Parties to this Agreement</h3>
-        <div class="party">
-            <h4>Disclosing Party:</h4>
-            <p><strong>{{companyName}}</strong><br>
-            {{companyAddress}}<br>
-            {{#if companyEmail}}Email: {{companyEmail}}<br>{{/if}}
-            {{#if companyPhone}}Phone: {{companyPhone}}{{/if}}</p>
-        </div>
-        <div class="party">
-            <h4>Receiving Party:</h4>
-            <p><strong>{{partyName}}</strong><br>
-            {{partyAddress}}<br>
-            {{#if partyEmail}}Email: {{partyEmail}}<br>{{/if}}
-            {{#if partyPhone}}Phone: {{partyPhone}}{{/if}}</p>
+        <div class="parties-grid">
+            <div class="party-card">
+                <div class="party-label">Disclosing Party</div>
+                <div class="party-name">{{companyName}}</div>
+                <div class="party-details">
+                    {{{companyAddress}}}
+                    {{#if companyEmail}}<br>{{companyEmail}}{{/if}}
+                    {{#if companyPhone}}<br>{{companyPhone}}{{/if}}
+                </div>
+            </div>
+            <div class="party-card">
+                <div class="party-label">Receiving Party</div>
+                <div class="party-name">{{partyName}}</div>
+                <div class="party-details">
+                    {{{partyAddress}}}
+                    {{#if partyEmail}}<br>{{partyEmail}}{{/if}}
+                    {{#if partyPhone}}<br>{{partyPhone}}{{/if}}
+                </div>
+            </div>
         </div>
     </div>
 
     <div class="content">
-        <p><strong>WHEREAS,</strong> the Disclosing Party possesses certain confidential and proprietary information related to {{#if purpose}}{{purpose}}{{else}}business operations, technology, and trade secrets{{/if}};</p>
+        <p><strong>WHEREAS,</strong> the Disclosing Party possesses certain confidential and proprietary information
+            related to {{#if purpose}}{{purpose}}{{else}}business operations, technology, and trade secrets{{/if}};</p>
 
-        <p><strong>WHEREAS,</strong> the Receiving Party desires to receive and evaluate such confidential information for the purpose of {{#if purpose}}{{purpose}}{{else}}potential business collaboration{{/if}};</p>
+        <p><strong>WHEREAS,</strong> the Receiving Party desires to receive and evaluate such confidential information
+            for the purpose of {{#if purpose}}{{purpose}}{{else}}potential business collaboration{{/if}};</p>
 
-        <p><strong>NOW, THEREFORE,</strong> in consideration of the mutual covenants contained herein, the parties agree as follows:</p>
+        <p><strong>NOW, THEREFORE,</strong> in consideration of the mutual covenants contained herein, the parties agree
+            as follows:</p>
 
         <div class="clause">
             <h4>1. Definition of Confidential Information</h4>
-            <p>For purposes of this Agreement, "Confidential Information" shall include all information, whether written, oral, electronic, or visual, disclosed by the Disclosing Party to the Receiving Party, including but not limited to:</p>
+            <p>For purposes of this Agreement, "Confidential Information" shall include all information disclosed by the
+                Disclosing Party, including but not limited to:</p>
             <ul>
-                <li>Technical data, trade secrets, know-how, research, product plans, products, services, customers, customer lists, markets, software, developments, inventions, processes, formulas, technology, designs, drawings, engineering, hardware configuration information, marketing, finances, or other business information.</li>
-                <li>All information marked, designated or otherwise identified as "confidential" or "proprietary".</li>
+                <li>Technical data, trade secrets, know-how, research, product plans, software, developments,
+                    inventions, processes, formulas, technology, designs, engineering, marketing, finances, or other
+                    business information.</li>
+                <li>All information marked, designated or identified as "confidential" or "proprietary".</li>
                 <li>All information that would reasonably be considered confidential under the circumstances.</li>
             </ul>
         </div>
@@ -140,9 +266,10 @@
             <ul>
                 <li>Hold and maintain the Confidential Information in strict confidence</li>
                 <li>Not disclose the Confidential Information to any third parties without prior written consent</li>
-                <li>Use the Confidential Information solely for the purpose of {{#if purpose}}{{purpose}}{{else}}evaluating potential business opportunities{{/if}}</li>
+                <li>Use the Confidential Information solely for the purpose of {{#if
+                    purpose}}{{purpose}}{{else}}evaluating potential business opportunities{{/if}}</li>
                 <li>Take reasonable precautions to protect the confidentiality of the information</li>
-                <li>Limit access to the Confidential Information to employees or agents who have a legitimate need to know</li>
+                <li>Limit access to employees or agents who have a legitimate need to know</li>
             </ul>
         </div>
 
@@ -151,61 +278,89 @@
             <p>The obligations of confidentiality shall not apply to information that:</p>
             <ul>
                 <li>Is or becomes publicly available through no breach of this Agreement</li>
-                <li>Is rightfully received from a third party without breach of any confidentiality obligation</li>
-                <li>Is independently developed without use of or reference to Confidential Information</li>
+                <li>Is rightfully received from a third party without breach of any obligation</li>
+                <li>Is independently developed without use of Confidential Information</li>
                 <li>Is required to be disclosed by law or court order</li>
             </ul>
         </div>
 
         <div class="clause">
             <h4>4. Term and Termination</h4>
-            <p>This Agreement shall remain in effect for a period of {{#if duration}}{{duration}} years{{else}}3 years{{/if}} from the Effective Date, unless terminated earlier by mutual written consent. The obligations of confidentiality shall survive termination of this Agreement.</p>
+            <p>This Agreement shall remain in effect for a period of {{#if duration}}{{duration}} years{{else}}3
+                years{{/if}} from the Effective Date, unless terminated earlier by mutual written consent. The
+                obligations of confidentiality shall survive termination.</p>
         </div>
 
         <div class="clause">
             <h4>5. Return of Information</h4>
-            <p>Upon termination of this Agreement or upon request by the Disclosing Party, the Receiving Party shall promptly return or destroy all documents, materials, and other tangible manifestations of Confidential Information.</p>
+            <p>Upon termination or upon request, the Receiving Party shall promptly return or destroy all documents and
+                materials containing Confidential Information.</p>
         </div>
 
-        <div class="important">
-            <h4>⚠️ Legal Consequences</h4>
-            <p><strong>Breach of this Agreement may result in irreparable harm to the Disclosing Party. The Receiving Party acknowledges that monetary damages may be inadequate and that the Disclosing Party shall be entitled to equitable relief, including injunction and specific performance.</strong></p>
+        <div class="important-box">
+            <h4>Legal Consequences</h4>
+            <p>Breach of this Agreement may result in irreparable harm. The Disclosing Party shall be entitled to
+                equitable relief, including injunction and specific performance, in addition to any other remedies
+                available at law.</p>
         </div>
 
         <div class="clause">
             <h4>6. Governing Law</h4>
-            <p>This Agreement shall be governed by and construed in accordance with the laws of {{#if jurisdiction}}{{jurisdiction}}{{else}}India{{/if}}, without regard to its conflict of laws principles.</p>
+            <p>This Agreement shall be governed by the laws of {{#if jurisdiction}}{{jurisdiction}}{{else}}India{{/if}},
+                without regard to its conflict of laws principles.</p>
         </div>
 
-        <p>By signing below, the parties acknowledge that they have read, understood, and agree to be bound by the terms and conditions of this Non-Disclosure Agreement.</p>
+        <p>By signing below, the parties acknowledge that they have read, understood, and agree to be bound by the terms
+            of this Non-Disclosure Agreement.</p>
     </div>
 
     <div class="signature-section">
-        <div class="signature-box">
-            <h4>Disclosing Party</h4>
-            <div class="signature-line">
-                <strong>{{companyName}}</strong><br><br>
-                Signature: ________________________<br><br>
-                Name: {{#if signatoryName}}{{signatoryName}}{{else}}[Authorized Signatory]{{/if}}<br>
-                Title: {{#if signatoryTitle}}{{signatoryTitle}}{{else}}[Title]{{/if}}<br>
-                Date: ________________________
+        <div class="signature-card">
+            <div class="sig-title">Disclosing Party</div>
+            <div class="sig-name">{{companyName}}</div>
+            <div class="sig-field">
+                <div class="sig-field-label">Signature</div>
+                <div class="sig-field-line"></div>
+            </div>
+            <div class="sig-field">
+                <div class="sig-field-label">Name: {{#if
+                    signatoryName}}{{signatoryName}}{{else}}________________________{{/if}}</div>
+            </div>
+            <div class="sig-field">
+                <div class="sig-field-label">Title: {{#if
+                    signatoryTitle}}{{signatoryTitle}}{{else}}________________________{{/if}}</div>
+            </div>
+            <div class="sig-field">
+                <div class="sig-field-label">Date</div>
+                <div class="sig-field-line"></div>
             </div>
         </div>
-        <div class="signature-box">
-            <h4>Receiving Party</h4>
-            <div class="signature-line">
-                <strong>{{partyName}}</strong><br><br>
-                Signature: ________________________<br><br>
-                Name: ________________________<br>
-                Title: ________________________<br>
-                Date: ________________________
+        <div class="signature-card">
+            <div class="sig-title">Receiving Party</div>
+            <div class="sig-name">{{partyName}}</div>
+            <div class="sig-field">
+                <div class="sig-field-label">Signature</div>
+                <div class="sig-field-line"></div>
+            </div>
+            <div class="sig-field">
+                <div class="sig-field-label">Name</div>
+                <div class="sig-field-line"></div>
+            </div>
+            <div class="sig-field">
+                <div class="sig-field-label">Title</div>
+                <div class="sig-field-line"></div>
+            </div>
+            <div class="sig-field">
+                <div class="sig-field-label">Date</div>
+                <div class="sig-field-line"></div>
             </div>
         </div>
     </div>
 
     <div class="footer">
-        <p><strong>Witness:</strong> This agreement was executed in the presence of witnesses on {{effectiveDate}}.</p>
-        <p>Generated on {{currentDate}} | {{companyName}} - Legal Document System</p>
+        <p>Executed in the presence of witnesses on {{effectiveDate}}.</p>
+        <p>{{companyName}} — Legal Document System</p>
     </div>
 </body>
+
 </html>

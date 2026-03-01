@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Quotation</title>
+    <title>Purchase Order</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         * {
@@ -51,18 +51,18 @@
         }
 
         .doc-title {
-            font-size: 32px;
+            font-size: 28px;
             font-weight: 800;
             color: #e5e7eb;
             text-transform: uppercase;
             letter-spacing: 0.06em;
         }
 
-        .validity-badge {
+        .status-badge {
             display: inline-block;
-            padding: 4px 12px;
+            padding: 4px 14px;
             border-radius: 9999px;
-            font-size: 10px;
+            font-size: 11px;
             font-weight: 600;
             text-transform: uppercase;
             letter-spacing: 0.05em;
@@ -71,20 +71,48 @@
             margin-top: 8px;
         }
 
-        .meta-grid {
+        .meta-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+
+        .meta-item {
+            background: #f9fafb;
+            border-radius: 6px;
+            padding: 10px 14px;
+        }
+
+        .meta-item .label {
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            color: #6b7280;
+            font-weight: 600;
+        }
+
+        .meta-item .value {
+            font-size: 14px;
+            font-weight: 600;
+            color: #111827;
+            margin-top: 2px;
+        }
+
+        .parties-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 24px;
             margin-bottom: 24px;
         }
 
-        .meta-card {
+        .party-card {
             background: #f9fafb;
             border-radius: 8px;
             padding: 16px;
         }
 
-        .meta-label {
+        .party-label {
             font-size: 11px;
             text-transform: uppercase;
             letter-spacing: 0.06em;
@@ -93,52 +121,17 @@
             margin-bottom: 10px;
         }
 
-        .meta-name {
+        .party-name {
             font-size: 15px;
             font-weight: 600;
             color: #111827;
             margin-bottom: 4px;
         }
 
-        .meta-detail {
+        .party-detail {
             font-size: 12px;
             color: #4b5563;
             line-height: 1.5;
-        }
-
-        .quote-meta {
-            display: grid;
-            grid-template-columns: 1fr 1fr 1fr;
-            gap: 12px;
-            margin-bottom: 24px;
-        }
-
-        .quote-meta-item {
-            background: #f9fafb;
-            border-radius: 6px;
-            padding: 10px 14px;
-        }
-
-        .quote-meta-item .label {
-            font-size: 10px;
-            text-transform: uppercase;
-            letter-spacing: 0.06em;
-            color: #6b7280;
-            font-weight: 600;
-        }
-
-        .quote-meta-item .value {
-            font-size: 14px;
-            font-weight: 600;
-            color: #111827;
-            margin-top: 2px;
-        }
-
-        .intro {
-            font-size: 14px;
-            color: #374151;
-            margin-bottom: 24px;
-            line-height: 1.7;
         }
 
         .items-table {
@@ -212,6 +205,45 @@
             margin-top: 4px;
         }
 
+        .delivery-section {
+            background: #f9fafb;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 24px 0;
+        }
+
+        .delivery-title {
+            font-size: 11px;
+            font-weight: 600;
+            color: #111827;
+            margin-bottom: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+
+        .delivery-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            font-size: 13px;
+        }
+
+        .delivery-item {
+            display: flex;
+            gap: 8px;
+            padding: 4px 0;
+        }
+
+        .delivery-item .label {
+            color: #6b7280;
+            min-width: 140px;
+        }
+
+        .delivery-item .value {
+            color: #111827;
+            font-weight: 500;
+        }
+
         .terms-section {
             background: #f9fafb;
             border-radius: 8px;
@@ -239,32 +271,24 @@
             line-height: 1.5;
         }
 
-        .cta-section {
+        .note-box {
             background: #eff6ff;
             border: 1px solid #bfdbfe;
             border-radius: 8px;
-            padding: 20px;
+            padding: 16px 20px;
             margin: 24px 0;
-            text-align: center;
-        }
-
-        .cta-text {
-            font-size: 14px;
-            font-weight: 600;
+            font-size: 13px;
             color: #1e40af;
         }
 
-        .cta-sub {
-            font-size: 12px;
-            color: #3b82f6;
-            margin-top: 4px;
+        .note-box strong {
+            color: #1e3a8a;
         }
 
         .signature-section {
             margin-top: 40px;
             display: flex;
             justify-content: space-between;
-            align-items: flex-end;
         }
 
         .sig-block {}
@@ -310,54 +334,49 @@
             <div class="company-detail">{{{companyAddress}}}</div>
             {{#if companyPhone}}<div class="company-detail">Phone: {{companyPhone}}</div>{{/if}}
             {{#if companyEmail}}<div class="company-detail">Email: {{companyEmail}}</div>{{/if}}
-            {{#if gstNumber}}<div class="company-detail"><strong>GST:</strong> {{gstNumber}}</div>{{/if}}
         </div>
         <div class="doc-badge">
-            <div class="doc-title">QUOTATION</div>
-            <div class="validity-badge">Valid for {{#if validityDays}}{{validityDays}}{{else}}30{{/if}} days</div>
+            <div class="doc-title">PURCHASE ORDER</div>
+            <div class="status-badge">Open Order</div>
         </div>
     </div>
 
-    <div class="quote-meta">
-        <div class="quote-meta-item">
-            <div class="label">Quote No.</div>
-            <div class="value">{{quotationNumber}}</div>
+    <div class="meta-row">
+        <div class="meta-item">
+            <div class="label">PO Number</div>
+            <div class="value">{{poNumber}}</div>
         </div>
-        <div class="quote-meta-item">
+        <div class="meta-item">
             <div class="label">Date</div>
-            <div class="value">{{quotationDate}}</div>
+            <div class="value">{{poDate}}</div>
         </div>
-        <div class="quote-meta-item">
-            <div class="label">Valid Until</div>
-            <div class="value">{{#if validUntil}}{{validUntil}}{{else}}30 days{{/if}}</div>
-        </div>
-    </div>
-
-    <div class="meta-grid">
-        <div class="meta-card">
-            <div class="meta-label">From</div>
-            <div class="meta-name">{{companyName}}</div>
-            <div class="meta-detail">{{{companyAddress}}}</div>
-        </div>
-        <div class="meta-card">
-            <div class="meta-label">Quotation For</div>
-            <div class="meta-name">{{clientName}}</div>
-            <div class="meta-detail">{{{clientAddress}}}</div>
-            {{#if clientPhone}}<div class="meta-detail">Phone: {{clientPhone}}</div>{{/if}}
+        <div class="meta-item">
+            <div class="label">Delivery Date</div>
+            <div class="value">{{deliveryDate}}</div>
         </div>
     </div>
 
-    <div class="intro">
-        <p>Dear {{clientName}},</p>
-        <p>Thank you for your interest in our services. We are pleased to submit the following quotation for your
-            consideration:</p>
+    <div class="parties-grid">
+        <div class="party-card">
+            <div class="party-label">Buyer (Bill To)</div>
+            <div class="party-name">{{companyName}}</div>
+            <div class="party-detail">{{{companyAddress}}}</div>
+            {{#if gstNumber}}<div class="party-detail"><strong>GST:</strong> {{gstNumber}}</div>{{/if}}
+        </div>
+        <div class="party-card">
+            <div class="party-label">Vendor (Supplier)</div>
+            <div class="party-name">{{vendorName}}</div>
+            <div class="party-detail">{{{vendorAddress}}}</div>
+            {{#if vendorGST}}<div class="party-detail"><strong>GST:</strong> {{vendorGST}}</div>{{/if}}
+            {{#if vendorEmail}}<div class="party-detail">Email: {{vendorEmail}}</div>{{/if}}
+        </div>
     </div>
 
     <table class="items-table">
         <thead>
             <tr>
                 <th>#</th>
-                <th>Description</th>
+                <th>Item Description</th>
                 <th>Qty</th>
                 <th>Unit Price</th>
                 <th>Amount</th>
@@ -379,49 +398,63 @@
     <div class="totals-section">
         <div class="totals-table">
             <div class="total-row"><span>Subtotal</span><span>₹{{subtotal}}</span></div>
-            {{#if taxAmount}}<div class="total-row"><span>GST ({{#if
-                    taxRate}}{{taxRate}}{{else}}18{{/if}}%)</span><span>₹{{taxAmount}}</span></div>{{/if}}
-            <div class="total-row grand"><span>Total</span><span>₹{{totalAmount}}</span></div>
+            {{#if taxAmount}}<div class="total-row"><span>GST</span><span>₹{{taxAmount}}</span></div>{{/if}}
+            {{#if shippingCost}}<div class="total-row"><span>Shipping</span><span>₹{{shippingCost}}</span></div>{{/if}}
+            <div class="total-row grand"><span>Total Order</span><span>₹{{totalAmount}}</span></div>
+        </div>
+    </div>
+
+    <div class="delivery-section">
+        <div class="delivery-title">Delivery & Shipping Details</div>
+        <div class="delivery-grid">
+            <div class="delivery-item"><span class="label">Delivery Address:</span><span class="value">{{#if
+                    deliveryAddress}}{{{deliveryAddress}}}{{else}}{{{companyAddress}}}{{/if}}</span></div>
+            <div class="delivery-item"><span class="label">Expected Delivery:</span><span
+                    class="value">{{deliveryDate}}</span></div>
+            <div class="delivery-item"><span class="label">Shipping Method:</span><span class="value">{{#if
+                    shippingMethod}}{{shippingMethod}}{{else}}Standard Delivery{{/if}}</span></div>
+            <div class="delivery-item"><span class="label">Payment Terms:</span><span class="value">{{#if
+                    paymentTerms}}{{paymentTerms}}{{else}}Net 30 days{{/if}}</span></div>
         </div>
     </div>
 
     <div class="terms-section">
         <div class="terms-title">Terms & Conditions</div>
         <ol class="terms-list">
-            <li>This quotation is valid for {{#if validityDays}}{{validityDays}}{{else}}30{{/if}} days from the date of
-                issue.</li>
-            <li>Prices are inclusive/exclusive of GST as mentioned.</li>
-            <li>Payment terms: {{#if paymentTerms}}{{paymentTerms}}{{else}}50% advance, 50% on completion{{/if}}.</li>
-            <li>Delivery timeline: {{#if deliveryTimeline}}{{deliveryTimeline}}{{else}}As mutually agreed upon
-                confirmation{{/if}}.</li>
-            <li>This quotation is subject to final confirmation and formal agreement.</li>
+            <li>This Purchase Order is subject to the buyer's standard terms and conditions.</li>
+            <li>Goods must conform to the specifications and quality standards as agreed.</li>
+            <li>Delivery must be made by the specified delivery date. Late deliveries may be subject to penalties.</li>
+            <li>The buyer reserves the right to reject goods that do not meet specifications.</li>
+            <li>Invoice must reference this PO number for processing.</li>
+            <li>Payment will be processed within {{#if paymentTerms}}{{paymentTerms}}{{else}}30 days{{/if}} of receiving
+                a valid invoice.</li>
         </ol>
     </div>
 
-    <div class="cta-section">
-        <div class="cta-text">Ready to proceed? Accept this quotation to get started.</div>
-        <div class="cta-sub">Contact us at {{#if companyEmail}}{{companyEmail}}{{else}}sales@company.com{{/if}} for
-            questions</div>
+    <div class="note-box">
+        <strong>Important:</strong> This Purchase Order constitutes an offer to purchase goods/services as described. It
+        becomes a binding contract upon acceptance by the vendor. Please confirm acceptance within 48 hours.
     </div>
 
     <div class="signature-section">
         <div class="sig-block">
-            <div class="sig-label">For {{companyName}}</div>
+            <div class="sig-label">Authorized by (Buyer)</div>
             <div class="sig-line">
-                <div class="sig-name">Authorized Signatory</div>
+                <div class="sig-name">{{#if approverName}}{{approverName}}{{else}}Procurement Manager{{/if}}</div>
+                <div class="sig-role">{{companyName}}</div>
             </div>
         </div>
         <div class="sig-block">
-            <div class="sig-label">Client Acceptance</div>
+            <div class="sig-label">Accepted by (Vendor)</div>
             <div class="sig-line">
-                <div class="sig-name">{{clientName}}</div>
+                <div class="sig-name">{{vendorName}}</div>
                 <div class="sig-role">Date: ___________</div>
             </div>
         </div>
     </div>
 
     <div class="footer">
-        <p>{{companyName}} — Quotation Document</p>
+        <p>{{companyName}} — Purchase Order</p>
     </div>
 </body>
 

@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Quotation</title>
+    <title>Credit Note</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         * {
@@ -46,45 +46,77 @@
             line-height: 1.5;
         }
 
+        .company-detail strong {
+            color: #111827;
+        }
+
         .doc-badge {
             text-align: right;
         }
 
         .doc-title {
-            font-size: 32px;
+            font-size: 28px;
             font-weight: 800;
-            color: #e5e7eb;
+            color: #fecaca;
             text-transform: uppercase;
             letter-spacing: 0.06em;
         }
 
-        .validity-badge {
+        .type-badge {
             display: inline-block;
-            padding: 4px 12px;
+            padding: 4px 14px;
             border-radius: 9999px;
-            font-size: 10px;
+            font-size: 11px;
             font-weight: 600;
             text-transform: uppercase;
             letter-spacing: 0.05em;
-            background: #eff6ff;
-            color: #2563eb;
+            background: #fef2f2;
+            color: #dc2626;
             margin-top: 8px;
         }
 
-        .meta-grid {
+        .meta-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+
+        .meta-item {
+            background: #f9fafb;
+            border-radius: 6px;
+            padding: 10px 14px;
+        }
+
+        .meta-item .label {
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            color: #6b7280;
+            font-weight: 600;
+        }
+
+        .meta-item .value {
+            font-size: 14px;
+            font-weight: 600;
+            color: #111827;
+            margin-top: 2px;
+        }
+
+        .parties-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 24px;
             margin-bottom: 24px;
         }
 
-        .meta-card {
+        .party-card {
             background: #f9fafb;
             border-radius: 8px;
             padding: 16px;
         }
 
-        .meta-label {
+        .party-label {
             font-size: 11px;
             text-transform: uppercase;
             letter-spacing: 0.06em;
@@ -93,52 +125,40 @@
             margin-bottom: 10px;
         }
 
-        .meta-name {
+        .party-name {
             font-size: 15px;
             font-weight: 600;
             color: #111827;
             margin-bottom: 4px;
         }
 
-        .meta-detail {
+        .party-detail {
             font-size: 12px;
             color: #4b5563;
             line-height: 1.5;
         }
 
-        .quote-meta {
-            display: grid;
-            grid-template-columns: 1fr 1fr 1fr;
-            gap: 12px;
+        .reason-section {
+            background: #fef2f2;
+            border-radius: 8px;
+            padding: 16px 20px;
             margin-bottom: 24px;
+            border-left: 4px solid #ef4444;
         }
 
-        .quote-meta-item {
-            background: #f9fafb;
-            border-radius: 6px;
-            padding: 10px 14px;
-        }
-
-        .quote-meta-item .label {
-            font-size: 10px;
+        .reason-label {
+            font-size: 11px;
+            font-weight: 600;
+            color: #991b1b;
             text-transform: uppercase;
-            letter-spacing: 0.06em;
-            color: #6b7280;
-            font-weight: 600;
+            letter-spacing: 0.04em;
+            margin-bottom: 4px;
         }
 
-        .quote-meta-item .value {
+        .reason-text {
             font-size: 14px;
-            font-weight: 600;
-            color: #111827;
-            margin-top: 2px;
-        }
-
-        .intro {
-            font-size: 14px;
-            color: #374151;
-            margin-bottom: 24px;
-            line-height: 1.7;
+            color: #7f1d1d;
+            line-height: 1.6;
         }
 
         .items-table {
@@ -202,7 +222,7 @@
         }
 
         .total-row.grand {
-            background: #111827;
+            background: #dc2626;
             color: white;
             border-radius: 8px;
             padding: 12px 16px;
@@ -212,62 +232,29 @@
             margin-top: 4px;
         }
 
-        .terms-section {
+        .note-section {
             background: #f9fafb;
             border-radius: 8px;
-            padding: 20px;
+            padding: 16px 20px;
             margin: 24px 0;
+            font-size: 12px;
+            color: #6b7280;
+            line-height: 1.6;
         }
 
-        .terms-title {
-            font-size: 11px;
-            font-weight: 600;
+        .note-section strong {
             color: #111827;
-            margin-bottom: 12px;
-            text-transform: uppercase;
-            letter-spacing: 0.04em;
-        }
-
-        .terms-list {
-            padding-left: 20px;
-        }
-
-        .terms-list li {
-            margin-bottom: 6px;
-            font-size: 12px;
-            color: #4b5563;
-            line-height: 1.5;
-        }
-
-        .cta-section {
-            background: #eff6ff;
-            border: 1px solid #bfdbfe;
-            border-radius: 8px;
-            padding: 20px;
-            margin: 24px 0;
-            text-align: center;
-        }
-
-        .cta-text {
-            font-size: 14px;
-            font-weight: 600;
-            color: #1e40af;
-        }
-
-        .cta-sub {
-            font-size: 12px;
-            color: #3b82f6;
-            margin-top: 4px;
         }
 
         .signature-section {
             margin-top: 40px;
             display: flex;
-            justify-content: space-between;
-            align-items: flex-end;
+            justify-content: flex-end;
         }
 
-        .sig-block {}
+        .sig-block {
+            text-align: right;
+        }
 
         .sig-label {
             font-size: 11px;
@@ -278,7 +265,7 @@
         .sig-line {
             border-top: 1px solid #d1d5db;
             padding-top: 6px;
-            min-width: 200px;
+            min-width: 220px;
         }
 
         .sig-name {
@@ -308,49 +295,47 @@
         <div>
             <div class="company-name">{{companyName}}</div>
             <div class="company-detail">{{{companyAddress}}}</div>
-            {{#if companyPhone}}<div class="company-detail">Phone: {{companyPhone}}</div>{{/if}}
-            {{#if companyEmail}}<div class="company-detail">Email: {{companyEmail}}</div>{{/if}}
-            {{#if gstNumber}}<div class="company-detail"><strong>GST:</strong> {{gstNumber}}</div>{{/if}}
+            {{#if gstNumber}}<div class="company-detail"><strong>GSTIN:</strong> {{gstNumber}}</div>{{/if}}
         </div>
         <div class="doc-badge">
-            <div class="doc-title">QUOTATION</div>
-            <div class="validity-badge">Valid for {{#if validityDays}}{{validityDays}}{{else}}30{{/if}} days</div>
+            <div class="doc-title">CREDIT NOTE</div>
+            <div class="type-badge">Adjustment</div>
         </div>
     </div>
 
-    <div class="quote-meta">
-        <div class="quote-meta-item">
-            <div class="label">Quote No.</div>
-            <div class="value">{{quotationNumber}}</div>
+    <div class="meta-row">
+        <div class="meta-item">
+            <div class="label">Credit Note No.</div>
+            <div class="value">{{creditNoteNumber}}</div>
         </div>
-        <div class="quote-meta-item">
+        <div class="meta-item">
             <div class="label">Date</div>
-            <div class="value">{{quotationDate}}</div>
+            <div class="value">{{creditNoteDate}}</div>
         </div>
-        <div class="quote-meta-item">
-            <div class="label">Valid Until</div>
-            <div class="value">{{#if validUntil}}{{validUntil}}{{else}}30 days{{/if}}</div>
-        </div>
-    </div>
-
-    <div class="meta-grid">
-        <div class="meta-card">
-            <div class="meta-label">From</div>
-            <div class="meta-name">{{companyName}}</div>
-            <div class="meta-detail">{{{companyAddress}}}</div>
-        </div>
-        <div class="meta-card">
-            <div class="meta-label">Quotation For</div>
-            <div class="meta-name">{{clientName}}</div>
-            <div class="meta-detail">{{{clientAddress}}}</div>
-            {{#if clientPhone}}<div class="meta-detail">Phone: {{clientPhone}}</div>{{/if}}
+        <div class="meta-item">
+            <div class="label">Original Invoice</div>
+            <div class="value">{{originalInvoiceNumber}}</div>
         </div>
     </div>
 
-    <div class="intro">
-        <p>Dear {{clientName}},</p>
-        <p>Thank you for your interest in our services. We are pleased to submit the following quotation for your
-            consideration:</p>
+    <div class="parties-grid">
+        <div class="party-card">
+            <div class="party-label">Issued By</div>
+            <div class="party-name">{{companyName}}</div>
+            <div class="party-detail">{{{companyAddress}}}</div>
+            {{#if gstNumber}}<div class="party-detail"><strong>GST:</strong> {{gstNumber}}</div>{{/if}}
+        </div>
+        <div class="party-card">
+            <div class="party-label">Issued To</div>
+            <div class="party-name">{{clientName}}</div>
+            <div class="party-detail">{{{clientAddress}}}</div>
+            {{#if clientGST}}<div class="party-detail"><strong>GST:</strong> {{clientGST}}</div>{{/if}}
+        </div>
+    </div>
+
+    <div class="reason-section">
+        <div class="reason-label">Reason for Credit Note</div>
+        <div class="reason-text">{{{reason}}}</div>
     </div>
 
     <table class="items-table">
@@ -359,7 +344,7 @@
                 <th>#</th>
                 <th>Description</th>
                 <th>Qty</th>
-                <th>Unit Price</th>
+                <th>Rate</th>
                 <th>Amount</th>
             </tr>
         </thead>
@@ -379,29 +364,16 @@
     <div class="totals-section">
         <div class="totals-table">
             <div class="total-row"><span>Subtotal</span><span>₹{{subtotal}}</span></div>
-            {{#if taxAmount}}<div class="total-row"><span>GST ({{#if
-                    taxRate}}{{taxRate}}{{else}}18{{/if}}%)</span><span>₹{{taxAmount}}</span></div>{{/if}}
-            <div class="total-row grand"><span>Total</span><span>₹{{totalAmount}}</span></div>
+            {{#if taxAmount}}<div class="total-row"><span>GST</span><span>₹{{taxAmount}}</span></div>{{/if}}
+            <div class="total-row grand"><span>Credit Amount</span><span>₹{{totalAmount}}</span></div>
         </div>
     </div>
 
-    <div class="terms-section">
-        <div class="terms-title">Terms & Conditions</div>
-        <ol class="terms-list">
-            <li>This quotation is valid for {{#if validityDays}}{{validityDays}}{{else}}30{{/if}} days from the date of
-                issue.</li>
-            <li>Prices are inclusive/exclusive of GST as mentioned.</li>
-            <li>Payment terms: {{#if paymentTerms}}{{paymentTerms}}{{else}}50% advance, 50% on completion{{/if}}.</li>
-            <li>Delivery timeline: {{#if deliveryTimeline}}{{deliveryTimeline}}{{else}}As mutually agreed upon
-                confirmation{{/if}}.</li>
-            <li>This quotation is subject to final confirmation and formal agreement.</li>
-        </ol>
-    </div>
-
-    <div class="cta-section">
-        <div class="cta-text">Ready to proceed? Accept this quotation to get started.</div>
-        <div class="cta-sub">Contact us at {{#if companyEmail}}{{companyEmail}}{{else}}sales@company.com{{/if}} for
-            questions</div>
+    <div class="note-section">
+        <strong>Note:</strong> This credit note has been issued against Invoice No.
+        <strong>{{originalInvoiceNumber}}</strong>. The credited amount will be adjusted against your next invoice or
+        refunded as per mutual agreement. This credit note is valid for adjustment within 12 months from the date of
+        issue.
     </div>
 
     <div class="signature-section">
@@ -409,19 +381,13 @@
             <div class="sig-label">For {{companyName}}</div>
             <div class="sig-line">
                 <div class="sig-name">Authorized Signatory</div>
-            </div>
-        </div>
-        <div class="sig-block">
-            <div class="sig-label">Client Acceptance</div>
-            <div class="sig-line">
-                <div class="sig-name">{{clientName}}</div>
-                <div class="sig-role">Date: ___________</div>
+                <div class="sig-role">Finance Department</div>
             </div>
         </div>
     </div>
 
     <div class="footer">
-        <p>{{companyName}} — Quotation Document</p>
+        <p>This is a system-generated document. {{companyName}}</p>
     </div>
 </body>
 

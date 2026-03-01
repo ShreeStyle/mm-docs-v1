@@ -2,12 +2,13 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { ArrowLeft, FileText, Download, Eye, Loader2 } from 'lucide-react';
+import Handlebars from 'handlebars';
 import { api } from '../utils/api';
 
 const CreateDocument = () => {
     const { templateId } = useParams();
     const navigate = useNavigate();
-    
+
     const [template, setTemplate] = useState(null);
     const [formData, setFormData] = useState({});
     const [loading, setLoading] = useState(true);
@@ -32,7 +33,7 @@ const CreateDocument = () => {
             setLoading(true);
             const response = await api.get(`/templates/${templateId}`);
             console.log('Template fetch response:', response);
-            
+
             if (response.success) {
                 setTemplate(response.data);
                 // Initialize form data with empty values
@@ -64,12 +65,12 @@ const CreateDocument = () => {
     const validateForm = () => {
         const requiredFields = template.requiredFields.filter(field => field.required);
         const missingFields = requiredFields.filter(field => !formData[field.fieldName]?.trim());
-        
+
         if (missingFields.length > 0) {
             setError(`Please fill in required fields: ${missingFields.map(f => f.label).join(', ')}`);
             return false;
         }
-        
+
         setError(null);
         return true;
     };
@@ -79,7 +80,7 @@ const CreateDocument = () => {
 
         try {
             setGenerating(true);
-            
+
             const documentData = {
                 type: template.templateId,
                 title: `${template.name} - ${formData.candidateName || formData.employeeName || formData.clientName || 'Document'}`,
@@ -88,9 +89,9 @@ const CreateDocument = () => {
             };
 
             const response = await api.post('/documents/generate', documentData);
-            
+
             if (response.success) {
-                setGeneratedDocument(response.data);
+                setGeneratedDocument(response.document);
                 setPreviewMode(true);
             } else {
                 setError('Failed to generate document');
@@ -107,8 +108,8 @@ const CreateDocument = () => {
         if (!generatedDocument) return;
 
         try {
-            const url = `/documents/${generatedDocument._id}/${format === 'pdf' ? 'download' : 'download-docx'}`;
-            const response = await fetch(`http://localhost:5000/api${url}`, {
+            const url = `/api/documents/${generatedDocument._id}/${format === 'pdf' ? 'download' : 'download-docx'}`;
+            const response = await fetch(url, {
                 headers: {
                     'Authorization': `Bearer ${localStorage.getItem('token')}`
                 }
@@ -182,21 +183,21 @@ const CreateDocument = () => {
 
     const getPreviewContent = () => {
         if (!template || !template.content) return '';
-        
+
         let content = template.content;
-        
+
         // Replace placeholders with form data or professional sample data
         const previewData = {
             // Use form data if available, otherwise use professional sample data
             clientName: formData.clientName || 'ABC Corporation Pvt Ltd',
-            clientAddress: formData.clientAddress || '123 Business Street<br>Mumbai, Maharashtra - 400001<br>India',
+            clientAddress: new Handlebars.SafeString(formData.clientAddress ? formData.clientAddress.replace(/\n/g, '<br>') : '123 Business Street<br>Mumbai, Maharashtra - 400001<br>India'),
             invoiceNumber: formData.invoiceNumber || 'INV-2024-001',
             invoiceDate: formData.invoiceDate || new Date().toLocaleDateString('en-IN'),
             dueDate: formData.dueDate || new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toLocaleDateString('en-IN'),
             totalAmount: formData.totalAmount || '1,18,000',
-            serviceDescription: formData.serviceDescription || 'Professional Software Development Services<br>• Web Application Development<br>• API Integration<br>• Database Design & Implementation',
+            serviceDescription: new Handlebars.SafeString(formData.serviceDescription ? formData.serviceDescription.replace(/\n/g, '<br>') : 'Professional Software Development Services'),
             companyName: formData.companyName || 'Your Company Ltd',
-            companyAddress: formData.companyAddress || 'Tech Park, Sector 5<br>Bangalore, Karnataka - 560001<br>India',
+            companyAddress: new Handlebars.SafeString(formData.companyAddress ? formData.companyAddress.replace(/\n/g, '<br>') : 'Tech Park, Sector 5<br>Bangalore, Karnataka - 560001<br>India'),
             companyPhone: '+91-9876543210',
             companyEmail: 'billing@yourcompany.com',
             gstNumber: '29ABCDE1234F1Z5',
@@ -226,36 +227,34 @@ const CreateDocument = () => {
             workLocation: formData.workLocation || 'Bangalore Office',
             partyName: formData.partyName || 'Business Partner Corp',
             effectiveDate: formData.effectiveDate || '2024-03-01',
-            duration: formData.duration || '2'
+            duration: formData.duration || '2',
+
+            // Adding a default items array to make the invoice look good
+            items: [
+                {
+                    description: formData.serviceDescription || 'Professional Software Development Services - Core Product',
+                    quantity: 1,
+                    rate: formData.totalAmount ? (parseFloat(formData.totalAmount.replace(/,/g, '')) * 0.85 * 0.6).toLocaleString('en-IN') : '60,000',
+                    amount: formData.totalAmount ? (parseFloat(formData.totalAmount.replace(/,/g, '')) * 0.85 * 0.6).toLocaleString('en-IN') : '60,000'
+                },
+                {
+                    description: 'UI/UX Design Services - Consultation',
+                    quantity: 1,
+                    rate: formData.totalAmount ? (parseFloat(formData.totalAmount.replace(/,/g, '')) * 0.85 * 0.4).toLocaleString('en-IN') : '40,000',
+                    amount: formData.totalAmount ? (parseFloat(formData.totalAmount.replace(/,/g, '')) * 0.85 * 0.4).toLocaleString('en-IN') : '40,000'
+                }
+            ]
         };
-        
-        // Replace all placeholders with preview data
-        Object.keys(previewData).forEach(key => {
-            const regex = new RegExp(`{{${key}}}`, 'g');
-            content = content.replace(regex, previewData[key]);
-        });
-        
-        // Handle Handlebars conditional blocks more thoroughly
-        // Show content inside {{#if}} blocks (assume conditions are true for preview)
-        content = content.replace(/{{#if\s+[\w.]+}}([\s\S]*?){{\/if}}/g, '$1');
-        
-        // Remove {{#unless}} blocks (assume conditions are false for preview)
-        content = content.replace(/{{#unless\s+[\w.]+}}([\s\S]*?){{\/unless}}/g, '');
-        
-        // Handle {{else}} blocks - remove them for preview (we're showing the main content)
-        content = content.replace(/{{else}}[\s\S]*?(?={{\/if}})/g, '');
-        
-        // Handle {{#each}} blocks - show single item for preview
-        content = content.replace(/{{#each\s+[\w.]+}}([\s\S]*?){{\/each}}/g, '$1');
-        
-        // Remove any remaining Handlebars syntax
-        content = content.replace(/{{[^}]*}}/g, '');
-        
-        // Clean up extra whitespace and line breaks
-        content = content.replace(/\n\s*\n\s*\n/g, '\n\n');
-        content = content.replace(/^\s+|\s+$/g, '');
-        
-        return content;
+
+        try {
+            // Use Handlebars to compile the layout
+            const compiledTemplate = Handlebars.compile(content);
+            const html = compiledTemplate(previewData);
+            return html;
+        } catch (e) {
+            console.error('Error compiling template:', e);
+            return '<div style="color: red; padding: 20px;">Error generating preview. Template syntax might be invalid.</div>';
+        }
     };
 
     if (loading) {
@@ -346,7 +345,7 @@ const CreateDocument = () => {
             </div>
 
             <div style={{ padding: '32px' }}>
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '32px', maxWidth: '1400px', margin: '0 auto' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: '2fr 3fr', gap: '32px', maxWidth: '1600px', margin: '0 auto' }}>
                     {/* Form Section */}
                     <div style={{
                         backgroundColor: 'white',
@@ -459,7 +458,7 @@ const CreateDocument = () => {
                         borderRadius: '16px',
                         padding: '32px',
                         boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)',
-                        maxHeight: '80vh',
+                        maxHeight: '90vh',
                         overflow: 'auto'
                     }}>
                         <div style={{ marginBottom: '24px' }}>
@@ -485,19 +484,24 @@ const CreateDocument = () => {
                         }}>
                             {/* Document Content */}
                             <div style={{
-                                padding: '40px',
-                                minHeight: '1000px', // A4 height at 96 DPI
+                                width: '100%',
+                                minHeight: '1000px', // A4 height approx at 96 DPI
                                 backgroundColor: 'white',
-                                fontFamily: 'Segoe UI, Tahoma, Geneva, Verdana, sans-serif',
-                                fontSize: '14px',
-                                lineHeight: '1.6',
-                                color: '#2c3e50',
                                 position: 'relative',
                                 zIndex: 1
                             }}>
-                                <div dangerouslySetInnerHTML={{ __html: getPreviewContent() }} />
+                                <iframe
+                                    srcDoc={getPreviewContent()}
+                                    style={{
+                                        width: '100%',
+                                        height: '1123px',
+                                        border: 'none',
+                                        overflow: 'auto'
+                                    }}
+                                    title="Document Preview"
+                                />
                             </div>
-                            
+
                             {/* Subtle page indicator */}
                             <div style={{
                                 position: 'absolute',

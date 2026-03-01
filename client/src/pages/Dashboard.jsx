@@ -22,12 +22,12 @@ const LogoIcon = () => (
 export default function Dashboard() {
     const { user, logout, login, token } = useAuth();
     const navigate = useNavigate();
-    
+
     // Navigation state
     const [currentView, setCurrentView] = useState('dashboard');
     const [selectedCategory, setSelectedCategory] = useState(null);
     const [selectedDocType, setSelectedDocType] = useState(null);
-    
+
     // Data states
     const [docs, setDocs] = useState([]);
     const [brandKit, setBrandKit] = useState(null);
@@ -35,7 +35,7 @@ export default function Dashboard() {
     const [isGenerating, setIsGenerating] = useState(false);
     const [generatedDoc, setGeneratedDoc] = useState(null);
     const [searchQuery, setSearchQuery] = useState('');
-    
+
     // Form states
     const [genericDocData, setGenericDocData] = useState({
         employeeName: '', position: '', department: '', startDate: '', salary: '', reportingTo: '',
@@ -70,11 +70,11 @@ export default function Dashboard() {
             const downloadUrl = window.URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = downloadUrl;
-            
+
             // Find the document to get its title
             const doc = docs.find(d => d._id === docId);
             const fileName = doc ? doc.title.replace(/[^a-z0-9]/gi, '_') : 'document';
-            
+
             a.download = `${fileName}.${format}`;
             document.body.appendChild(a);
             a.click();
@@ -90,9 +90,8 @@ export default function Dashboard() {
         { id: 'dashboard', label: 'Dashboard', icon: Home, active: currentView === 'dashboard' },
         { id: 'create', label: 'Create Document', icon: Plus, active: currentView === 'create' },
         { id: 'documents', label: 'My Documents', icon: FileText, active: currentView === 'documents' },
-        { id: 'compliance', label: 'Compliance Center', icon: Shield, active: currentView === 'compliance' },
-        { id: 'templates', label: 'Templates', icon: Layers, active: currentView === 'templates' },
-        { id: 'users', label: 'Users', icon: Users, active: currentView === 'users' },
+        { id: 'templates', label: 'Template Library', icon: Layers, active: currentView === 'templates' || ['hr', 'legal', 'sales', 'finance', 'compliance'].includes(currentView) },
+        { id: 'compliance-center', label: 'Compliance Center', icon: Shield, active: currentView === 'compliance-center' },
         { id: 'settings', label: 'Settings', icon: Settings, active: currentView === 'settings' }
     ];
 
@@ -153,16 +152,16 @@ export default function Dashboard() {
             }}>
                 <LogoIcon />
                 <div>
-                    <h1 style={{ 
-                        fontSize: '20px', 
-                        fontWeight: '700', 
-                        color: '#111827', 
+                    <h1 style={{
+                        fontSize: '20px',
+                        fontWeight: '700',
+                        color: '#111827',
                         margin: 0,
                         fontFamily: 'Inter, sans-serif'
                     }}>MM Docs</h1>
-                    <p style={{ 
-                        fontSize: '12px', 
-                        color: '#6B7280', 
+                    <p style={{
+                        fontSize: '12px',
+                        color: '#6B7280',
                         margin: 0,
                         fontWeight: '500'
                     }}>AI Document Platform</p>
@@ -178,13 +177,11 @@ export default function Dashboard() {
                             key={item.id}
                             onClick={() => {
                                 if (item.id === 'templates') {
-                                    navigate('/dashboard/templates');
-                                } else {
-                                    setCurrentView(item.id);
                                     setSelectedCategory(null);
                                     setSelectedDocType(null);
-                                    setGeneratedDoc(null);
                                 }
+                                setGeneratedDoc(null);
+                                setCurrentView(item.id);
                             }}
                             style={{
                                 width: '100%',
@@ -246,16 +243,16 @@ export default function Dashboard() {
                     {user?.name?.charAt(0) || 'U'}
                 </div>
                 <div style={{ flex: 1 }}>
-                    <p style={{ 
-                        fontSize: '14px', 
-                        fontWeight: '600', 
-                        color: '#111827', 
-                        margin: 0 
+                    <p style={{
+                        fontSize: '14px',
+                        fontWeight: '600',
+                        color: '#111827',
+                        margin: 0
                     }}>{user?.name || 'User'}</p>
-                    <p style={{ 
-                        fontSize: '12px', 
-                        color: '#6B7280', 
-                        margin: 0 
+                    <p style={{
+                        fontSize: '12px',
+                        color: '#6B7280',
+                        margin: 0
                     }}>{isPro ? 'Pro Plan' : 'Free Plan'}</p>
                 </div>
                 <button
@@ -298,30 +295,30 @@ export default function Dashboard() {
             zIndex: 100
         }}>
             <div>
-                <h1 style={{ 
-                    fontSize: '28px', 
-                    fontWeight: '700', 
-                    color: '#111827', 
+                <h1 style={{
+                    fontSize: '28px',
+                    fontWeight: '700',
+                    color: '#111827',
                     margin: 0,
                     textTransform: 'capitalize'
                 }}>{currentView === 'dashboard' ? 'Dashboard' : currentView.replace(/([A-Z])/g, ' $1').trim()}</h1>
                 {currentView === 'dashboard' && (
-                    <p style={{ 
-                        fontSize: '16px', 
-                        color: '#6B7280', 
-                        margin: '4px 0 0 0' 
+                    <p style={{
+                        fontSize: '16px',
+                        color: '#6B7280',
+                        margin: '4px 0 0 0'
                     }}>Good evening, {user?.name?.split(' ')[0]} – MM Docs Excellence & Strategic Mastery</p>
                 )}
             </div>
-            
+
             <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
                 {/* Search Bar */}
                 <div style={{
                     position: 'relative',
                     width: '320px'
                 }}>
-                    <Search 
-                        size={20} 
+                    <Search
+                        size={20}
                         style={{
                             position: 'absolute',
                             left: '16px',
@@ -590,29 +587,41 @@ export default function Dashboard() {
                     overflow: 'hidden'
                 }}>
                     <div style={{ padding: '24px', borderBottom: '1px solid #E5E7EB' }}>
-                        <h3 style={{ 
-                            fontSize: '18px', 
-                            fontWeight: '600', 
-                            color: '#111827', 
-                            margin: 0 
+                        <h3 style={{
+                            fontSize: '18px',
+                            fontWeight: '600',
+                            color: '#111827',
+                            margin: 0
                         }}>Recent Activity</h3>
-                        <p style={{ 
-                            fontSize: '14px', 
-                            color: '#6B7280', 
-                            margin: '4px 0 0 0' 
+                        <p style={{
+                            fontSize: '14px',
+                            color: '#6B7280',
+                            margin: '4px 0 0 0'
                         }}>Your latest document generation activity</p>
                     </div>
-                    
+
                     <div style={{ padding: '0' }}>
                         {docs.length > 0 ? (
                             docs.slice(0, 5).map((doc, index) => (
-                                <div key={doc._id || index} style={{
-                                    padding: '16px 24px',
-                                    borderBottom: index < 4 ? '1px solid #F3F4F6' : 'none',
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'space-between'
-                                }}>
+                                <div
+                                    key={doc._id || index}
+                                    onClick={() => handleViewDocument(doc)}
+                                    style={{
+                                        padding: '16px 24px',
+                                        borderBottom: index < 4 ? '1px solid #F3F4F6' : 'none',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'space-between',
+                                        cursor: 'pointer',
+                                        transition: 'all 0.2s ease'
+                                    }}
+                                    onMouseEnter={(e) => {
+                                        e.currentTarget.style.backgroundColor = '#F9FAFB';
+                                    }}
+                                    onMouseLeave={(e) => {
+                                        e.currentTarget.style.backgroundColor = 'transparent';
+                                    }}
+                                >
                                     <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                                         <div style={{
                                             width: '40px',
@@ -626,16 +635,16 @@ export default function Dashboard() {
                                             <FileText size={20} color="#F97316" />
                                         </div>
                                         <div>
-                                            <p style={{ 
-                                                fontSize: '14px', 
-                                                fontWeight: '600', 
-                                                color: '#111827', 
-                                                margin: 0 
+                                            <p style={{
+                                                fontSize: '14px',
+                                                fontWeight: '600',
+                                                color: '#111827',
+                                                margin: 0
                                             }}>{doc.title}</p>
-                                            <p style={{ 
-                                                fontSize: '12px', 
-                                                color: '#6B7280', 
-                                                margin: '2px 0 0 0' 
+                                            <p style={{
+                                                fontSize: '12px',
+                                                color: '#6B7280',
+                                                margin: '2px 0 0 0'
                                             }}>{doc.type?.replace(/_/g, ' ') || 'Document'} • {new Date(doc.createdAt).toLocaleDateString()}</p>
                                         </div>
                                     </div>
@@ -652,8 +661,8 @@ export default function Dashboard() {
                                 </div>
                             ))
                         ) : (
-                            <div style={{ 
-                                padding: '48px 24px', 
+                            <div style={{
+                                padding: '48px 24px',
                                 textAlign: 'center',
                                 color: '#6B7280'
                             }}>
@@ -674,19 +683,19 @@ export default function Dashboard() {
                     height: 'fit-content'
                 }}>
                     <div style={{ padding: '24px', borderBottom: '1px solid #E5E7EB' }}>
-                        <h3 style={{ 
-                            fontSize: '18px', 
-                            fontWeight: '600', 
-                            color: '#111827', 
-                            margin: 0 
+                        <h3 style={{
+                            fontSize: '18px',
+                            fontWeight: '600',
+                            color: '#111827',
+                            margin: 0
                         }}>Quick Actions</h3>
-                        <p style={{ 
-                            fontSize: '14px', 
-                            color: '#6B7280', 
-                            margin: '4px 0 0 0' 
+                        <p style={{
+                            fontSize: '14px',
+                            color: '#6B7280',
+                            margin: '4px 0 0 0'
                         }}>Popular document templates</p>
                     </div>
-                    
+
                     <div style={{ padding: '24px' }}>
                         <button
                             onClick={() => setCurrentView('create')}
@@ -773,16 +782,16 @@ export default function Dashboard() {
             {!selectedCategory ? (
                 <>
                     <div style={{ marginBottom: '32px', textAlign: 'center' }}>
-                        <h2 style={{ 
-                            fontSize: '32px', 
-                            fontWeight: '700', 
-                            color: '#111827', 
-                            margin: '0 0 8px 0' 
+                        <h2 style={{
+                            fontSize: '32px',
+                            fontWeight: '700',
+                            color: '#111827',
+                            margin: '0 0 8px 0'
                         }}>Select Category</h2>
-                        <p style={{ 
-                            fontSize: '18px', 
-                            color: '#6B7280', 
-                            margin: 0 
+                        <p style={{
+                            fontSize: '18px',
+                            color: '#6B7280',
+                            margin: 0
                         }}>Choose the document category to get started</p>
                     </div>
 
@@ -804,7 +813,10 @@ export default function Dashboard() {
                             return (
                                 <div
                                     key={category.id}
-                                    onClick={() => setSelectedCategory(category.id)}
+                                    onClick={() => {
+                                        setSelectedCategory(category.id);
+                                        setCurrentView('templates');
+                                    }}
                                     style={{
                                         backgroundColor: 'white',
                                         border: '2px solid #E5E7EB',
@@ -843,11 +855,11 @@ export default function Dashboard() {
                                     }}>
                                         <Icon size={32} color={category.color} />
                                     </div>
-                                    <h3 style={{ 
-                                        fontSize: '18px', 
-                                        fontWeight: '600', 
-                                        color: '#111827', 
-                                        margin: 0 
+                                    <h3 style={{
+                                        fontSize: '18px',
+                                        fontWeight: '600',
+                                        color: '#111827',
+                                        margin: 0
                                     }}>{category.label}</h3>
                                 </div>
                             );
@@ -857,16 +869,16 @@ export default function Dashboard() {
                     {/* AI Suggestions */}
                     <div style={{ marginTop: '48px' }}>
                         <div style={{ textAlign: 'center', marginBottom: '32px' }}>
-                            <h3 style={{ 
-                                fontSize: '24px', 
-                                fontWeight: '600', 
-                                color: '#111827', 
-                                margin: '0 0 8px 0' 
+                            <h3 style={{
+                                fontSize: '24px',
+                                fontWeight: '600',
+                                color: '#111827',
+                                margin: '0 0 8px 0'
                             }}>AI Suggestions</h3>
-                            <p style={{ 
-                                fontSize: '16px', 
-                                color: '#6B7280', 
-                                margin: 0 
+                            <p style={{
+                                fontSize: '16px',
+                                color: '#6B7280',
+                                margin: 0
                             }}>Popular templates to get you started</p>
                         </div>
 
@@ -890,6 +902,7 @@ export default function Dashboard() {
                                         onClick={() => {
                                             setSelectedCategory(suggestion.category);
                                             setSelectedDocType(suggestion.type);
+                                            setCurrentView('templates');
                                         }}
                                         style={{
                                             backgroundColor: 'white',
@@ -926,16 +939,16 @@ export default function Dashboard() {
                                             <Icon size={24} color="#F97316" />
                                         </div>
                                         <div>
-                                            <h4 style={{ 
-                                                fontSize: '16px', 
-                                                fontWeight: '600', 
-                                                color: '#111827', 
-                                                margin: 0 
+                                            <h4 style={{
+                                                fontSize: '16px',
+                                                fontWeight: '600',
+                                                color: '#111827',
+                                                margin: 0
                                             }}>{suggestion.label}</h4>
-                                            <p style={{ 
-                                                fontSize: '14px', 
-                                                color: '#6B7280', 
-                                                margin: '4px 0 0 0' 
+                                            <p style={{
+                                                fontSize: '14px',
+                                                color: '#6B7280',
+                                                margin: '4px 0 0 0'
                                             }}>Generate professional {suggestion.label.toLowerCase()}</p>
                                         </div>
                                     </button>
@@ -963,20 +976,20 @@ export default function Dashboard() {
                     >
                         ← Back to Categories
                     </button>
-                    
-                    <h2 style={{ 
-                        fontSize: '28px', 
-                        fontWeight: '700', 
-                        color: '#111827', 
+
+                    <h2 style={{
+                        fontSize: '28px',
+                        fontWeight: '700',
+                        color: '#111827',
                         margin: '0 0 8px 0',
                         textTransform: 'capitalize'
                     }}>
                         {selectedCategory} Documents
                     </h2>
-                    <p style={{ 
-                        fontSize: '16px', 
-                        color: '#6B7280', 
-                        margin: '0 0 32px 0' 
+                    <p style={{
+                        fontSize: '16px',
+                        color: '#6B7280',
+                        margin: '0 0 32px 0'
                     }}>Choose a document type to generate</p>
 
                     <div style={{
@@ -1022,7 +1035,7 @@ export default function Dashboard() {
                             };
 
                             const currentTypes = documentTypes[selectedCategory] || [];
-                            
+
                             return currentTypes.map((docType) => (
                                 <div
                                     key={docType.id}
@@ -1064,17 +1077,17 @@ export default function Dashboard() {
                                     }}>
                                         {docType.icon}
                                     </div>
-                                    <h3 style={{ 
-                                        fontSize: '14px', 
-                                        fontWeight: '600', 
-                                        color: '#111827', 
+                                    <h3 style={{
+                                        fontSize: '14px',
+                                        fontWeight: '600',
+                                        color: '#111827',
                                         margin: '0 0 6px 0',
                                         textAlign: 'center',
                                         lineHeight: '1.2'
                                     }}>{docType.label}</h3>
-                                    <p style={{ 
-                                        fontSize: '11px', 
-                                        color: '#6B7280', 
+                                    <p style={{
+                                        fontSize: '11px',
+                                        color: '#6B7280',
                                         margin: 0,
                                         textAlign: 'center',
                                         lineHeight: '1.3'
@@ -1093,23 +1106,23 @@ export default function Dashboard() {
                             border: '1px solid #E5E7EB',
                             boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)'
                         }}>
-                            <div style={{ 
-                                display: 'flex', 
-                                justifyContent: 'space-between', 
+                            <div style={{
+                                display: 'flex',
+                                justifyContent: 'space-between',
                                 alignItems: 'center',
                                 marginBottom: '16px'
                             }}>
                                 <div>
-                                    <h3 style={{ 
-                                        fontSize: '18px', 
-                                        fontWeight: '600', 
-                                        color: '#111827', 
-                                        margin: '0 0 4px 0' 
+                                    <h3 style={{
+                                        fontSize: '18px',
+                                        fontWeight: '600',
+                                        color: '#111827',
+                                        margin: '0 0 4px 0'
                                     }}>Ready to Generate</h3>
-                                    <p style={{ 
-                                        fontSize: '14px', 
-                                        color: '#6B7280', 
-                                        margin: 0 
+                                    <p style={{
+                                        fontSize: '14px',
+                                        color: '#6B7280',
+                                        margin: 0
                                     }}>
                                         Selected: {(() => {
                                             const allTypes = {
@@ -1193,29 +1206,29 @@ export default function Dashboard() {
     // My Documents Page
     const MyDocumentsPage = () => {
         console.log('Documents in MyDocumentsPage:', docs);
-        
+
         return (
             <div style={{ padding: '32px' }}>
-                <div style={{ 
-                    display: 'flex', 
-                    justifyContent: 'space-between', 
-                    alignItems: 'center', 
-                    marginBottom: '32px' 
+                <div style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    marginBottom: '32px'
                 }}>
                     <div>
-                        <h2 style={{ 
-                            fontSize: '28px', 
-                            fontWeight: '700', 
-                            color: '#111827', 
-                            margin: 0 
+                        <h2 style={{
+                            fontSize: '28px',
+                            fontWeight: '700',
+                            color: '#111827',
+                            margin: 0
                         }}>My Documents</h2>
-                        <p style={{ 
-                            fontSize: '16px', 
-                            color: '#6B7280', 
-                            margin: '4px 0 0 0' 
+                        <p style={{
+                            fontSize: '16px',
+                            color: '#6B7280',
+                            margin: '4px 0 0 0'
                         }}>Manage and organize your generated documents</p>
                     </div>
-                    
+
                     <div style={{ display: 'flex', gap: '12px' }}>
                         <button style={{
                             padding: '10px 16px',
@@ -1310,20 +1323,20 @@ export default function Dashboard() {
                                             <FileText size={20} color="#F97316" />
                                         </div>
                                         <div>
-                                            <p style={{ 
-                                                fontSize: '14px', 
-                                                fontWeight: '600', 
-                                                color: '#111827', 
-                                                margin: 0 
+                                            <p style={{
+                                                fontSize: '14px',
+                                                fontWeight: '600',
+                                                color: '#111827',
+                                                margin: 0
                                             }}>{doc.title}</p>
-                                            <p style={{ 
-                                                fontSize: '12px', 
-                                                color: '#6B7280', 
-                                                margin: '2px 0 0 0' 
+                                            <p style={{
+                                                fontSize: '12px',
+                                                color: '#6B7280',
+                                                margin: '2px 0 0 0'
                                             }}>{doc.type?.replace(/_/g, ' ') || 'Document'}</p>
                                         </div>
                                     </div>
-                                    
+
                                     <div style={{
                                         backgroundColor: '#EFF6FF',
                                         color: '#1D4ED8',
@@ -1335,15 +1348,15 @@ export default function Dashboard() {
                                         textTransform: 'capitalize'
                                     }}>
                                         {doc.type?.includes('hr') ? 'HR' :
-                                         doc.type?.includes('legal') ? 'Legal' :
-                                         doc.type?.includes('sales') ? 'Sales' :
-                                         doc.type?.includes('finance') ? 'Finance' : 'Other'}
+                                            doc.type?.includes('legal') ? 'Legal' :
+                                                doc.type?.includes('sales') ? 'Sales' :
+                                                    doc.type?.includes('finance') ? 'Finance' : 'Other'}
                                     </div>
-                                    
+
                                     <div style={{ fontSize: '14px', color: '#6B7280' }}>
                                         {new Date(doc.createdAt).toLocaleDateString()}
                                     </div>
-                                    
+
                                     <div style={{
                                         backgroundColor: '#DCFCE7',
                                         color: '#166534',
@@ -1355,9 +1368,9 @@ export default function Dashboard() {
                                     }}>
                                         Completed
                                     </div>
-                                    
+
                                     <div style={{ display: 'flex', gap: '8px' }}>
-                                        <button 
+                                        <button
                                             onClick={() => handleViewDocument(doc)}
                                             style={{
                                                 padding: '6px',
@@ -1382,7 +1395,7 @@ export default function Dashboard() {
                                         >
                                             <Eye size={14} />
                                         </button>
-                                        <button 
+                                        <button
                                             onClick={() => handleDownloadDocument(doc._id, 'pdf')}
                                             onContextMenu={(e) => {
                                                 e.preventDefault();
@@ -1400,7 +1413,7 @@ export default function Dashboard() {
                                                     padding: 8px 0;
                                                     min-width: 120px;
                                                 `;
-                                                
+
                                                 const pdfOption = document.createElement('button');
                                                 pdfOption.textContent = 'Download PDF';
                                                 pdfOption.style.cssText = `
@@ -1416,7 +1429,7 @@ export default function Dashboard() {
                                                     handleDownloadDocument(doc._id, 'pdf');
                                                     document.body.removeChild(menu);
                                                 };
-                                                
+
                                                 const docxOption = document.createElement('button');
                                                 docxOption.textContent = 'Download DOCX';
                                                 docxOption.style.cssText = `
@@ -1432,11 +1445,11 @@ export default function Dashboard() {
                                                     handleDownloadDocument(doc._id, 'docx');
                                                     document.body.removeChild(menu);
                                                 };
-                                                
+
                                                 menu.appendChild(pdfOption);
                                                 menu.appendChild(docxOption);
                                                 document.body.appendChild(menu);
-                                                
+
                                                 // Remove menu when clicking elsewhere
                                                 const removeMenu = (e) => {
                                                     if (!menu.contains(e.target)) {
@@ -1474,8 +1487,8 @@ export default function Dashboard() {
                             ))}
                         </div>
                     ) : (
-                        <div style={{ 
-                            padding: '80px 24px', 
+                        <div style={{
+                            padding: '80px 24px',
                             textAlign: 'center',
                             color: '#6B7280'
                         }}>
@@ -1483,7 +1496,11 @@ export default function Dashboard() {
                             <h3 style={{ fontSize: '18px', fontWeight: '600', margin: '0 0 8px 0' }}>No documents yet</h3>
                             <p style={{ fontSize: '14px', margin: '0 0 24px 0' }}>Create your first document to get started</p>
                             <button
-                                onClick={() => setCurrentView('create')}
+                                onClick={() => {
+                                    setCurrentView('create');
+                                    setSelectedCategory(null);
+                                    setSelectedDocType(null);
+                                }}
                                 style={{
                                     padding: '12px 24px',
                                     backgroundColor: '#F97316',
@@ -1507,16 +1524,16 @@ export default function Dashboard() {
     const ComplianceCenterPage = () => (
         <div style={{ padding: '32px' }}>
             <div style={{ marginBottom: '32px' }}>
-                <h2 style={{ 
-                    fontSize: '28px', 
-                    fontWeight: '700', 
-                    color: '#111827', 
-                    margin: 0 
+                <h2 style={{
+                    fontSize: '28px',
+                    fontWeight: '700',
+                    color: '#111827',
+                    margin: 0
                 }}>Compliance Center</h2>
-                <p style={{ 
-                    fontSize: '16px', 
-                    color: '#6B7280', 
-                    margin: '4px 0 0 0' 
+                <p style={{
+                    fontSize: '16px',
+                    color: '#6B7280',
+                    margin: '4px 0 0 0'
                 }}>AI-powered compliance monitoring and validation</p>
             </div>
 
@@ -1555,19 +1572,19 @@ export default function Dashboard() {
                             <div style={{ fontSize: '12px', color: '#6B7280', fontWeight: '500' }}>/ 100</div>
                         </div>
                     </div>
-                    
-                    <h3 style={{ 
-                        fontSize: '20px', 
-                        fontWeight: '600', 
-                        color: '#111827', 
-                        margin: '0 0 8px 0' 
+
+                    <h3 style={{
+                        fontSize: '20px',
+                        fontWeight: '600',
+                        color: '#111827',
+                        margin: '0 0 8px 0'
                     }}>Compliance Score</h3>
-                    <p style={{ 
-                        fontSize: '14px', 
-                        color: '#6B7280', 
-                        margin: '0 0 16px 0' 
+                    <p style={{
+                        fontSize: '14px',
+                        color: '#6B7280',
+                        margin: '0 0 16px 0'
                     }}>Overall compliance rating</p>
-                    
+
                     <div style={{
                         backgroundColor: '#DCFCE7',
                         color: '#166534',
@@ -1589,13 +1606,13 @@ export default function Dashboard() {
                     boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)',
                     padding: '32px'
                 }}>
-                    <h3 style={{ 
-                        fontSize: '20px', 
-                        fontWeight: '600', 
-                        color: '#111827', 
-                        margin: '0 0 24px 0' 
+                    <h3 style={{
+                        fontSize: '20px',
+                        fontWeight: '600',
+                        color: '#111827',
+                        margin: '0 0 24px 0'
                     }}>Compliance Checks</h3>
-                    
+
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
                         {[
                             { label: 'GST Format Check', status: 'passed', description: 'All invoices follow GST format requirements' },
@@ -1617,32 +1634,32 @@ export default function Dashboard() {
                                     width: '12px',
                                     height: '12px',
                                     borderRadius: '50%',
-                                    backgroundColor: 
+                                    backgroundColor:
                                         check.status === 'passed' ? '#10B981' :
-                                        check.status === 'review' ? '#F59E0B' : '#EF4444'
+                                            check.status === 'review' ? '#F59E0B' : '#EF4444'
                                 }} />
-                                
+
                                 <div style={{ flex: 1 }}>
-                                    <h4 style={{ 
-                                        fontSize: '14px', 
-                                        fontWeight: '600', 
-                                        color: '#111827', 
-                                        margin: '0 0 4px 0' 
+                                    <h4 style={{
+                                        fontSize: '14px',
+                                        fontWeight: '600',
+                                        color: '#111827',
+                                        margin: '0 0 4px 0'
                                     }}>{check.label}</h4>
-                                    <p style={{ 
-                                        fontSize: '12px', 
-                                        color: '#6B7280', 
-                                        margin: 0 
+                                    <p style={{
+                                        fontSize: '12px',
+                                        color: '#6B7280',
+                                        margin: 0
                                     }}>{check.description}</p>
                                 </div>
-                                
+
                                 <div style={{
-                                    backgroundColor: 
+                                    backgroundColor:
                                         check.status === 'passed' ? '#DCFCE7' :
-                                        check.status === 'review' ? '#FEF3C7' : '#FEE2E2',
-                                    color: 
+                                            check.status === 'review' ? '#FEF3C7' : '#FEE2E2',
+                                    color:
                                         check.status === 'passed' ? '#166534' :
-                                        check.status === 'review' ? '#92400E' : '#DC2626',
+                                            check.status === 'review' ? '#92400E' : '#DC2626',
                                     padding: '4px 12px',
                                     borderRadius: '20px',
                                     fontSize: '12px',
@@ -1663,7 +1680,7 @@ export default function Dashboard() {
     const DocumentGenerationPage = () => {
         const [formData, setFormData] = useState({});
         const [isGenerating, setIsGenerating] = useState(false);
-        
+
         // Get form fields based on document type
         const getFormFields = () => {
             const commonFields = [
@@ -1700,7 +1717,7 @@ export default function Dashboard() {
                     { id: 'relievingDate', label: 'Relieving Date', type: 'date', required: true },
                     { id: 'workDescription', label: 'Work Description', type: 'textarea', placeholder: 'Brief description of work and achievements', required: true }
                 ],
-                
+
                 // Legal Documents
                 nda: [
                     ...commonFields,
@@ -1718,7 +1735,7 @@ export default function Dashboard() {
                     { id: 'purpose', label: 'Purpose of MOU', type: 'textarea', placeholder: 'Detailed purpose and scope of understanding', required: true },
                     { id: 'duration', label: 'Duration (Years)', type: 'number', placeholder: 'e.g. 3', required: true }
                 ],
-                
+
                 // Sales Documents
                 business_proposal: [
                     ...commonFields,
@@ -1738,7 +1755,7 @@ export default function Dashboard() {
                     { id: 'totalAmount', label: 'Total Amount (₹)', type: 'number', placeholder: 'e.g. 250000', required: true },
                     { id: 'serviceDescription', label: 'Service Description', type: 'textarea', placeholder: 'Detailed description of services/products', required: true }
                 ],
-                
+
                 // Finance Documents
                 invoice: [
                     ...commonFields,
@@ -1761,7 +1778,7 @@ export default function Dashboard() {
                     { id: 'baseAmount', label: 'Base Amount (₹)', type: 'number', placeholder: 'e.g. 100000', required: true },
                     { id: 'serviceDescription', label: 'Service/Product Description', type: 'textarea', placeholder: 'Detailed description for GST compliance', required: true }
                 ],
-                
+
                 // Compliance Documents
                 audit_report: [
                     ...commonFields,
@@ -1784,10 +1801,10 @@ export default function Dashboard() {
         };
 
         const generatePreviewContent = () => {
-            const currentDate = new Date().toLocaleDateString('en-US', { 
-                year: 'numeric', 
-                month: 'long', 
-                day: 'numeric' 
+            const currentDate = new Date().toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
             });
 
             // Generate preview based on document type and form data
@@ -2190,7 +2207,7 @@ HR Department
                 // Validate required fields
                 const requiredFields = formFields.filter(field => field.required);
                 const missingFields = requiredFields.filter(field => !formData[field.id]);
-                
+
                 if (missingFields.length > 0) {
                     alert(`Please fill in all required fields: ${missingFields.map(f => f.label).join(', ')}`);
                     setIsGenerating(false);
@@ -2200,10 +2217,10 @@ HR Department
                 // Create a comprehensive topic/prompt for AI generation
                 const createPrompt = () => {
                     const basePrompt = `Generate a professional ${selectedDocType.replace(/_/g, ' ')} document`;
-                    
+
                     // Build context from form data
                     const context = [];
-                    
+
                     if (formData.companyName) context.push(`for company: ${formData.companyName}`);
                     if (formData.candidateName) context.push(`candidate: ${formData.candidateName}`);
                     if (formData.employeeName) context.push(`employee: ${formData.employeeName}`);
@@ -2216,7 +2233,7 @@ HR Department
                         const amount = formData.totalAmount || formData.projectValue || formData.baseAmount;
                         context.push(`amount: ₹${Number(amount).toLocaleString()}`);
                     }
-                    
+
                     // Add specific details based on document type
                     const specificDetails = [];
                     Object.entries(formData).forEach(([key, value]) => {
@@ -2224,7 +2241,7 @@ HR Department
                             specificDetails.push(`${key.replace(/([A-Z])/g, ' $1').toLowerCase()}: ${value}`);
                         }
                     });
-                    
+
                     return `${basePrompt}${context.length ? ` ${context.join(', ')}` : ''}${specificDetails.length ? `. Additional details: ${specificDetails.join(', ')}` : ''}. Make it professional, comprehensive, and industry-standard.`;
                 };
 
@@ -2247,7 +2264,10 @@ HR Department
                         'Content-Type': 'application/json',
                         'Authorization': `Bearer ${token}`
                     },
-                    body: JSON.stringify(documentData)
+                    body: JSON.stringify({
+                        ...documentData,
+                        content: formData
+                    })
                 });
 
                 if (!response.ok) {
@@ -2264,13 +2284,13 @@ HR Department
 
                 // Set the generated document for viewing
                 setGeneratedDoc(result.document);
-                
+
                 // Navigate to view the generated document
                 setCurrentView('view-document');
-                
+
                 // Reset form data
                 setFormData({});
-                
+
             } catch (error) {
                 console.error('Generation error:', error);
                 setError(`Failed to generate document: ${error.message}`);
@@ -2304,16 +2324,16 @@ HR Department
                     >
                         ← Back to Document Types
                     </button>
-                    <h2 style={{ 
-                        fontSize: '28px', 
-                        fontWeight: '700', 
-                        color: '#111827', 
-                        margin: 0 
+                    <h2 style={{
+                        fontSize: '28px',
+                        fontWeight: '700',
+                        color: '#111827',
+                        margin: 0
                     }}>Generate {selectedDocType.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}</h2>
-                    <p style={{ 
-                        fontSize: '16px', 
-                        color: '#6B7280', 
-                        margin: '4px 0 0 0' 
+                    <p style={{
+                        fontSize: '16px',
+                        color: '#6B7280',
+                        margin: '4px 0 0 0'
                     }}>Fill in the details below to generate your professional document</p>
                 </div>
 
@@ -2328,10 +2348,10 @@ HR Department
                         padding: '24px',
                         overflowY: 'auto'
                     }}>
-                        <h3 style={{ 
-                            fontSize: '18px', 
-                            fontWeight: '600', 
-                            color: '#111827', 
+                        <h3 style={{
+                            fontSize: '18px',
+                            fontWeight: '600',
+                            color: '#111827',
                             margin: '0 0 20px 0',
                             display: 'flex',
                             alignItems: 'center',
@@ -2487,11 +2507,11 @@ HR Department
                                 borderRadius: '50%',
                                 backgroundColor: '#10B981'
                             }} />
-                            <h3 style={{ 
-                                fontSize: '16px', 
-                                fontWeight: '600', 
-                                color: '#111827', 
-                                margin: 0 
+                            <h3 style={{
+                                fontSize: '16px',
+                                fontWeight: '600',
+                                color: '#111827',
+                                margin: 0
                             }}>📄 LIVE PREVIEW</h3>
                         </div>
 
@@ -2518,25 +2538,25 @@ HR Department
                                         {(formData.companyName || 'MM').charAt(0)}
                                     </span>
                                 </div>
-                                <h1 style={{ 
-                                    fontSize: '24px', 
-                                    fontWeight: '700', 
-                                    color: '#111827', 
-                                    margin: '0 0 8px 0' 
+                                <h1 style={{
+                                    fontSize: '24px',
+                                    fontWeight: '700',
+                                    color: '#111827',
+                                    margin: '0 0 8px 0'
                                 }}>{formData.companyName || '[Company Name]'}</h1>
-                                <p style={{ 
-                                    fontSize: '14px', 
-                                    color: '#6B7280', 
-                                    margin: 0 
+                                <p style={{
+                                    fontSize: '14px',
+                                    color: '#6B7280',
+                                    margin: 0
                                 }}>{formData.companyAddress || '[Company Address]'}</p>
                             </div>
 
                             {/* Document Title */}
                             <div style={{ textAlign: 'center', marginBottom: '32px' }}>
-                                <h2 style={{ 
-                                    fontSize: '28px', 
-                                    fontWeight: '700', 
-                                    color: '#111827', 
+                                <h2 style={{
+                                    fontSize: '28px',
+                                    fontWeight: '700',
+                                    color: '#111827',
                                     margin: '0 0 8px 0',
                                     textTransform: 'uppercase',
                                     letterSpacing: '1px'
@@ -2567,10 +2587,10 @@ HR Department
                                 borderTop: '1px solid #E5E7EB',
                                 textAlign: 'center'
                             }}>
-                                <p style={{ 
-                                    fontSize: '12px', 
-                                    color: '#9CA3AF', 
-                                    margin: 0 
+                                <p style={{
+                                    fontSize: '12px',
+                                    color: '#9CA3AF',
+                                    margin: 0
                                 }}>
                                     Generated with MM Docs AI • {new Date().toLocaleDateString()}
                                 </p>
@@ -2582,364 +2602,364 @@ HR Department
         );
     };
     const DocumentViewerPage = () => {
-            if (!generatedDoc) {
-                return (
-                    <div style={{ 
-                        padding: '32px', 
-                        textAlign: 'center', 
-                        color: '#6B7280',
-                        minHeight: '400px',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        flexDirection: 'column'
-                    }}>
-                        <FileText size={64} color="#D1D5DB" style={{ marginBottom: '24px' }} />
-                        <h3 style={{ fontSize: '20px', fontWeight: '600', margin: '0 0 8px 0' }}>No Document Selected</h3>
-                        <p style={{ fontSize: '16px', margin: '0 0 24px 0' }}>Please select a document to view</p>
-                        <button
-                            onClick={() => setCurrentView('documents')}
-                            style={{
-                                padding: '12px 24px',
-                                backgroundColor: '#F97316',
-                                border: 'none',
-                                borderRadius: '8px',
-                                fontSize: '14px',
-                                fontWeight: '600',
-                                color: 'white',
-                                cursor: 'pointer'
-                            }}
-                        >
-                            Back to Documents
-                        </button>
-                    </div>
-                );
-            }
-
+        if (!generatedDoc) {
             return (
-                <div style={{ padding: '20px', maxHeight: '100vh', overflow: 'hidden' }}>
-                    {/* Compact Header */}
-                    <div style={{ 
-                        display: 'flex', 
-                        justifyContent: 'space-between', 
-                        alignItems: 'center', 
-                        marginBottom: '16px',
-                        paddingBottom: '12px',
-                        borderBottom: '1px solid #E5E7EB'
-                    }}>
-                        <div>
-                            <button 
-                                onClick={() => setCurrentView('documents')}
-                                style={{
-                                    backgroundColor: 'transparent',
-                                    border: 'none',
-                                    color: '#6B7280',
-                                    fontSize: '12px',
-                                    cursor: 'pointer',
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    gap: '4px',
-                                    marginBottom: '6px',
-                                    padding: '4px 0'
-                                }}
-                            >
-                                ← Back to Documents
-                            </button>
-                            <h2 style={{ 
-                                fontSize: '18px', 
-                                fontWeight: '700', 
-                                color: '#111827', 
-                                margin: 0 
-                            }}>{generatedDoc.title}</h2>
-                            <p style={{ 
-                                fontSize: '11px', 
-                                color: '#6B7280', 
-                                margin: '2px 0 0 0' 
-                            }}>
-                                {generatedDoc.type?.replace(/_/g, ' ') || 'Document'} • {new Date(generatedDoc.createdAt).toLocaleDateString()}
-                            </p>
-                        </div>
-
-                        <div style={{ display: 'flex', gap: '6px' }}>
-                            <button 
-                                onClick={() => handleDownloadDocument(generatedDoc._id, 'pdf')}
-                                style={{
-                                    padding: '6px 12px',
-                                    backgroundColor: 'white',
-                                    border: '1px solid #E5E7EB',
-                                    borderRadius: '6px',
-                                    fontSize: '11px',
-                                    fontWeight: '600',
-                                    color: '#374151',
-                                    cursor: 'pointer',
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    gap: '4px'
-                                }}
-                            >
-                                <Download size={12} />
-                                PDF
-                            </button>
-                            <button 
-                                onClick={() => handleDownloadDocument(generatedDoc._id, 'docx')}
-                                style={{
-                                    padding: '6px 12px',
-                                    backgroundColor: '#F97316',
-                                    border: 'none',
-                                    borderRadius: '6px',
-                                    fontSize: '11px',
-                                    fontWeight: '600',
-                                    color: 'white',
-                                    cursor: 'pointer',
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    gap: '4px'
-                                }}
-                            >
-                                <Download size={12} />
-                                DOCX
-                            </button>
-                        </div>
-                    </div>
-
-                    {/* Compact Document Content */}
-                    <div style={{
-                        backgroundColor: 'white',
-                        borderRadius: '12px',
-                        border: '1px solid #E5E7EB',
-                        boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)',
-                        overflow: 'hidden',
-                        height: 'calc(100vh - 140px)'
-                    }}>
-                        <div style={{
-                            height: '100%',
-                            overflowY: 'auto',
-                            padding: '20px'
-                        }}>
-                            {/* Company Header - Compact */}
-                            <div style={{ 
-                                textAlign: 'center', 
-                                marginBottom: '20px',
-                                paddingBottom: '12px',
-                                borderBottom: '2px solid #F97316'
-                            }}>
-                                <div style={{
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'center',
-                                    gap: '8px',
-                                    marginBottom: '6px'
-                                }}>
-                                    <div style={{
-                                        width: '24px',
-                                        height: '24px',
-                                        borderRadius: '6px',
-                                        backgroundColor: '#F97316',
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        justifyContent: 'center',
-                                        color: 'white',
-                                        fontSize: '12px',
-                                        fontWeight: '600'
-                                    }}>
-                                        {(brandKit?.name || generatedDoc.content?.companyName || 'MM').charAt(0)}
-                                    </div>
-                                    <div>
-                                        <h1 style={{ 
-                                            fontSize: '16px', 
-                                            fontWeight: '700', 
-                                            color: '#111827', 
-                                            margin: 0 
-                                        }}>{brandKit?.name || generatedDoc.content?.companyName || 'MM Docs'}</h1>
-                                        <p style={{ 
-                                            fontSize: '10px', 
-                                            color: '#6B7280', 
-                                            margin: 0 
-                                        }}>{generatedDoc.content?.companyAddress || 'Professional Document Platform'}</p>
-                                    </div>
-                                </div>
-                            </div>
-
-                            {/* Document Title - Compact */}
-                            <div style={{ textAlign: 'center', marginBottom: '20px' }}>
-                                <h2 style={{ 
-                                    fontSize: '20px', 
-                                    fontWeight: '700', 
-                                    color: '#111827', 
-                                    margin: '0 0 4px 0',
-                                    textTransform: 'uppercase',
-                                    letterSpacing: '0.5px'
-                                }}>
-                                    {generatedDoc.content?.title || generatedDoc.title}
-                                </h2>
-                                <p style={{ 
-                                    fontSize: '11px', 
-                                    color: '#6B7280', 
-                                    margin: 0 
-                                }}>
-                                    {generatedDoc.content?.date || new Date().toLocaleDateString('en-US', { 
-                                        year: 'numeric', 
-                                        month: 'long', 
-                                        day: 'numeric' 
-                                    })}
-                                </p>
-                            </div>
-
-                            {/* AI Generated Content Display */}
-                            <div style={{
-                                fontSize: '12px',
-                                lineHeight: '1.5',
-                                color: '#374151',
-                                fontFamily: 'Inter, sans-serif'
-                            }}>
-                                {typeof generatedDoc.content === 'string' ? (
-                                    // Handle string content
-                                    generatedDoc.content.split('\n').map((line, i) => (
-                                        <p key={i} style={{ 
-                                            marginBottom: line.trim() ? '10px' : '5px',
-                                            fontSize: line.length < 50 && line.trim() ? '14px' : '12px',
-                                            fontWeight: line.length < 50 && line.trim() ? '600' : '400',
-                                            color: line.length < 50 && line.trim() ? '#111827' : '#374151'
-                                        }}>
-                                            {line || '\u00A0'}
-                                        </p>
-                                    ))
-                                ) : generatedDoc.content && typeof generatedDoc.content === 'object' ? (
-                                    // Handle structured content from AI
-                                    <div>
-                                        {/* Render all content fields dynamically */}
-                                        {Object.entries(generatedDoc.content).map(([key, value]) => {
-                                            // Skip certain meta fields
-                                            if (['title', 'date', 'companyName', 'companyAddress'].includes(key)) {
-                                                return null;
-                                            }
-
-                                            return (
-                                                <div key={key} style={{ marginBottom: '16px' }}>
-                                                    {/* Field Title */}
-                                                    <h3 style={{ 
-                                                        fontSize: '13px', 
-                                                        fontWeight: '600', 
-                                                        color: '#111827', 
-                                                        marginBottom: '8px',
-                                                        borderLeft: '3px solid #F97316',
-                                                        paddingLeft: '8px',
-                                                        textTransform: 'capitalize'
-                                                    }}>
-                                                        {key.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())}
-                                                    </h3>
-
-                                                    {/* Field Content */}
-                                                    <div style={{ paddingLeft: '12px' }}>
-                                                        {Array.isArray(value) ? (
-                                                            // Handle arrays (lists)
-                                                            <ul style={{ 
-                                                                listStyle: 'none', 
-                                                                padding: 0, 
-                                                                margin: 0 
-                                                            }}>
-                                                                {value.map((item, index) => (
-                                                                    <li key={index} style={{ 
-                                                                        display: 'flex', 
-                                                                        alignItems: 'flex-start', 
-                                                                        marginBottom: '6px',
-                                                                        fontSize: '12px',
-                                                                        lineHeight: '1.4'
-                                                                    }}>
-                                                                        <span style={{ 
-                                                                            color: '#F97316', 
-                                                                            marginRight: '8px', 
-                                                                            fontSize: '12px',
-                                                                            fontWeight: '600'
-                                                                        }}>•</span>
-                                                                        <span style={{ color: '#374151' }}>
-                                                                            {typeof item === 'object' ? JSON.stringify(item, null, 2) : item}
-                                                                        </span>
-                                                                    </li>
-                                                                ))}
-                                                            </ul>
-                                                        ) : typeof value === 'object' && value !== null ? (
-                                                            // Handle nested objects
-                                                            <div style={{ 
-                                                                backgroundColor: '#F9FAFB',
-                                                                padding: '12px',
-                                                                borderRadius: '6px',
-                                                                border: '1px solid #E5E7EB'
-                                                            }}>
-                                                                {Object.entries(value).map(([subKey, subValue]) => (
-                                                                    <div key={subKey} style={{ marginBottom: '8px' }}>
-                                                                        <span style={{ 
-                                                                            fontSize: '11px', 
-                                                                            fontWeight: '600', 
-                                                                            color: '#6B7280', 
-                                                                            textTransform: 'uppercase',
-                                                                            display: 'block',
-                                                                            marginBottom: '2px'
-                                                                        }}>
-                                                                            {subKey.replace(/([A-Z])/g, ' $1')}
-                                                                        </span>
-                                                                        <span style={{ 
-                                                                            fontSize: '12px', 
-                                                                            color: '#111827',
-                                                                            fontWeight: '500'
-                                                                        }}>
-                                                                            {typeof subValue === 'object' ? JSON.stringify(subValue, null, 2) : subValue}
-                                                                        </span>
-                                                                    </div>
-                                                                ))}
-                                                            </div>
-                                                        ) : (
-                                                            // Handle simple text values
-                                                            <p style={{ 
-                                                                fontSize: '12px', 
-                                                                lineHeight: '1.5', 
-                                                                color: '#374151',
-                                                                margin: 0,
-                                                                whiteSpace: 'pre-wrap'
-                                                            }}>
-                                                                {value}
-                                                            </p>
-                                                        )}
-                                                    </div>
-                                                </div>
-                                            );
-                                        })}
-                                    </div>
-                                ) : (
-                                    // Fallback for any other content type
-                                    <div style={{
-                                        textAlign: 'center',
-                                        padding: '40px',
-                                        color: '#6B7280'
-                                    }}>
-                                        <p>Document content could not be displayed</p>
-                                        <p style={{ fontSize: '11px', marginTop: '8px' }}>
-                                            Content type: {typeof generatedDoc.content}
-                                        </p>
-                                    </div>
-                                )}
-                            </div>
-
-                            {/* Compact Footer */}
-                            <div style={{
-                                marginTop: '20px',
-                                paddingTop: '12px',
-                                borderTop: '1px solid #E5E7EB',
-                                textAlign: 'center'
-                            }}>
-                                <p style={{ 
-                                    fontSize: '9px', 
-                                    color: '#9CA3AF', 
-                                    margin: 0 
-                                }}>
-                                    Generated with MM Docs AI • {brandKit?.name || "Professional"} Workspace
-                                </p>
-                            </div>
-                        </div>
-                    </div>
+                <div style={{
+                    padding: '32px',
+                    textAlign: 'center',
+                    color: '#6B7280',
+                    minHeight: '400px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    flexDirection: 'column'
+                }}>
+                    <FileText size={64} color="#D1D5DB" style={{ marginBottom: '24px' }} />
+                    <h3 style={{ fontSize: '20px', fontWeight: '600', margin: '0 0 8px 0' }}>No Document Selected</h3>
+                    <p style={{ fontSize: '16px', margin: '0 0 24px 0' }}>Please select a document to view</p>
+                    <button
+                        onClick={() => setCurrentView('documents')}
+                        style={{
+                            padding: '12px 24px',
+                            backgroundColor: '#F97316',
+                            border: 'none',
+                            borderRadius: '8px',
+                            fontSize: '14px',
+                            fontWeight: '600',
+                            color: 'white',
+                            cursor: 'pointer'
+                        }}
+                    >
+                        Back to Documents
+                    </button>
                 </div>
             );
         }
+
+        return (
+            <div style={{ padding: '20px', maxHeight: '100vh', overflow: 'hidden' }}>
+                {/* Compact Header */}
+                <div style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    marginBottom: '16px',
+                    paddingBottom: '12px',
+                    borderBottom: '1px solid #E5E7EB'
+                }}>
+                    <div>
+                        <button
+                            onClick={() => setCurrentView('documents')}
+                            style={{
+                                backgroundColor: 'transparent',
+                                border: 'none',
+                                color: '#6B7280',
+                                fontSize: '12px',
+                                cursor: 'pointer',
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '4px',
+                                marginBottom: '6px',
+                                padding: '4px 0'
+                            }}
+                        >
+                            ← Back to Documents
+                        </button>
+                        <h2 style={{
+                            fontSize: '18px',
+                            fontWeight: '700',
+                            color: '#111827',
+                            margin: 0
+                        }}>{generatedDoc.title}</h2>
+                        <p style={{
+                            fontSize: '11px',
+                            color: '#6B7280',
+                            margin: '2px 0 0 0'
+                        }}>
+                            {generatedDoc.type?.replace(/_/g, ' ') || 'Document'} • {new Date(generatedDoc.createdAt).toLocaleDateString()}
+                        </p>
+                    </div>
+
+                    <div style={{ display: 'flex', gap: '6px' }}>
+                        <button
+                            onClick={() => handleDownloadDocument(generatedDoc._id, 'pdf')}
+                            style={{
+                                padding: '6px 12px',
+                                backgroundColor: 'white',
+                                border: '1px solid #E5E7EB',
+                                borderRadius: '6px',
+                                fontSize: '11px',
+                                fontWeight: '600',
+                                color: '#374151',
+                                cursor: 'pointer',
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '4px'
+                            }}
+                        >
+                            <Download size={12} />
+                            PDF
+                        </button>
+                        <button
+                            onClick={() => handleDownloadDocument(generatedDoc._id, 'docx')}
+                            style={{
+                                padding: '6px 12px',
+                                backgroundColor: '#F97316',
+                                border: 'none',
+                                borderRadius: '6px',
+                                fontSize: '11px',
+                                fontWeight: '600',
+                                color: 'white',
+                                cursor: 'pointer',
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '4px'
+                            }}
+                        >
+                            <Download size={12} />
+                            DOCX
+                        </button>
+                    </div>
+                </div>
+
+                {/* Compact Document Content */}
+                <div style={{
+                    backgroundColor: 'white',
+                    borderRadius: '12px',
+                    border: '1px solid #E5E7EB',
+                    boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)',
+                    overflow: 'hidden',
+                    height: 'calc(100vh - 140px)'
+                }}>
+                    <div style={{
+                        height: '100%',
+                        overflowY: 'auto',
+                        padding: '20px'
+                    }}>
+                        {/* Company Header - Compact */}
+                        <div style={{
+                            textAlign: 'center',
+                            marginBottom: '20px',
+                            paddingBottom: '12px',
+                            borderBottom: '2px solid #F97316'
+                        }}>
+                            <div style={{
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                gap: '8px',
+                                marginBottom: '6px'
+                            }}>
+                                <div style={{
+                                    width: '24px',
+                                    height: '24px',
+                                    borderRadius: '6px',
+                                    backgroundColor: '#F97316',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    color: 'white',
+                                    fontSize: '12px',
+                                    fontWeight: '600'
+                                }}>
+                                    {(brandKit?.name || generatedDoc.content?.companyName || 'MM').charAt(0)}
+                                </div>
+                                <div>
+                                    <h1 style={{
+                                        fontSize: '16px',
+                                        fontWeight: '700',
+                                        color: '#111827',
+                                        margin: 0
+                                    }}>{brandKit?.name || generatedDoc.content?.companyName || 'MM Docs'}</h1>
+                                    <p style={{
+                                        fontSize: '10px',
+                                        color: '#6B7280',
+                                        margin: 0
+                                    }}>{generatedDoc.content?.companyAddress || 'Professional Document Platform'}</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Document Title - Compact */}
+                        <div style={{ textAlign: 'center', marginBottom: '20px' }}>
+                            <h2 style={{
+                                fontSize: '20px',
+                                fontWeight: '700',
+                                color: '#111827',
+                                margin: '0 0 4px 0',
+                                textTransform: 'uppercase',
+                                letterSpacing: '0.5px'
+                            }}>
+                                {generatedDoc.content?.title || generatedDoc.title}
+                            </h2>
+                            <p style={{
+                                fontSize: '11px',
+                                color: '#6B7280',
+                                margin: 0
+                            }}>
+                                {generatedDoc.content?.date || new Date().toLocaleDateString('en-US', {
+                                    year: 'numeric',
+                                    month: 'long',
+                                    day: 'numeric'
+                                })}
+                            </p>
+                        </div>
+
+                        {/* AI Generated Content Display */}
+                        <div style={{
+                            fontSize: '12px',
+                            lineHeight: '1.5',
+                            color: '#374151',
+                            fontFamily: 'Inter, sans-serif'
+                        }}>
+                            {typeof generatedDoc.content === 'string' ? (
+                                // Handle string content
+                                generatedDoc.content.split('\n').map((line, i) => (
+                                    <p key={i} style={{
+                                        marginBottom: line.trim() ? '10px' : '5px',
+                                        fontSize: line.length < 50 && line.trim() ? '14px' : '12px',
+                                        fontWeight: line.length < 50 && line.trim() ? '600' : '400',
+                                        color: line.length < 50 && line.trim() ? '#111827' : '#374151'
+                                    }}>
+                                        {line || '\u00A0'}
+                                    </p>
+                                ))
+                            ) : generatedDoc.content && typeof generatedDoc.content === 'object' ? (
+                                // Handle structured content from AI
+                                <div>
+                                    {/* Render all content fields dynamically */}
+                                    {Object.entries(generatedDoc.content).map(([key, value]) => {
+                                        // Skip certain meta fields
+                                        if (['title', 'date', 'companyName', 'companyAddress'].includes(key)) {
+                                            return null;
+                                        }
+
+                                        return (
+                                            <div key={key} style={{ marginBottom: '16px' }}>
+                                                {/* Field Title */}
+                                                <h3 style={{
+                                                    fontSize: '13px',
+                                                    fontWeight: '600',
+                                                    color: '#111827',
+                                                    marginBottom: '8px',
+                                                    borderLeft: '3px solid #F97316',
+                                                    paddingLeft: '8px',
+                                                    textTransform: 'capitalize'
+                                                }}>
+                                                    {key.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())}
+                                                </h3>
+
+                                                {/* Field Content */}
+                                                <div style={{ paddingLeft: '12px' }}>
+                                                    {Array.isArray(value) ? (
+                                                        // Handle arrays (lists)
+                                                        <ul style={{
+                                                            listStyle: 'none',
+                                                            padding: 0,
+                                                            margin: 0
+                                                        }}>
+                                                            {value.map((item, index) => (
+                                                                <li key={index} style={{
+                                                                    display: 'flex',
+                                                                    alignItems: 'flex-start',
+                                                                    marginBottom: '6px',
+                                                                    fontSize: '12px',
+                                                                    lineHeight: '1.4'
+                                                                }}>
+                                                                    <span style={{
+                                                                        color: '#F97316',
+                                                                        marginRight: '8px',
+                                                                        fontSize: '12px',
+                                                                        fontWeight: '600'
+                                                                    }}>•</span>
+                                                                    <span style={{ color: '#374151' }}>
+                                                                        {typeof item === 'object' ? JSON.stringify(item, null, 2) : item}
+                                                                    </span>
+                                                                </li>
+                                                            ))}
+                                                        </ul>
+                                                    ) : typeof value === 'object' && value !== null ? (
+                                                        // Handle nested objects
+                                                        <div style={{
+                                                            backgroundColor: '#F9FAFB',
+                                                            padding: '12px',
+                                                            borderRadius: '6px',
+                                                            border: '1px solid #E5E7EB'
+                                                        }}>
+                                                            {Object.entries(value).map(([subKey, subValue]) => (
+                                                                <div key={subKey} style={{ marginBottom: '8px' }}>
+                                                                    <span style={{
+                                                                        fontSize: '11px',
+                                                                        fontWeight: '600',
+                                                                        color: '#6B7280',
+                                                                        textTransform: 'uppercase',
+                                                                        display: 'block',
+                                                                        marginBottom: '2px'
+                                                                    }}>
+                                                                        {subKey.replace(/([A-Z])/g, ' $1')}
+                                                                    </span>
+                                                                    <span style={{
+                                                                        fontSize: '12px',
+                                                                        color: '#111827',
+                                                                        fontWeight: '500'
+                                                                    }}>
+                                                                        {typeof subValue === 'object' ? JSON.stringify(subValue, null, 2) : subValue}
+                                                                    </span>
+                                                                </div>
+                                                            ))}
+                                                        </div>
+                                                    ) : (
+                                                        // Handle simple text values
+                                                        <p style={{
+                                                            fontSize: '12px',
+                                                            lineHeight: '1.5',
+                                                            color: '#374151',
+                                                            margin: 0,
+                                                            whiteSpace: 'pre-wrap'
+                                                        }}>
+                                                            {value}
+                                                        </p>
+                                                    )}
+                                                </div>
+                                            </div>
+                                        );
+                                    })}
+                                </div>
+                            ) : (
+                                // Fallback for any other content type
+                                <div style={{
+                                    textAlign: 'center',
+                                    padding: '40px',
+                                    color: '#6B7280'
+                                }}>
+                                    <p>Document content could not be displayed</p>
+                                    <p style={{ fontSize: '11px', marginTop: '8px' }}>
+                                        Content type: {typeof generatedDoc.content}
+                                    </p>
+                                </div>
+                            )}
+                        </div>
+
+                        {/* Compact Footer */}
+                        <div style={{
+                            marginTop: '20px',
+                            paddingTop: '12px',
+                            borderTop: '1px solid #E5E7EB',
+                            textAlign: 'center'
+                        }}>
+                            <p style={{
+                                fontSize: '9px',
+                                color: '#9CA3AF',
+                                margin: 0
+                            }}>
+                                Generated with MM Docs AI • {brandKit?.name || "Professional"} Workspace
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        );
+    }
 
     // Templates Page - Professional Template Management
     const TemplatesPage = () => {
@@ -2950,7 +2970,7 @@ HR Department
         const templateCategories = {
             all: 'All Templates',
             hr: 'HR Documents',
-            legal: 'Legal Documents', 
+            legal: 'Legal Documents',
             sales: 'Sales Documents',
             finance: 'Finance Documents',
             compliance: 'Compliance Documents'
@@ -2968,7 +2988,7 @@ HR Department
                     color: '#3B82F6'
                 },
                 {
-                    id: 'appointment_letter', 
+                    id: 'appointment_letter',
                     name: 'Appointment Letter',
                     description: 'Official appointment confirmation letter',
                     icon: '📋',
@@ -3086,10 +3106,10 @@ HR Department
 
         const handleTemplateSelect = (template) => {
             // Find the category for this template
-            const templateCategory = Object.keys(templates).find(cat => 
+            const templateCategory = Object.keys(templates).find(cat =>
                 templates[cat].some(t => t.id === template.id)
             );
-            
+
             // Set the states in the main Dashboard component
             setSelectedCategory(templateCategory);
             setSelectedDocType(template.id);
@@ -3196,9 +3216,9 @@ HR Department
 
                         {/* Template Header */}
                         <div style={{ marginBottom: '24px' }}>
-                            <div style={{ 
-                                display: 'flex', 
-                                alignItems: 'center', 
+                            <div style={{
+                                display: 'flex',
+                                alignItems: 'center',
                                 gap: '12px',
                                 marginBottom: '16px'
                             }}>
@@ -3208,16 +3228,16 @@ HR Department
                                     {template.icon}
                                 </div>
                                 <div>
-                                    <h3 style={{ 
-                                        fontSize: '20px', 
-                                        fontWeight: '600', 
-                                        color: '#111827', 
-                                        margin: '0 0 4px 0' 
+                                    <h3 style={{
+                                        fontSize: '20px',
+                                        fontWeight: '600',
+                                        color: '#111827',
+                                        margin: '0 0 4px 0'
                                     }}>{template.name}</h3>
-                                    <p style={{ 
-                                        fontSize: '14px', 
-                                        color: '#6B7280', 
-                                        margin: 0 
+                                    <p style={{
+                                        fontSize: '14px',
+                                        color: '#6B7280',
+                                        margin: 0
                                     }}>{template.description}</p>
                                 </div>
                             </div>
@@ -3231,13 +3251,13 @@ HR Department
                             padding: '20px',
                             marginBottom: '24px'
                         }}>
-                            <h4 style={{ 
-                                fontSize: '14px', 
-                                fontWeight: '600', 
+                            <h4 style={{
+                                fontSize: '14px',
+                                fontWeight: '600',
                                 color: '#374151',
                                 marginBottom: '12px'
                             }}>Sample Preview:</h4>
-                            
+
                             <div style={{
                                 fontFamily: 'Times New Roman, serif',
                                 fontSize: '12px',
@@ -3257,14 +3277,14 @@ HR Department
                                             <strong>Date:</strong> {new Date().toLocaleDateString()}
                                         </div>
                                         <div style={{ marginBottom: '15px' }}>
-                                            <strong>To,</strong><br/>
+                                            <strong>To,</strong><br />
                                             <strong>{data.candidateName}</strong>
                                         </div>
                                         <div style={{ marginBottom: '15px' }}>
                                             <strong>Subject: Offer of Employment - {data.position}</strong>
                                         </div>
                                         <div>
-                                            Dear {data.candidateName},<br/><br/>
+                                            Dear {data.candidateName},<br /><br />
                                             We are pleased to offer you employment with {data.companyName} for the position of <strong>{data.position}</strong>...
                                         </div>
                                     </div>
@@ -3283,14 +3303,14 @@ HR Department
                                             <strong>Date:</strong> {data.appointmentDate}
                                         </div>
                                         <div style={{ marginBottom: '15px' }}>
-                                            <strong>To,</strong><br/>
+                                            <strong>To,</strong><br />
                                             <strong>{data.employeeName}</strong>
                                         </div>
                                         <div style={{ marginBottom: '15px' }}>
                                             <strong>Subject: Appointment as {data.position}</strong>
                                         </div>
                                         <div>
-                                            Dear {data.employeeName},<br/><br/>
+                                            Dear {data.employeeName},<br /><br />
                                             We are pleased to inform you that you have been appointed as <strong>{data.position}</strong> in the <strong>{data.department}</strong> department...
                                         </div>
                                     </div>
@@ -3320,8 +3340,8 @@ HR Department
                                             Warning Letter
                                         </div>
                                         <div style={{ marginBottom: '15px' }}>
-                                            <strong>To,</strong><br/>
-                                            {data.employeeName}<br/>
+                                            <strong>To,</strong><br />
+                                            {data.employeeName}<br />
                                             {data.companyName}
                                         </div>
                                         <div style={{ marginBottom: '15px' }}>
@@ -3331,7 +3351,7 @@ HR Department
                                             <strong>Subject:</strong> Warning against {data.violationType}
                                         </div>
                                         <div>
-                                            Dear {data.employeeName},<br/><br/>
+                                            Dear {data.employeeName},<br /><br />
                                             {data.incidentDescription}...
                                         </div>
                                     </div>
@@ -3339,7 +3359,7 @@ HR Department
 
                                 {!['offer_letter', 'appointment_letter', 'experience_certificate', 'warning_letter'].includes(template.id) && (
                                     <div style={{ textAlign: 'center', color: '#6B7280', fontStyle: 'italic' }}>
-                                        Preview for {template.name} will be available soon.<br/>
+                                        Preview for {template.name} will be available soon.<br />
                                         This template includes: {template.fields.join(', ')}
                                     </div>
                                 )}
@@ -3348,16 +3368,16 @@ HR Department
 
                         {/* Required Fields */}
                         <div style={{ marginBottom: '24px' }}>
-                            <h4 style={{ 
-                                fontSize: '14px', 
-                                fontWeight: '600', 
+                            <h4 style={{
+                                fontSize: '14px',
+                                fontWeight: '600',
                                 color: '#374151',
                                 marginBottom: '8px'
                             }}>Required Fields:</h4>
-                            <div style={{ 
-                                display: 'flex', 
-                                flexWrap: 'wrap', 
-                                gap: '6px' 
+                            <div style={{
+                                display: 'flex',
+                                flexWrap: 'wrap',
+                                gap: '6px'
                             }}>
                                 {template.fields.map((field) => (
                                     <span
@@ -3378,8 +3398,8 @@ HR Department
                         </div>
 
                         {/* Action Buttons */}
-                        <div style={{ 
-                            display: 'flex', 
+                        <div style={{
+                            display: 'flex',
                             gap: '12px',
                             justifyContent: 'flex-end'
                         }}>
@@ -3426,23 +3446,23 @@ HR Department
             <div style={{ padding: '32px' }}>
                 {/* Header */}
                 <div style={{ marginBottom: '32px' }}>
-                    <h2 style={{ 
-                        fontSize: '28px', 
-                        fontWeight: '700', 
-                        color: '#111827', 
-                        margin: '0 0 8px 0' 
+                    <h2 style={{
+                        fontSize: '28px',
+                        fontWeight: '700',
+                        color: '#111827',
+                        margin: '0 0 8px 0'
                     }}>Document Templates</h2>
-                    <p style={{ 
-                        fontSize: '16px', 
-                        color: '#6B7280', 
-                        margin: 0 
+                    <p style={{
+                        fontSize: '16px',
+                        color: '#6B7280',
+                        margin: 0
                     }}>Professional templates based on your reference formats</p>
                 </div>
 
                 {/* Category Filter */}
-                <div style={{ 
-                    display: 'flex', 
-                    gap: '12px', 
+                <div style={{
+                    display: 'flex',
+                    gap: '12px',
                     marginBottom: '32px',
                     flexWrap: 'wrap'
                 }}>
@@ -3509,9 +3529,9 @@ HR Department
                             }}
                         >
                             {/* Template Header */}
-                            <div style={{ 
-                                display: 'flex', 
-                                alignItems: 'center', 
+                            <div style={{
+                                display: 'flex',
+                                alignItems: 'center',
                                 gap: '12px',
                                 marginBottom: '16px'
                             }}>
@@ -3528,11 +3548,11 @@ HR Department
                                     {template.icon}
                                 </div>
                                 <div style={{ flex: 1 }}>
-                                    <h3 style={{ 
-                                        fontSize: '16px', 
-                                        fontWeight: '600', 
-                                        color: '#111827', 
-                                        margin: '0 0 4px 0' 
+                                    <h3 style={{
+                                        fontSize: '16px',
+                                        fontWeight: '600',
+                                        color: '#111827',
+                                        margin: '0 0 4px 0'
                                     }}>{template.name}</h3>
                                     <div style={{
                                         backgroundColor: `${template.color}15`,
@@ -3543,7 +3563,7 @@ HR Department
                                         fontWeight: '600',
                                         display: 'inline-block'
                                     }}>
-                                        {templateCategories[Object.keys(templates).find(cat => 
+                                        {templateCategories[Object.keys(templates).find(cat =>
                                             templates[cat].some(t => t.id === template.id)
                                         )]}
                                     </div>
@@ -3551,9 +3571,9 @@ HR Department
                             </div>
 
                             {/* Template Description */}
-                            <p style={{ 
-                                fontSize: '14px', 
-                                color: '#6B7280', 
+                            <p style={{
+                                fontSize: '14px',
+                                color: '#6B7280',
                                 margin: '0 0 16px 0',
                                 lineHeight: '1.4'
                             }}>{template.description}</p>
@@ -3566,14 +3586,14 @@ HR Department
                                 padding: '12px',
                                 marginBottom: '16px'
                             }}>
-                                <div style={{ 
-                                    fontSize: '12px', 
+                                <div style={{
+                                    fontSize: '12px',
                                     color: '#9CA3AF',
                                     fontWeight: '500',
                                     marginBottom: '4px'
                                 }}>Preview:</div>
-                                <div style={{ 
-                                    fontSize: '13px', 
+                                <div style={{
+                                    fontSize: '13px',
                                     color: '#374151',
                                     fontStyle: 'italic'
                                 }}>{template.preview}</div>
@@ -3581,16 +3601,16 @@ HR Department
 
                             {/* Required Fields */}
                             <div style={{ marginBottom: '20px' }}>
-                                <div style={{ 
-                                    fontSize: '12px', 
+                                <div style={{
+                                    fontSize: '12px',
                                     color: '#9CA3AF',
                                     fontWeight: '500',
                                     marginBottom: '8px'
                                 }}>Required Fields:</div>
-                                <div style={{ 
-                                    display: 'flex', 
-                                    flexWrap: 'wrap', 
-                                    gap: '4px' 
+                                <div style={{
+                                    display: 'flex',
+                                    flexWrap: 'wrap',
+                                    gap: '4px'
                                 }}>
                                     {template.fields.slice(0, 3).map((field) => (
                                         <span
@@ -3620,9 +3640,9 @@ HR Department
                             </div>
 
                             {/* Action Buttons */}
-                            <div style={{ 
-                                display: 'flex', 
-                                gap: '8px' 
+                            <div style={{
+                                display: 'flex',
+                                gap: '8px'
                             }}>
                                 <button
                                     onClick={() => handleTemplateSelect(template)}
@@ -3689,7 +3709,7 @@ HR Department
                         const categoryTemplates = templates[key] || [];
                         const colors = ['#3B82F6', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6'];
                         const colorIndex = Object.keys(templateCategories).slice(1).indexOf(key);
-                        
+
                         return (
                             <div
                                 key={key}
@@ -3716,16 +3736,16 @@ HR Department
                                 }}>
                                     {categoryTemplates.length}
                                 </div>
-                                <h4 style={{ 
-                                    fontSize: '14px', 
-                                    fontWeight: '600', 
-                                    color: '#111827', 
-                                    margin: '0 0 4px 0' 
+                                <h4 style={{
+                                    fontSize: '14px',
+                                    fontWeight: '600',
+                                    color: '#111827',
+                                    margin: '0 0 4px 0'
                                 }}>{label}</h4>
-                                <p style={{ 
-                                    fontSize: '12px', 
-                                    color: '#6B7280', 
-                                    margin: 0 
+                                <p style={{
+                                    fontSize: '12px',
+                                    color: '#6B7280',
+                                    margin: 0
                                 }}>Available Templates</p>
                             </div>
                         );
@@ -3734,9 +3754,9 @@ HR Department
 
                 {/* Preview Modal */}
                 {previewMode && selectedTemplate && (
-                    <PreviewModal 
-                        template={selectedTemplate} 
-                        onClose={closePreview} 
+                    <PreviewModal
+                        template={selectedTemplate}
+                        onClose={closePreview}
                     />
                 )}
             </div>
@@ -3748,7 +3768,13 @@ HR Department
         switch (currentView) {
             case 'dashboard':
                 return <DashboardOverview />;
+            case 'templates':
             case 'create':
+            case 'hr':
+            case 'legal':
+            case 'sales':
+            case 'finance':
+            case 'compliance':
                 return <CreateDocumentPage />;
             case 'generate-document':
                 return <DocumentGenerationPage />;
@@ -3756,18 +3782,14 @@ HR Department
                 return <MyDocumentsPage />;
             case 'view-document':
                 return <DocumentViewerPage />;
-            case 'compliance':
+            case 'compliance-center': // Renamed to avoid collision with category
                 return <ComplianceCenterPage />;
-            case 'templates':
-                // Templates are handled by separate route
-                navigate('/dashboard/templates');
-                return null;
             case 'users':
             case 'settings':
                 return (
-                    <div style={{ 
-                        padding: '32px', 
-                        textAlign: 'center', 
+                    <div style={{
+                        padding: '32px',
+                        textAlign: 'center',
                         color: '#6B7280',
                         minHeight: '400px',
                         display: 'flex',
@@ -3788,8 +3810,8 @@ HR Department
     };
 
     return (
-        <div style={{ 
-            backgroundColor: '#F8F9FB', 
+        <div style={{
+            backgroundColor: '#F8F9FB',
             minHeight: '100vh',
             fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, sans-serif'
         }}>

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Eye, Loader2 } from 'lucide-react';
+import { Eye, Loader2, ArrowLeft } from 'lucide-react';
 import { api } from '../utils/api';
 
 const TemplatesPage = () => {
@@ -24,7 +24,7 @@ const TemplatesPage = () => {
             setLoading(true);
             const params = selectedCategory !== 'all' ? `?category=${selectedCategory}` : '';
             const response = await api.get(`/templates${params}`);
-            
+
             if (response.success) {
                 setTemplates(response.data);
             }
@@ -83,7 +83,7 @@ const TemplatesPage = () => {
 
         const getPreviewContent = () => {
             let content = template.content || '';
-            
+
             // Replace placeholders with realistic professional sample data
             const sampleData = {
                 // Invoice specific
@@ -112,7 +112,7 @@ const TemplatesPage = () => {
                 notes: 'Thank you for choosing our services. We look forward to continued business.',
                 quantity: '1',
                 rate: '1,18,000',
-                
+
                 // HR templates
                 candidateName: 'John Doe',
                 employeeName: 'Jane Smith',
@@ -129,14 +129,14 @@ const TemplatesPage = () => {
                 violationType: 'Attendance Issues',
                 incidentDescription: 'Repeated late arrivals and unauthorized absences affecting team productivity.',
                 issueDate: new Date().toLocaleDateString('en-IN'),
-                
+
                 // Legal templates
                 partyName: 'Business Partner Corp',
                 partyAddress: '456 Corporate Avenue<br>Delhi, NCR - 110001<br>India',
                 effectiveDate: '2024-03-01',
                 duration: '2',
                 purpose: 'Joint software development project for enterprise solutions',
-                
+
                 currentDate: new Date().toLocaleDateString('en-IN')
             };
 
@@ -145,16 +145,16 @@ const TemplatesPage = () => {
                 const regex = new RegExp(`{{${key}}}`, 'g');
                 content = content.replace(regex, sampleData[key]);
             });
-            
+
             // Handle Handlebars conditional blocks for preview
             content = content.replace(/{{#if\s+[\w.]+}}([\s\S]*?){{\/if}}/g, '$1');
             content = content.replace(/{{#unless\s+[\w.]+}}([\s\S]*?){{\/unless}}/g, '');
             content = content.replace(/{{else}}[\s\S]*?(?={{\/if}})/g, '');
             content = content.replace(/{{#each\s+[\w.]+}}([\s\S]*?){{\/each}}/g, '$1');
-            
+
             // Remove any remaining Handlebars syntax
             content = content.replace(/{{[^}]*}}/g, '');
-            
+
             // Clean up extra whitespace
             content = content.replace(/\n\s*\n\s*\n/g, '\n\n');
 
@@ -212,9 +212,9 @@ const TemplatesPage = () => {
 
                     {/* Template Header */}
                     <div style={{ marginBottom: '24px' }}>
-                        <div style={{ 
-                            display: 'flex', 
-                            alignItems: 'center', 
+                        <div style={{
+                            display: 'flex',
+                            alignItems: 'center',
                             gap: '12px',
                             marginBottom: '16px'
                         }}>
@@ -222,16 +222,16 @@ const TemplatesPage = () => {
                                 {template.icon}
                             </div>
                             <div>
-                                <h3 style={{ 
-                                    fontSize: '24px', 
-                                    fontWeight: '600', 
-                                    color: '#111827', 
-                                    margin: '0 0 4px 0' 
+                                <h3 style={{
+                                    fontSize: '24px',
+                                    fontWeight: '600',
+                                    color: '#111827',
+                                    margin: '0 0 4px 0'
                                 }}>{template.name}</h3>
-                                <p style={{ 
-                                    fontSize: '14px', 
-                                    color: '#6B7280', 
-                                    margin: 0 
+                                <p style={{
+                                    fontSize: '14px',
+                                    color: '#6B7280',
+                                    margin: 0
                                 }}>{template.description}</p>
                             </div>
                         </div>
@@ -239,16 +239,16 @@ const TemplatesPage = () => {
 
                     {/* Required Fields */}
                     <div style={{ marginBottom: '24px' }}>
-                        <h4 style={{ 
-                            fontSize: '16px', 
-                            fontWeight: '600', 
+                        <h4 style={{
+                            fontSize: '16px',
+                            fontWeight: '600',
                             color: '#374151',
                             marginBottom: '12px'
                         }}>Required Fields:</h4>
-                        <div style={{ 
+                        <div style={{
                             display: 'grid',
                             gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
-                            gap: '8px' 
+                            gap: '8px'
                         }}>
                             {template.requiredFields?.map((field) => (
                                 <div
@@ -281,13 +281,13 @@ const TemplatesPage = () => {
                         maxHeight: '400px',
                         overflow: 'auto'
                     }}>
-                        <h4 style={{ 
-                            fontSize: '14px', 
-                            fontWeight: '600', 
+                        <h4 style={{
+                            fontSize: '14px',
+                            fontWeight: '600',
                             color: '#374151',
                             marginBottom: '16px'
                         }}>Document Preview:</h4>
-                        
+
                         <div style={{
                             fontFamily: 'Times New Roman, serif',
                             fontSize: '12px',
@@ -303,8 +303,8 @@ const TemplatesPage = () => {
                     </div>
 
                     {/* Action Buttons */}
-                    <div style={{ 
-                        display: 'flex', 
+                    <div style={{
+                        display: 'flex',
                         gap: '12px',
                         justifyContent: 'flex-end'
                     }}>
@@ -360,16 +360,47 @@ const TemplatesPage = () => {
         <div style={{ padding: '32px', backgroundColor: '#F8F9FB', minHeight: '100vh' }}>
             {/* Header */}
             <div style={{ marginBottom: '32px' }}>
-                <h2 style={{ 
-                    fontSize: '28px', 
-                    fontWeight: '700', 
-                    color: '#111827', 
-                    margin: '0 0 8px 0' 
+                <button
+                    onClick={() => navigate('/dashboard')}
+                    style={{
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '8px',
+                        padding: '8px 16px',
+                        backgroundColor: 'white',
+                        color: '#374151',
+                        border: '1px solid #E5E7EB',
+                        borderRadius: '8px',
+                        fontSize: '14px',
+                        fontWeight: '500',
+                        cursor: 'pointer',
+                        marginBottom: '20px',
+                        transition: 'all 0.2s ease'
+                    }}
+                    onMouseEnter={(e) => {
+                        e.currentTarget.style.backgroundColor = '#F9FAFB';
+                        e.currentTarget.style.borderColor = '#F97316';
+                        e.currentTarget.style.color = '#F97316';
+                    }}
+                    onMouseLeave={(e) => {
+                        e.currentTarget.style.backgroundColor = 'white';
+                        e.currentTarget.style.borderColor = '#E5E7EB';
+                        e.currentTarget.style.color = '#374151';
+                    }}
+                >
+                    <ArrowLeft size={16} />
+                    Back to Dashboard
+                </button>
+                <h2 style={{
+                    fontSize: '28px',
+                    fontWeight: '700',
+                    color: '#111827',
+                    margin: '0 0 8px 0'
                 }}>Document Templates</h2>
-                <p style={{ 
-                    fontSize: '16px', 
-                    color: '#6B7280', 
-                    margin: 0 
+                <p style={{
+                    fontSize: '16px',
+                    color: '#6B7280',
+                    margin: 0
                 }}>Professional templates for all your business document needs</p>
             </div>
 
@@ -387,9 +418,9 @@ const TemplatesPage = () => {
             )}
 
             {/* Category Filter */}
-            <div style={{ 
-                display: 'flex', 
-                gap: '12px', 
+            <div style={{
+                display: 'flex',
+                gap: '12px',
                 marginBottom: '32px',
                 flexWrap: 'wrap'
             }}>
@@ -411,7 +442,7 @@ const TemplatesPage = () => {
                     >
                         {label}
                         {key !== 'all' && categories.find(c => c.id === key) && (
-                            <span style={{ 
+                            <span style={{
                                 marginLeft: '8px',
                                 backgroundColor: selectedCategory === key ? 'rgba(255,255,255,0.2)' : '#F3F4F6',
                                 padding: '2px 6px',
@@ -462,9 +493,9 @@ const TemplatesPage = () => {
                             }}
                         >
                             {/* Template Header */}
-                            <div style={{ 
-                                display: 'flex', 
-                                alignItems: 'center', 
+                            <div style={{
+                                display: 'flex',
+                                alignItems: 'center',
                                 gap: '12px',
                                 marginBottom: '16px'
                             }}>
@@ -481,11 +512,11 @@ const TemplatesPage = () => {
                                     {template.icon}
                                 </div>
                                 <div style={{ flex: 1 }}>
-                                    <h3 style={{ 
-                                        fontSize: '16px', 
-                                        fontWeight: '600', 
-                                        color: '#111827', 
-                                        margin: '0 0 4px 0' 
+                                    <h3 style={{
+                                        fontSize: '16px',
+                                        fontWeight: '600',
+                                        color: '#111827',
+                                        margin: '0 0 4px 0'
                                     }}>{template.name}</h3>
                                     <div style={{
                                         backgroundColor: '#FEF3E2',
@@ -502,9 +533,9 @@ const TemplatesPage = () => {
                             </div>
 
                             {/* Template Description */}
-                            <p style={{ 
-                                fontSize: '14px', 
-                                color: '#6B7280', 
+                            <p style={{
+                                fontSize: '14px',
+                                color: '#6B7280',
                                 margin: '0 0 16px 0',
                                 lineHeight: '1.4'
                             }}>{template.description}</p>
@@ -517,22 +548,22 @@ const TemplatesPage = () => {
                                 padding: '12px',
                                 marginBottom: '16px'
                             }}>
-                                <div style={{ 
-                                    fontSize: '12px', 
+                                <div style={{
+                                    fontSize: '12px',
                                     color: '#9CA3AF',
                                     fontWeight: '500',
                                     marginBottom: '4px'
                                 }}>Required Fields:</div>
-                                <div style={{ 
-                                    fontSize: '13px', 
+                                <div style={{
+                                    fontSize: '13px',
                                     color: '#374151',
                                     fontWeight: '500'
                                 }}>{template.requiredFields?.length || 0} fields to fill</div>
                             </div>
 
                             {/* Usage Stats */}
-                            <div style={{ 
-                                display: 'flex', 
+                            <div style={{
+                                display: 'flex',
                                 justifyContent: 'space-between',
                                 alignItems: 'center',
                                 marginBottom: '20px',
@@ -544,9 +575,9 @@ const TemplatesPage = () => {
                             </div>
 
                             {/* Action Buttons */}
-                            <div style={{ 
-                                display: 'flex', 
-                                gap: '8px' 
+                            <div style={{
+                                display: 'flex',
+                                gap: '8px'
                             }}>
                                 <button
                                     onClick={(e) => {
@@ -608,9 +639,9 @@ const TemplatesPage = () => {
 
             {/* Preview Modal */}
             {previewMode && selectedTemplate && (
-                <PreviewModal 
-                    template={selectedTemplate} 
-                    onClose={closePreview} 
+                <PreviewModal
+                    template={selectedTemplate}
+                    onClose={closePreview}
                 />
             )}
         </div>

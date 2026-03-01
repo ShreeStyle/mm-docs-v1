@@ -1,149 +1,250 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Appointment Letter</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
         body {
-            font-family: 'Times New Roman', serif;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             line-height: 1.6;
-            color: #000;
+            color: #1f2937;
             max-width: 800px;
             margin: 0 auto;
-            padding: 40px;
+            padding: 48px 40px;
             background: white;
-            font-size: 12pt;
+            font-size: 14px;
         }
-        .header {
-            text-align: center;
-            margin-bottom: 40px;
-            border-bottom: 2px solid #000;
-            padding-bottom: 20px;
-        }
-        .company-name {
-            font-size: 20pt;
-            font-weight: bold;
-            color: #000;
-            margin-bottom: 8px;
-            text-transform: uppercase;
-        }
-        .company-address {
-            font-size: 11pt;
-            color: #000;
-            margin-bottom: 10px;
-        }
-        .document-title {
-            font-size: 16pt;
-            font-weight: bold;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            margin: 30px 0;
-            text-align: center;
-            color: #000;
-            text-decoration: underline;
-        }
-        .date-ref {
+
+        .letterhead {
             display: flex;
             justify-content: space-between;
-            margin-bottom: 30px;
-            font-size: 11pt;
+            align-items: flex-start;
+            padding-bottom: 28px;
+            margin-bottom: 36px;
+            border-bottom: 1px solid #e5e7eb;
         }
+
+        .company-name {
+            font-size: 22px;
+            font-weight: 700;
+            color: #111827;
+            margin-bottom: 8px;
+            letter-spacing: -0.02em;
+        }
+
+        .company-address {
+            font-size: 13px;
+            color: #4b5563;
+            line-height: 1.6;
+            max-width: 280px;
+        }
+
+        .doc-badge {
+            text-align: right;
+        }
+
+        .doc-title {
+            font-size: 30px;
+            font-weight: 800;
+            color: #e5e7eb;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            margin-bottom: 8px;
+        }
+
+        .doc-date {
+            font-size: 13px;
+            color: #6b7280;
+        }
+
+        .doc-date strong {
+            color: #111827;
+        }
+
+        .section-label {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            color: #6b7280;
+            font-weight: 600;
+            margin-bottom: 12px;
+        }
+
+        .recipient {
+            margin-bottom: 32px;
+        }
+
+        .recipient-name {
+            font-size: 16px;
+            font-weight: 600;
+            color: #111827;
+            margin-bottom: 4px;
+        }
+
+        .recipient-addr {
+            font-size: 13px;
+            color: #4b5563;
+        }
+
+        .subject {
+            background: #f9fafb;
+            border-radius: 8px;
+            padding: 16px 20px;
+            margin-bottom: 28px;
+            font-weight: 600;
+            color: #111827;
+            font-size: 14px;
+        }
+
         .content {
-            margin-bottom: 30px;
-            text-align: justify;
+            font-size: 14px;
+            color: #374151;
+            line-height: 1.7;
         }
+
         .content p {
-            margin-bottom: 15px;
+            margin-bottom: 16px;
         }
+
         .details-table {
             width: 100%;
             border-collapse: collapse;
-            margin: 20px 0;
-            border: 2px solid #000;
+            margin: 24px 0;
         }
-        .details-table th,
-        .details-table td {
-            border: 1px solid #000;
-            padding: 12px;
-            text-align: left;
-            font-size: 11pt;
-        }
+
         .details-table th {
-            background-color: #f5f5f5;
-            font-weight: bold;
+            background: #f9fafb;
+            text-align: left;
+            padding: 12px 16px;
+            font-size: 13px;
+            font-weight: 600;
+            color: #6b7280;
+            border-bottom: 1px solid #e5e7eb;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            width: 35%;
         }
+
+        .details-table td {
+            padding: 12px 16px;
+            font-size: 14px;
+            color: #111827;
+            font-weight: 500;
+            border-bottom: 1px solid #f3f4f6;
+        }
+
+        .terms-section {
+            background: #f9fafb;
+            border-radius: 8px;
+            padding: 24px;
+            margin: 28px 0;
+        }
+
+        .terms-title {
+            font-size: 13px;
+            font-weight: 600;
+            color: #111827;
+            margin-bottom: 16px;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+
+        .terms-list {
+            padding-left: 20px;
+        }
+
+        .terms-list li {
+            margin-bottom: 10px;
+            font-size: 13px;
+            color: #4b5563;
+            line-height: 1.6;
+        }
+
         .signature-section {
-            margin-top: 50px;
+            margin-top: 48px;
             display: flex;
             justify-content: space-between;
         }
-        .signature-box {
-            text-align: center;
-            width: 45%;
+
+        .signature-block {
+            width: 44%;
         }
-        .signature-line {
-            border-top: 1px solid #000;
-            margin-top: 60px;
-            padding-top: 5px;
-            font-size: 11pt;
+
+        .sig-label {
+            font-size: 12px;
+            font-weight: 600;
+            color: #6b7280;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            margin-bottom: 48px;
         }
+
+        .sig-line {
+            border-top: 1px solid #d1d5db;
+            padding-top: 8px;
+        }
+
+        .sig-name {
+            font-size: 14px;
+            font-weight: 600;
+            color: #111827;
+        }
+
+        .sig-role {
+            font-size: 12px;
+            color: #6b7280;
+        }
+
         .footer {
-            margin-top: 40px;
+            margin-top: 48px;
             text-align: center;
-            font-size: 10pt;
-            color: #666;
-            border-top: 1px solid #ccc;
-            padding-top: 20px;
-        }
-        .terms-section {
-            margin: 25px 0;
-            border: 1px solid #000;
-            padding: 20px;
-        }
-        .terms-title {
-            font-size: 12pt;
-            font-weight: bold;
-            margin-bottom: 15px;
-            text-align: center;
-            text-decoration: underline;
-        }
-        .terms-list {
-            list-style: decimal;
-            padding-left: 20px;
-        }
-        .terms-list li {
-            margin-bottom: 8px;
-            font-size: 11pt;
-            line-height: 1.4;
+            padding-top: 24px;
+            border-top: 1px solid #e5e7eb;
+            color: #9ca3af;
+            font-size: 12px;
         }
     </style>
 </head>
+
 <body>
-    <div class="header">
-        <div class="company-name">{{companyName}}</div>
-        <div class="company-address">{{companyAddress}}</div>
-        {{#if companyPhone}}<div>Phone: {{companyPhone}} {{#if companyEmail}}| Email: {{companyEmail}}{{/if}}</div>{{/if}}
+    <div class="letterhead">
+        <div>
+            <div class="company-name">{{companyName}}</div>
+            <div class="company-address">
+                {{{companyAddress}}}
+                {{#if companyPhone}}<br>{{companyPhone}}{{/if}}
+                {{#if companyEmail}}<br>{{companyEmail}}{{/if}}
+            </div>
+        </div>
+        <div class="doc-badge">
+            <div class="doc-title">APPOINTMENT</div>
+            <div class="doc-date"><strong>Date:</strong> {{appointmentDate}}</div>
+            {{#if refNumber}}<div class="doc-date"><strong>Ref:</strong> {{refNumber}}</div>{{/if}}
+        </div>
     </div>
 
-    <div class="document-title">Appointment Letter</div>
-
-    <div class="date-ref">
-        <div><strong>Date:</strong> {{appointmentDate}}</div>
-        {{#if refNumber}}<div><strong>Ref:</strong> {{refNumber}}</div>{{/if}}
+    <div class="recipient">
+        <div class="section-label">To</div>
+        <div class="recipient-name">{{employeeName}}</div>
+        {{#if employeeAddress}}<div class="recipient-addr">{{{employeeAddress}}}</div>{{/if}}
     </div>
+
+    <div class="subject">Subject: Appointment as {{position}}</div>
 
     <div class="content">
-        <p><strong>To,</strong></p>
-        <p><strong>{{employeeName}}</strong><br>
-        {{#if employeeAddress}}{{employeeAddress}}{{/if}}</p>
-
-        <p><strong>Subject: Appointment as {{position}}</strong></p>
-
         <p>Dear {{employeeName}},</p>
-
-        <p>We are pleased to inform you that you have been appointed as <strong>{{position}}</strong> in the <strong>{{department}}</strong> department of {{companyName}}, effective from <strong>{{startDate}}</strong>.</p>
-
+        <p>We are pleased to inform you that you have been appointed as <strong>{{position}}</strong> in the
+            <strong>{{department}}</strong> department of {{companyName}}, effective from
+            <strong>{{startDate}}</strong>.</p>
         <p>Your appointment is subject to the terms and conditions mentioned below and as per the company policies:</p>
 
         <table class="details-table">
@@ -171,53 +272,54 @@
                 <th>Work Location</th>
                 <td>{{workLocation}}</td>
             </tr>
-            {{#if probationPeriod}}
-            <tr>
+            {{#if probationPeriod}}<tr>
                 <th>Probation Period</th>
                 <td>{{probationPeriod}}</td>
-            </tr>
-            {{/if}}
+            </tr>{{/if}}
         </table>
 
         <div class="terms-section">
-            <div class="terms-title">Terms and Conditions</div>
+            <div class="terms-title">Terms & Conditions</div>
             <ol class="terms-list">
-                <li>You will be governed by the rules, regulations, and policies of the company as amended from time to time.</li>
+                <li>You will be governed by the rules, regulations, and policies of the company as amended from time to
+                    time.</li>
                 <li>You are required to maintain confidentiality of all company information and data.</li>
-                <li>Your employment is subject to satisfactory completion of probation period{{#if probationPeriod}} of {{probationPeriod}}{{/if}}.</li>
-                <li>You will be required to give {{#if noticePeriod}}{{noticePeriod}}{{else}}30 days{{/if}} notice in writing before leaving the organization.</li>
-                <li>The company reserves the right to terminate your services with appropriate notice as per company policy.</li>
-                <li>You will be entitled to benefits as per company policy including health insurance and paid leave.</li>
+                <li>Your employment is subject to satisfactory completion of probation period{{#if probationPeriod}} of
+                    {{probationPeriod}}{{/if}}.</li>
+                <li>You will be required to give {{#if noticePeriod}}{{noticePeriod}}{{else}}30 days{{/if}} notice in
+                    writing before leaving the organization.</li>
+                <li>The company reserves the right to terminate your services with appropriate notice as per company
+                    policy.</li>
+                <li>You will be entitled to benefits as per company policy including health insurance and paid leave.
+                </li>
             </ol>
         </div>
 
         <p>We welcome you to our organization and look forward to a long and mutually beneficial association.</p>
-
-        <p>Please confirm your acceptance of this appointment by signing and returning a copy of this letter.</p>
-
-        <p>Congratulations and welcome to {{companyName}}!</p>
+        <p>Please confirm your acceptance by signing and returning a copy of this letter.</p>
+        <p>Congratulations and welcome to <strong>{{companyName}}</strong>!</p>
     </div>
 
     <div class="signature-section">
-        <div class="signature-box">
-            <div class="signature-line">
-                <strong>For {{companyName}}</strong><br>
-                {{#if hrContactPerson}}{{hrContactPerson}}{{else}}HR Manager{{/if}}<br>
-                Human Resources
+        <div class="signature-block">
+            <div class="sig-label">For {{companyName}}</div>
+            <div class="sig-line">
+                <div class="sig-name">{{#if hrContactPerson}}{{hrContactPerson}}{{else}}HR Manager{{/if}}</div>
+                <div class="sig-role">Human Resources</div>
             </div>
         </div>
-        <div class="signature-box">
-            <div class="signature-line">
-                <strong>Employee Acceptance</strong><br>
-                {{employeeName}}<br>
-                Date: ___________
+        <div class="signature-block">
+            <div class="sig-label">Employee Acceptance</div>
+            <div class="sig-line">
+                <div class="sig-name">{{employeeName}}</div>
+                <div class="sig-role">Date: ___________</div>
             </div>
         </div>
     </div>
 
     <div class="footer">
-        <p>This is a computer-generated document and does not require a physical signature.</p>
-        <p>{{companyName}} - Professional Document System</p>
+        <p>This is a system-generated document. {{companyName}}</p>
     </div>
 </body>
+
 </html>

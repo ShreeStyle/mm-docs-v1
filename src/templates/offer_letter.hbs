@@ -1,325 +1,325 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Employment Offer Letter</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         * {
+            box-sizing: border-box;
             margin: 0;
             padding: 0;
-            box-sizing: border-box;
         }
-        
+
         body {
-            font-family: 'Times New Roman', serif;
-            line-height: 1.5;
-            color: #000;
-            background: #fff;
-            font-size: 12pt;
-        }
-        
-        .document-container {
-            max-width: 210mm;
-            margin: 0 auto;
-            padding: 25mm;
-            min-height: 297mm;
-            background: white;
-        }
-        
-        /* Clean Professional Header */
-        .letterhead {
-            text-align: center;
-            margin-bottom: 40px;
-            border-bottom: 2px solid #000;
-            padding-bottom: 20px;
-        }
-        
-        .company-name {
-            font-size: 20pt;
-            font-weight: bold;
-            color: #000;
-            margin-bottom: 8px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-        
-        .company-address {
-            font-size: 11pt;
-            color: #000;
-            line-height: 1.4;
-        }
-        
-        /* Document Header */
-        .document-header {
-            text-align: center;
-            margin: 30px 0;
-        }
-        
-        .document-title {
-            font-size: 16pt;
-            font-weight: bold;
-            color: #000;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            text-decoration: underline;
-        }
-        
-        /* Date and Reference */
-        .date-reference {
-            margin: 25px 0;
-            font-size: 11pt;
-            color: #000;
-        }
-        
-        .date-line {
-            margin-bottom: 8px;
-        }
-        
-        /* Recipient */
-        .recipient {
-            margin: 25px 0;
-            font-size: 11pt;
-            line-height: 1.4;
-        }
-        
-        .recipient-name {
-            font-weight: bold;
-            color: #000;
-            font-size: 12pt;
-        }
-        
-        /* Subject Line */
-        .subject-line {
-            margin: 20px 0;
-            font-weight: bold;
-            color: #000;
-            font-size: 11pt;
-        }
-        
-        /* Main Content */
-        .content {
-            font-size: 11pt;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             line-height: 1.6;
-            color: #000;
-            text-align: justify;
+            color: #1f2937;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 48px 40px;
+            background: white;
+            font-size: 14px;
         }
-        
+
+        .letterhead {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            padding-bottom: 28px;
+            margin-bottom: 36px;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .company-name {
+            font-size: 22px;
+            font-weight: 700;
+            color: #111827;
+            margin-bottom: 8px;
+            letter-spacing: -0.02em;
+        }
+
+        .company-address {
+            font-size: 13px;
+            color: #4b5563;
+            line-height: 1.6;
+            max-width: 280px;
+        }
+
+        .doc-badge {
+            text-align: right;
+        }
+
+        .doc-title {
+            font-size: 36px;
+            font-weight: 800;
+            color: #e5e7eb;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            margin-bottom: 8px;
+        }
+
+        .doc-date {
+            font-size: 13px;
+            color: #6b7280;
+        }
+
+        .doc-date strong {
+            color: #111827;
+        }
+
+        .section-label {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            color: #6b7280;
+            font-weight: 600;
+            margin-bottom: 12px;
+        }
+
+        .recipient {
+            margin-bottom: 32px;
+        }
+
+        .recipient-name {
+            font-size: 16px;
+            font-weight: 600;
+            color: #111827;
+            margin-bottom: 4px;
+        }
+
+        .recipient-addr {
+            font-size: 13px;
+            color: #4b5563;
+        }
+
+        .subject {
+            background: #f9fafb;
+            border-radius: 8px;
+            padding: 16px 20px;
+            margin-bottom: 28px;
+            font-weight: 600;
+            color: #111827;
+            font-size: 14px;
+        }
+
+        .content {
+            font-size: 14px;
+            color: #374151;
+            line-height: 1.7;
+        }
+
         .content p {
-            margin-bottom: 15px;
+            margin-bottom: 16px;
         }
-        
-        /* Professional Details Table */
+
         .details-table {
             width: 100%;
             border-collapse: collapse;
-            margin: 25px 0;
-            border: 2px solid #000;
+            margin: 24px 0;
         }
-        
-        .details-table th,
-        .details-table td {
-            border: 1px solid #000;
-            padding: 12px;
-            text-align: left;
-            font-size: 11pt;
-        }
-        
+
         .details-table th {
-            background-color: #f5f5f5;
-            font-weight: bold;
+            background: #f9fafb;
+            text-align: left;
+            padding: 12px 16px;
+            font-size: 13px;
+            font-weight: 600;
+            color: #6b7280;
+            border-bottom: 1px solid #e5e7eb;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            width: 35%;
         }
-        
-        /* Terms Section */
+
+        .details-table td {
+            padding: 12px 16px;
+            font-size: 14px;
+            color: #111827;
+            font-weight: 500;
+            border-bottom: 1px solid #f3f4f6;
+        }
+
         .terms-section {
-            margin: 25px 0;
-            border: 1px solid #000;
-            padding: 20px;
+            background: #f9fafb;
+            border-radius: 8px;
+            padding: 24px;
+            margin: 28px 0;
         }
-        
+
         .terms-title {
-            font-size: 12pt;
-            font-weight: bold;
-            margin-bottom: 15px;
-            text-align: center;
-            text-decoration: underline;
+            font-size: 13px;
+            font-weight: 600;
+            color: #111827;
+            margin-bottom: 16px;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
         }
-        
+
         .terms-list {
-            list-style: decimal;
             padding-left: 20px;
         }
-        
+
         .terms-list li {
-            margin-bottom: 8px;
-            font-size: 11pt;
-            line-height: 1.4;
+            margin-bottom: 10px;
+            font-size: 13px;
+            color: #4b5563;
+            line-height: 1.6;
         }
-        
-        /* Signature Section */
+
         .signature-section {
-            margin-top: 50px;
+            margin-top: 48px;
             display: flex;
             justify-content: space-between;
         }
-        
+
         .signature-block {
-            text-align: center;
-            width: 45%;
+            width: 44%;
         }
-        
-        .signature-title {
-            font-size: 11pt;
-            font-weight: bold;
-            margin-bottom: 50px;
+
+        .sig-label {
+            font-size: 12px;
+            font-weight: 600;
+            color: #6b7280;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            margin-bottom: 48px;
         }
-        
-        .signature-line {
-            border-top: 1px solid #000;
+
+        .sig-line {
+            border-top: 1px solid #d1d5db;
             padding-top: 8px;
-            font-size: 10pt;
         }
-        
-        .signature-name {
-            font-weight: bold;
-            margin-bottom: 4px;
+
+        .sig-name {
+            font-size: 14px;
+            font-weight: 600;
+            color: #111827;
         }
-        
-        /* Footer */
-        .document-footer {
-            margin-top: 40px;
+
+        .sig-role {
+            font-size: 12px;
+            color: #6b7280;
+        }
+
+        .footer {
+            margin-top: 48px;
             text-align: center;
-            font-size: 9pt;
-            color: #666;
-        }
-        
-        /* Print Styles */
-        @media print {
-            .document-container {
-                margin: 0;
-                padding: 20mm;
-            }
-            
-            body {
-                background: white;
-            }
+            padding-top: 24px;
+            border-top: 1px solid #e5e7eb;
+            color: #9ca3af;
+            font-size: 12px;
         }
     </style>
 </head>
+
 <body>
-    <div class="document-container">
-        <!-- Professional Letterhead -->
-        <div class="letterhead">
+    <div class="letterhead">
+        <div>
             <div class="company-name">{{companyName}}</div>
-            <div class="company-address">{{companyAddress}}</div>
-            {{#if companyPhone}}<div>Phone: {{companyPhone}} {{#if companyEmail}}| Email: {{companyEmail}}{{/if}}</div>{{/if}}
-        </div>
-
-        <!-- Document Title -->
-        <div class="document-header">
-            <div class="document-title">Offer Letter</div>
-        </div>
-
-        <!-- Date and Reference -->
-        <div class="date-reference">
-            <div class="date-line"><strong>Date:</strong> {{offerDate}}</div>
-            {{#if refNumber}}<div><strong>Ref No:</strong> {{refNumber}}</div>{{/if}}
-        </div>
-
-        <!-- Recipient Information -->
-        <div class="recipient">
-            <div><strong>To,</strong></div>
-            <div class="recipient-name">{{candidateName}}</div>
-            {{#if candidateAddress}}<div>{{candidateAddress}}</div>{{/if}}
-        </div>
-
-        <!-- Subject -->
-        <div class="subject-line">
-            <strong>Subject: Offer of Employment - {{position}}</strong>
-        </div>
-
-        <!-- Main Content -->
-        <div class="content">
-            <p>Dear {{candidateName}},</p>
-
-            <p>We are pleased to offer you employment with {{companyName}} for the position of <strong>{{position}}</strong>. We believe your skills and experience will be valuable to our organization.</p>
-
-            <!-- Employment Details Table -->
-            <table class="details-table">
-                <tr>
-                    <th>Position</th>
-                    <td>{{position}}</td>
-                </tr>
-                <tr>
-                    <th>Department</th>
-                    <td>{{department}}</td>
-                </tr>
-                <tr>
-                    <th>Annual Salary</th>
-                    <td>₹{{salary}} per annum</td>
-                </tr>
-                <tr>
-                    <th>Date of Joining</th>
-                    <td>{{startDate}}</td>
-                </tr>
-                <tr>
-                    <th>Reporting To</th>
-                    <td>{{reportingTo}}</td>
-                </tr>
-                <tr>
-                    <th>Work Location</th>
-                    <td>{{workLocation}}</td>
-                </tr>
-                {{#if probationPeriod}}
-                <tr>
-                    <th>Probation Period</th>
-                    <td>{{probationPeriod}}</td>
-                </tr>
-                {{/if}}
-            </table>
-
-            <!-- Terms and Conditions -->
-            <div class="terms-section">
-                <div class="terms-title">Terms and Conditions</div>
-                <ol class="terms-list">
-                    <li>Your employment is subject to satisfactory completion of background verification and reference checks.</li>
-                    <li>You will be governed by the company's rules, regulations, and policies as amended from time to time.</li>
-                    <li>You are required to maintain strict confidentiality regarding company information and business.</li>
-                    <li>This offer is contingent upon your acceptance within 7 days from the date of this letter.</li>
-                    <li>Your employment will be subject to a probation period of {{#if probationPeriod}}{{probationPeriod}}{{else}}90 days{{/if}}.</li>
-                    <li>Either party may terminate employment with {{#if noticePeriod}}{{noticePeriod}}{{else}}30 days{{/if}} written notice.</li>
-                    <li>You will be entitled to benefits as per company policy including health insurance and paid leave.</li>
-                </ol>
-            </div>
-
-            <p>Please confirm your acceptance by signing and returning a copy of this letter. We look forward to welcoming you to our team.</p>
-
-            <p>Congratulations and welcome to {{companyName}}!</p>
-        </div>
-
-        <!-- Professional Signature Section -->
-        <div class="signature-section">
-            <div class="signature-block">
-                <div class="signature-title">For {{companyName}}</div>
-                <div class="signature-line">
-                    <div class="signature-name">{{#if hrContactPerson}}{{hrContactPerson}}{{else}}HR Manager{{/if}}</div>
-                    <div>Human Resources</div>
-                </div>
-            </div>
-            <div class="signature-block">
-                <div class="signature-title">Acceptance</div>
-                <div class="signature-line">
-                    <div class="signature-name">{{candidateName}}</div>
-                    <div>Date: ___________</div>
-                </div>
+            <div class="company-address">
+                {{{companyAddress}}}
+                {{#if companyPhone}}<br>{{companyPhone}}{{/if}}
+                {{#if companyEmail}}<br>{{companyEmail}}{{/if}}
             </div>
         </div>
-
-        <!-- Footer -->
-        <div class="document-footer">
-            <p>This is a computer-generated document.</p>
-            <p>{{companyName}} - Professional HR System</p>
+        <div class="doc-badge">
+            <div class="doc-title">OFFER</div>
+            <div class="doc-date"><strong>Date:</strong> {{offerDate}}</div>
+            {{#if refNumber}}<div class="doc-date"><strong>Ref:</strong> {{refNumber}}</div>{{/if}}
         </div>
     </div>
+
+    <div class="recipient">
+        <div class="section-label">To</div>
+        <div class="recipient-name">{{candidateName}}</div>
+        {{#if candidateAddress}}<div class="recipient-addr">{{{candidateAddress}}}</div>{{/if}}
+    </div>
+
+    <div class="subject">Subject: Offer of Employment — {{position}}</div>
+
+    <div class="content">
+        <p>Dear {{candidateName}},</p>
+        <p>We are pleased to offer you employment with <strong>{{companyName}}</strong> for the position of
+            <strong>{{position}}</strong>. We believe your skills and experience will be a valuable addition to our
+            team.</p>
+
+        <table class="details-table">
+            <tr>
+                <th>Position</th>
+                <td>{{position}}</td>
+            </tr>
+            <tr>
+                <th>Department</th>
+                <td>{{department}}</td>
+            </tr>
+            <tr>
+                <th>Annual Salary</th>
+                <td>₹{{salary}} per annum</td>
+            </tr>
+            <tr>
+                <th>Date of Joining</th>
+                <td>{{startDate}}</td>
+            </tr>
+            <tr>
+                <th>Reporting To</th>
+                <td>{{reportingTo}}</td>
+            </tr>
+            <tr>
+                <th>Work Location</th>
+                <td>{{workLocation}}</td>
+            </tr>
+            {{#if probationPeriod}}<tr>
+                <th>Probation Period</th>
+                <td>{{probationPeriod}}</td>
+            </tr>{{/if}}
+        </table>
+
+        <div class="terms-section">
+            <div class="terms-title">Terms & Conditions</div>
+            <ol class="terms-list">
+                <li>Your employment is subject to satisfactory completion of background verification and reference
+                    checks.</li>
+                <li>You will be governed by the company's rules, regulations, and policies as amended from time to time.
+                </li>
+                <li>You are required to maintain strict confidentiality regarding company information and business.</li>
+                <li>This offer is contingent upon your acceptance within 7 days from the date of this letter.</li>
+                <li>Your employment will be subject to a probation period of {{#if
+                    probationPeriod}}{{probationPeriod}}{{else}}90 days{{/if}}.</li>
+                <li>Either party may terminate employment with {{#if noticePeriod}}{{noticePeriod}}{{else}}30
+                    days{{/if}} written notice.</li>
+                <li>You will be entitled to benefits as per company policy including health insurance and paid leave.
+                </li>
+            </ol>
+        </div>
+
+        <p>Please confirm your acceptance by signing and returning a copy of this letter. We look forward to welcoming
+            you to our team.</p>
+        <p>Congratulations and welcome to <strong>{{companyName}}</strong>!</p>
+    </div>
+
+    <div class="signature-section">
+        <div class="signature-block">
+            <div class="sig-label">For {{companyName}}</div>
+            <div class="sig-line">
+                <div class="sig-name">{{#if hrContactPerson}}{{hrContactPerson}}{{else}}HR Manager{{/if}}</div>
+                <div class="sig-role">Human Resources</div>
+            </div>
+        </div>
+        <div class="signature-block">
+            <div class="sig-label">Acceptance</div>
+            <div class="sig-line">
+                <div class="sig-name">{{candidateName}}</div>
+                <div class="sig-role">Date: ___________</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="footer">
+        <p>This is a system-generated document. {{companyName}}</p>
+    </div>
 </body>
+
 </html>

@@ -1,110 +1,468 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GST Invoice</title>
+    <title>GST Tax Invoice</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
         body {
-            font-family: 'Times New Roman', serif;
-            line-height: 1.6;
-            color: #000;
+            font-family: 'Inter', -apple-system, sans-serif;
+            line-height: 1.5;
+            color: #1f2937;
             max-width: 800px;
             margin: 0 auto;
             padding: 40px;
             background: white;
-            font-size: 12pt;
+            font-size: 13px;
         }
+
         .header {
-            text-align: center;
-            margin-bottom: 40px;
-            border-bottom: 2px solid #000;
-            padding-bottom: 20px;
-        }
-        .company-name {
-            font-size: 20pt;
-            font-weight: bold;
-            color: #000;
-            margin-bottom: 8px;
-            text-transform: uppercase;
-        }
-        .document-title {
-            font-size: 18pt;
-            font-weight: bold;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            margin: 30px 0;
-            text-align: center;
-            color: #000;
-            text-decoration: underline;
-        }
-        .invoice-details {
             display: flex;
             justify-content: space-between;
-            margin-bottom: 30px;
+            align-items: flex-start;
+            padding-bottom: 24px;
+            margin-bottom: 28px;
+            border-bottom: 1px solid #e5e7eb;
         }
-        .details-table {
+
+        .company-name {
+            font-size: 22px;
+            font-weight: 700;
+            color: #111827;
+            margin-bottom: 6px;
+        }
+
+        .company-detail {
+            font-size: 12px;
+            color: #4b5563;
+            line-height: 1.5;
+        }
+
+        .company-detail strong {
+            color: #111827;
+        }
+
+        .doc-badge {
+            text-align: right;
+        }
+
+        .doc-title {
+            font-size: 30px;
+            font-weight: 800;
+            color: #e5e7eb;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+        }
+
+        .tax-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 9999px;
+            font-size: 10px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            background: #ecfdf5;
+            color: #059669;
+            margin-top: 4px;
+        }
+
+        .meta-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+            margin-bottom: 28px;
+        }
+
+        .meta-card {
+            background: #f9fafb;
+            border-radius: 8px;
+            padding: 16px;
+        }
+
+        .meta-label {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            color: #6b7280;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .meta-name {
+            font-size: 15px;
+            font-weight: 600;
+            color: #111827;
+            margin-bottom: 4px;
+        }
+
+        .meta-detail {
+            font-size: 12px;
+            color: #4b5563;
+            line-height: 1.5;
+        }
+
+        .meta-detail strong {
+            color: #374151;
+        }
+
+        .invoice-meta {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+
+        .invoice-meta-item {
+            background: #f9fafb;
+            border-radius: 6px;
+            padding: 10px 14px;
+        }
+
+        .invoice-meta-item .label {
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            color: #6b7280;
+            font-weight: 600;
+        }
+
+        .invoice-meta-item .value {
+            font-size: 14px;
+            font-weight: 600;
+            color: #111827;
+            margin-top: 2px;
+        }
+
+        .items-table {
             width: 100%;
             border-collapse: collapse;
-            margin: 20px 0;
-            border: 2px solid #000;
+            margin: 24px 0;
         }
-        .details-table th,
-        .details-table td {
-            border: 1px solid #000;
-            padding: 12px;
+
+        .items-table thead th {
+            background: #f9fafb;
             text-align: left;
-            font-size: 11pt;
+            padding: 10px 14px;
+            font-size: 11px;
+            font-weight: 600;
+            color: #6b7280;
+            border-bottom: 1px solid #e5e7eb;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
         }
-        .details-table th {
-            background-color: #f5f5f5;
-            font-weight: bold;
+
+        .items-table thead th:nth-child(n+3) {
+            text-align: right;
         }
-        .total-section {
-            margin-top: 20px;
-            border: 2px solid #000;
-            padding: 15px;
-            background-color: #f9f9f9;
+
+        .items-table tbody td {
+            padding: 10px 14px;
+            font-size: 13px;
+            color: #111827;
+            border-bottom: 1px solid #f3f4f6;
+        }
+
+        .items-table tbody td:nth-child(n+3) {
+            text-align: right;
+            font-weight: 500;
+        }
+
+        .items-table tbody td:first-child {
+            font-size: 12px;
+            color: #6b7280;
+            text-align: center;
+            width: 36px;
+        }
+
+        .tax-breakdown {
+            margin: 24px 0;
+        }
+
+        .tax-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+        }
+
+        .tax-card {
+            background: #f9fafb;
+            border-radius: 8px;
+            padding: 16px;
+        }
+
+        .tax-card .label {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            color: #6b7280;
+            font-weight: 600;
+        }
+
+        .tax-card .row {
+            display: flex;
+            justify-content: space-between;
+            padding: 6px 0;
+            font-size: 13px;
+            color: #374151;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .tax-card .row:last-child {
+            border-bottom: none;
+        }
+
+        .totals-section {
+            display: flex;
+            justify-content: flex-end;
+            margin: 24px 0;
+        }
+
+        .totals-table {
+            width: 320px;
+        }
+
+        .total-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 16px;
+            font-size: 13px;
+            color: #374151;
+            border-bottom: 1px solid #f3f4f6;
+        }
+
+        .total-row.grand {
+            background: #111827;
+            color: white;
+            border-radius: 8px;
+            padding: 12px 16px;
+            font-size: 16px;
+            font-weight: 700;
+            border-bottom: none;
+            margin-top: 4px;
+        }
+
+        .amount-words {
+            background: #f9fafb;
+            border-radius: 8px;
+            padding: 12px 16px;
+            margin: 16px 0;
+            font-size: 12px;
+            color: #6b7280;
+        }
+
+        .amount-words strong {
+            color: #111827;
+        }
+
+        .bank-section {
+            background: #f9fafb;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 24px 0;
+        }
+
+        .bank-title {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            color: #6b7280;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .bank-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            font-size: 12px;
+        }
+
+        .bank-item {
+            display: flex;
+            gap: 8px;
+        }
+
+        .bank-item .label {
+            color: #6b7280;
+            min-width: 100px;
+        }
+
+        .bank-item .value {
+            color: #111827;
+            font-weight: 500;
+        }
+
+        .footer {
+            margin-top: 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+        }
+
+        .footer-note {
+            font-size: 11px;
+            color: #9ca3af;
+            max-width: 300px;
+        }
+
+        .footer-sig {
+            text-align: right;
+        }
+
+        .footer-sig .label {
+            font-size: 11px;
+            color: #6b7280;
+            margin-bottom: 36px;
+        }
+
+        .footer-sig .line {
+            border-top: 1px solid #d1d5db;
+            padding-top: 6px;
+            font-size: 12px;
+            font-weight: 600;
+            color: #111827;
         }
     </style>
 </head>
+
 <body>
     <div class="header">
-        <div class="company-name">{{companyName}}</div>
-        <div>{{companyAddress}}</div>
-        <div><strong>GST No:</strong> {{gstNumber}}</div>
-    </div>
-
-    <div class="document-title">Tax Invoice</div>
-
-    <div class="invoice-details">
         <div>
-            <p><strong>Invoice No:</strong> {{invoiceNumber}}</p>
-            <p><strong>Date:</strong> {{invoiceDate}}</p>
+            <div class="company-name">{{companyName}}</div>
+            <div class="company-detail">{{{companyAddress}}}</div>
+            {{#if companyPhone}}<div class="company-detail">Phone: {{companyPhone}}</div>{{/if}}
+            {{#if companyEmail}}<div class="company-detail">Email: {{companyEmail}}</div>{{/if}}
+            <div class="company-detail"><strong>GSTIN:</strong> {{gstNumber}}</div>
+            {{#if panNumber}}<div class="company-detail"><strong>PAN:</strong> {{panNumber}}</div>{{/if}}
         </div>
-        <div>
-            <p><strong>Bill To:</strong></p>
-            <p><strong>{{clientName}}</strong></p>
-            <p><strong>GST No:</strong> {{clientGST}}</p>
+        <div class="doc-badge">
+            <div class="doc-title">TAX INVOICE</div>
+            <div class="tax-badge">GST Compliant</div>
         </div>
     </div>
 
-    <table class="details-table">
-        <tr>
-            <th>Description</th>
-            <th>Amount</th>
-        </tr>
-        <tr>
-            <td>{{serviceDescription}}</td>
-            <td>₹{{baseAmount}}</td>
-        </tr>
+    <div class="invoice-meta">
+        <div class="invoice-meta-item">
+            <div class="label">Invoice No.</div>
+            <div class="value">{{invoiceNumber}}</div>
+        </div>
+        <div class="invoice-meta-item">
+            <div class="label">Date of Issue</div>
+            <div class="value">{{invoiceDate}}</div>
+        </div>
+        <div class="invoice-meta-item">
+            <div class="label">Due Date</div>
+            <div class="value">{{dueDate}}</div>
+        </div>
+    </div>
+
+    <div class="meta-grid">
+        <div class="meta-card">
+            <div class="meta-label">Bill To</div>
+            <div class="meta-name">{{clientName}}</div>
+            <div class="meta-detail">{{{clientAddress}}}</div>
+            {{#if clientGST}}<div class="meta-detail"><strong>GSTIN:</strong> {{clientGST}}</div>{{/if}}
+            {{#if clientPhone}}<div class="meta-detail">Phone: {{clientPhone}}</div>{{/if}}
+        </div>
+        <div class="meta-card">
+            <div class="meta-label">Ship To</div>
+            <div class="meta-name">{{#if shipToName}}{{shipToName}}{{else}}{{clientName}}{{/if}}</div>
+            <div class="meta-detail">{{{#if shipToAddress}}}{{{shipToAddress}}}{{else}}{{{clientAddress}}}{{/if}}</div>
+            {{#if placeOfSupply}}<div class="meta-detail"><strong>Place of Supply:</strong> {{placeOfSupply}}</div>
+            {{/if}}
+        </div>
+    </div>
+
+    <table class="items-table">
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Description</th>
+                <th>HSN/SAC</th>
+                <th>Qty</th>
+                <th>Rate</th>
+                <th>Amount</th>
+            </tr>
+        </thead>
+        <tbody>
+            {{#each items}}
+            <tr>
+                <td>{{@index}}</td>
+                <td>{{this.description}}</td>
+                <td>{{#if this.hsn}}{{this.hsn}}{{else}}998314{{/if}}</td>
+                <td style="text-align:right;">{{this.quantity}}</td>
+                <td>₹{{this.rate}}</td>
+                <td>₹{{this.amount}}</td>
+            </tr>
+            {{/each}}
+        </tbody>
     </table>
 
-    <div class="total-section">
-        <p><strong>Base Amount:</strong> ₹{{baseAmount}}</p>
-        <p><strong>CGST (9%):</strong> ₹{{#multiply baseAmount 0.09}}{{/multiply}}</p>
-        <p><strong>SGST (9%):</strong> ₹{{#multiply baseAmount 0.09}}{{/multiply}}</p>
-        <p><strong>Total Amount:</strong> ₹{{#multiply baseAmount 1.18}}{{/multiply}}</p>
+    <div class="tax-breakdown">
+        <div class="tax-grid">
+            <div class="tax-card">
+                <div class="label">Tax Breakdown (Intra-State)</div>
+                <div class="row"><span>CGST @ {{#if cgstRate}}{{cgstRate}}{{else}}9{{/if}}%</span><span>₹{{#if
+                        cgstAmount}}{{cgstAmount}}{{else}}{{taxAmount}}{{/if}}</span></div>
+                <div class="row"><span>SGST @ {{#if sgstRate}}{{sgstRate}}{{else}}9{{/if}}%</span><span>₹{{#if
+                        sgstAmount}}{{sgstAmount}}{{else}}{{taxAmount}}{{/if}}</span></div>
+            </div>
+            <div class="tax-card">
+                <div class="label">Summary</div>
+                <div class="row"><span>Taxable Amount</span><span>₹{{subtotal}}</span></div>
+                <div class="row"><span>Total Tax</span><span>₹{{taxAmount}}</span></div>
+                <div class="row" style="font-weight:600;color:#111827;"><span>Invoice
+                        Total</span><span>₹{{totalAmount}}</span></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="totals-section">
+        <div class="totals-table">
+            <div class="total-row"><span>Subtotal</span><span>₹{{subtotal}}</span></div>
+            <div class="total-row"><span>CGST</span><span>₹{{#if
+                    cgstAmount}}{{cgstAmount}}{{else}}{{taxAmount}}{{/if}}</span></div>
+            <div class="total-row"><span>SGST</span><span>₹{{#if
+                    sgstAmount}}{{sgstAmount}}{{else}}{{taxAmount}}{{/if}}</span></div>
+            {{#if roundOff}}<div class="total-row"><span>Round Off</span><span>{{roundOff}}</span></div>{{/if}}
+            <div class="total-row grand"><span>Total Due</span><span>₹{{totalAmount}}</span></div>
+        </div>
+    </div>
+
+    <div class="bank-section">
+        <div class="bank-title">Payment Information</div>
+        <div class="bank-grid">
+            <div class="bank-item"><span class="label">Bank Name:</span><span class="value">{{#if
+                    bankName}}{{bankName}}{{else}}HDFC Bank{{/if}}</span></div>
+            <div class="bank-item"><span class="label">Account No:</span><span class="value">{{#if
+                    accountNumber}}{{accountNumber}}{{else}}XXXXXXXXXX{{/if}}</span></div>
+            <div class="bank-item"><span class="label">IFSC Code:</span><span class="value">{{#if
+                    ifscCode}}{{ifscCode}}{{else}}HDFC0001234{{/if}}</span></div>
+            <div class="bank-item"><span class="label">Branch:</span><span class="value">{{#if
+                    branchName}}{{branchName}}{{else}}Main Branch{{/if}}</span></div>
+        </div>
+    </div>
+
+    <div class="footer">
+        <div class="footer-note">
+            <p>1. Payment is due within the terms stated above.</p>
+            <p>2. This is a computer-generated invoice.</p>
+            <p>3. Subject to {{#if jurisdiction}}{{jurisdiction}}{{else}}Bangalore{{/if}} jurisdiction.</p>
+        </div>
+        <div class="footer-sig">
+            <div class="label">For {{companyName}}</div>
+            <div class="line">Authorized Signatory</div>
+        </div>
     </div>
 </body>
+
 </html>

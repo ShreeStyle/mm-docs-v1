@@ -1,109 +1,341 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Warning Letter</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            font-size: 12pt;
-            line-height: 1.6;
-            color: #000;
-            background: #fff;
+        * {
+            box-sizing: border-box;
             margin: 0;
-            padding: 40px;
-            max-width: 210mm;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+            color: #1f2937;
+            max-width: 800px;
             margin: 0 auto;
+            padding: 48px 40px;
+            background: white;
+            font-size: 14px;
         }
-        
-        .document-title {
-            text-align: center;
-            font-size: 18pt;
-            font-weight: bold;
-            margin-bottom: 40px;
-            text-decoration: underline;
+
+        .letterhead {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            padding-bottom: 28px;
+            margin-bottom: 36px;
+            border-bottom: 1px solid #e5e7eb;
         }
-        
-        .recipient-section {
-            margin-bottom: 30px;
+
+        .company-name {
+            font-size: 22px;
+            font-weight: 700;
+            color: #111827;
+            margin-bottom: 8px;
+            letter-spacing: -0.02em;
         }
-        
-        .recipient-section p {
-            margin: 5px 0;
+
+        .company-address {
+            font-size: 13px;
+            color: #4b5563;
+            line-height: 1.6;
+            max-width: 280px;
         }
-        
-        .date {
-            margin-bottom: 30px;
+
+        .doc-badge {
+            text-align: right;
         }
-        
+
+        .doc-title {
+            font-size: 32px;
+            font-weight: 800;
+            color: #fecaca;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            margin-bottom: 8px;
+        }
+
+        .doc-date {
+            font-size: 13px;
+            color: #6b7280;
+        }
+
+        .doc-date strong {
+            color: #111827;
+        }
+
+        .confidential-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 9999px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            background: #fef2f2;
+            color: #dc2626;
+            margin-top: 8px;
+        }
+
+        .section-label {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            color: #6b7280;
+            font-weight: 600;
+            margin-bottom: 12px;
+        }
+
+        .recipient {
+            margin-bottom: 32px;
+        }
+
+        .recipient-name {
+            font-size: 16px;
+            font-weight: 600;
+            color: #111827;
+            margin-bottom: 4px;
+        }
+
+        .recipient-detail {
+            font-size: 13px;
+            color: #4b5563;
+        }
+
         .subject {
-            margin-bottom: 30px;
-            font-weight: bold;
+            background: #fef2f2;
+            border-radius: 8px;
+            padding: 16px 20px;
+            border-left: 4px solid #ef4444;
+            margin-bottom: 28px;
+            font-weight: 600;
+            color: #991b1b;
+            font-size: 14px;
         }
-        
+
         .content {
-            text-align: justify;
-            margin-bottom: 30px;
+            font-size: 14px;
+            color: #374151;
+            line-height: 1.7;
         }
-        
+
         .content p {
-            margin-bottom: 15px;
+            margin-bottom: 16px;
         }
-        
+
+        .incident-box {
+            background: #f9fafb;
+            border-radius: 8px;
+            padding: 24px;
+            margin: 24px 0;
+            border-left: 4px solid #6b7280;
+        }
+
+        .incident-title {
+            font-size: 13px;
+            font-weight: 600;
+            color: #111827;
+            margin-bottom: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+
+        .incident-text {
+            font-size: 14px;
+            color: #374151;
+            line-height: 1.7;
+        }
+
+        .action-section {
+            background: #fffbeb;
+            border-radius: 8px;
+            padding: 24px;
+            margin: 24px 0;
+            border-left: 4px solid #f59e0b;
+        }
+
+        .action-title {
+            font-size: 13px;
+            font-weight: 600;
+            color: #92400e;
+            margin-bottom: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+
+        .action-list {
+            padding-left: 20px;
+        }
+
+        .action-list li {
+            margin-bottom: 8px;
+            font-size: 13px;
+            color: #78350f;
+            line-height: 1.5;
+        }
+
         .closing {
-            margin-top: 40px;
+            margin-top: 24px;
         }
-        
+
         .signature-section {
-            margin-top: 60px;
+            margin-top: 48px;
         }
-        
-        .signature-name {
-            font-weight: bold;
+
+        .sig-label {
+            font-size: 12px;
+            font-weight: 600;
+            color: #6b7280;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            margin-bottom: 48px;
         }
-        
-        /* Print styles */
-        @media print {
-            body {
-                padding: 20mm;
-            }
+
+        .sig-line {
+            border-top: 1px solid #d1d5db;
+            padding-top: 8px;
+            width: 250px;
+        }
+
+        .sig-name {
+            font-size: 14px;
+            font-weight: 600;
+            color: #111827;
+        }
+
+        .sig-role {
+            font-size: 12px;
+            color: #6b7280;
+        }
+
+        .ack-section {
+            margin-top: 48px;
+            background: #f9fafb;
+            border-radius: 8px;
+            padding: 24px;
+        }
+
+        .ack-title {
+            font-size: 13px;
+            font-weight: 600;
+            color: #111827;
+            margin-bottom: 16px;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+
+        .ack-fields {
+            display: flex;
+            gap: 40px;
+            font-size: 13px;
+            color: #6b7280;
+        }
+
+        .ack-field {
+            flex: 1;
+        }
+
+        .ack-line {
+            border-bottom: 1px solid #d1d5db;
+            margin-top: 32px;
+        }
+
+        .footer {
+            margin-top: 48px;
+            text-align: center;
+            padding-top: 24px;
+            border-top: 1px solid #e5e7eb;
+            color: #9ca3af;
+            font-size: 12px;
         }
     </style>
 </head>
+
 <body>
-    <div class="document-title">Warning Letter</div>
-    
-    <div class="recipient-section">
-        <p><strong>To,</strong></p>
-        <p>{{employeeName}}</p>
-        <p>{{position}}, {{department}}</p>
-        <p>{{companyName}},</p>
-        <p>{{companyAddress}}</p>
+    <div class="letterhead">
+        <div>
+            <div class="company-name">{{companyName}}</div>
+            <div class="company-address">{{{companyAddress}}}</div>
+        </div>
+        <div class="doc-badge">
+            <div class="doc-title">WARNING</div>
+            <div class="doc-date"><strong>Date:</strong> {{issueDate}}</div>
+            <div class="confidential-badge">Confidential</div>
+        </div>
     </div>
-    
-    <div class="date">{{issueDate}}</div>
-    
-    <div class="subject">
-        <strong>Subject:</strong> Warning against {{violationType}}
+
+    <div class="recipient">
+        <div class="section-label">To</div>
+        <div class="recipient-name">{{employeeName}}</div>
+        <div class="recipient-detail">{{position}}, {{department}}</div>
     </div>
-    
+
+    <div class="subject">Subject: Warning — {{violationType}}</div>
+
     <div class="content">
         <p>Dear {{#if employeeName}}{{employeeName}}{{else}}Employee{{/if}},</p>
-        
-        <p>{{incidentDescription}}</p>
-        
-        <p>You have already read our company policy and so you must be aware by now what action we can take against you regarding this. Since you are still in your training period, we suggest you improve your performance and be punctual; otherwise this can lead to termination of employment. We also expect you to be cordial towards your fellow employees and seniors and not indulge in unruly behavior.</p>
+
+        <p>This letter is being issued to bring to your attention a serious concern regarding your conduct/performance
+            at {{companyName}}.</p>
+
+        <div class="incident-box">
+            <div class="incident-title">Incident Details</div>
+            <div class="incident-text">{{{incidentDescription}}}</div>
+        </div>
+
+        <p>This behavior is in violation of company policies and is not acceptable. As per our company guidelines, such
+            actions can have serious consequences including but not limited to suspension or termination of employment.
+        </p>
+
+        <div class="action-section">
+            <div class="action-title">Expected Corrective Actions</div>
+            <ul class="action-list">
+                <li>Immediate improvement in the area of concern is expected.</li>
+                <li>You must adhere to all company policies and guidelines going forward.</li>
+                <li>Any repeat occurrence will lead to further disciplinary action.</li>
+                <li>You are expected to maintain cordial relations with colleagues and superiors.</li>
+            </ul>
+        </div>
+
+        <p>We hope that you will take this warning seriously and make the necessary improvements. The management is
+            willing to support you in making these improvements, but continued violations will not be tolerated.</p>
+
+        <p>This letter will be placed in your personnel file for record.</p>
     </div>
-    
-    <div class="closing">
-        <p>With regards,</p>
-        <p>Yours truly,</p>
-    </div>
-    
+
     <div class="signature-section">
-        <p class="signature-name">{{#if hrContactPerson}}{{hrContactPerson}}{{else}}HR Manager{{/if}}</p>
-        <p>{{#if managerTitle}}{{managerTitle}}{{else}}Head, HR department{{/if}}</p>
+        <div class="sig-label">Issued By</div>
+        <div class="sig-line">
+            <div class="sig-name">{{#if hrContactPerson}}{{hrContactPerson}}{{else}}HR Manager{{/if}}</div>
+            <div class="sig-role">{{#if managerTitle}}{{managerTitle}}{{else}}Head, HR Department{{/if}}</div>
+        </div>
+    </div>
+
+    <div class="ack-section">
+        <div class="ack-title">Employee Acknowledgment</div>
+        <p style="font-size: 13px; color: #4b5563; margin-bottom: 16px;">I acknowledge receipt of this warning letter
+            and understand its contents.</p>
+        <div class="ack-fields">
+            <div class="ack-field">
+                <div>Employee Signature</div>
+                <div class="ack-line"></div>
+            </div>
+            <div class="ack-field">
+                <div>Date</div>
+                <div class="ack-line"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="footer">
+        <p>This is a confidential HR document. {{companyName}}</p>
     </div>
 </body>
+
 </html>

@@ -171,10 +171,11 @@ exports.updateDocument = async (req, res) => {
 // Create a new document with AI generation and template rendering
 exports.generateDocument = async (req, res) => {
     try {
-        const { type, topic, title } = req.body;
+        const { type, topic, title, content: providedData } = req.body;
         const userId = req.user.id;
 
         console.log(`🚀 Generating document: type=${type}, topic=${topic}, userId=${userId}`);
+        console.log(`📦 Provided Data: ${JSON.stringify(providedData)}`);
 
         if (!type || !topic) {
             return res.status(400).json({ message: "Type and topic are required" });
@@ -188,7 +189,7 @@ exports.generateDocument = async (req, res) => {
         console.log("🔍 Fetching brand kit...");
         const brandKit = await BrandKit.findOne({ userId });
         console.log(`🎨 Brand kit found: ${brandKit ? 'Yes' : 'No'}`);
-        
+
         const brandContext = brandKit
             ? { name: brandKit.name, tone: "Professional", description: brandKit.description, logo: brandKit.logo }
             : { name: "MM Docs", tone: "Professional" };
@@ -197,11 +198,11 @@ exports.generateDocument = async (req, res) => {
         console.log(`🤖 Generating ${type} content...`);
         console.log(`📝 Topic: ${topic}`);
         console.log(`🎨 Brand context: ${JSON.stringify(brandContext)}`);
-        const content = await generateContent(type, topic, brandContext);
+        const content = await generateContent(type, topic, brandContext, providedData);
         console.log(`✅ AI content generated successfully`);
         console.log(`📄 Generated content type: ${typeof content}`);
         console.log(`📄 Generated content keys: ${Object.keys(content)}`);
-        
+
         // Validate that content is an object
         if (!content || typeof content !== 'object') {
             throw new Error('AI service returned invalid content format');
@@ -224,6 +225,7 @@ exports.generateDocument = async (req, res) => {
         console.log(`✅ Document saved with ID: ${document._id}`);
 
         res.status(201).json({
+            success: true,
             message: "Document generated and saved successfully! 🎉",
             document,
             previewUrl: `/api/documents/${document._id}/preview`,
@@ -232,8 +234,8 @@ exports.generateDocument = async (req, res) => {
     } catch (error) {
         console.error("❌ Document Generation Error:", error);
         console.error("❌ Error stack:", error.stack);
-        res.status(500).json({ 
-            message: "Error generating document", 
+        res.status(500).json({
+            message: "Error generating document",
             error: error.message,
             details: process.env.NODE_ENV === 'development' ? error.stack : undefined
         });
