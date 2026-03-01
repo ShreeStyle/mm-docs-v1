@@ -319,26 +319,10 @@ Return ONLY valid, richly detailed JSON document content.`;
         "reportingTo": "${context.reportingTo || context.reportingto || '[Direct Supervisor/Manager Name]'}",
         "workLocation": "${context.workLocation || '[Office Location/Remote]'}",
         "workingHours": "${context.workingHours || 'Monday to Friday, 9:00 AM to 6:00 PM'}",
-        "benefits": [
-          "Comprehensive health insurance coverage for employee and family",
-          "Annual paid time off (PTO) as per company policy",
-          "Professional development and training opportunities",
-          "Performance-based annual bonus eligibility",
-          "Retirement savings plan with company matching"
-        ],
-        "termsAndConditions": [
-          "Employment is contingent upon successful completion of background verification and reference checks",
-          "This is an at-will employment arrangement",
-          "Employee must sign and comply with company confidentiality and non-disclosure agreements",
-          "Employee handbook and policies will be provided during onboarding",
-          "Probationary period of 90 days applies"
-        ],
-        "nextSteps": [
-          "Please confirm your acceptance by signing and returning this letter within 7 days",
-          "Complete pre-employment documentation and background checks",
-          "Attend new employee orientation on your start date"
-        ],
-        "contactPerson": "HR Department - hr@${(context.companyName || context.company || brandContext.name).toLowerCase().replace(/\s+/g, '')}.com",
+        "benefits": "${context.benefits || '[List of benefits]'} ",
+        "termsAndConditions": "${context.termsAndConditions || '[Standard terms]'} ",
+        "nextSteps": "${context.nextSteps || '[Steps to accept]'} ",
+        "hrContactPerson": "${context.hrContactPerson || context.contactPerson || 'HR Manager'}",
         "closingMessage": "We are excited about the possibility of you joining our team and look forward to your positive response."
       }`;
 
@@ -385,9 +369,9 @@ Return ONLY valid, richly detailed JSON document content.`;
           "Participate in professional development and training programs",
           "Adhere to all company policies, procedures, and code of conduct"
         ],
-        "probation": "90 days from the date of joining",
-        "noticePeriod": "30 days during probation, 60 days after confirmation",
-        "contactPerson": "HR Department - hr@${(context.companyName || context.company || brandContext.name).toLowerCase().replace(/\s+/g, '')}.com",
+        "probationPeriod": "${context.probationPeriod || '90 days'}",
+        "noticePeriod": "${context.noticePeriod || '30 days'}",
+        "hrContactPerson": "${context.hrContactPerson || context.contactPerson || 'HR Manager'}",
         "closingMessage": "We look forward to a mutually beneficial relationship."
       }`;
 
@@ -426,7 +410,7 @@ Return ONLY valid, richly detailed JSON document content.`;
         "endDate": "${context.endDate || context.enddate || '[End Date/Present]'}",
         "performance": "${context.performance || 'excellent'}",
         "skills": "${context.skills || 'professionalism, dedication, and teamwork'}",
-        "contactPerson": "${context.hrName || 'HR Manager'}",
+        "hrContactPerson": "${context.hrContactPerson || context.hrName || 'HR Manager'}",
         "certificateId": "EXP-${Date.now().toString().slice(-6)}"
       }`;
 
@@ -730,29 +714,27 @@ Return ONLY valid, richly detailed JSON document content.`;
         "title": "Tax Invoice",
         "invoiceNumber": "${context.invoiceNumber || 'GST-INV-' + Date.now().toString().slice(-6)}",
         "invoiceDate": "${context.invoiceDate || new Date().toLocaleDateString('en-IN', { year: 'numeric', month: 'long', day: 'numeric' })}",
-        "supplier": {
-          "legalName": "${context.supplierName || context.company || brandContext.name}",
-          "gstin": "${context.supplierGSTIN || '[Supplier GSTIN]'}",
-          "address": "${context.supplierAddress || '[Supplier Address]'}"
-        },
-        "buyer": {
-          "legalName": "${context.buyerName || context.client || context.customerName || '[Buyer Name]'}",
-          "gstin": "${context.buyerGSTIN || '[Buyer GSTIN]'}",
-          "address": "${context.buyerAddress || '[Buyer Address]'}"
-        },
+        "dueDate": "${context.dueDate || '[Due Date]'}",
+        "companyName": "${context.supplierName || context.company || brandContext.name}",
+        "companyAddress": "${context.supplierAddress || '[Supplier Address]'}",
+        "gstNumber": "${context.supplierGSTIN || '[Supplier GSTIN]'}",
+        "clientName": "${context.buyerName || context.client || context.customerName || '[Buyer Name]'}",
+        "clientAddress": "${context.buyerAddress || '[Buyer Address]'}",
+        "clientGST": "${context.buyerGSTIN || '[Buyer GSTIN]'}",
         "items": ${context.items ? JSON.stringify(context.items) : `[
           {
             "description": "${context.description || 'Services'}",
-            "hsnSac": "${context.hsnSac || '9983'}",
+            "hsn": "${context.hsn || '998314'}",
             "quantity": "${context.quantity || 1}",
             "rate": "${context.rate || context.amount || 0}",
-            "taxableValue": "${context.amount || 0}",
-            "cgst": "${(context.amount || 0) * 0.09}",
-            "sgst": "${(context.amount || 0) * 0.09}",
-            "total": "${(context.amount || 0) * 1.18}"
+            "amount": "${context.amount || 0}"
           }
         ]`},
-        "grandTotal": "${context.total || (context.amount || 0) * 1.18}"
+        "subtotal": "${context.subtotal || context.amount || 0}",
+        "taxAmount": "${context.taxAmount || (context.amount || 0) * 0.18}",
+        "cgstAmount": "${(context.amount || 0) * 0.09}",
+        "sgstAmount": "${(context.amount || 0) * 0.09}",
+        "totalAmount": "${context.total || (context.amount || 0) * 1.18}"
       }`;
 
     } else if (effectiveType === "compliance_certificate") {

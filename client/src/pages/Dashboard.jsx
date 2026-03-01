@@ -2242,7 +2242,9 @@ HR Department
                         }
                     });
 
-                    return `${basePrompt}${context.length ? ` ${context.join(', ')}` : ''}${specificDetails.length ? `. Additional details: ${specificDetails.join(', ')}` : ''}. Make it professional, comprehensive, and industry-standard.`;
+                    return `${basePrompt}${context.length ? ` ${context.join(', ')}` : ''}${specificDetails.length ? `. Additional details: ${specificDetails.join(', ')}` : ''}. 
+                    IMPORTANT: PRIORITIZE THE FOLLOWING FORM DATA OVER ANY GENERATED CONTENT: ${JSON.stringify(formData)}.
+                    Make it professional, comprehensive, and industry-standard.`;
                 };
 
                 const prompt = createPrompt();
