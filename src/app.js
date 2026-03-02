@@ -63,7 +63,7 @@ if (process.env.NODE_ENV === 'production') {
   app.use(express.static(path.join(__dirname, '../client/dist')));
   
   // All non-API routes serve the frontend
-  app.get('*', (req, res, next) => {
+  app.get(/.*/, (req, res, next) => {
     // Skip API routes
     if (req.path.startsWith('/api') || req.path.startsWith('/uploads')) {
       return next();
