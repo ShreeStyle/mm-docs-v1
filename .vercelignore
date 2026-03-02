@@ -1,0 +1,16 @@
+node_modules
+.env
+.env.local
+*.log
+.DS_Store
+client/node_modules
+uploads/*
+!uploads/.gitkeep
+.vscode
+.idea
+coverage
+*.test.js
+test-*.js
+debug-*.js
+*.md
+!README.md

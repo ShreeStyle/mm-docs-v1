@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { api } from '../utils/api';
+import { getApiUrl } from '../config/api';
 import {
     Search, Home, Inbox, Settings, Layers, Trash2,
     UserPlus, ChevronDown, Plus, Sparkles, Clock,
@@ -62,7 +63,7 @@ export default function Dashboard() {
     const handleDownloadDocument = async (docId, format = 'pdf') => {
         try {
             const token = localStorage.getItem('token');
-            const url = `http://localhost:5000/api/documents/${docId}/${format === 'pdf' ? 'download' : 'download-docx'}`;
+            const url = getApiUrl(`/api/documents/${docId}/${format === 'pdf' ? 'download' : 'download-docx'}`);
 
             const response = await fetch(url, {
                 headers: {
@@ -2420,10 +2421,10 @@ HR Department
                 console.log('Generating document with data:', documentData);
 
                 // Call the document generation endpoint
-                console.log('🔄 Fetching:', 'http://localhost:5000/api/documents/generate');
+                console.log('🔄 Fetching document generation API');
                 console.log('🔑 Token:', token ? 'Present' : 'Missing');
                 
-                const response = await fetch('http://localhost:5000/api/documents/generate', {
+                const response = await fetch(getApiUrl('/api/documents/generate'), {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -2435,7 +2436,7 @@ HR Department
                     })
                 }).catch(error => {
                     console.error('❌ Fetch error:', error);
-                    throw new Error(`Network error: ${error.message}. Make sure backend is running on http://localhost:5000`);
+                    throw new Error(`Network error: ${error.message}. Please check your connection.`);
                 });
 
                 console.log('✅ Response status:', response?.status);

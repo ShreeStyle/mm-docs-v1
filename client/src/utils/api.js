@@ -1,4 +1,7 @@
-const API_BASE_URL = 'http://localhost:5000/api';
+// Determine API base URL based on environment
+const API_BASE_URL = import.meta.env.PROD 
+    ? '/api'  // In production, use relative path (Vercel will handle routing)
+    : 'http://localhost:5000/api';  // In development, use local server
 
 const apiRequest = async (endpoint, options = {}) => {
     const token = localStorage.getItem('token');

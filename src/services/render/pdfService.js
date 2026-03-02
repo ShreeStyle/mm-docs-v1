@@ -1,5 +1,17 @@
-const puppeteer = require("puppeteer");
 const { injectWatermark } = require("../watermark/watermarkService");
+
+// Use puppeteer-core with chrome-aws-lambda for Vercel compatibility
+let puppeteer;
+let chromium;
+
+if (process.env.VERCEL || process.env.NODE_ENV === 'production') {
+    // Use puppeteer-core with chromium for serverless environments
+    puppeteer = require("puppeteer-core");
+    chromium = require("@sparticuz/chromium");
+} else {
+    // Use regular puppeteer for local development
+    puppeteer = require("puppeteer");
+}
 
 exports.generatePDF = async (html, user = null) => {
     let browser;
@@ -12,10 +24,20 @@ exports.generatePDF = async (html, user = null) => {
             console.log(`📄 Watermark ${user.plan === 'free' ? 'added' : 'not needed'} for ${user.email || 'user'}`);
         }
 
-        browser = await puppeteer.launch({
-            headless: true,
-            args: ['--no-sandbox', '--disable-setuid-sandbox']
-        });
+        // Launch browser based on environment
+        if (process.env.VERCEL || process.env.NODE_ENV === 'production') {
+            browser = await puppeteer.launch({
+                args: chromium.args,
+                defaultViewport: chromium.defaultViewport,
+                executablePath: await chromium.executablePath(),
+                headless: chromium.headless,
+            });
+        } else {
+            browser = await puppeteer.launch({
+                headless: true,
+                args: ['--no-sandbox', '--disable-setuid-sandbox']
+            });
+        }
 
         const page = await browser.newPage();
         await page.setContent(html, { waitUntil: 'networkidle0' });

@@ -6,6 +6,7 @@ import {
     Save, RotateCcw, AlertCircle, CheckCircle, Trash2, Eye, ArrowLeft
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { getApiUrl, BASE_URL } from '../config/api';
 import '../styles/BrandSettings.css';
 
 const AVAILABLE_FONTS = [
@@ -56,7 +57,7 @@ export default function BrandSettings() {
 
     const fetchBrandKit = async () => {
         try {
-            const response = await fetch('http://localhost:5000/api/brand-kit', {
+            const response = await fetch(getApiUrl('/api/brand-kit'), {
                 headers: {
                     'Authorization': `Bearer ${token}`,
                     'Content-Type': 'application/json'
@@ -74,9 +75,9 @@ export default function BrandSettings() {
                         address: '',
                         customText: ''
                     }
-                });
+                });  
                 if (data.logo) {
-                    setLogoPreview(`http://localhost:5000${data.logo}`);
+                    setLogoPreview(`${BASE_URL}${data.logo}`);
                 }
             }
         } catch (error) {
@@ -144,7 +145,7 @@ export default function BrandSettings() {
             formData.append('description', brandKit.description);
             formData.append('footer', JSON.stringify(brandKit.footer));
             
-            const response = await fetch('http://localhost:5000/api/brand-kit', {
+            const response = await fetch(getApiUrl('/api/brand-kit'), {
                 method: 'POST',
                 headers: {
                     'Authorization': `Bearer ${token}`
@@ -159,7 +160,7 @@ export default function BrandSettings() {
                     footer: data.footer || brandKit.footer
                 });
                 if (data.logo) {
-                    setLogoPreview(`http://localhost:5000${data.logo}`);
+                    setLogoPreview(`${BASE_URL}${data.logo}`);
                 }
                 setLogoFile(null);
                 setMessage({ type: 'success', text: 'Brand Kit saved successfully!' });
@@ -182,7 +183,7 @@ export default function BrandSettings() {
         
         setSaving(true);
         try {
-            const response = await fetch('http://localhost:5000/api/brand-kit/reset', {
+            const response = await fetch(getApiUrl('/api/brand-kit/reset'), {
                 method: 'POST',
                 headers: {
                     'Authorization': `Bearer ${token}`,
@@ -202,7 +203,7 @@ export default function BrandSettings() {
                         customText: ''
                     }
                 });
-                setLogoPreview(data.logo ? `http://localhost:5000${data.logo}` : '');
+                setLogoPreview(data.logo ? `${BASE_URL}${data.logo}` : '');
                 setLogoFile(null);
                 setMessage({ type: 'success', text: 'Brand Kit reset to default' });
             }
