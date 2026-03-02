@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { 
     Upload, Palette, Type, FileText, Globe, Mail, Phone, MapPin, 
-    Save, RotateCcw, AlertCircle, CheckCircle, Trash2, Eye
+    Save, RotateCcw, AlertCircle, CheckCircle, Trash2, Eye, ArrowLeft
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import '../styles/BrandSettings.css';
@@ -22,6 +23,7 @@ const AVAILABLE_FONTS = [
 
 export default function BrandSettings() {
     const { token } = useAuth();
+    const navigate = useNavigate();
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
     const [message, setMessage] = useState({ type: '', text: '' });
@@ -225,6 +227,37 @@ export default function BrandSettings() {
         <div className="brand-settings-container">
             <div className="brand-settings-header">
                 <div>
+                    <button 
+                        className="btn-back"
+                        onClick={() => navigate('/dashboard')}
+                        style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '8px',
+                            padding: '8px 16px',
+                            marginBottom: '16px',
+                            backgroundColor: 'transparent',
+                            border: '1px solid #E5E7EB',
+                            borderRadius: '8px',
+                            color: '#6B7280',
+                            fontSize: '14px',
+                            cursor: 'pointer',
+                            transition: 'all 0.2s ease'
+                        }}
+                        onMouseEnter={(e) => {
+                            e.target.style.backgroundColor = '#F9FAFB';
+                            e.target.style.borderColor = '#D1D5DB';
+                            e.target.style.color = '#374151';
+                        }}
+                        onMouseLeave={(e) => {
+                            e.target.style.backgroundColor = 'transparent';
+                            e.target.style.borderColor = '#E5E7EB';
+                            e.target.style.color = '#6B7280';
+                        }}
+                    >
+                        <ArrowLeft size={18} />
+                        Back to Dashboard
+                    </button>
                     <h1>Brand Settings</h1>
                     <p>Customize your brand identity that will be applied to all your documents</p>
                 </div>

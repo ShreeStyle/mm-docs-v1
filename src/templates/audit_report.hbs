@@ -4,8 +4,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Audit Report</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <title>Comprehensive Audit Report</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         * {
             box-sizing: border-box;
@@ -15,72 +15,72 @@
 
         body {
             font-family: 'Inter', -apple-system, sans-serif;
-            line-height: 1.6;
+            line-height: 1.65;
             color: #1f2937;
-            max-width: 800px;
+            max-width: 850px;
             margin: 0 auto;
-            padding: 48px 40px;
+            padding: 50px 45px;
             background: white;
             font-size: 14px;
         }
 
         .header {
             text-align: center;
-            padding-bottom: 28px;
-            margin-bottom: 36px;
-            border-bottom: 1px solid #e5e7eb;
+            padding-bottom: 30px;
+            margin-bottom: 40px;
+            border-bottom: 3px solid #111827;
         }
 
         .company-name {
-            font-size: 14px;
+            font-size: 13px;
             font-weight: 600;
             color: #6b7280;
             text-transform: uppercase;
-            letter-spacing: 0.06em;
-            margin-bottom: 8px;
+            letter-spacing: 0.08em;
+            margin-bottom: 6px;
         }
 
         .doc-title {
-            font-size: 32px;
+            font-size: 38px;
             font-weight: 800;
             color: #111827;
-            letter-spacing: -0.01em;
-            margin-bottom: 4px;
+            letter-spacing: -0.02em;
+            margin: 12px 0;
         }
 
-        .doc-subtitle {
-            font-size: 14px;
-            color: #6b7280;
-        }
-
-        .doc-subtitle strong {
-            color: #111827;
+        .report-number {
+            font-size: 15px;
+            color: #374151;
+            font-weight: 600;
+            margin: 8px 0;
         }
 
         .confidential-badge {
             display: inline-block;
-            padding: 4px 14px;
-            border-radius: 9999px;
+            padding: 6px 18px;
+            border-radius: 20px;
             font-size: 11px;
-            font-weight: 600;
+            font-weight: 700;
             text-transform: uppercase;
-            letter-spacing: 0.05em;
-            background: #fef2f2;
-            color: #dc2626;
-            margin-top: 10px;
+            letter-spacing: 0.06em;
+            background: #dc2626;
+            color: white;
+            margin-top: 12px;
         }
 
         .meta-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 24px;
-            margin-bottom: 28px;
+            gap: 20px;
+            margin-bottom: 32px;
+            background: #f9fafb;
+            padding: 24px;
+            border-radius: 12px;
+            border: 1px solid #e5e7eb;
         }
 
-        .meta-card {
-            background: #f9fafb;
-            border-radius: 8px;
-            padding: 16px;
+        .meta-item {
+            padding: 12px;
         }
 
         .meta-label {
@@ -88,422 +88,800 @@
             text-transform: uppercase;
             letter-spacing: 0.06em;
             color: #6b7280;
-            font-weight: 600;
-            margin-bottom: 10px;
+            font-weight: 700;
+            margin-bottom: 6px;
         }
 
-        .meta-name {
+        .meta-value {
             font-size: 15px;
             font-weight: 600;
             color: #111827;
-            margin-bottom: 4px;
-        }
-
-        .meta-detail {
-            font-size: 12px;
-            color: #4b5563;
             line-height: 1.5;
         }
 
-        .info-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr 1fr;
-            gap: 12px;
-            margin-bottom: 28px;
-        }
-
-        .info-item {
-            background: #f9fafb;
-            border-radius: 6px;
-            padding: 10px 14px;
-        }
-
-        .info-item .label {
-            font-size: 10px;
-            text-transform: uppercase;
-            letter-spacing: 0.06em;
-            color: #6b7280;
-            font-weight: 600;
-        }
-
-        .info-item .value {
-            font-size: 14px;
-            font-weight: 600;
-            color: #111827;
-            margin-top: 2px;
+        .meta-sub {
+            font-size: 13px;
+            color: #4b5563;
+            margin-top: 4px;
+            font-weight: 400;
         }
 
         .section {
-            margin: 28px 0;
+            margin: 35px 0;
+            page-break-inside: avoid;
         }
 
         .section-title {
-            font-size: 16px;
+            font-size: 20px;
             font-weight: 700;
             color: #111827;
-            margin-bottom: 12px;
-            padding-bottom: 8px;
+            margin-bottom: 16px;
+            padding-bottom: 10px;
             border-bottom: 2px solid #e5e7eb;
+            text-transform: uppercase;
+            letter-spacing: 0.02em;
+        }
+
+        .subsection-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #111827;
+            margin: 20px 0 12px 0;
         }
 
         .content {
             font-size: 14px;
+        .content {
+            font-size: 14px;
             color: #374151;
-            line-height: 1.7;
+            line-height: 1.8;
         }
 
         .content p {
-            margin-bottom: 14px;
+            margin-bottom: 16px;
+            text-align: justify;
         }
 
-        .finding-card {
-            background: #f9fafb;
-            border-radius: 8px;
-            padding: 20px;
+        .key-findings-list {
+            padding-left: 0;
+            list-style: none;
             margin: 16px 0;
-            border-left: 4px solid #6b7280;
         }
 
-        .finding-card.critical {
-            border-left-color: #dc2626;
-            background: #fef2f2;
-        }
-
-        .finding-card.high {
-            border-left-color: #f97316;
-            background: #fff7ed;
-        }
-
-        .finding-card.medium {
-            border-left-color: #eab308;
-            background: #fefce8;
-        }
-
-        .finding-card.low {
-            border-left-color: #22c55e;
-            background: #f0fdf4;
-        }
-
-        .finding-severity {
-            font-size: 11px;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.04em;
-            margin-bottom: 6px;
-        }
-
-        .finding-card.critical .finding-severity {
-            color: #dc2626;
-        }
-
-        .finding-card.high .finding-severity {
-            color: #f97316;
-        }
-
-        .finding-card.medium .finding-severity {
-            color: #eab308;
-        }
-
-        .finding-card.low .finding-severity {
-            color: #22c55e;
-        }
-
-        .finding-title {
+        .key-findings-list li {
+            padding: 12px 18px;
+            margin-bottom: 10px;
+            background: #ecfdf5;
+            border-left: 4px solid #10b981;
+            border-radius: 6px;
             font-size: 14px;
-            font-weight: 600;
-            color: #111827;
-            margin-bottom: 6px;
+            color: #065f46;
+            font-weight: 500;
         }
 
-        .finding-desc {
-            font-size: 13px;
-            color: #4b5563;
-            line-height: 1.6;
-        }
-
-        .summary-grid {
+        .financial-grid {
             display: grid;
-            grid-template-columns: 1fr 1fr 1fr 1fr;
-            gap: 12px;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
             margin: 20px 0;
         }
 
-        .summary-item {
+        .financial-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+            border-radius: 12px;
+            color: white;
             text-align: center;
-            padding: 16px;
-            border-radius: 8px;
         }
 
-        .summary-item.critical {
-            background: #fef2f2;
+        .financial-card.revenue {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
         }
 
-        .summary-item.high {
-            background: #fff7ed;
+        .financial-card.expense {
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
         }
 
-        .summary-item.medium {
-            background: #fefce8;
+        .financial-card.profit {
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
         }
 
-        .summary-item.low {
-            background: #f0fdf4;
+        .financial-card.assets {
+            background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
         }
 
-        .summary-count {
-            font-size: 28px;
-            font-weight: 800;
+        .financial-card.liabilities {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
         }
 
-        .summary-item.critical .summary-count {
-            color: #dc2626;
+        .financial-card.equity {
+            background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
         }
 
-        .summary-item.high .summary-count {
-            color: #f97316;
-        }
-
-        .summary-item.medium .summary-count {
-            color: #eab308;
-        }
-
-        .summary-item.low .summary-count {
-            color: #22c55e;
-        }
-
-        .summary-label {
+        .financial-label {
             font-size: 11px;
             text-transform: uppercase;
-            letter-spacing: 0.04em;
-            color: #6b7280;
-            font-weight: 600;
-            margin-top: 4px;
-        }
-
-        .recommendation-list {
-            padding-left: 0;
-            list-style: none;
-        }
-
-        .recommendation-list li {
-            padding: 12px 16px;
+            letter-spacing: 0.05em;
+            opacity: 0.9;
             margin-bottom: 8px;
-            background: #f9fafb;
+            font-weight: 600;
+        }
+
+        .financial-value {
+            font-size: 24px;
+            font-weight: 800;
+            margin-bottom: 4px;
+        }
+
+        .financial-note {
+            font-size: 12px;
+            opacity: 0.85;
+            margin-top: 8px;
+        }
+
+        .finding-card {
+            background: white;
+            border: 2px solid #e5e7eb;
+            border-radius: 12px;
+            padding: 24px;
+            margin: 20px 0;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+
+        .finding-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 16px;
+            gap: 16px;
+        }
+
+        .finding-category {
+            font-size: 17px;
+            font-weight: 700;
+            color: #111827;
+            flex: 1;
+        }
+
+        .finding-status {
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            white-space: nowrap;
+        }
+
+        .finding-status.satisfactory {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .finding-status.compliant {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        .finding-status.adequate {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .finding-status.attention {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .finding-risk {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            margin-left: 8px;
+        }
+
+        .finding-risk.low {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .finding-risk.medium {
+            background: #fed7aa;
+            color: #92400e;
+        }
+
+        .finding-risk.high {
+            background: #fecaca;
+            color: #991b1b;
+        }
+
+        .finding-section {
+            margin: 14px 0;
+        }
+
+        .finding-label {
+            font-size: 12px;
+            font-weight: 700;
+            color: #6b7280;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 6px;
+        }
+
+        .finding-text {
+            font-size: 14px;
+            color: #374151;
+            line-height: 1.7;
+            text-align: justify;
+        }
+
+        .finding-text.recommendation {
+            color: #1e40af;
+            font-weight: 500;
+            background: #eff6ff;
+            padding: 12px 16px;
             border-radius: 8px;
+            border-left: 3px solid #3b82f6;
+        }
+
+        .finding-text.management-response {
+            color: #065f46;
+            font-weight: 500;
+            background: #ecfdf5;
+            padding: 12px 16px;
+            border-radius: 8px;
+            border-left: 3px solid #10b981;
+        }
+
+        .control-assessment {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 20px;
+            margin: 16px 0;
+        }
+
+        .control-item {
+            display: grid;
+            grid-template-columns: 200px 1fr;
+            gap: 16px;
+            padding: 12px 0;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .control-item:last-child {
+            border-bottom: none;
+        }
+
+        .control-name {
+            font-size: 13px;
+            font-weight: 700;
+            color: #1e293b;
+        }
+
+        .control-rating {
+            font-size: 13px;
+            color: #475569;
+            font-weight: 500;
+        }
+
+        .compliance-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin: 20px 0;
+        }
+
+        .compliance-card {
+            background: white;
+            border: 2px solid #e5e7eb;
+            border-radius: 10px;
+            padding: 18px;
+        }
+
+        .compliance-title {
+            font-size: 14px;
+            font-weight: 700;
+            color: #111827;
+            margin-bottom: 8px;
+        }
+
+        .compliance-status {
             font-size: 13px;
             color: #374151;
             line-height: 1.6;
-            display: flex;
-            align-items: flex-start;
-            gap: 12px;
         }
 
-        .recommendation-list li::before {
-            content: "→";
-            font-weight: 700;
-            color: #2563eb;
-            flex-shrink: 0;
-            margin-top: 1px;
-        }
-
-        .opinion-box {
-            background: #111827;
+        .recommendation-card {
+            background: white;
+            border: 2px solid #e5e7eb;
             border-radius: 12px;
-            padding: 24px;
-            margin: 24px 0;
-            color: white;
+            padding: 22px;
+            margin: 16px 0;
+            position: relative;
+            overflow: hidden;
         }
 
-        .opinion-label {
-            font-size: 12px;
-            text-transform: uppercase;
-            letter-spacing: 0.06em;
-            color: #9ca3af;
-            margin-bottom: 8px;
+        .recommendation-card::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 6px;
         }
 
-        .opinion-text {
-            font-size: 16px;
-            font-weight: 600;
-            line-height: 1.6;
+        .recommendation-card.priority-high::before {
+            background: #dc2626;
         }
 
-        .signature-section {
-            margin-top: 40px;
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 32px;
+        .recommendation-card.priority-medium::before {
+            background: #f59e0b;
         }
 
-        .sig-card {
-            background: #f9fafb;
-            border-radius: 8px;
-            padding: 20px;
+        .recommendation-card.priority-low::before {
+            background: #10b981;
         }
 
-        .sig-title {
-            font-size: 12px;
-            font-weight: 600;
-            color: #6b7280;
+        .recommendation-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
             margin-bottom: 12px;
+        }
+
+        .priority-badge {
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 10px;
+            font-weight: 700;
             text-transform: uppercase;
             letter-spacing: 0.04em;
         }
 
-        .sig-field {
-            margin-bottom: 12px;
+        .priority-badge.high {
+            background: #fee2e2;
+            color: #991b1b;
         }
 
-        .sig-field-label {
+        .priority-badge.medium {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .priority-badge.low {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .recommendation-title {
+            font-size: 15px;
+            font-weight: 700;
+            color: #111827;
+            margin-bottom: 12px;
+            line-height: 1.5;
+        }
+
+        .recommendation-details {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin-top: 14px;
             font-size: 12px;
+        }
+
+        .detail-item {
+            background: #f9fafb;
+            padding: 10px 12px;
+            border-radius: 6px;
+        }
+
+        .detail-label {
+            font-weight: 600;
             color: #6b7280;
             margin-bottom: 4px;
         }
 
-        .sig-field-line {
-            border-bottom: 1px solid #d1d5db;
-            height: 20px;
+        .detail-value {
+            color: #111827;
+            font-weight: 500;
+        }
+
+        .conclusion-box {
+            background: #f8fafc;
+            border: 2px solid #cbd5e1;
+            border-radius: 12px;
+            padding: 28px;
+            margin: 28px 0;
+        }
+
+        .conclusion-text {
+            font-size: 14px;
+            color: #334155;
+            line-height: 1.9;
+            text-align: justify;
+        }
+
+        .signature-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+            margin-top: 40px;
+            padding-top: 30px;
+            border-top: 2px solid #e5e7eb;
+        }
+
+        .sig-card {
+            background: #fafafa;
+            border: 1px solid #e5e7eb;
+            border-radius: 10px;
+            padding: 22px;
+        }
+
+        .sig-title {
+            font-size: 12px;
+            font-weight: 700;
+            color: #6b7280;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 16px;
+        }
+
+        .sig-info {
+            margin: 12px 0;
+            font-size: 13px;
+            color: #374151;
+        }
+
+        .sig-label {
+            font-weight: 600;
+            color: #6b7280;
+        }
+
+        .sig-line {
+            border-bottom: 1px solid #9ca3af;
+            height: 30px;
+            margin: 16px 0;
+        }
+
+        .appendices-section {
+            background: #fffbeb;
+            border: 2px solid #fbbf24;
+            border-radius: 10px;
+            padding: 20px 24px;
+            margin: 28px 0;
+        }
+
+        .appendices-title {
+            font-size: 15px;
+            font-weight: 700;
+            color: #92400e;
+            margin-bottom: 12px;
+        }
+
+        .appendices-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .appendices-list li {
+            padding: 8px 0;
+            color: #78350f;
+            font-size: 13px;
+            font-weight: 500;
+            border-bottom: 1px solid #fde68a;
+        }
+
+        .appendices-list li:last-child {
+            border-bottom: none;
+        }
+
+        .disclaimer {
+            background: #fef2f2;
+            border: 1px solid #fecaca;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 28px 0;
+        }
+
+        .disclaimer-title {
+            font-size: 13px;
+            font-weight: 700;
+            color: #991b1b;
+            text-transform: uppercase;
+            margin-bottom: 10px;
+        }
+
+        .disclaimer-text {
+            font-size: 12px;
+            color: #7f1d1d;
+            line-height: 1.7;
         }
 
         .footer {
-            margin-top: 40px;
+            margin-top: 50px;
             text-align: center;
-            padding-top: 20px;
-            border-top: 1px solid #e5e7eb;
+            padding-top: 25px;
+            border-top: 2px solid #e5e7eb;
             color: #9ca3af;
             font-size: 11px;
+        }
+
+        @media print {
+            body {
+                padding: 30px;
+            }
+
+            .finding-card,
+            .recommendation-card,
+            .section {
+                page-break-inside: avoid;
+            }
         }
     </style>
 </head>
 
 <body>
     <div class="header">
-        <div class="company-name">{{companyName}}</div>
-        <div class="doc-title">Audit Report</div>
-        <div class="doc-subtitle"><strong>Audit Period:</strong> {{auditStartDate}} to {{auditEndDate}}</div>
+        <div class="company-name">{{auditorName}}</div>
+        <div class="doc-title">{{title}}</div>
+        <div class="report-number">Report No: {{reportNumber}}</div>
+        <div class="report-number">{{auditDate}}</div>
         <div class="confidential-badge">Confidential</div>
     </div>
 
-    <div class="info-grid">
-        <div class="info-item">
-            <div class="label">Report No.</div>
-            <div class="value">{{#if reportNumber}}{{reportNumber}}{{else}}AUD-2024-001{{/if}}</div>
-        </div>
-        <div class="info-item">
-            <div class="label">Audit Type</div>
-            <div class="value">{{#if auditType}}{{auditType}}{{else}}Internal{{/if}}</div>
-        </div>
-        <div class="info-item">
-            <div class="label">Date of Report</div>
-            <div class="value">{{reportDate}}</div>
-        </div>
-    </div>
-
     <div class="meta-grid">
-        <div class="meta-card">
-            <div class="meta-label">Entity Audited</div>
-            <div class="meta-name">{{#if auditedEntity}}{{auditedEntity}}{{else}}{{companyName}}{{/if}}</div>
-            <div class="meta-detail">{{#if auditedDepartment}}Department: {{auditedDepartment}}{{/if}}</div>
+        <div class="meta-item">
+            <div class="meta-label">Subject Organization</div>
+            <div class="meta-value">{{companyName}}</div>
+            <div class="meta-sub">{{companyAddress}}</div>
         </div>
-        <div class="meta-card">
+        <div class="meta-item">
+            <div class="meta-label">Audit Period</div>
+            <div class="meta-value">{{auditPeriod}}</div>
+            <div class="meta-sub">Fiscal Year: {{fiscalYear}}</div>
+        </div>
+        <div class="meta-item">
+            <div class="meta-label">Audit Type</div>
+            <div class="meta-value">{{auditType}}</div>
+        </div>
+        <div class="meta-item">
             <div class="meta-label">Auditor</div>
-            <div class="meta-name">{{auditorName}}</div>
-            <div class="meta-detail">{{#if auditorDesignation}}{{auditorDesignation}}{{/if}}{{#if
-                auditorFirm}}<br>{{auditorFirm}}{{/if}}</div>
+            <div class="meta-value">{{auditorName}}</div>
+            <div class="meta-sub">{{auditorAddress}}</div>
         </div>
     </div>
 
+    <!-- Executive Summary Section -->
     <div class="section">
         <div class="section-title">Executive Summary</div>
         <div class="content">
-            <p>{{{executiveSummary}}}</p>
+            <div class="subsection-title">Introduction</div>
+            <p>{{executiveSummary.introduction}}</p>
+            
+            <div class="subsection-title">Scope of Audit</div>
+            <p>{{executiveSummary.scope}}</p>
+            
+            <div class="subsection-title">Auditor's Opinion</div>
+            <p><strong>{{executiveSummary.opinion}}</strong></p>
+            
+            <div class="subsection-title">Key Findings</div>
+            <ul class="key-findings-list">
+                {{#each executiveSummary.keyFindings}}
+                <li>{{this}}</li>
+                {{/each}}
+            </ul>
         </div>
     </div>
 
+    <!-- Financial Overview Section -->
     <div class="section">
-        <div class="section-title">Scope of Audit</div>
+        <div class="section-title">Financial Overview</div>
+        <div class="financial-grid">
+            <div class="financial-card revenue">
+                <div class="financial-label">Total Revenue</div>
+                <div class="financial-value">{{financialOverview.totalRevenue}}</div>
+            </div>
+            <div class="financial-card expense">
+                <div class="financial-label">Total Expenses</div>
+                <div class="financial-value">{{financialOverview.totalExpenses}}</div>
+            </div>
+            <div class="financial-card profit">
+                <div class="financial-label">Net Profit</div>
+                <div class="financial-value">{{financialOverview.netProfit}}</div>
+            </div>
+            <div class="financial-card assets">
+                <div class="financial-label">Total Assets</div>
+                <div class="financial-value">{{financialOverview.totalAssets}}</div>
+            </div>
+            <div class="financial-card liabilities">
+                <div class="financial-label">Total Liabilities</div>
+                <div class="financial-value">{{financialOverview.totalLiabilities}}</div>
+            </div>
+            <div class="financial-card equity">
+                <div class="financial-label">Shareholders' Equity</div>
+                <div class="financial-value">{{financialOverview.shareholdersEquity}}</div>
+            </div>
+        </div>
         <div class="content">
-            <p>{{{auditScope}}}</p>
+            <p><strong>Cash Flow:</strong> {{financialOverview.cashFlow}}</p>
+            <p><strong>Profit Margin:</strong> {{financialOverview.profitMargin}}</p>
+            <p>{{financialOverview.commentary}}</p>
         </div>
     </div>
 
+    <!-- Audit Findings Section -->
     <div class="section">
-        <div class="section-title">Findings Summary</div>
-        <div class="summary-grid">
-            <div class="summary-item critical">
-                <div class="summary-count">{{#if criticalCount}}{{criticalCount}}{{else}}0{{/if}}</div>
-                <div class="summary-label">Critical</div>
+        <div class="section-title">Detailed Audit Findings</div>
+        {{#each auditFindings}}
+        <div class="finding-card">
+            <div class="finding-header">
+                <div class="finding-category">
+                    {{category}}
+                    <span class="finding-risk {{riskLevel}}">{{riskLevel}} risk</span>
+                </div>
+                <div class="finding-status {{status}}">{{status}}</div>
             </div>
-            <div class="summary-item high">
-                <div class="summary-count">{{#if highCount}}{{highCount}}{{else}}0{{/if}}</div>
-                <div class="summary-label">High</div>
+            <div class="finding-section">
+                <div class="finding-label">Observation</div>
+                <div class="finding-text">{{observation}}</div>
             </div>
-            <div class="summary-item medium">
-                <div class="summary-count">{{#if mediumCount}}{{mediumCount}}{{else}}0{{/if}}</div>
-                <div class="summary-label">Medium</div>
+            <div class="finding-section">
+                <div class="finding-label">Recommendation</div>
+                <div class="finding-text recommendation">{{recommendation}}</div>
             </div>
-            <div class="summary-item low">
-                <div class="summary-count">{{#if lowCount}}{{lowCount}}{{else}}0{{/if}}</div>
-                <div class="summary-label">Low</div>
+            <div class="finding-section">
+                <div class="finding-label">Management Response</div>
+                <div class="finding-text management-response">{{managementResponse}}</div>
+            </div>
+        </div>
+        {{/each}}
+    </div>
+
+    <!-- Internal Control Assessment -->
+    <div class="section">
+        <div class="section-title">Internal Control Assessment</div>
+        <div class="control-assessment">
+            <div class="control-item">
+                <div class="control-name">Control Environment</div>
+                <div class="control-rating">{{internalControlAssessment.controlEnvironment}}</div>
+            </div>
+            <div class="control-item">
+                <div class="control-name">Risk Assessment</div>
+                <div class="control-rating">{{internalControlAssessment.riskAssessment}}</div>
+            </div>
+            <div class="control-item">
+                <div class="control-name">Control Activities</div>
+                <div class="control-rating">{{internalControlAssessment.controlActivities}}</div>
+            </div>
+            <div class="control-item">
+                <div class="control-name">Information & Communication</div>
+                <div class="control-rating">{{internalControlAssessment.informationCommunication}}</div>
+            </div>
+            <div class="control-item">
+                <div class="control-name">Monitoring</div>
+                <div class="control-rating">{{internalControlAssessment.monitoring}}</div>
+            </div>
+            <div class="control-item">
+                <div class="control-name"><strong>Overall Rating</strong></div>
+                <div class="control-rating"><strong>{{internalControlAssessment.overallRating}}</strong></div>
             </div>
         </div>
     </div>
 
+    <!-- Compliance Status -->
     <div class="section">
-        <div class="section-title">Detailed Findings</div>
+        <div class="section-title">Compliance Status</div>
+        <div class="compliance-grid">
+            <div class="compliance-card">
+                <div class="compliance-title">Tax Compliance</div>
+                <div class="compliance-status">{{complianceStatus.taxCompliance}}</div>
+            </div>
+            <div class="compliance-card">
+                <div class="compliance-title">Statutory Compliance</div>
+                <div class="compliance-status">{{complianceStatus.statutoryCompliance}}</div>
+            </div>
+            <div class="compliance-card">
+                <div class="compliance-title">Regulatory Compliance</div>
+                <div class="compliance-status">{{complianceStatus.regulatoryCompliance}}</div>
+            </div>
+            <div class="compliance-card">
+                <div class="compliance-title">Labor Compliance</div>
+                <div class="compliance-status">{{complianceStatus.laborCompliance}}</div>
+            </div>
+        </div>
         <div class="content">
-            <p>{{{detailedFindings}}}</p>
+            <p><strong>Overall Compliance Status:</strong> {{complianceStatus.overallStatus}}</p>
         </div>
     </div>
 
+    <!-- Recommendations & Action Plan -->
     <div class="section">
-        <div class="section-title">Recommendations</div>
-        <div class="content">
-            <p>{{{recommendations}}}</p>
+        <div class="section-title">Recommendations & Action Plan</div>
+        {{#each recommendationsAndActionPlan}}
+        <div class="recommendation-card priority-{{priority}}">
+            <div class="recommendation-header">
+                <span class="priority-badge {{priority}}">{{priority}} Priority</span>
+            </div>
+            <div class="recommendation-title">{{recommendation}}</div>
+            <div class="recommendation-details">
+                <div class="detail-item">
+                    <div class="detail-label">Expected Benefit</div>
+                    <div class="detail-value">{{expectedBenefit}}</div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">Timeline</div>
+                    <div class="detail-value">{{timeline}}</div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">Estimated Investment</div>
+                    <div class="detail-value">{{estimatedInvestment}}</div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">Responsible Party</div>
+                    <div class="detail-value">{{responsibleParty}}</div>
+                </div>
+            </div>
+        </div>
+        {{/each}}
+    </div>
+
+    <!-- Conclusion -->
+    <div class="section">
+        <div class="section-title">Conclusion</div>
+        <div class="conclusion-box">
+            <div class="conclusion-text">{{{conclusion}}}</div>
         </div>
     </div>
 
-    <div class="opinion-box">
-        <div class="opinion-label">Auditor's Opinion</div>
-        <div class="opinion-text">{{#if auditorOpinion}}{{{auditorOpinion}}}{{else}}Based on the audit procedures
-            performed and evidence obtained, we provide a qualified opinion on the effectiveness of internal controls
-            and compliance with applicable policies and regulations during the audit period.{{/if}}</div>
+    <!-- Appendices -->
+    <div class="appendices-section">
+        <div class="appendices-title">📎 Appendices</div>
+        <ul class="appendices-list">
+            {{#each appendices}}
+            <li>{{this}}</li>
+            {{/each}}
+        </ul>
     </div>
 
-    <div class="signature-section">
+    <!-- Disclaimer -->
+    <div class="disclaimer">
+        <div class="disclaimer-title">⚠️ Disclaimer</div>
+        <div class="disclaimer-text">{{disclaimer}}</div>
+    </div>
+
+    <!-- Signature Section -->
+    <div class="signature-grid">
         <div class="sig-card">
             <div class="sig-title">Lead Auditor</div>
-            <div class="sig-field">
-                <div class="sig-field-label">Signature</div>
-                <div class="sig-field-line"></div>
-            </div>
-            <div class="sig-field">
-                <div class="sig-field-label">Name: {{auditorName}}</div>
-            </div>
-            <div class="sig-field">
-                <div class="sig-field-label">Date</div>
-                <div class="sig-field-line"></div>
-            </div>
+            <div class="sig-line"></div>
+            <div class="sig-info"><span class="sig-label">Name:</span> {{auditTeamSignature.leadAuditor}}</div>
+            <div class="sig-info"><span class="sig-label">Credentials:</span> {{auditTeamSignature.credentials}}</div>
+            <div class="sig-info"><span class="sig-label">Firm:</span> {{auditTeamSignature.firmName}}</div>
+            <div class="sig-info"><span class="sig-label">Membership No:</span> {{auditTeamSignature.membershipNumber}}</div>
+            <div class="sig-info"><span class="sig-label">Date:</span> {{auditTeamSignature.date}}</div>
+            <div class="sig-info"><span class="sig-label">Place:</span> {{auditTeamSignature.place}}</div>
         </div>
         <div class="sig-card">
             <div class="sig-title">Management Acknowledgment</div>
-            <div class="sig-field">
-                <div class="sig-field-label">Signature</div>
-                <div class="sig-field-line"></div>
-            </div>
-            <div class="sig-field">
-                <div class="sig-field-label">Name & Title</div>
-                <div class="sig-field-line"></div>
-            </div>
-            <div class="sig-field">
-                <div class="sig-field-label">Date</div>
-                <div class="sig-field-line"></div>
-            </div>
+            <div class="sig-line"></div>
+            <div class="sig-info"><span class="sig-label">Signature:</span> _________________________</div>
+            <div class="sig-line"></div>
+            <div class="sig-info"><span class="sig-label">Name & Title:</span> _________________________</div>
+            <div class="sig-line"></div>
+            <div class="sig-info"><span class="sig-label">Date:</span> _________________________</div>
         </div>
     </div>
 
     <div class="footer">
-        <p>This report is intended solely for the use of {{companyName}} management. {{companyName}} — Compliance</p>
+        {{#if footerText}}
+        <p>{{footerText}}</p>
+        {{else}}
+        <p>Generated with MM Docs AI • Professional Workspace</p>
+        {{/if}}
     </div>
 </body>
 

@@ -41,8 +41,14 @@ export default function Dashboard() {
         employeeName: '', position: '', department: '', startDate: '', salary: '', reportingTo: '',
         partyName: '', agreementType: '', effectiveDate: '', terms: '',
         clientName: '', amount: '', dueDate: '', items: '',
-        period: '', companyName: '', details: ''
+        period: '', companyName: '', details: '',
+        companyEmail: '', companyPhone: '', reportingTime: '', reportingLocation: '',
+        managerEmail: '', managerPhone: '', hrContactPerson: '', hrEmail: '', hrPhone: '',
+        dresscode: '', workingHours: ''
     });
+
+    // Validation state
+    const [validationErrors, setValidationErrors] = useState([]);
 
     const [isPro, setIsPro] = useState(user?.plan === 'pro');
 
@@ -600,15 +606,19 @@ export default function Dashboard() {
                         }}>Your latest document generation activity</p>
                     </div>
 
-                    <div style={{ padding: '0' }}>
+                    <div style={{ 
+                        padding: '0',
+                        maxHeight: '500px',
+                        overflowY: 'auto'
+                    }}>
                         {docs.length > 0 ? (
-                            docs.slice(0, 5).map((doc, index) => (
+                            docs.map((doc, index) => (
                                 <div
                                     key={doc._id || index}
                                     onClick={() => handleViewDocument(doc)}
                                     style={{
                                         padding: '16px 24px',
-                                        borderBottom: index < 4 ? '1px solid #F3F4F6' : 'none',
+                                        borderBottom: index < docs.length - 1 ? '1px solid #F3F4F6' : 'none',
                                         display: 'flex',
                                         alignItems: 'center',
                                         justifyContent: 'space-between',
@@ -815,7 +825,7 @@ export default function Dashboard() {
                                     key={category.id}
                                     onClick={() => {
                                         setSelectedCategory(category.id);
-                                        setCurrentView('templates');
+                                        setCurrentView(category.id);
                                     }}
                                     style={{
                                         backgroundColor: 'white',
@@ -902,7 +912,7 @@ export default function Dashboard() {
                                         onClick={() => {
                                             setSelectedCategory(suggestion.category);
                                             setSelectedDocType(suggestion.type);
-                                            setCurrentView('templates');
+                                            setCurrentView(suggestion.category);
                                         }}
                                         style={{
                                             backgroundColor: 'white',
@@ -1717,6 +1727,38 @@ export default function Dashboard() {
                     { id: 'relievingDate', label: 'Relieving Date', type: 'date', required: true },
                     { id: 'workDescription', label: 'Work Description', type: 'textarea', placeholder: 'Brief description of work and achievements', required: true }
                 ],
+                onboarding_letter: [
+                    ...commonFields,
+                    { id: 'companyEmail', label: 'Company Email', type: 'email', placeholder: 'e.g. hr@company.com', required: true },
+                    { id: 'companyPhone', label: 'Company Phone', type: 'tel', placeholder: 'e.g. +91-80-1234-5678', required: true },
+                    { id: 'employeeName', label: 'Employee Full Name', type: 'text', placeholder: 'e.g. Neha Patel', required: true },
+                    { id: 'position', label: 'Designation/Position', type: 'text', placeholder: 'e.g. Quality Assurance Manager', required: true },
+                    { id: 'department', label: 'Department', type: 'text', placeholder: 'e.g. Quality Control & Regulatory Affairs', required: true },
+                    { id: 'startDate', label: 'Joining Date', type: 'date', required: true },
+                    { id: 'reportingTime', label: 'Reporting Time', type: 'time', placeholder: 'e.g. 09:30', required: true },
+                    { id: 'reportingLocation', label: 'Reporting Location', type: 'text', placeholder: 'e.g. 7th Floor Reception, Main Building', required: true },
+                    { id: 'reportingTo', label: 'Reporting Manager Name', type: 'text', placeholder: 'e.g. Dr. Amit Desai', required: true },
+                    { id: 'managerEmail', label: 'Manager Email', type: 'email', placeholder: 'e.g. amit.desai@company.com', required: true },
+                    { id: 'managerPhone', label: 'Manager Phone', type: 'tel', placeholder: 'e.g. +91-80-1234-5679', required: true },
+                    { id: 'hrContactPerson', label: 'HR Contact Person Name', type: 'text', placeholder: 'e.g. Priya Sharma', required: true },
+                    { id: 'hrEmail', label: 'HR Email', type: 'email', placeholder: 'e.g. priya.sharma@company.com', required: true },
+                    { id: 'hrPhone', label: 'HR Phone', type: 'tel', placeholder: 'e.g. +91-80-1234-5680', required: true },
+                    { id: 'dresscode', label: 'Dress Code', type: 'select', options: ['Business Formal', 'Business Casual', 'Smart Casual', 'Casual'], required: true },
+                    { id: 'workingHours', label: 'Working Hours', type: 'text', placeholder: 'e.g. Monday to Saturday, 9:30 AM - 6:30 PM', required: true }
+                ],
+                warning_letter: [
+                    ...commonFields,
+                    { id: 'employeeName', label: 'Employee Name', type: 'text', placeholder: 'e.g. Rajesh Kumar', required: true },
+                    { id: 'employeeId', label: 'Employee ID', type: 'text', placeholder: 'e.g. EMP-2024-123', required: true },
+                    { id: 'position', label: 'Position', type: 'text', placeholder: 'e.g. Senior Developer', required: true },
+                    { id: 'department', label: 'Department', type: 'text', placeholder: 'e.g. Engineering', required: true },
+                    { id: 'warningType', label: 'Warning Type', type: 'select', options: ['First Warning', 'Second Warning', 'Final Warning'], required: true },
+                    { id: 'warningSubject', label: 'Warning Subject', type: 'text', placeholder: 'e.g. Attendance Issue / Performance Issue', required: true },
+                    { id: 'incidentDate', label: 'Incident Date', type: 'date', required: true },
+                    { id: 'issueDescription', label: 'Issue Description', type: 'textarea', placeholder: 'Detailed description of the issue or violation', required: true },
+                    { id: 'expectedImprovement', label: 'Expected Improvement', type: 'textarea', placeholder: 'What needs to improve and by when', required: true },
+                    { id: 'reviewPeriod', label: 'Review Period', type: 'text', placeholder: 'e.g. 30 days / 90 days', required: true }
+                ],
 
                 // Legal Documents
                 nda: [
@@ -1726,6 +1768,34 @@ export default function Dashboard() {
                     { id: 'effectiveDate', label: 'Effective Date', type: 'date', required: true },
                     { id: 'duration', label: 'Duration (Years)', type: 'number', placeholder: 'e.g. 2', required: true },
                     { id: 'purpose', label: 'Purpose/Project', type: 'textarea', placeholder: 'Brief description of the purpose or project', required: true }
+                ],
+                service_agreement: [
+                    ...commonFields,
+                    { id: 'clientName', label: 'Client Name', type: 'text', placeholder: 'e.g. XYZ Corporation', required: true },
+                    { id: 'clientAddress', label: 'Client Address', type: 'textarea', placeholder: 'Complete client address', required: true },
+                    { id: 'serviceType', label: 'Service Type', type: 'text', placeholder: 'e.g. Software Development / Consulting', required: true },
+                    { id: 'serviceDescription', label: 'Service Description', type: 'textarea', placeholder: 'Detailed description of services to be provided', required: true },
+                    { id: 'contractValue', label: 'Contract Value (₹)', type: 'number', placeholder: 'e.g. 500000', required: true },
+                    { id: 'startDate', label: 'Start Date', type: 'date', required: true },
+                    { id: 'endDate', label: 'End Date', type: 'date', required: true },
+                    { id: 'paymentTerms', label: 'Payment Terms', type: 'textarea', placeholder: 'e.g. 50% advance, 50% on completion', required: true }
+                ],
+                terms_of_service: [
+                    ...commonFields,
+                    { id: 'serviceName', label: 'Service/Product Name', type: 'text', placeholder: 'e.g. MyApp Platform', required: true },
+                    { id: 'effectiveDate', label: 'Effective Date', type: 'date', required: true },
+                    { id: 'serviceDescription', label: 'Service Description', type: 'textarea', placeholder: 'Brief description of the service or product', required: true },
+                    { id: 'userObligations', label: 'User Obligations', type: 'textarea', placeholder: 'Key obligations and responsibilities of users', required: true },
+                    { id: 'restrictions', label: 'Restrictions', type: 'textarea', placeholder: 'Prohibited activities and restrictions', required: true }
+                ],
+                privacy_policy: [
+                    ...commonFields,
+                    { id: 'serviceName', label: 'Service/Product Name', type: 'text', placeholder: 'e.g. MyApp Platform', required: true },
+                    { id: 'effectiveDate', label: 'Effective Date', type: 'date', required: true },
+                    { id: 'dataCollected', label: 'Data Collected', type: 'textarea', placeholder: 'Types of data collected from users', required: true },
+                    { id: 'dataUsage', label: 'Data Usage', type: 'textarea', placeholder: 'How user data will be used', required: true },
+                    { id: 'dataSecurity', label: 'Security Measures', type: 'textarea', placeholder: 'Security measures to protect user data', required: true },
+                    { id: 'contactEmail', label: 'Privacy Contact Email', type: 'email', placeholder: 'e.g. privacy@company.com', required: true }
                 ],
                 mou: [
                     ...commonFields,
@@ -1745,6 +1815,26 @@ export default function Dashboard() {
                     { id: 'projectValue', label: 'Project Value (₹)', type: 'number', placeholder: 'e.g. 5000000', required: true },
                     { id: 'timeline', label: 'Project Timeline', type: 'text', placeholder: 'e.g. 6 months', required: true },
                     { id: 'projectDescription', label: 'Project Description', type: 'textarea', placeholder: 'Detailed project scope and deliverables', required: true }
+                ],
+                sales_contract: [
+                    ...commonFields,
+                    { id: 'buyerName', label: 'Buyer Name', type: 'text', placeholder: 'e.g. ABC Corporation', required: true },
+                    { id: 'buyerAddress', label: 'Buyer Address', type: 'textarea', placeholder: 'Complete buyer address', required: true },
+                    { id: 'productDescription', label: 'Product/Service Description', type: 'textarea', placeholder: 'Detailed description of goods or services', required: true },
+                    { id: 'quantity', label: 'Quantity', type: 'text', placeholder: 'e.g. 100 units', required: true },
+                    { id: 'totalAmount', label: 'Total Contract Value (₹)', type: 'number', placeholder: 'e.g. 2500000', required: true },
+                    { id: 'deliveryDate', label: 'Delivery Date', type: 'date', required: true },
+                    { id: 'paymentTerms', label: 'Payment Terms', type: 'textarea', placeholder: 'e.g. 30% advance, 70% on delivery', required: true }
+                ],
+                partnership_agreement: [
+                    ...commonFields,
+                    { id: 'partnerName', label: 'Partner Name', type: 'text', placeholder: 'e.g. John Doe / XYZ Corp', required: true },
+                    { id: 'partnerAddress', label: 'Partner Address', type: 'textarea', placeholder: 'Complete partner address', required: true },
+                    { id: 'businessName', label: 'Partnership Business Name', type: 'text', placeholder: 'e.g. ABC & XYZ Partners', required: true },
+                    { id: 'businessType', label: 'Business Type', type: 'text', placeholder: 'e.g. Consulting Services', required: true },
+                    { id: 'capitalContribution', label: 'Capital Contribution (₹)', type: 'number', placeholder: 'e.g. 1000000', required: true },
+                    { id: 'profitSharingRatio', label: 'Profit Sharing Ratio', type: 'text', placeholder: 'e.g. 50:50 or 60:40', required: true },
+                    { id: 'effectiveDate', label: 'Effective Date', type: 'date', required: true }
                 ],
                 quotation: [
                     ...commonFields,
@@ -1767,6 +1857,36 @@ export default function Dashboard() {
                     { id: 'totalAmount', label: 'Total Amount (₹)', type: 'number', placeholder: 'e.g. 118000', required: true },
                     { id: 'serviceDescription', label: 'Service/Product Description', type: 'textarea', placeholder: 'Detailed description of services or products', required: true }
                 ],
+                purchase_order: [
+                    ...commonFields,
+                    { id: 'vendorName', label: 'Vendor Name', type: 'text', placeholder: 'e.g. ABC Suppliers Pvt. Ltd.', required: true },
+                    { id: 'vendorAddress', label: 'Vendor Address', type: 'textarea', placeholder: 'Complete vendor address', required: true },
+                    { id: 'poNumber', label: 'Purchase Order Number', type: 'text', placeholder: 'e.g. PO-2026-001', required: true },
+                    { id: 'poDate', label: 'PO Date', type: 'date', required: true },
+                    { id: 'deliveryDate', label: 'Expected Delivery Date', type: 'date', required: true },
+                    { id: 'itemDescription', label: 'Items Description', type: 'textarea', placeholder: 'Detailed description of items to be purchased', required: true },
+                    { id: 'totalAmount', label: 'Total Amount (₹)', type: 'number', placeholder: 'e.g. 500000', required: true }
+                ],
+                receipt: [
+                    ...commonFields,
+                    { id: 'customerName', label: 'Customer Name', type: 'text', placeholder: 'e.g. Rajesh Kumar', required: true },
+                    { id: 'receiptNumber', label: 'Receipt Number', type: 'text', placeholder: 'e.g. REC-2026-001', required: true },
+                    { id: 'receiptDate', label: 'Receipt Date', type: 'date', required: true },
+                    { id: 'paymentMethod', label: 'Payment Method', type: 'select', options: ['Cash', 'Credit Card', 'Debit Card', 'UPI', 'Bank Transfer', 'Cheque'], required: true },
+                    { id: 'amount', label: 'Amount Received (₹)', type: 'number', placeholder: 'e.g. 50000', required: true },
+                    { id: 'paymentFor', label: 'Payment For', type: 'text', placeholder: 'e.g. Invoice INV-2026-001', required: true },
+                    { id: 'description', label: 'Description', type: 'textarea', placeholder: 'Brief description of the payment', required: true }
+                ],
+                credit_note: [
+                    ...commonFields,
+                    { id: 'clientName', label: 'Client Name', type: 'text', placeholder: 'e.g. XYZ Corporation', required: true },
+                    { id: 'clientAddress', label: 'Client Address', type: 'textarea', placeholder: 'Complete client address', required: true },
+                    { id: 'creditNoteNumber', label: 'Credit Note Number', type: 'text', placeholder: 'e.g. CN-2026-001', required: true },
+                    { id: 'creditNoteDate', label: 'Credit Note Date', type: 'date', required: true },
+                    { id: 'invoiceNumber', label: 'Original Invoice Number', type: 'text', placeholder: 'e.g. INV-2025-999', required: true },
+                    { id: 'creditAmount', label: 'Credit Amount (₹)', type: 'number', placeholder: 'e.g. 10000', required: true },
+                    { id: 'reason', label: 'Reason for Credit', type: 'textarea', placeholder: 'e.g. Product return / Overcharge / Discount', required: true }
+                ],
                 gst_invoice: [
                     ...commonFields,
                     { id: 'gstNumber', label: 'Company GST Number', type: 'text', placeholder: 'e.g. 29ABCDE1234F1Z5', required: true },
@@ -1780,6 +1900,16 @@ export default function Dashboard() {
                 ],
 
                 // Compliance Documents
+                gst_filing_summary: [
+                    ...commonFields,
+                    { id: 'gstNumber', label: 'GST Number', type: 'text', placeholder: 'e.g. 29ABCDE1234F1Z5', required: true },
+                    { id: 'filingPeriod', label: 'Filing Period', type: 'text', placeholder: 'e.g. January 2026 / Q4 FY2025-26', required: true },
+                    { id: 'returnType', label: 'Return Type', type: 'select', options: ['GSTR-1', 'GSTR-3B', 'GSTR-4', 'GSTR-9'], required: true },
+                    { id: 'totalSales', label: 'Total Sales (₹)', type: 'number', placeholder: 'e.g. 5000000', required: true },
+                    { id: 'totalPurchases', label: 'Total Purchases (₹)', type: 'number', placeholder: 'e.g. 3000000', required: true },
+                    { id: 'outputTax', label: 'Output GST (₹)', type: 'number', placeholder: 'e.g. 900000', required: true },
+                    { id: 'inputTax', label: 'Input GST (₹)', type: 'number', placeholder: 'e.g. 540000', required: true }
+                ],
                 audit_report: [
                     ...commonFields,
                     { id: 'auditPeriod', label: 'Audit Period', type: 'text', placeholder: 'e.g. FY 2025-26', required: true },
@@ -1787,6 +1917,25 @@ export default function Dashboard() {
                     { id: 'auditorName', label: 'Auditor Name', type: 'text', placeholder: 'e.g. CA Rajesh Kumar', required: true },
                     { id: 'auditDate', label: 'Audit Date', type: 'date', required: true },
                     { id: 'findings', label: 'Key Findings', type: 'textarea', placeholder: 'Summary of audit findings and observations', required: true }
+                ],
+                policy_document: [
+                    ...commonFields,
+                    { id: 'policyTitle', label: 'Policy Title', type: 'text', placeholder: 'e.g. Work From Home Policy', required: true },
+                    { id: 'policyNumber', label: 'Policy Number', type: 'text', placeholder: 'e.g. POL-HR-2026-001', required: true },
+                    { id: 'effectiveDate', label: 'Effective Date', type: 'date', required: true },
+                    { id: 'department', label: 'Applicable Department', type: 'text', placeholder: 'e.g. All Departments / HR / Finance', required: true },
+                    { id: 'policyObjective', label: 'Policy Objective', type: 'textarea', placeholder: 'Main objectives and purpose of this policy', required: true },
+                    { id: 'policyScope', label: 'Policy Scope', type: 'textarea', placeholder: 'Who this policy applies to and its coverage', required: true },
+                    { id: 'policyGuidelines', label: 'Key Guidelines', type: 'textarea', placeholder: 'Main guidelines and procedures', required: true }
+                ],
+                regulatory_filing: [
+                    ...commonFields,
+                    { id: 'filingType', label: 'Filing Type', type: 'text', placeholder: 'e.g. ROC Filing / Tax Filing / Compliance Report', required: true },
+                    { id: 'filingNumber', label: 'Filing Reference Number', type: 'text', placeholder: 'e.g. ROC-2026-12345', required: true },
+                    { id: 'regulatoryBody', label: 'Regulatory Body', type: 'text', placeholder: 'e.g. Ministry of Corporate Affairs / Income Tax Dept', required: true },
+                    { id: 'filingDate', label: 'Filing Date', type: 'date', required: true },
+                    { id: 'filingPeriod', label: 'Filing Period', type: 'text', placeholder: 'e.g. FY 2025-26 / January 2026', required: true },
+                    { id: 'filingDetails', label: 'Filing Details', type: 'textarea', placeholder: 'Summary of filing details and compliance information', required: true }
                 ]
             };
 
@@ -1798,6 +1947,11 @@ export default function Dashboard() {
                 ...prev,
                 [fieldId]: value
             }));
+            
+            // Clear validation errors when user starts filling the form
+            if (validationErrors.length > 0) {
+                setValidationErrors([]);
+            }
         };
 
         const generatePreviewContent = () => {
@@ -2156,19 +2310,30 @@ EMPLOYEE ONBOARDING WELCOME LETTER
 
 Date: ${currentDate}
 
-Dear ${formData.employeeName || '[Employee Name]'},
+${formData.companyName}
+${formData.companyAddress || ''}
+Email: ${formData.companyEmail || ''}
+Phone: ${formData.companyPhone || ''}
 
-Welcome to ${formData.companyName || '[Company Name]'}! We are delighted to have you join our ${formData.department || '[Department]'} team as ${formData.position || '[Position]'}.
+Dear ${formData.employeeName},
+
+Welcome to ${formData.companyName}! We are delighted to have you join our ${formData.department} team as ${formData.position}.
 
 FIRST DAY INSTRUCTIONS:
-• Report Date: ${formData.startDate || '[Start Date]'} at 9:00 AM
-• Report to: Main Reception
-• Bring: Original documents for verification
+• Report Date: ${formData.startDate} at ${formData.reportingTime || '9:00 AM'}
+• Report to: ${formData.reportingLocation}
+• Reporting Manager: ${formData.reportingTo}
+• Dress Code: ${formData.dresscode}
+• Working Hours: ${formData.workingHours}
 
-ONBOARDING SCHEDULE:
-Day 1: Documentation, IT setup, workplace tour, team introductions
-Week 1: Department orientation, role-specific training
-Month 1: Performance review and goal setting
+CONTACT INFORMATION:
+Reporting Manager: ${formData.reportingTo}
+• Email: ${formData.managerEmail}
+• Phone: ${formData.managerPhone}
+
+HR Contact: ${formData.hrContactPerson}
+• Email: ${formData.hrEmail}
+• Phone: ${formData.hrPhone}
 
 REQUIRED DOCUMENTS:
 • Government-issued photo ID
@@ -2177,19 +2342,10 @@ REQUIRED DOCUMENTS:
 • Previous employment letters
 • Passport-size photographs (2 copies)
 
-BENEFITS OVERVIEW:
-• Health insurance coverage
-• Paid time off and sick leave
-• Professional development opportunities
-• Employee assistance programs
-
-CONTACT INFORMATION:
-HR: hr@${(formData.companyName || 'company').toLowerCase().replace(/\s+/g, '')}.com
-IT Support: it@${(formData.companyName || 'company').toLowerCase().replace(/\s+/g, '')}.com
-
 We look forward to a successful journey together. Welcome aboard!
 
-${formData.companyName || '[Company Name]'}
+Best regards,
+${formData.companyName}
 HR Department
                     `
                 }
@@ -2203,13 +2359,17 @@ HR Department
 
         const handleGenerate = async () => {
             setIsGenerating(true);
+            setValidationErrors([]); // Clear previous errors
+            
             try {
                 // Validate required fields
                 const requiredFields = formFields.filter(field => field.required);
-                const missingFields = requiredFields.filter(field => !formData[field.id]);
+                const missingFields = requiredFields.filter(field => !formData[field.id] || formData[field.id].toString().trim() === '');
 
                 if (missingFields.length > 0) {
-                    alert(`Please fill in all required fields: ${missingFields.map(f => f.label).join(', ')}`);
+                    const errorMessages = missingFields.map(f => f.label);
+                    setValidationErrors(errorMessages);
+                    alert(`❌ Please fill in all required fields:\n\n${errorMessages.join('\n')}\n\nDocument generation is blocked until all required information is provided.`);
                     setIsGenerating(false);
                     return;
                 }
@@ -2260,6 +2420,9 @@ HR Department
                 console.log('Generating document with data:', documentData);
 
                 // Call the document generation endpoint
+                console.log('🔄 Fetching:', 'http://localhost:5000/api/documents/generate');
+                console.log('🔑 Token:', token ? 'Present' : 'Missing');
+                
                 const response = await fetch('http://localhost:5000/api/documents/generate', {
                     method: 'POST',
                     headers: {
@@ -2270,10 +2433,15 @@ HR Department
                         ...documentData,
                         content: formData
                     })
+                }).catch(error => {
+                    console.error('❌ Fetch error:', error);
+                    throw new Error(`Network error: ${error.message}. Make sure backend is running on http://localhost:5000`);
                 });
 
+                console.log('✅ Response status:', response?.status);
+
                 if (!response.ok) {
-                    const errorData = await response.json();
+                    const errorData = await response.json().catch(() => ({ message: 'Unknown error' }));
                     throw new Error(errorData.message || 'Failed to generate document');
                 }
 
@@ -2363,13 +2531,38 @@ HR Department
                         </h3>
 
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-                            {formFields.map((field) => (
+                            {validationErrors.length > 0 && (
+                                <div style={{
+                                    padding: '12px 16px',
+                                    backgroundColor: '#FEE2E2',
+                                    border: '1px solid #FCA5A5',
+                                    borderRadius: '8px',
+                                    color: '#991B1B',
+                                    fontSize: '14px'
+                                }}>
+                                    <strong>⚠️ Missing Required Fields:</strong>
+                                    <ul style={{ marginTop: '8px', marginBottom: '0', paddingLeft: '20px' }}>
+                                        {validationErrors.map((error, idx) => (
+                                            <li key={idx}>{error}</li>
+                                        ))}
+                                    </ul>
+                                    <p style={{ marginTop: '8px', marginBottom: '0', fontSize: '13px' }}>
+                                        All fields must be completed before generating the document.
+                                    </p>
+                                </div>
+                            )}
+                            
+                            {formFields.map((field) => {
+                                const hasError = field.required && validationErrors.includes(field.label);
+                                const borderColor = hasError ? '#EF4444' : '#D1D5DB';
+                                
+                                return (
                                 <div key={field.id}>
                                     <label style={{
                                         display: 'block',
                                         fontSize: '14px',
                                         fontWeight: '600',
-                                        color: '#374151',
+                                        color: hasError ? '#EF4444' : '#374151',
                                         marginBottom: '6px'
                                     }}>
                                         {field.label} {field.required && <span style={{ color: '#EF4444' }}>*</span>}
@@ -2383,16 +2576,17 @@ HR Department
                                             style={{
                                                 width: '100%',
                                                 padding: '12px',
-                                                border: '1px solid #D1D5DB',
+                                                border: `2px solid ${borderColor}`,
                                                 borderRadius: '8px',
                                                 fontSize: '14px',
                                                 fontFamily: 'Inter, sans-serif',
                                                 resize: 'vertical',
                                                 outline: 'none',
-                                                transition: 'border-color 0.2s ease'
+                                                transition: 'border-color 0.2s ease',
+                                                backgroundColor: hasError ? '#FEF2F2' : 'white'
                                             }}
-                                            onFocus={(e) => e.target.style.borderColor = '#F97316'}
-                                            onBlur={(e) => e.target.style.borderColor = '#D1D5DB'}
+                                            onFocus={(e) => e.target.style.borderColor = hasError ? '#EF4444' : '#F97316'}
+                                            onBlur={(e) => e.target.style.borderColor = borderColor}
                                         />
                                     ) : field.type === 'select' ? (
                                         <select
@@ -2401,15 +2595,16 @@ HR Department
                                             style={{
                                                 width: '100%',
                                                 padding: '12px',
-                                                border: '1px solid #D1D5DB',
+                                                border: `2px solid ${borderColor}`,
                                                 borderRadius: '8px',
                                                 fontSize: '14px',
                                                 fontFamily: 'Inter, sans-serif',
                                                 outline: 'none',
-                                                transition: 'border-color 0.2s ease'
+                                                transition: 'border-color 0.2s ease',
+                                                backgroundColor: hasError ? '#FEF2F2' : 'white'
                                             }}
-                                            onFocus={(e) => e.target.style.borderColor = '#F97316'}
-                                            onBlur={(e) => e.target.style.borderColor = '#D1D5DB'}
+                                            onFocus={(e) => e.target.style.borderColor = hasError ? '#EF4444' : '#F97316'}
+                                            onBlur={(e) => e.target.style.borderColor = borderColor}
                                         >
                                             <option value="">Select {field.label}</option>
                                             {field.options?.map(option => (
@@ -2425,19 +2620,20 @@ HR Department
                                             style={{
                                                 width: '100%',
                                                 padding: '12px',
-                                                border: '1px solid #D1D5DB',
+                                                border: `2px solid ${borderColor}`,
                                                 borderRadius: '8px',
                                                 fontSize: '14px',
                                                 fontFamily: 'Inter, sans-serif',
                                                 outline: 'none',
-                                                transition: 'border-color 0.2s ease'
+                                                transition: 'border-color 0.2s ease',
+                                                backgroundColor: hasError ? '#FEF2F2' : 'white'
                                             }}
-                                            onFocus={(e) => e.target.style.borderColor = '#F97316'}
-                                            onBlur={(e) => e.target.style.borderColor = '#D1D5DB'}
+                                            onFocus={(e) => e.target.style.borderColor = hasError ? '#EF4444' : '#F97316'}
+                                            onBlur={(e) => e.target.style.borderColor = borderColor}
                                         />
                                     )}
                                 </div>
-                            ))}
+                            )})}
                         </div>
 
                         {/* Generate Button */}
@@ -2969,6 +3165,12 @@ HR Department
         const [selectedTemplate, setSelectedTemplate] = useState(null);
         const [previewMode, setPreviewMode] = useState(false);
 
+        // Debug logging for preview mode
+        useEffect(() => {
+            console.log('📊 PreviewMode changed:', previewMode);
+            console.log('📋 SelectedTemplate:', selectedTemplate?.name || 'null');
+        }, [previewMode, selectedTemplate]);
+
         const templateCategories = {
             all: 'All Templates',
             hr: 'HR Documents',
@@ -3044,6 +3246,33 @@ HR Department
                     preview: 'Comprehensive service terms and conditions',
                     fields: ['clientName', 'serviceType', 'duration', 'terms'],
                     color: '#7C3AED'
+                },
+                {
+                    id: 'terms_of_service',
+                    name: 'Terms of Service',
+                    description: 'User terms and conditions for services',
+                    icon: '📜',
+                    preview: 'Legal terms governing service usage',
+                    fields: ['serviceName', 'effectiveDate', 'userObligations', 'restrictions'],
+                    color: '#0891B2'
+                },
+                {
+                    id: 'privacy_policy',
+                    name: 'Privacy Policy',
+                    description: 'Data privacy and protection policy',
+                    icon: '🛡️',
+                    preview: 'Comprehensive privacy and data protection document',
+                    fields: ['serviceName', 'dataCollected', 'dataUsage', 'dataSecurity'],
+                    color: '#6366F1'
+                },
+                {
+                    id: 'mou',
+                    name: 'Memorandum of Understanding',
+                    description: 'Formal agreement between parties',
+                    icon: '🤝',
+                    preview: 'MOU outlining mutual understanding and cooperation',
+                    fields: ['partyName', 'purpose', 'duration', 'effectiveDate'],
+                    color: '#8B5CF6'
                 }
             ],
             sales: [
@@ -3055,6 +3284,24 @@ HR Department
                     preview: 'Comprehensive business proposal with pricing',
                     fields: ['clientName', 'projectTitle', 'projectValue', 'timeline'],
                     color: '#DC2626'
+                },
+                {
+                    id: 'sales_contract',
+                    name: 'Sales Contract',
+                    description: 'Formal sales agreement contract',
+                    icon: '🤝',
+                    preview: 'Binding sales contract with terms and conditions',
+                    fields: ['buyerName', 'productDescription', 'quantity', 'totalAmount'],
+                    color: '#DB2777'
+                },
+                {
+                    id: 'partnership_agreement',
+                    name: 'Partnership Agreement',
+                    description: 'Business partnership contract',
+                    icon: '👥',
+                    preview: 'Legal partnership agreement with profit sharing',
+                    fields: ['partnerName', 'businessName', 'capitalContribution', 'profitSharingRatio'],
+                    color: '#9333EA'
                 },
                 {
                     id: 'quotation',
@@ -3084,6 +3331,33 @@ HR Department
                     preview: 'Tax compliant invoice with GST breakdown',
                     fields: ['clientName', 'gstNumber', 'baseAmount', 'invoiceDate'],
                     color: '#7C2D12'
+                },
+                {
+                    id: 'purchase_order',
+                    name: 'Purchase Order',
+                    description: 'Official purchase order for vendors',
+                    icon: '📦',
+                    preview: 'Formal purchase order with item details',
+                    fields: ['vendorName', 'poNumber', 'itemDescription', 'totalAmount'],
+                    color: '#0D9488'
+                },
+                {
+                    id: 'receipt',
+                    name: 'Receipt',
+                    description: 'Payment receipt acknowledgment',
+                    icon: '🧾',
+                    preview: 'Official payment receipt confirmation',
+                    fields: ['customerName', 'receiptNumber', 'amount', 'paymentMethod'],
+                    color: '#65A30D'
+                },
+                {
+                    id: 'credit_note',
+                    name: 'Credit Note',
+                    description: 'Credit note for returns or adjustments',
+                    icon: '📝',
+                    preview: 'Credit memo for invoice adjustments',
+                    fields: ['clientName', 'creditNoteNumber', 'creditAmount', 'reason'],
+                    color: '#CA8A04'
                 }
             ],
             compliance: [
@@ -3095,18 +3369,45 @@ HR Department
                     preview: 'Comprehensive audit findings and recommendations',
                     fields: ['auditPeriod', 'auditType', 'auditorName', 'findings'],
                     color: '#BE185D'
+                },
+                {
+                    id: 'gst_filing_summary',
+                    name: 'GST Filing Summary',
+                    description: 'GST return filing summary report',
+                    icon: '📑',
+                    preview: 'Detailed GST filing summary with tax calculations',
+                    fields: ['gstNumber', 'filingPeriod', 'returnType', 'totalSales'],
+                    color: '#C026D3'
+                },
+                {
+                    id: 'policy_document',
+                    name: 'Policy Document',
+                    description: 'Company policy and guidelines document',
+                    icon: '📋',
+                    preview: 'Official organizational policy document',
+                    fields: ['policyTitle', 'policyNumber', 'effectiveDate', 'policyObjective'],
+                    color: '#7C3AED'
+                },
+                {
+                    id: 'regulatory_filing',
+                    name: 'Regulatory Filing',
+                    description: 'Government and regulatory compliance filing',
+                    icon: '🏛️',
+                    preview: 'Official regulatory submission document',
+                    fields: ['filingType', 'filingNumber', 'regulatoryBody', 'filingDate'],
+                    color: '#4F46E5'
                 }
             ]
         };
 
         const getAllTemplates = () => {
-            if (selectedCategory === 'all') {
-                return Object.values(templates).flat();
-            }
-            return templates[selectedCategory] || [];
+            // Always return all templates - no category filtering
+            return Object.values(templates).flat();
         };
 
         const handleTemplateSelect = (template) => {
+            console.log('🔴 REDIRECTING TO EDITOR:', template.name);
+            console.trace('Called from:');
             // Find the category for this template
             const templateCategory = Object.keys(templates).find(cat =>
                 templates[cat].some(t => t.id === template.id)
@@ -3115,12 +3416,16 @@ HR Department
             // Set the states in the main Dashboard component
             setSelectedCategory(templateCategory);
             setSelectedDocType(template.id);
-            setCurrentView('create');
+            // Go directly to document generation page with form
+            setCurrentView('generate-document');
         };
 
         const handlePreviewTemplate = (template) => {
+            console.log('🟢 OPENING PREVIEW MODAL:', template.name);
+            console.log('Current previewMode:', previewMode);
             setSelectedTemplate(template);
             setPreviewMode(true);
+            console.log('PreviewMode set to true');
         };
 
         const closePreview = () => {
@@ -3130,44 +3435,225 @@ HR Department
 
         // Preview Modal Component
         const PreviewModal = ({ template, onClose }) => {
+            console.log('🎭 PreviewModal rendering with template:', template?.name || 'null');
             if (!template) return null;
 
-            const sampleData = {
+            // Sample data for template preview (realistic examples)
+            const placeholderData = {
                 offer_letter: {
-                    candidateName: 'John Doe',
+                    candidateName: 'Sarah Johnson',
                     position: 'Senior Software Engineer',
-                    salary: '1800000',
-                    startDate: '2024-04-01',
+                    salary: '$120,000 per annum',
+                    startDate: 'April 15, 2026',
                     department: 'Engineering',
-                    companyName: 'Tech Solutions Pvt Ltd',
-                    companyAddress: '123 Tech Park, Bangalore - 560001'
+                    companyName: 'Tech Innovations Inc.',
+                    companyAddress: '123 Silicon Valley Blvd, San Francisco, CA 94105'
                 },
                 appointment_letter: {
-                    employeeName: 'Jane Smith',
-                    position: 'Marketing Manager',
-                    department: 'Marketing',
-                    appointmentDate: '2024-04-01',
-                    companyName: 'Business Corp Ltd',
-                    companyAddress: '456 Business Center, Mumbai - 400001'
+                    employeeName: 'Michael Chen',
+                    position: 'Project Manager',
+                    department: 'Operations',
+                    appointmentDate: 'March 10, 2026',
+                    companyName: 'Global Solutions Ltd.',
+                    companyAddress: '456 Business Park, New York, NY 10001'
                 },
                 experience_certificate: {
-                    employeeName: 'Robert Johnson',
-                    position: 'Project Manager',
-                    joiningDate: '2022-01-15',
-                    relievingDate: '2024-03-31',
-                    companyName: 'Innovation Labs',
-                    companyAddress: '789 Innovation Hub, Hyderabad - 500001'
+                    employeeName: 'Priya Sharma',
+                    position: 'Marketing Specialist',
+                    joiningDate: 'January 15, 2023',
+                    relievingDate: 'February 28, 2026',
+                    companyName: 'Digital Marketing Hub',
+                    companyAddress: '789 Corporate Ave, Austin, TX 78701'
                 },
                 warning_letter: {
-                    employeeName: 'Alex Wilson',
-                    violationType: 'Attendance Issues',
-                    incidentDescription: 'Repeated tardiness and unauthorized absences',
-                    companyName: 'Professional Services Ltd',
-                    companyAddress: '321 Corporate Plaza, Chennai - 600001'
+                    employeeName: 'James Wilson',
+                    violationType: 'Repeated Tardiness',
+                    incidentDescription: 'This letter is to formally address concerns regarding your repeated late arrivals to work over the past three weeks.',
+                    companyName: 'Professional Services Corp.',
+                    companyAddress: '321 Executive Plaza, Boston, MA 02101'
+                },
+                onboarding_letter: {
+                    employeeName: 'Emily Martinez',
+                    position: 'Data Analyst',
+                    startDate: 'April 1, 2026',
+                    orientation: 'Your orientation will take place on April 1st at 9:00 AM in Conference Room A. You will meet with HR, IT, and your team lead.',
+                    companyName: 'Analytics Pro Inc.',
+                    companyAddress: '555 Data Drive, Seattle, WA 98101'
+                },
+                nda: {
+                    partyName: 'Acme Technologies LLC',
+                    effectiveDate: 'March 1, 2026',
+                    duration: '3 years',
+                    purpose: 'Protection of confidential business information and trade secrets related to software development projects',
+                    companyName: 'SecureCode Solutions',
+                    companyAddress: '888 Privacy Lane, Denver, CO 80202'
+                },
+                terms_of_service: {
+                    serviceName: 'CloudSync Platform',
+                    effectiveDate: 'January 1, 2026',
+                    serviceDescription: 'Cloud-based file synchronization and collaboration platform for teams',
+                    userObligations: 'Users must maintain account security, use service lawfully, and respect intellectual property rights',
+                    restrictions: 'No unauthorized access, no malicious uploads, no redistribution of licensed content',
+                    companyName: 'CloudSync Inc.',
+                    companyAddress: '777 Cloud Street, Portland, OR 97201'
+                },
+                privacy_policy: {
+                    serviceName: 'DataGuard App',
+                    effectiveDate: 'February 1, 2026',
+                    dataCollected: 'Name, email address, usage data, device information, cookies',
+                    dataUsage: 'Service improvement, personalization, analytics, customer support',
+                    dataSecurity: 'AES-256 encryption, secure servers, regular security audits, GDPR compliance',
+                    contactEmail: 'privacy@dataguard.com',
+                    companyName: 'DataGuard Technologies',
+                    companyAddress: '999 Security Blvd, Chicago, IL 60601'
+                },
+                mou: {
+                    partyName: 'Innovation Labs Ltd.',
+                    partyAddress: '234 Research Park, Cambridge, MA 02139',
+                    effectiveDate: 'March 15, 2026',
+                    purpose: 'Collaborative research and development in artificial intelligence applications',
+                    duration: '2 years with option to extend',
+                    companyName: 'Future Tech Corp.',
+                    companyAddress: '456 Innovation Way, Palo Alto, CA 94301'
+                },
+                service_agreement: {
+                    clientName: 'Retail Solutions Inc.',
+                    serviceType: 'IT Infrastructure Management and Support',
+                    duration: '12 months',
+                    terms: 'Monthly retainer of $5,000, 24/7 support, 4-hour response time, quarterly reviews',
+                    companyName: 'TechSupport Pro',
+                    companyAddress: '678 Service Road, Dallas, TX 75201'
+                },
+                business_proposal: {
+                    clientName: 'Metro City Council',
+                    projectTitle: 'Smart City Infrastructure Deployment',
+                    projectValue: '$2.5 Million',
+                    timeline: '18 months from project initiation',
+                    companyName: 'Urban Tech Solutions',
+                    companyAddress: '890 City Center, Los Angeles, CA 90012'
+                },
+                sales_contract: {
+                    buyerName: 'Greenfield Manufacturing Co.',
+                    buyerAddress: '432 Industrial Park, Detroit, MI 48201',
+                    productDescription: '500 Units of Premium Steel Components (Model XB-2000)',
+                    quantity: '500 units',
+                    totalAmount: '$85,000',
+                    deliveryDate: 'May 30, 2026',
+                    paymentTerms: '50% advance, 50% upon delivery',
+                    companyName: 'Superior Components Inc.',
+                    companyAddress: '111 Manufacturing Ave, Pittsburgh, PA 15201'
+                },
+                partnership_agreement: {
+                    partnerName: 'Jennifer Thompson',
+                    partnerAddress: '789 Business Square, Miami, FL 33101',
+                    businessName: 'Coastal Ventures LLC',
+                    businessType: 'Real Estate Development',
+                    capitalContribution: 'Partner A: $200,000, Partner B: $200,000',
+                    profitSharingRatio: '50:50',
+                    effectiveDate: 'April 1, 2026',
+                    companyName: 'Coastal Ventures LLC',
+                    companyAddress: '789 Business Square, Miami, FL 33101'
+                },
+                quotation: {
+                    clientName: 'Bright Future Enterprises',
+                    quotationNumber: 'QT-2026-0145',
+                    totalAmount: '$15,750',
+                    validUntil: 'April 15, 2026',
+                    companyName: 'Professional Services Ltd.',
+                    companyAddress: '222 Commerce Street, Phoenix, AZ 85001'
+                },
+                invoice: {
+                    clientName: 'Sunshine Retail Corp.',
+                    invoiceNumber: 'INV-2026-0892',
+                    totalAmount: '$8,500',
+                    dueDate: 'April 5, 2026',
+                    companyName: 'Quality Supplies Inc.',
+                    companyAddress: '333 Trade Center, Atlanta, GA 30301'
+                },
+                purchase_order: {
+                    vendorName: 'Office Essentials Suppliers',
+                    vendorAddress: '444 Warehouse Drive, Houston, TX 77001',
+                    poNumber: 'PO-2026-3421',
+                    poDate: 'March 10, 2026',
+                    deliveryDate: 'March 25, 2026',
+                    itemDescription: 'Office furniture - 20 ergonomic chairs, 10 standing desks',
+                    totalAmount: '$12,400',
+                    companyName: 'Growing Business Inc.',
+                    companyAddress: '555 Corporate Plaza, Philadelphia, PA 19101'
+                },
+                receipt: {
+                    customerName: 'David Anderson',
+                    receiptNumber: 'RCP-2026-5678',
+                    receiptDate: 'March 5, 2026',
+                    paymentMethod: 'Credit Card (Visa ending 4532)',
+                    amount: '$2,350',
+                    paymentFor: 'Professional consulting services - February 2026',
+                    description: 'Strategic business consulting and market analysis',
+                    companyName: 'Consulting Experts LLC',
+                    companyAddress: '666 Advisor Lane, San Diego, CA 92101'
+                },
+                credit_note: {
+                    clientName: 'Premier Products Ltd.',
+                    clientAddress: '777 Customer Road, Nashville, TN 37201',
+                    creditNoteNumber: 'CN-2026-0234',
+                    creditNoteDate: 'March 8, 2026',
+                    invoiceNumber: 'INV-2026-0756',
+                    creditAmount: '$1,200',
+                    reason: 'Product return - 3 defective units (Model Z-100)',
+                    companyName: 'Quality Manufacturing Co.',
+                    companyAddress: '888 Factory Lane, Cleveland, OH 44101'
+                },
+                gst_invoice: {
+                    clientName: 'Global Traders Pvt. Ltd.',
+                    gstNumber: '29ABCDE1234F1Z5',
+                    baseAmount: '₹50,000',
+                    invoiceDate: 'March 12, 2026',
+                    companyName: 'Tech Solutions India',
+                    companyAddress: 'Plot 45, Sector 18, Gurgaon, Haryana 122001, India'
+                },
+                audit_report: {
+                    auditPeriod: 'January 1 - December 31, 2025',
+                    auditType: 'Internal Financial Audit',
+                    auditorName: 'Anderson & Associates CPAs',
+                    findings: 'Overall financial controls are adequate with minor recommendations for improvement in inventory management',
+                    companyName: 'Reliable Business Solutions',
+                    companyAddress: '999 Audit Plaza, Minneapolis, MN 55401'
+                },
+                gst_filing_summary: {
+                    gstNumber: '27AAAAA0000A1Z5',
+                    filingPeriod: 'February 2026',
+                    returnType: 'GSTR-3B',
+                    totalSales: '₹15,50,000',
+                    totalPurchases: '₹8,75,000',
+                    outputTax: '₹2,79,000',
+                    inputTax: '₹1,57,500',
+                    companyName: 'Indian Enterprises Pvt. Ltd.',
+                    companyAddress: 'Block B, Tech Park, Bangalore, Karnataka 560001, India'
+                },
+                policy_document: {
+                    policyTitle: 'Remote Work Policy',
+                    policyNumber: 'HR-POL-2026-08',
+                    effectiveDate: 'April 1, 2026',
+                    department: 'Human Resources',
+                    policyObjective: 'Establish guidelines for remote work arrangements and maintain productivity standards',
+                    policyScope: 'All full-time employees eligible for remote work',
+                    policyGuidelines: 'Maintain regular hours, secure internet connection required, daily check-ins with supervisor',
+                    companyName: 'Modern Workplace Inc.',
+                    companyAddress: '147 Progressive Ave, San Francisco, CA 94102'
+                },
+                regulatory_filing: {
+                    filingType: 'Annual Compliance Report',
+                    filingNumber: 'ACR-2026-8765',
+                    regulatoryBody: 'Securities and Exchange Commission',
+                    filingDate: 'March 15, 2026',
+                    filingPeriod: 'Fiscal Year 2025',
+                    filingDetails: 'Annual financial statements, management discussion, governance disclosure',
+                    companyName: 'Public Corporation Ltd.',
+                    companyAddress: '258 Wall Street, New York, NY 10005'
                 }
             };
 
-            const data = sampleData[template.id] || {};
+            const data = placeholderData[template.id] || {};
 
             return (
                 <div style={{
@@ -3186,8 +3672,9 @@ HR Department
                         backgroundColor: 'white',
                         borderRadius: '16px',
                         padding: '32px',
-                        maxWidth: '600px',
-                        maxHeight: '80vh',
+                        maxWidth: '900px',
+                        width: '90%',
+                        maxHeight: '90vh',
                         overflow: 'auto',
                         position: 'relative',
                         boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1)'
@@ -3245,7 +3732,7 @@ HR Department
                             </div>
                         </div>
 
-                        {/* Sample Content */}
+                        {/* Template Structure Preview */}
                         <div style={{
                             backgroundColor: '#F9FAFB',
                             border: '1px solid #E5E7EB',
@@ -3257,8 +3744,16 @@ HR Department
                                 fontSize: '14px',
                                 fontWeight: '600',
                                 color: '#374151',
-                                marginBottom: '12px'
-                            }}>Sample Preview:</h4>
+                                marginBottom: '8px'
+                            }}>Template Preview (Sample Data):</h4>
+                            <p style={{
+                                fontSize: '12px',
+                                color: '#6B7280',
+                                marginBottom: '12px',
+                                fontStyle: 'italic'
+                            }}>
+                                Below is a preview with realistic sample data. Click "Use This Template" below to create your own document with your actual data.
+                            </p>
 
                             <div style={{
                                 fontFamily: 'Times New Roman, serif',
@@ -3276,7 +3771,7 @@ HR Department
                                             OFFER LETTER
                                         </div>
                                         <div style={{ marginBottom: '15px' }}>
-                                            <strong>Date:</strong> {new Date().toLocaleDateString()}
+                                            <strong>Date:</strong> March 5, 2026
                                         </div>
                                         <div style={{ marginBottom: '15px' }}>
                                             <strong>To,</strong><br />
@@ -3285,9 +3780,47 @@ HR Department
                                         <div style={{ marginBottom: '15px' }}>
                                             <strong>Subject: Offer of Employment - {data.position}</strong>
                                         </div>
-                                        <div>
-                                            Dear {data.candidateName},<br /><br />
-                                            We are pleased to offer you employment with {data.companyName} for the position of <strong>{data.position}</strong>...
+                                        <div style={{ marginBottom: '15px' }}>
+                                            Dear {data.candidateName},
+                                        </div>
+                                        <div style={{ marginBottom: '15px' }}>
+                                            We are pleased to offer you the position of <strong>{data.position}</strong> with {data.companyName}. We believe your skills and experience will be a valuable asset to our team.
+                                        </div>
+                                        <div style={{ marginBottom: '15px' }}>
+                                            <strong>Position Details:</strong><br />
+                                            • Position: {data.position}<br />
+                                            • Department: {data.department}<br />
+                                            • Reporting To: Head of Engineering<br />
+                                            • Start Date: {data.startDate}<br />
+                                            • Location: San Francisco, CA
+                                        </div>
+                                        <div style={{ marginBottom: '15px' }}>
+                                            <strong>Compensation & Benefits:</strong><br />
+                                            • Annual Salary: {data.salary}<br />
+                                            • Sign-on Bonus: $10,000<br />
+                                            • Stock Options: 5,000 shares (4-year vesting)<br />
+                                            • Health Insurance: Medical, Dental, Vision<br />
+                                            • 401(k) matching up to 6%<br />
+                                            • Paid Time Off: 20 days annually<br />
+                                            • Professional Development Budget: $2,000/year
+                                        </div>
+                                        <div style={{ marginBottom: '15px' }}>
+                                            <strong>Employment Terms:</strong><br />
+                                            This is a full-time position. Your employment will be at-will, meaning either you or the company may terminate the relationship at any time, with or without cause.
+                                        </div>
+                                        <div style={{ marginBottom: '15px' }}>
+                                            Please sign and return this letter by March 12, 2026, to confirm your acceptance. We look forward to welcoming you to our team!
+                                        </div>
+                                        <div style={{ marginTop: '30px' }}>
+                                            Sincerely,<br /><br />
+                                            <strong>John Smith</strong><br />
+                                            Chief Technology Officer<br />
+                                            {data.companyName}
+                                        </div>
+                                        <div style={{ marginTop: '40px', borderTop: '1px solid #000', paddingTop: '20px' }}>
+                                            <strong>Acceptance:</strong><br />
+                                            I, {data.candidateName}, accept the above offer of employment.<br /><br />
+                                            Signature: __________________ Date: __________
                                         </div>
                                     </div>
                                 )}
@@ -3311,9 +3844,48 @@ HR Department
                                         <div style={{ marginBottom: '15px' }}>
                                             <strong>Subject: Appointment as {data.position}</strong>
                                         </div>
-                                        <div>
-                                            Dear {data.employeeName},<br /><br />
-                                            We are pleased to inform you that you have been appointed as <strong>{data.position}</strong> in the <strong>{data.department}</strong> department...
+                                        <div style={{ marginBottom: '15px' }}>
+                                            Dear {data.employeeName},
+                                        </div>
+                                        <div style={{ marginBottom: '15px' }}>
+                                            We are pleased to inform you that you have been appointed as <strong>{data.position}</strong> in the <strong>{data.department}</strong> department of {data.companyName}, effective from {data.appointmentDate}.
+                                        </div>
+                                        <div style={{ marginBottom: '15px' }}>
+                                            <strong>Terms of Appointment:</strong>
+                                        </div>
+                                        <div style={{ marginBottom: '15px', marginLeft: '20px' }}>
+                                            1. <strong>Position:</strong> {data.position}<br />
+                                            2. <strong>Department:</strong> {data.department}<br />
+                                            3. <strong>Work Location:</strong> New York, NY<br />
+                                            4. <strong>Working Hours:</strong> 9:00 AM to 6:00 PM (Mon-Fri)<br />
+                                            5. <strong>Probation Period:</strong> 3 months<br />
+                                            6. <strong>Notice Period:</strong> 30 days
+                                        </div>
+                                        <div style={{ marginBottom: '15px' }}>
+                                            <strong>Roles & Responsibilities:</strong>
+                                        </div>
+                                        <div style={{ marginBottom: '15px', marginLeft: '20px' }}>
+                                            • Managing and coordinating project activities<br />
+                                            • Leading team meetings and planning sessions<br />
+                                            • Ensuring project deliverables meet quality standards<br />
+                                            • Reporting to senior management on project progress<br />
+                                            • Managing stakeholder communications
+                                        </div>
+                                        <div style={{ marginBottom: '15px' }}>
+                                            Your performance will be reviewed periodically, and you will be eligible for performance-based incentives as per company policy.
+                                        </div>
+                                        <div style={{ marginBottom: '15px' }}>
+                                            We are confident that you will be a valuable member of our team and contribute to the company's continued success.
+                                        </div>
+                                        <div style={{ marginTop: '30px' }}>
+                                            Sincerely,<br /><br />
+                                            <strong>HR Department</strong><br />
+                                            {data.companyName}
+                                        </div>
+                                        <div style={{ marginTop: '40px', borderTop: '1px solid #000', paddingTop: '20px' }}>
+                                            <strong>Acknowledgement:</strong><br />
+                                            I, {data.employeeName}, acknowledge receipt of this appointment letter and accept the terms mentioned above.<br /><br />
+                                            Signature: __________________ Date: __________
                                         </div>
                                     </div>
                                 )}
@@ -3328,41 +3900,376 @@ HR Department
                                             EXPERIENCE CERTIFICATE
                                         </div>
                                         <div style={{ marginBottom: '15px' }}>
+                                            <strong>Date:</strong> March 2, 2026
+                                        </div>
+                                        <div style={{ marginBottom: '15px' }}>
                                             <strong>TO WHOM IT MAY CONCERN</strong>
                                         </div>
-                                        <div>
-                                            This is to certify that <strong>{data.employeeName}</strong> was employed with {data.companyName} as <strong>{data.position}</strong> from {data.joiningDate} to {data.relievingDate}...
+                                        <div style={{ marginBottom: '15px' }}>
+                                            This is to certify that <strong>{data.employeeName}</strong> was employed with {data.companyName} as <strong>{data.position}</strong> from <strong>{data.joiningDate}</strong> to <strong>{data.relievingDate}</strong>.
+                                        </div>
+                                        <div style={{ marginBottom: '15px' }}>
+                                            During their tenure with us, {data.employeeName} demonstrated excellent professional skills and dedication to their work. They were responsible for:
+                                        </div>
+                                        <div style={{ marginBottom: '15px', marginLeft: '20px' }}>
+                                            • Developing and executing marketing campaigns<br />
+                                            • Managing social media presence and content strategy<br />
+                                            • Conducting market research and competitor analysis<br />
+                                            • Coordinating with cross-functional teams<br />
+                                            • Contributing to brand development initiatives
+                                        </div>
+                                        <div style={{ marginBottom: '15px' }}>
+                                            {data.employeeName} displayed high levels of professionalism, integrity, and commitment throughout their employment. Their contributions were valuable to our team's success.
+                                        </div>
+                                        <div style={{ marginBottom: '15px' }}>
+                                            We wish them all the best in their future endeavors.
+                                        </div>
+                                        <div style={{ marginTop: '40px' }}>
+                                            <strong>For {data.companyName}</strong><br /><br /><br />
+                                            _______________________<br />
+                                            <strong>Authorized Signatory</strong><br />
+                                            HR Manager<br />
+                                            {data.companyName}
+                                        </div>
+                                        <div style={{ marginTop: '20px', fontSize: '10px', color: '#666' }}>
+                                            <strong>Note:</strong> This certificate is issued upon request and does not constitute a recommendation or endorsement.
                                         </div>
                                     </div>
                                 )}
 
                                 {template.id === 'warning_letter' && (
                                     <div>
-                                        <div style={{ textAlign: 'center', fontSize: '16px', fontWeight: 'bold', marginBottom: '20px', textDecoration: 'underline' }}>
-                                            Warning Letter
+                                        <div style={{ textAlign: 'center', marginBottom: '20px', borderBottom: '2px solid #000', paddingBottom: '10px' }}>
+                                            <div style={{ fontSize: '16px', fontWeight: 'bold' }}>{data.companyName}</div>
+                                            <div style={{ fontSize: '10px' }}>{data.companyAddress}</div>
+                                        </div>
+                                        <div style={{ textAlign: 'center', fontSize: '14px', fontWeight: 'bold', marginBottom: '20px', textDecoration: 'underline', color: '#DC2626' }}>
+                                            WARNING LETTER
+                                        </div>
+                                        <div style={{ marginBottom: '15px' }}>
+                                            <strong>Date:</strong> March 2, 2026
                                         </div>
                                         <div style={{ marginBottom: '15px' }}>
                                             <strong>To,</strong><br />
                                             {data.employeeName}<br />
+                                            Employee ID: EMP-2456<br />
+                                            Operations Department
+                                        </div>
+                                        <div style={{ marginBottom: '15px' }}>
+                                            <strong>Subject: Warning Notice - {data.violationType}</strong>
+                                        </div>
+                                        <div style={{ marginBottom: '15px' }}>
+                                            Dear {data.employeeName},
+                                        </div>
+                                        <div style={{ marginBottom: '15px' }}>
+                                            {data.incidentDescription}
+                                        </div>
+                                        <div style={{ marginBottom: '15px' }}>
+                                            <strong>Incidents Recorded:</strong>
+                                        </div>
+                                        <div style={{ marginBottom: '15px', marginLeft: '20px' }}>
+                                            • February 5, 2026 - Arrived 45 minutes late<br />
+                                            • February 12, 2026 - Arrived 30 minutes late<br />
+                                            • February 19, 2026 - Arrived 50 minutes late<br />
+                                            • February 26, 2026 - Arrived 40 minutes late
+                                        </div>
+                                        <div style={{ marginBottom: '15px' }}>
+                                            This behavior is unacceptable and violates our company's attendance policy. Punctuality is essential for maintaining team productivity and ensuring smooth business operations.
+                                        </div>
+                                        <div style={{ marginBottom: '15px' }}>
+                                            <strong>Expected Improvement:</strong>
+                                        </div>
+                                        <div style={{ marginBottom: '15px', marginLeft: '20px' }}>
+                                            You are expected to:<br />
+                                            • Arrive at work on time (9:00 AM) daily<br />
+                                            • Inform your supervisor in advance if you anticipate being late<br />
+                                            • Demonstrate improved commitment to company policies
+                                        </div>
+                                        <div style={{ marginBottom: '15px', backgroundColor: '#FEF2F2', padding: '10px', border: '1px solid #DC2626' }}>
+                                            <strong>Warning:</strong> Failure to improve your attendance may result in further disciplinary action, including suspension or termination of employment.
+                                        </div>
+                                        <div style={{ marginBottom: '15px' }}>
+                                            We trust that you will take this matter seriously and demonstrate immediate improvement.
+                                        </div>
+                                        <div style={{ marginTop: '30px' }}>
+                                            Sincerely,<br /><br />
+                                            <strong>Sarah Johnson</strong><br />
+                                            HR Manager<br />
                                             {data.companyName}
                                         </div>
-                                        <div style={{ marginBottom: '15px' }}>
-                                            {new Date().toLocaleDateString()}
-                                        </div>
-                                        <div style={{ marginBottom: '15px' }}>
-                                            <strong>Subject:</strong> Warning against {data.violationType}
-                                        </div>
-                                        <div>
-                                            Dear {data.employeeName},<br /><br />
-                                            {data.incidentDescription}...
+                                        <div style={{ marginTop: '40px', borderTop: '1px solid #000', paddingTop: '20px' }}>
+                                            <strong>Employee Acknowledgement:</strong><br />
+                                            I acknowledge receipt of this warning letter.<br /><br />
+                                            Employee Signature: __________________ Date: __________
                                         </div>
                                     </div>
                                 )}
 
-                                {!['offer_letter', 'appointment_letter', 'experience_certificate', 'warning_letter'].includes(template.id) && (
-                                    <div style={{ textAlign: 'center', color: '#6B7280', fontStyle: 'italic' }}>
-                                        Preview for {template.name} will be available soon.<br />
-                                        This template includes: {template.fields.join(', ')}
+                                {template.id === 'invoice' && (
+                                    <div>
+                                        <div style={{ textAlign: 'center', marginBottom: '20px', borderBottom: '3px solid #000', paddingBottom: '15px' }}>
+                                            <div style={{ fontSize: '18px', fontWeight: 'bold' }}>{data.companyName}</div>
+                                            <div style={{ fontSize: '10px' }}>{data.companyAddress}</div>
+                                        </div>
+                                        <div style={{ textAlign: 'center', fontSize: '20px', fontWeight: 'bold', marginBottom: '20px', color: '#3B82F6' }}>
+                                            INVOICE
+                                        </div>
+                                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '20px' }}>
+                                            <div>
+                                                <strong>Bill To:</strong><br />
+                                                {data.clientName}<br />
+                                                789 Customer Street<br />
+                                                Atlanta, GA 30301
+                                            </div>
+                                            <div style={{ textAlign: 'right' }}>
+                                                <strong>Invoice #:</strong> {data.invoiceNumber}<br />
+                                                <strong>Date:</strong> March 2, 2026<br />
+                                                <strong>Due Date:</strong> {data.dueDate}
+                                            </div>
+                                        </div>
+                                        <table style={{ width: '100%', borderCollapse: 'collapse', marginBottom: '20px', border: '1px solid #000' }}>
+                                            <thead>
+                                                <tr style={{ backgroundColor: '#F3F4F6' }}>
+                                                    <th style={{ border: '1px solid #000', padding: '8px', textAlign: 'left' }}>Description</th>
+                                                    <th style={{ border: '1px solid #000', padding: '8px', textAlign: 'center' }}>Qty</th>
+                                                    <th style={{ border: '1px solid #000', padding: '8px', textAlign: 'right' }}>Rate</th>
+                                                    <th style={{ border: '1px solid #000', padding: '8px', textAlign: 'right' }}>Amount</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr>
+                                                    <td style={{ border: '1px solid #000', padding: '8px' }}>Premium Product Supplies</td>
+                                                    <td style={{ border: '1px solid #000', padding: '8px', textAlign: 'center' }}>50</td>
+                                                    <td style={{ border: '1px solid #000', padding: '8px', textAlign: 'right' }}>$100.00</td>
+                                                    <td style={{ border: '1px solid #000', padding: '8px', textAlign: 'right' }}>$5,000.00</td>
+                                                </tr>
+                                                <tr>
+                                                    <td style={{ border: '1px solid #000', padding: '8px' }}>Professional Services</td>
+                                                    <td style={{ border: '1px solid #000', padding: '8px', textAlign: 'center' }}>20</td>
+                                                    <td style={{ border: '1px solid #000', padding: '8px', textAlign: 'right' }}>$150.00</td>
+                                                    <td style={{ border: '1px solid #000', padding: '8px', textAlign: 'right' }}>$3,000.00</td>
+                                                </tr>
+                                                <tr>
+                                                    <td style={{ border: '1px solid #000', padding: '8px' }}>Shipping & Handling</td>
+                                                    <td style={{ border: '1px solid #000', padding: '8px', textAlign: 'center' }}>1</td>
+                                                    <td style={{ border: '1px solid #000', padding: '8px', textAlign: 'right' }}>$500.00</td>
+                                                    <td style={{ border: '1px solid #000', padding: '8px', textAlign: 'right' }}>$500.00</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                        <div style={{ textAlign: 'right', marginBottom: '20px' }}>
+                                            <div style={{ marginBottom: '5px' }}>Subtotal: $8,500.00</div>
+                                            <div style={{ marginBottom: '5px' }}>Tax (0%): $0.00</div>
+                                            <div style={{ fontSize: '16px', fontWeight: 'bold', paddingTop: '10px', borderTop: '2px solid #000' }}>
+                                                Total Due: {data.totalAmount}
+                                            </div>
+                                        </div>
+                                        <div style={{ marginTop: '30px', fontSize: '11px' }}>
+                                            <strong>Payment Terms:</strong> Payment is due within 30 days of invoice date.<br />
+                                            <strong>Payment Methods:</strong> Bank Transfer, Check, Credit Card<br />
+                                            <strong>Late Fee:</strong> 1.5% per month on overdue balances<br /><br />
+                                            <strong>Bank Details:</strong><br />
+                                            Bank Name: First National Bank<br />
+                                            Account Number: 1234567890<br />
+                                            Routing Number: 987654321<br />
+                                            Account Name: {data.companyName}
+                                        </div>
+                                        <div style={{ marginTop: '20px', fontSize: '10px', textAlign: 'center', color: '#666' }}>
+                                            Thank you for your business!
+                                        </div>
+                                    </div>
+                                )}
+
+                                {template.id === 'nda' && (
+                                    <div>
+                                        <div style={{ textAlign: 'center', fontSize: '18px', fontWeight: 'bold', marginBottom: '20px', textDecoration: 'underline' }}>
+                                            NON-DISCLOSURE AGREEMENT (NDA)
+                                        </div>
+                                        <div style={{ marginBottom: '15px' }}>
+                                            This Non-Disclosure Agreement ("Agreement") is entered into on <strong>{data.effectiveDate}</strong> by and between:
+                                        </div>
+                                        <div style={{ marginBottom: '15px', marginLeft: '20px' }}>
+                                            <strong>Disclosing Party:</strong> {data.companyName}<br />
+                                            Address: {data.companyAddress}<br /><br />
+                                            <strong>Receiving Party:</strong> {data.partyName}
+                                        </div>
+                                        <div style={{ marginBottom: '15px' }}>
+                                            <strong>1. PURPOSE</strong><br />
+                                            The purpose of this Agreement is to protect confidential information disclosed between the parties for: {data.purpose}.
+                                        </div>
+                                        <div style={{ marginBottom: '15px' }}>
+                                            <strong>2. CONFIDENTIAL INFORMATION</strong><br />
+                                            "Confidential Information" means any and all information disclosed by the Disclosing Party, including but not limited to:<br />
+                                            \u2022 Technical data, trade secrets, and know-how<br />
+                                            \u2022 Business operations, strategies, and plans<br />
+                                            \u2022 Customer lists and supplier information<br />
+                                            \u2022 Financial information and projections<br />
+                                            \u2022 Software code, algorithms, and technical specifications
+                                        </div>
+                                        <div style={{ marginBottom: '15px' }}>
+                                            <strong>3. OBLIGATIONS</strong><br />
+                                            The Receiving Party agrees to:<br />
+                                            a) Maintain confidentiality of all Confidential Information<br />
+                                            b) Use the information solely for the agreed purpose<br />
+                                            c) Not disclose information to third parties without written consent<br />
+                                            d) Implement reasonable security measures to protect the information<br />
+                                            e) Return or destroy all confidential materials upon request
+                                        </div>
+                                        <div style={{ marginBottom: '15px' }}>
+                                            <strong>4. TERM</strong><br />
+                                            This Agreement shall remain in effect for a period of <strong>{data.duration}</strong> from the Effective Date.
+                                        </div>
+                                        <div style={{ marginBottom: '15px' }}>
+                                            <strong>5. EXCEPTIONS</strong><br />
+                                            This Agreement does not apply to information that:<br />
+                                            \u2022 Is or becomes publicly available through no breach of this Agreement<br />
+                                            \u2022 Was rightfully in possession prior to disclosure<br />
+                                            \u2022 Is independently developed without use of Confidential Information<br />
+                                            \u2022 Is required to be disclosed by law or court order
+                                        </div>
+                                        <div style={{ marginBottom: '15px' }}>
+                                            <strong>6. GOVERNING LAW</strong><br />
+                                            This Agreement shall be governed by and construed in accordance with the laws of California, United States.
+                                        </div>
+                                        <div style={{ marginTop: '40px' }}>
+                                            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                                                <div>
+                                                    <strong>DISCLOSING PARTY</strong><br /><br />
+                                                    Signature: __________________<br />
+                                                    Name: {data.companyName}<br />
+                                                    Date: __________
+                                                </div>
+                                                <div>
+                                                    <strong>RECEIVING PARTY</strong><br /><br />
+                                                    Signature: __________________<br />
+                                                    Name: {data.partyName}<br />
+                                                    Date: __________
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                )}
+
+                                {template.id === 'quotation' && (
+                                    <div>
+                                        <div style={{ textAlign: 'center', marginBottom: '20px', borderBottom: '3px solid #000', paddingBottom: '15px' }}>
+                                            <div style={{ fontSize: '18px', fontWeight: 'bold' }}>{data.companyName}</div>
+                                            <div style={{ fontSize: '10px' }}>{data.companyAddress}</div>
+                                        </div>
+                                        <div style={{ textAlign: 'center', fontSize: '20px', fontWeight: 'bold', marginBottom: '20px', color: '#10B981' }}>
+                                            QUOTATION
+                                        </div>
+                                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '20px' }}>
+                                            <div>
+                                                <strong>To:</strong><br />
+                                                {data.clientName}<br />
+                                                567 Business Avenue<br />
+                                                Phoenix, AZ 85001
+                                            </div>
+                                            <div style={{ textAlign: 'right' }}>
+                                                <strong>Quotation #:</strong> {data.quotationNumber}<br />
+                                                <strong>Date:</strong> March 2, 2026<br />
+                                                <strong>Valid Until:</strong> {data.validUntil}
+                                            </div>
+                                        </div>
+                                        <div style={{ marginBottom: '20px' }}>
+                                            Dear {data.clientName},<br /><br />
+                                            Thank you for your inquiry. We are pleased to provide you with the following quotation for our professional services:
+                                        </div>
+                                        <table style={{ width: '100%', borderCollapse: 'collapse', marginBottom: '20px', border: '1px solid #000' }}>
+                                            <thead>
+                                                <tr style={{ backgroundColor: '#F3F4F6' }}>
+                                                    <th style={{ border: '1px solid #000', padding: '8px', textAlign: 'left' }}>Item Description</th>
+                                                    <th style={{ border: '1px solid #000', padding: '8px', textAlign: 'center' }}>Quantity</th>
+                                                    <th style={{ border: '1px solid #000', padding: '8px', textAlign: 'right' }}>Unit Price</th>
+                                                    <th style={{ border: '1px solid #000', padding: '8px', textAlign: 'right' }}>Total</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr>
+                                                    <td style={{ border: '1px solid #000', padding: '8px' }}>Website Development - E-commerce Platform</td>
+                                                    <td style={{ border: '1px solid #000', padding: '8px', textAlign: 'center' }}>1</td>
+                                                    <td style={{ border: '1px solid #000', padding: '8px', textAlign: 'right' }}>$8,500.00</td>
+                                                    <td style={{ border: '1px solid #000', padding: '8px', textAlign: 'right' }}>$8,500.00</td>
+                                                </tr>
+                                                <tr>
+                                                    <td style={{ border: '1px solid #000', padding: '8px' }}>SEO Optimization - 6 Months</td>
+                                                    <td style={{ border: '1px solid #000', padding: '8px', textAlign: 'center' }}>1</td>
+                                                    <td style={{ border: '1px solid #000', padding: '8px', textAlign: 'right' }}>$4,500.00</td>
+                                                    <td style={{ border: '1px solid #000', padding: '8px', textAlign: 'right' }}>$4,500.00</td>
+                                                </tr>
+                                                <tr>
+                                                    <td style={{ border: '1px solid #000', padding: '8px' }}>Content Management System Setup</td>
+                                                    <td style={{ border: '1px solid #000', padding: '8px', textAlign: 'center' }}>1</td>
+                                                    <td style={{ border: '1px solid #000', padding: '8px', textAlign: 'right' }}>$2,250.00</td>
+                                                    <td style={{ border: '1px solid #000', padding: '8px', textAlign: 'right' }}>$2,250.00</td>
+                                                </tr>
+                                                <tr>
+                                                    <td style={{ border: '1px solid #000', padding: '8px' }}>Training & Support - 3 Months</td>
+                                                    <td style={{ border: '1px solid #000', padding: '8px', textAlign: 'center' }}>1</td>
+                                                    <td style={{ border: '1px solid #000', padding: '8px', textAlign: 'right' }}>$500.00</td>
+                                                    <td style={{ border: '1px solid #000', padding: '8px', textAlign: 'right' }}>$500.00</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                        <div style={{ textAlign: 'right', marginBottom: '20px' }}>
+                                            <div style={{ marginBottom: '5px' }}>Subtotal: $15,750.00</div>
+                                            <div style={{ marginBottom: '5px' }}>Discount (0%): $0.00</div>
+                                            <div style={{ fontSize: '16px', fontWeight: 'bold', paddingTop: '10px', borderTop: '2px solid #000' }}>
+                                                Total Quote: {data.totalAmount}
+                                            </div>
+                                        </div>
+                                        <div style={{ marginTop: '20px', fontSize: '11px' }}>
+                                            <strong>Terms & Conditions:</strong><br />
+                                            • This quotation is valid until {data.validUntil}<br />
+                                            • 50% advance payment required to commence work<br />
+                                            • Estimated project completion: 8-10 weeks<br />
+                                            • Payment terms: 50% advance, 25% at milestone, 25% on completion<br />
+                                            • Prices are in USD and exclude applicable taxes
+                                        </div>
+                                        <div style={{ marginTop: '20px' }}>
+                                            We look forward to working with you. Please contact us if you have any questions.<br /><br />
+                                            Best regards,<br />
+                                            <strong>{data.companyName}</strong>
+                                        </div>
+                                    </div>
+                                )}
+
+                                {!['offer_letter', 'appointment_letter', 'experience_certificate', 'warning_letter', 'invoice', 'nda', 'quotation'].includes(template.id) && (
+                                    <div style={{ textAlign: 'center', padding: '40px 20px' }}>
+                                        <div style={{ fontSize: '48px', marginBottom: '20px' }}>{template.icon}</div>
+                                        <div style={{ fontSize: '18px', fontWeight: '600', color: '#111827', marginBottom: '10px' }}>
+                                            {template.name}
+                                        </div>
+                                        <div style={{ fontSize: '14px', color: '#6B7280', marginBottom: '20px' }}>
+                                            {template.description}
+                                        </div>
+                                        <div style={{ backgroundColor: '#F9FAFB', border: '1px solid #E5E7EB', borderRadius: '8px', padding: '20px', marginTop: '20px' }}>
+                                            <div style={{ fontSize: '12px', color: '#6B7280', marginBottom: '15px' }}>
+                                                <strong>This template includes:</strong>
+                                            </div>
+                                            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', justifyContent: 'center' }}>
+                                                {template.fields.map((field) => (
+                                                    <span
+                                                        key={field}
+                                                        style={{
+                                                            backgroundColor: 'white',
+                                                            border: '1px solid #E5E7EB',
+                                                            color: '#374151',
+                                                            padding: '6px 12px',
+                                                            borderRadius: '6px',
+                                                            fontSize: '12px',
+                                                            fontWeight: '500'
+                                                        }}
+                                                    >
+                                                        {field}
+                                                    </span>
+                                                ))}
+                                            </div>
+                                            <div style={{ fontSize: '12px', color: '#6B7280', marginTop: '20px', fontStyle: 'italic' }}>
+                                                Click "Use This Template" below to create your personalized document with all fields filled in.
+                                            </div>
+                                        </div>
                                     </div>
                                 )}
                             </div>
@@ -3458,47 +4365,16 @@ HR Department
                         fontSize: '16px',
                         color: '#6B7280',
                         margin: 0
-                    }}>Professional templates based on your reference formats</p>
+                    }}>Ready-to-use document structures. Select a template to create a document with your data.</p>
                 </div>
 
-                {/* Category Filter */}
-                <div style={{
-                    display: 'flex',
-                    gap: '12px',
-                    marginBottom: '32px',
-                    flexWrap: 'wrap'
-                }}>
-                    {Object.entries(templateCategories).map(([key, label]) => (
-                        <button
-                            key={key}
-                            onClick={() => setSelectedCategory(key)}
-                            style={{
-                                padding: '8px 16px',
-                                backgroundColor: selectedCategory === key ? '#F97316' : 'white',
-                                color: selectedCategory === key ? 'white' : '#6B7280',
-                                border: '1px solid #E5E7EB',
-                                borderRadius: '8px',
-                                fontSize: '14px',
-                                fontWeight: '500',
-                                cursor: 'pointer',
-                                transition: 'all 0.2s ease'
-                            }}
-                            onMouseEnter={(e) => {
-                                if (selectedCategory !== key) {
-                                    e.target.style.borderColor = '#F97316';
-                                    e.target.style.color = '#F97316';
-                                }
-                            }}
-                            onMouseLeave={(e) => {
-                                if (selectedCategory !== key) {
-                                    e.target.style.borderColor = '#E5E7EB';
-                                    e.target.style.color = '#6B7280';
-                                }
-                            }}
-                        >
-                            {label}
-                        </button>
-                    ))}
+                {/* Templates Grid - All Templates Displayed */}
+                <div style={{ marginBottom: '24px' }}>
+                    <p style={{
+                        fontSize: '14px',
+                        color: '#6B7280',
+                        margin: 0
+                    }}>Showing all {getAllTemplates().length} templates</p>
                 </div>
 
                 {/* Templates Grid */}
@@ -3510,6 +4386,12 @@ HR Department
                     {getAllTemplates().map((template) => (
                         <div
                             key={template.id}
+                            onClick={(e) => {
+                                console.log('📦 CARD CLICKED:', template.name);
+                                console.log('Event target:', e.target.tagName);
+                                console.log('Event currentTarget:', e.currentTarget.tagName);
+                                handlePreviewTemplate(template);
+                            }}
                             style={{
                                 backgroundColor: 'white',
                                 border: '1px solid #E5E7EB',
@@ -3520,14 +4402,14 @@ HR Department
                                 cursor: 'pointer'
                             }}
                             onMouseEnter={(e) => {
-                                e.target.style.transform = 'translateY(-4px)';
-                                e.target.style.boxShadow = '0 8px 25px rgba(0, 0, 0, 0.15)';
-                                e.target.style.borderColor = template.color;
+                                e.currentTarget.style.transform = 'translateY(-4px)';
+                                e.currentTarget.style.boxShadow = '0 8px 25px rgba(0, 0, 0, 0.15)';
+                                e.currentTarget.style.borderColor = template.color;
                             }}
                             onMouseLeave={(e) => {
-                                e.target.style.transform = 'translateY(0)';
-                                e.target.style.boxShadow = '0 1px 3px rgba(0, 0, 0, 0.1)';
-                                e.target.style.borderColor = '#E5E7EB';
+                                e.currentTarget.style.transform = 'translateY(0)';
+                                e.currentTarget.style.boxShadow = '0 1px 3px rgba(0, 0, 0, 0.1)';
+                                e.currentTarget.style.borderColor = '#E5E7EB';
                             }}
                         >
                             {/* Template Header */}
@@ -3641,16 +4523,21 @@ HR Department
                                 </div>
                             </div>
 
-                            {/* Action Buttons */}
+                            {/* Action Button */}
                             <div style={{
                                 display: 'flex',
                                 gap: '8px'
                             }}>
                                 <button
-                                    onClick={() => handleTemplateSelect(template)}
+                                    onClick={(e) => {
+                                        console.log('🔘 BUTTON CLICKED:', template.name);
+                                        console.log('Opening preview...');
+                                        e.stopPropagation();
+                                        handlePreviewTemplate(template);
+                                    }}
                                     style={{
                                         flex: 1,
-                                        padding: '10px 16px',
+                                        padding: '12px 20px',
                                         backgroundColor: template.color,
                                         color: 'white',
                                         border: 'none',
@@ -3658,42 +4545,19 @@ HR Department
                                         fontSize: '14px',
                                         fontWeight: '600',
                                         cursor: 'pointer',
-                                        transition: 'all 0.2s ease'
+                                        transition: 'all 0.2s ease',
+                                        boxShadow: `0 2px 8px ${template.color}30`
                                     }}
                                     onMouseEnter={(e) => {
-                                        e.target.style.opacity = '0.9';
-                                        e.target.style.transform = 'translateY(-1px)';
+                                        e.target.style.transform = 'translateY(-2px)';
+                                        e.target.style.boxShadow = `0 4px 12px ${template.color}40`;
                                     }}
                                     onMouseLeave={(e) => {
-                                        e.target.style.opacity = '1';
                                         e.target.style.transform = 'translateY(0)';
+                                        e.target.style.boxShadow = `0 2px 8px ${template.color}30`;
                                     }}
                                 >
-                                    Use Template
-                                </button>
-                                <button
-                                    onClick={() => handlePreviewTemplate(template)}
-                                    style={{
-                                        padding: '10px 12px',
-                                        backgroundColor: 'transparent',
-                                        color: template.color,
-                                        border: `1px solid ${template.color}`,
-                                        borderRadius: '8px',
-                                        fontSize: '14px',
-                                        fontWeight: '600',
-                                        cursor: 'pointer',
-                                        transition: 'all 0.2s ease'
-                                    }}
-                                    onMouseEnter={(e) => {
-                                        e.target.style.backgroundColor = template.color;
-                                        e.target.style.color = 'white';
-                                    }}
-                                    onMouseLeave={(e) => {
-                                        e.target.style.backgroundColor = 'transparent';
-                                        e.target.style.color = template.color;
-                                    }}
-                                >
-                                    <Eye size={16} />
+                                    Preview Template
                                 </button>
                             </div>
                         </div>
@@ -3771,6 +4635,7 @@ HR Department
             case 'dashboard':
                 return <DashboardOverview />;
             case 'templates':
+                return <TemplatesPage />;
             case 'create':
             case 'hr':
             case 'legal':

@@ -1,15 +1,27 @@
 const nodemailer = require("nodemailer");
 
 // Create email transporter
-// For production, use a service like SendGrid, AWS SES, or Gmail
+// Supports Gmail, custom SMTP, SendGrid, AWS SES, etc.
 const createTransporter = () => {
-    // Using Gmail for demo (requires app password)
-    // For production, use environment variables
-    return nodemailer.createTransport({
+    // Check if custom SMTP is configured
+    if (process.env.SMTP_HOST) {
+        return nodemailer.createTransporter({
+            host: process.env.SMTP_HOST,
+            port: parseInt(process.env.SMTP_PORT || '587'),
+            secure: process.env.SMTP_SECURE === 'true', // true for 465, false for other ports
+            auth: {
+                user: process.env.SMTP_USER || process.env.EMAIL_USER,
+                pass: process.env.SMTP_PASSWORD || process.env.EMAIL_PASSWORD,
+            },
+        });
+    }
+    
+    // Fallback to Gmail service
+    return nodemailer.createTransporter({
         service: "gmail",
         auth: {
-            user: process.env.EMAIL_USER || "your-email@gmail.com",
-            pass: process.env.EMAIL_PASSWORD || "your-app-password",
+            user: process.env.EMAIL_USER,
+            pass: process.env.EMAIL_PASSWORD,
         },
     });
 };
@@ -20,7 +32,7 @@ exports.sendDocumentEmail = async (recipientEmail, documentTitle, documentUrl, s
         const transporter = createTransporter();
 
         const mailOptions = {
-            from: `${senderName} via MM Docs <${process.env.EMAIL_USER}>`,
+            from: `${senderName} via Mediaa Masala Doc <${process.env.EMAIL_FROM || process.env.EMAIL_USER}>`,
             to: recipientEmail,
             subject: `${senderName} shared a document: ${documentTitle}`,
             html: `
@@ -74,9 +86,9 @@ exports.sendOTPEmail = async (recipientEmail, recipientName, otp) => {
         const transporter = createTransporter();
 
         const mailOptions = {
-            from: `MM Docs Security <${process.env.EMAIL_USER}>`,
+            from: `Mediaa Masala Doc <${process.env.EMAIL_FROM || process.env.EMAIL_USER}>`,
             to: recipientEmail,
-            subject: "Your MM Docs Login Verification Code",
+            subject: "Login Verification",
             html: `
                 <!DOCTYPE html>
                 <html>
@@ -99,7 +111,7 @@ exports.sendOTPEmail = async (recipientEmail, recipientName, otp) => {
                             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
                         }
                         .header { 
-                            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                            background: linear-gradient(135deg, #D97706 0%, #EA580C 100%);
                             padding: 40px 30px;
                             text-align: center;
                         }
@@ -123,8 +135,8 @@ exports.sendOTPEmail = async (recipientEmail, recipientName, otp) => {
                             margin-bottom: 20px;
                         }
                         .otp-box {
-                            background: linear-gradient(135deg, #f5f7fa 0%, #e4e8ec 100%);
-                            border: 2px dashed #667eea;
+                            background: linear-gradient(135deg, #FEF3C7 0%, #FED7AA 100%);
+                            border: 2px solid #D97706;
                             border-radius: 8px;
                             padding: 30px;
                             text-align: center;
@@ -140,10 +152,14 @@ exports.sendOTPEmail = async (recipientEmail, recipientName, otp) => {
                         .otp-code {
                             font-size: 36px;
                             font-weight: bold;
-                            color: #667eea;
+                            color: #FFFFFF;
                             letter-spacing: 8px;
                             font-family: 'Courier New', monospace;
                             margin: 10px 0;
+                            background: #D97706;
+                            padding: 15px 30px;
+                            border-radius: 8px;
+                            display: inline-block;
                         }
                         .warning {
                             background: #fff3cd;
@@ -202,10 +218,9 @@ exports.sendOTPEmail = async (recipientEmail, recipientName, otp) => {
                             <h1>Login Verification Code</h1>
                         </div>
                         <div class="content">
-                            <p class="greeting">Hi ${recipientName},</p>
+                            <p class="greeting">Hello,</p>
                             <p class="info-text">
-                                You requested to sign in to your MM Docs account. To complete the login process, 
-                                please use the verification code below:
+                                Your verification code for login is:
                             </p>
                             
                             <div class="otp-box">
@@ -215,30 +230,16 @@ exports.sendOTPEmail = async (recipientEmail, recipientName, otp) => {
 
                             <div class="warning">
                                 <p class="warning-text">
-                                    ⏱️ <strong>This code will expire in 10 minutes.</strong> Enter it on the login page to continue.
+                                    <strong>This code will expire in 10 minutes.</strong>
                                 </p>
                             </div>
 
                             <p class="info-text">
-                                If you didn't request this code, please ignore this email or contact our support team 
-                                if you have concerns about your account security.
+                                If you didn't request this code, please ignore this email.
                             </p>
-
-                            <div class="security-tips">
-                                <h3>🛡️ Security Tips:</h3>
-                                <ul>
-                                    <li>Never share this code with anyone</li>
-                                    <li>MM Docs staff will never ask for your verification code</li>
-                                    <li>Always verify the sender's email address</li>
-                                </ul>
-                            </div>
                         </div>
                         <div class="footer">
-                            <p class="footer-text">This is an automated security message from MM Docs</p>
-                            <p class="footer-text">© ${new Date().getFullYear()} MM Docs. All rights reserved.</p>
-                            <p class="footer-text" style="margin-top: 10px;">
-                                Professional Document Generation Platform
-                            </p>
+                            <p class="footer-text">Mediaa Masala - Restaurant Management Platform</p>
                         </div>
                     </div>
                 </body>

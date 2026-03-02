@@ -7,7 +7,7 @@ const PLANS = {
     billingCycle: "monthly",
     features: {
       documentsPerMonth: 10,
-      watermark: true,
+      watermark: false,
       brandKit: false,
       aiQuality: "basic",
       exports: {
@@ -119,8 +119,8 @@ const canExportDocument = (user, exportCount = 0) => {
 };
 
 const shouldAddWatermark = (user) => {
-  const plan = PLANS[user.plan] || PLANS.free;
-  return plan.features.watermark === true;
+  // Watermark disabled for all users
+  return false;
 };
 
 const canUseBrandKit = (user) => {

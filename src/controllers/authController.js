@@ -8,7 +8,7 @@ const generateOTP = () => {
   return Math.floor(100000 + Math.random() * 900000).toString();
 };
 
-// Step 1: Login with email and password (sends OTP)
+// Direct login with email and password
 exports.login = async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -25,42 +25,19 @@ exports.login = async (req, res) => {
       return res.status(400).json({ message: "Invalid credentials" });
     }
 
-    // Generate OTP
-    const otp = generateOTP();
-    
-    // Set OTP expiration (10 minutes)
-    const otpExpires = new Date(Date.now() + 10 * 60 * 1000);
+    // Generate JWT token
+    const token = generateToken(user._id);
 
-    // Save OTP to database
-    user.otp = otp;
-    user.otpExpires = otpExpires;
-    await user.save();
+    console.log(`✅ Login successful for ${user.email}`);
 
-    // Send OTP via email
-    try {
-      await sendOTPEmail(user.email, user.name, otp);
-      console.log(`✅ OTP email sent to ${user.email}`);
-    } catch (emailError) {
-      console.error("⚠️  Email sending failed:", emailError.message);
-      
-      // In development, continue even if email fails (for testing)
-      if (process.env.NODE_ENV !== 'development') {
-        return res.status(500).json({ 
-          message: "Failed to send OTP. Please check email configuration." 
-        });
-      }
-      console.log('📧 Development mode: Continuing without email...');
-    }
-
-    console.log(`🔐 OTP generated for ${user.email}: ${otp}`); // For development/testing
-    
     res.status(200).json({
-      message: "OTP sent to your email",
-      requiresOTP: true,
-      email: user.email,
-      // In development, you might want to include OTP for testing
-      // Remove this in production!
-      ...(process.env.NODE_ENV === 'development' && { devOTP: otp })
+      message: "Login successful ✅",
+      token,
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+      },
     });
 
   } catch (err) {
