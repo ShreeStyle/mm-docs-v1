@@ -131,6 +131,13 @@ Return ONLY valid, richly detailed, FORMALLY WRITTEN JSON document content.`;
     console.log(`📝 Final effective type: ${effectiveType}`);
     console.log(`📋 Topic for processing: ${topic}`);
 
+    // For structured compliance documents, skip AI call and use template-based generation
+    const structuredDocTypes = ['audit_report', 'gst_filing_summary', 'gst_filing', 'policy_document', 'regulatory_filing'];
+    if (structuredDocTypes.includes(effectiveType)) {
+      console.log(`✅ Using structured template for ${effectiveType} - skipping AI API call`);
+      return generateMockContent(effectiveType, topic, providedData, brandContext);
+    }
+
     if (effectiveType === "proposal") {
       // Parse structured input data
       const inputData = {};
@@ -1022,7 +1029,7 @@ Return ONLY valid JSON with this exact structure:
       (topic.toLowerCase().includes("resume") ? "resume" :
         topic.toLowerCase().includes("proposal") ? "proposal" :
           topic.toLowerCase().includes("marketing brief") ? "marketing_brief" : type) : type;
-    return generateMockContent(fallbackType, topic, providedData);
+    return generateMockContent(fallbackType, topic, providedData, brandContext);
   }
 };
 
@@ -1094,7 +1101,7 @@ const generateProfessionalAppreciation = (rawInput, employeeName, position) => {
 };
 
 // Fallback mock generation (in case API fails)
-const generateMockContent = (type, topic, providedData = {}) => {
+const generateMockContent = (type, topic, providedData = {}, brandContext = {}) => {
   console.log('🔄 Generating fallback content with provided data:', providedData);
   const topicTitle = topic.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
   const effectiveType = type.toLowerCase();
@@ -1834,6 +1841,210 @@ We appreciate the cooperation and assistance provided by management and staff th
       ],
       
       disclaimer: "This audit report is intended solely for the use of management, the board of directors, and regulatory authorities as applicable. It should not be distributed to or used by parties other than those specified without our prior written consent. The findings and recommendations are based on information available as of the audit date and conditions existing at that time."
+    };
+  } else if (effectiveType === "gst_filing_summary" || effectiveType === "gst_filing") {
+    console.log('📝 Building GST Filing Summary with data:', providedData);
+    const currentDate = new Date().toLocaleDateString('en-IN', { year: 'numeric', month: 'long', day: 'numeric' });
+    
+    // Calculate net tax payable
+    const outputTax = parseFloat(String(providedData.outputTax || '0').replace(/[^0-9.]/g, '')) || 0;
+    const inputTax = parseFloat(String(providedData.inputTax || '0').replace(/[^0-9.]/g, '')) || 0;
+    const netTaxPayable = Math.max(0, outputTax - inputTax);
+    
+    return {
+      title: "GST Filing Summary",
+      companyName: providedData.companyName || brandContext.name || "[Company Name]",
+      companyAddress: providedData.companyAddress || "[Company Address]",
+      gstNumber: providedData.gstNumber || "[GST Number]",
+      filingPeriod: providedData.filingPeriod || "[Filing Period]",
+      returnType: providedData.returnType || "GSTR-3B",
+      filingDate: providedData.filingDate || currentDate,
+      
+      totalSales: providedData.totalSales || "0",
+      totalPurchases: providedData.totalPurchases || "0",
+      outputTax: providedData.outputTax || "0",
+      inputTax: providedData.inputTax || "0",
+      netTaxPayable: netTaxPayable.toFixed(2),
+      
+      interestPayable: providedData.interestPayable || "0",
+      lateFee: providedData.lateFee || "0",
+      
+      taxableSupplies: providedData.taxableSupplies || [
+        {
+          description: "Taxable supplies @ 18%",
+          amount: Math.round(parseFloat(String(providedData.totalSales || '0').replace(/[^0-9.]/g, '')) * 0.85).toLocaleString('en-IN')
+        },
+        {
+          description: "Taxable supplies @ 5%",
+          amount: Math.round(parseFloat(String(providedData.totalSales || '0').replace(/[^0-9.]/g, '')) * 0.15).toLocaleString('en-IN')
+        }
+      ],
+      
+      complianceStatus: providedData.complianceStatus || "Pending Filing",
+      filingReference: providedData.filingReference || "",
+      
+      remarks: providedData.remarks || `This GST filing summary has been prepared for ${providedData.returnType || 'GSTR-3B'} for the period ${providedData.filingPeriod || '[Filing Period]'}. All figures are based on books of accounts and supporting documentation. Please verify all amounts before final submission to the GST portal.`,
+      
+      generatedDate: currentDate
+    };
+  } else if (effectiveType === "policy_document") {
+    console.log('📝 Building Policy Document with data:', providedData);
+    const currentDate = new Date().toLocaleDateString('en-IN', { year: 'numeric', month: 'long', day: 'numeric' });
+    
+    return {
+      title: providedData.policyTitle || "Company Policy Document",
+      policyTitle: providedData.policyTitle || "Company Policy Document",
+      policySubtitle: providedData.policySubtitle || "Official Company Policy",
+      policyType: providedData.policyType || "Internal Policy",
+      
+      companyName: providedData.companyName || brandContext.name || "[Company Name]",
+      companyAddress: providedData.companyAddress || "[Company Address]",
+      
+      effectiveDate: providedData.effectiveDate || currentDate,
+      version: providedData.version || "1.0",
+      department: providedData.department || "All Departments",
+      
+      policyPurpose: providedData.policyPurpose || "This policy establishes guidelines and standards to ensure consistent, professional, and compliant operations across the organization.",
+      
+      policyScope: providedData.policyScope || "This policy applies to all employees, contractors, consultants, and stakeholders associated with the organization. It covers all work-related activities conducted on company premises or using company resources.",
+      
+      policyGuidelines: providedData.policyGuidelines || `
+        <p>All personnel are expected to:</p>
+        <ul>
+          <li>Familiarize themselves with and adhere to this policy at all times</li>
+          <li>Maintain professional standards in all work-related activities</li>
+          <li>Report any policy violations or concerns to the appropriate authority</li>
+          <li>Participate in required training and awareness programs</li>
+          <li>Uphold the organization's values, ethics, and code of conduct</li>
+        </ul>
+        <p>Management is responsible for ensuring policy compliance, providing necessary resources, and addressing violations promptly and fairly.</p>
+      `,
+      
+      sections: providedData.sections || [
+        {
+          heading: "Policy Statement",
+          content: `${providedData.companyName || 'The organization'} is committed to maintaining high standards of professional conduct, compliance, and operational excellence. This policy outlines the expectations, responsibilities, and guidelines that govern our workplace and business activities.`
+        },
+        {
+          heading: "Responsibilities",
+          content: `
+            <p><strong>Management:</strong> Responsible for policy implementation, resource allocation, and enforcement.</p>
+            <p><strong>Employees:</strong> Required to understand, comply with, and uphold policy standards.</p>
+            <p><strong>Human Resources:</strong> Oversees policy awareness, training, and violation investigations.</p>
+          `
+        },
+        {
+          heading: "Implementation",
+          content: "This policy is effective from the date specified and will be communicated to all relevant stakeholders. Regular training sessions and awareness programs will be conducted to ensure understanding and compliance."
+        }
+      ],
+      
+      procedures: providedData.procedures || [
+        {
+          title: "Compliance Monitoring",
+          description: "Regular audits and reviews will be conducted to ensure adherence to this policy. Any non-compliance will be documented and addressed through appropriate channels."
+        },
+        {
+          title: "Reporting Mechanism",
+          description: "Employees can report policy violations or concerns through designated channels, including direct supervisors, HR department, or anonymous reporting systems."
+        },
+        {
+          title: "Review and Updates",
+          description: "This policy will be reviewed periodically and updated as necessary to reflect changes in regulations, business practices, or organizational needs."
+        }
+      ],
+      
+      violations: providedData.violations || [
+        {
+          type: "Minor Violation",
+          consequence: "Written warning and mandatory training",
+          severity: "Low"
+        },
+        {
+          type: "Moderate Violation",
+          consequence: "Formal reprimand and performance improvement plan",
+          severity: "Medium"
+        },
+        {
+          type: "Serious Violation",
+          consequence: "Suspension or termination as per company disciplinary policy",
+          severity: "High"
+        }
+      ],
+      
+      importantNotice: providedData.importantNotice || "All employees, contractors, and stakeholders are required to read, understand, and comply with this policy. Any questions or concerns regarding this policy should be directed to the appropriate department head or human resources department. This policy may be updated from time to time, and all concerned parties will be notified of any changes.",
+      
+      reviewDate: providedData.reviewDate || new Date(new Date().setFullYear(new Date().getFullYear() + 1)).toLocaleDateString('en-IN', { year: 'numeric', month: 'long', day: 'numeric' }),
+      
+      approver1Name: providedData.approver1Name || "Management",
+      approver1Title: providedData.approver1Title || "Authorized Signatory",
+      approver2Name: providedData.approver2Name || "HR Department",
+      approver2Title: providedData.approver2Title || "Human Resources",
+      
+      generatedDate: currentDate
+    };
+  } else if (effectiveType === "regulatory_filing") {
+    console.log('📝 Building Regulatory Filing with data:', providedData);
+    const currentDate = new Date().toLocaleDateString('en-IN', { year: 'numeric', month: 'long', day: 'numeric' });
+    
+    return {
+      title: providedData.filingType || "Regulatory Filing",
+      
+      companyName: providedData.companyName || brandContext.name || "[Company Name]",
+      companyAddress: providedData.companyAddress || "[Company Address]",
+      registrationNumber: providedData.registrationNumber || "",
+      
+      filingType: providedData.filingType || "Regulatory Compliance Filing",
+      filingNumber: providedData.filingNumber || `FIL-${new Date().getFullYear()}-${String(Math.floor(Math.random() * 10000)).padStart(4, '0')}`,
+      filingDate: providedData.filingDate || currentDate,
+      filingStatus: providedData.filingStatus || "submitted",
+      
+      regulatoryBody: providedData.regulatoryBody || "Regulatory Authority",
+      filingPeriod: providedData.filingPeriod || "",
+      deadlineDate: providedData.deadlineDate || "",
+      
+      filingPurpose: providedData.filingPurpose || `This filing is submitted to comply with statutory requirements and regulatory obligations as mandated by applicable laws and regulations.`,
+      
+      filingDetails: providedData.filingDetails || `
+        <p>This regulatory filing contains all required information and documentation as per statutory requirements. The filing has been prepared in accordance with applicable regulations and reporting standards.</p>
+        <p><strong>Key Information Included:</strong></p>
+        <ul>
+          <li>Organization details and registration information</li>
+          <li>Financial and operational data for the specified period</li>
+          <li>Compliance certifications and declarations</li>
+          <li>Supporting documentation as required by regulations</li>
+        </ul>
+      `,
+      
+      sections: providedData.sections || [
+        {
+          heading: "Filing Summary",
+          content: `This filing covers the period ${providedData.filingPeriod || '[Filing Period]'} and includes all mandatory information required by ${providedData.regulatoryBody || 'the regulatory authority'}. All data has been verified for accuracy and completeness before submission.`
+        },
+        {
+          heading: "Compliance Declaration",
+          content: "The organization confirms full compliance with all applicable regulations and reporting requirements. All information submitted is true, accurate, and complete to the best of our knowledge and belief."
+        }
+      ],
+      
+      attachedDocuments: providedData.attachedDocuments || [
+        "Certificate of Incorporation",
+        "Financial Statements for the filing period",
+        "Board Resolution authorizing this filing",
+        "Compliance Certificates",
+        "Supporting Documentation as required"
+      ],
+      
+      complianceNotice: providedData.complianceNotice || "This filing is submitted in accordance with the applicable regulations and statutory requirements. All information provided is true, accurate, and complete to the best of our knowledge. The organization undertakes to comply with all regulatory obligations and to maintain proper records as required by law.",
+      
+      declarationText: providedData.declarationText || "I/We hereby declare that the information provided in this regulatory filing is true, complete, and accurate. I/We understand that any false statement or misrepresentation may result in legal penalties and regulatory action. I/We accept full responsibility for the accuracy of this submission and undertake to notify the regulatory authority of any material changes.",
+      
+      authorizedSignatory: providedData.authorizedSignatory || "[Authorized Signatory Name]",
+      signatoryTitle: providedData.signatoryTitle || "Designated Officer",
+      signatureDate: providedData.signatureDate || currentDate,
+      filingPlace: providedData.filingPlace || "[Location]",
+      
+      generatedDate: currentDate
     };
   } else {
     return {

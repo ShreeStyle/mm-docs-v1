@@ -1,0 +1,1070 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Comprehensive Audit Report</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, sans-serif;
+            line-height: 1.65;
+            color: #1f2937;
+            max-width: 850px;
+            margin: 0 auto;
+            padding: 50px 45px;
+            background: white;
+            font-size: 14px;
+        }
+
+        .header {
+            text-align: center;
+            padding-bottom: 30px;
+            margin-bottom: 40px;
+            border-bottom: 3px solid #111827;
+        }
+
+        .company-name {
+            font-size: 13px;
+            font-weight: 600;
+            color: #6b7280;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            margin-bottom: 6px;
+        }
+
+        .doc-title {
+            font-size: 38px;
+            font-weight: 800;
+            color: #111827;
+            letter-spacing: -0.02em;
+            margin: 12px 0;
+        }
+
+        .report-number {
+            font-size: 15px;
+            color: #374151;
+            font-weight: 600;
+            margin: 8px 0;
+        }
+
+        .confidential-badge {
+            display: inline-block;
+            padding: 6px 18px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            background: #dc2626;
+            color: white;
+            margin-top: 12px;
+        }
+
+        .meta-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 32px;
+            background: #f9fafb;
+            padding: 24px;
+            border-radius: 12px;
+            border: 1px solid #e5e7eb;
+        }
+
+        .meta-item {
+            padding: 12px;
+        }
+
+        .meta-label {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            color: #6b7280;
+            font-weight: 700;
+            margin-bottom: 6px;
+        }
+
+        .meta-value {
+            font-size: 15px;
+            font-weight: 600;
+            color: #111827;
+            line-height: 1.5;
+        }
+
+        .meta-sub {
+            font-size: 13px;
+            color: #4b5563;
+            margin-top: 4px;
+            font-weight: 400;
+        }
+
+        .section {
+            margin: 35px 0;
+            page-break-inside: avoid;
+        }
+
+        .section-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: #111827;
+            margin-bottom: 16px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #e5e7eb;
+            text-transform: uppercase;
+            letter-spacing: 0.02em;
+        }
+
+        .subsection-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #111827;
+            margin: 20px 0 12px 0;
+        }
+
+        .content {
+            font-size: 14px;
+        .content {
+            font-size: 14px;
+            color: #374151;
+            line-height: 1.8;
+        }
+
+        .content p {
+            margin-bottom: 16px;
+            text-align: justify;
+        }
+
+        .key-findings-list {
+            padding-left: 0;
+            list-style: none;
+            margin: 16px 0;
+        }
+
+        .key-findings-list li {
+            padding: 12px 18px;
+            margin-bottom: 10px;
+            background: #ecfdf5;
+            border-left: 4px solid #10b981;
+            border-radius: 6px;
+            font-size: 14px;
+            color: #065f46;
+            font-weight: 500;
+        }
+
+        .financial-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+            margin: 20px 0;
+        }
+
+        .financial-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+            border-radius: 12px;
+            color: white;
+            text-align: center;
+        }
+
+        .financial-card.revenue {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        }
+
+        .financial-card.expense {
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+        }
+
+        .financial-card.profit {
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+        }
+
+        .financial-card.assets {
+            background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+        }
+
+        .financial-card.liabilities {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+        }
+
+        .financial-card.equity {
+            background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+        }
+
+        .financial-label {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            opacity: 0.9;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+
+        .financial-value {
+            font-size: 24px;
+            font-weight: 800;
+            margin-bottom: 4px;
+        }
+
+        .financial-note {
+            font-size: 12px;
+            opacity: 0.85;
+            margin-top: 8px;
+        }
+
+        .finding-card {
+            background: white;
+            border: 2px solid #e5e7eb;
+            border-radius: 12px;
+            padding: 24px;
+            margin: 20px 0;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+
+        .finding-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 16px;
+            gap: 16px;
+        }
+
+        .finding-category {
+            font-size: 17px;
+            font-weight: 700;
+            color: #111827;
+            flex: 1;
+        }
+
+        .finding-status {
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            white-space: nowrap;
+        }
+
+        .finding-status.satisfactory {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .finding-status.compliant {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        .finding-status.adequate {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .finding-status.attention {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .finding-risk {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            margin-left: 8px;
+        }
+
+        .finding-risk.low {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .finding-risk.medium {
+            background: #fed7aa;
+            color: #92400e;
+        }
+
+        .finding-risk.high {
+            background: #fecaca;
+            color: #991b1b;
+        }
+
+        .finding-section {
+            margin: 14px 0;
+        }
+
+        .finding-label {
+            font-size: 12px;
+            font-weight: 700;
+            color: #6b7280;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 6px;
+        }
+
+        .finding-text {
+            font-size: 14px;
+            color: #374151;
+            line-height: 1.7;
+            text-align: justify;
+        }
+
+        .finding-text.recommendation {
+            color: #1e40af;
+            font-weight: 500;
+            background: #eff6ff;
+            padding: 12px 16px;
+            border-radius: 8px;
+            border-left: 3px solid #3b82f6;
+        }
+
+        .finding-text.management-response {
+            color: #065f46;
+            font-weight: 500;
+            background: #ecfdf5;
+            padding: 12px 16px;
+            border-radius: 8px;
+            border-left: 3px solid #10b981;
+        }
+
+        .control-assessment {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 20px;
+            margin: 16px 0;
+        }
+
+        .control-item {
+            display: grid;
+            grid-template-columns: 200px 1fr;
+            gap: 16px;
+            padding: 12px 0;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .control-item:last-child {
+            border-bottom: none;
+        }
+
+        .control-name {
+            font-size: 13px;
+            font-weight: 700;
+            color: #1e293b;
+        }
+
+        .control-rating {
+            font-size: 13px;
+            color: #475569;
+            font-weight: 500;
+        }
+
+        .compliance-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin: 20px 0;
+        }
+
+        .compliance-card {
+            background: white;
+            border: 2px solid #e5e7eb;
+            border-radius: 10px;
+            padding: 18px;
+        }
+
+        .compliance-title {
+            font-size: 14px;
+            font-weight: 700;
+            color: #111827;
+            margin-bottom: 8px;
+        }
+
+        .compliance-status {
+            font-size: 13px;
+            color: #374151;
+            line-height: 1.6;
+        }
+
+        .recommendation-card {
+            background: white;
+            border: 2px solid #e5e7eb;
+            border-radius: 12px;
+            padding: 22px;
+            margin: 16px 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .recommendation-card::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 6px;
+        }
+
+        .recommendation-card.priority-high::before {
+            background: #dc2626;
+        }
+
+        .recommendation-card.priority-medium::before {
+            background: #f59e0b;
+        }
+
+        .recommendation-card.priority-low::before {
+            background: #10b981;
+        }
+
+        .recommendation-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .priority-badge {
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+
+        .priority-badge.high {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .priority-badge.medium {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .priority-badge.low {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .recommendation-title {
+            font-size: 15px;
+            font-weight: 700;
+            color: #111827;
+            margin-bottom: 12px;
+            line-height: 1.5;
+        }
+
+        .recommendation-details {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin-top: 14px;
+            font-size: 12px;
+        }
+
+        .detail-item {
+            background: #f9fafb;
+            padding: 10px 12px;
+            border-radius: 6px;
+        }
+
+        .detail-label {
+            font-weight: 600;
+            color: #6b7280;
+            margin-bottom: 4px;
+        }
+
+        .detail-value {
+            color: #111827;
+            font-weight: 500;
+        }
+
+        .conclusion-box {
+            background: #f8fafc;
+            border: 2px solid #cbd5e1;
+            border-radius: 12px;
+            padding: 28px;
+            margin: 28px 0;
+        }
+
+        .conclusion-text {
+            font-size: 14px;
+            color: #334155;
+            line-height: 1.9;
+            text-align: justify;
+        }
+
+        .signature-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+            margin-top: 40px;
+            padding-top: 30px;
+            border-top: 2px solid #e5e7eb;
+        }
+
+        .sig-card {
+            background: #fafafa;
+            border: 1px solid #e5e7eb;
+            border-radius: 10px;
+            padding: 22px;
+        }
+
+        .sig-title {
+            font-size: 12px;
+            font-weight: 700;
+            color: #6b7280;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 16px;
+        }
+
+        .sig-info {
+            margin: 12px 0;
+            font-size: 13px;
+            color: #374151;
+        }
+
+        .sig-label {
+            font-weight: 600;
+            color: #6b7280;
+        }
+
+        .sig-line {
+            border-bottom: 1px solid #9ca3af;
+            height: 30px;
+            margin: 16px 0;
+        }
+
+        .appendices-section {
+            background: #fffbeb;
+            border: 2px solid #fbbf24;
+            border-radius: 10px;
+            padding: 20px 24px;
+            margin: 28px 0;
+        }
+
+        .appendices-title {
+            font-size: 15px;
+            font-weight: 700;
+            color: #92400e;
+            margin-bottom: 12px;
+        }
+
+        .appendices-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .appendices-list li {
+            padding: 8px 0;
+            color: #78350f;
+            font-size: 13px;
+            font-weight: 500;
+            border-bottom: 1px solid #fde68a;
+        }
+
+        .appendices-list li:last-child {
+            border-bottom: none;
+        }
+
+        .disclaimer {
+            background: #fef2f2;
+            border: 1px solid #fecaca;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 28px 0;
+        }
+
+        .disclaimer-title {
+            font-size: 13px;
+            font-weight: 700;
+            color: #991b1b;
+            text-transform: uppercase;
+            margin-bottom: 10px;
+        }
+
+        .disclaimer-text {
+            font-size: 12px;
+            color: #7f1d1d;
+            line-height: 1.7;
+        }
+
+        .footer {
+            margin-top: 50px;
+            text-align: center;
+            padding-top: 25px;
+            border-top: 2px solid #e5e7eb;
+            color: #9ca3af;
+            font-size: 11px;
+        }
+
+        @media print {
+            body {
+                padding: 30px;
+            }
+
+            .finding-card,
+            .recommendation-card,
+            .section {
+                page-break-inside: avoid;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="header">
+        <div class="company-name">CA rajesh khanna</div>
+        <div class="doc-title">Comprehensive Audit Report</div>
+        <div class="report-number">Report No: AUDIT-2026-3848</div>
+        <div class="report-number">March 3, 2026</div>
+        <div class="confidential-badge">Confidential</div>
+    </div>
+
+    <div class="meta-grid">
+        <div class="meta-item">
+            <div class="meta-label">Subject Organization</div>
+            <div class="meta-value">Leverage </div>
+            <div class="meta-sub">Nothing i dont know about the park, Ahmedabad</div>
+        </div>
+        <div class="meta-item">
+            <div class="meta-label">Audit Period</div>
+            <div class="meta-value">FY 2025 to 2026</div>
+            <div class="meta-sub">Fiscal Year: 2026-27</div>
+        </div>
+        <div class="meta-item">
+            <div class="meta-label">Audit Type</div>
+            <div class="meta-value">Internal Audit</div>
+        </div>
+        <div class="meta-item">
+            <div class="meta-label">Auditor</div>
+            <div class="meta-value">CA rajesh khanna</div>
+            <div class="meta-sub">India</div>
+        </div>
+    </div>
+
+    <!-- Executive Summary Section -->
+    <div class="section">
+        <div class="section-title">Executive Summary</div>
+        <div class="content">
+            <div class="subsection-title">Introduction</div>
+            <p>This comprehensive audit report presents the findings, observations, and recommendations arising from our detailed examination of Leverage &#x27;s financial statements, internal controls, and compliance procedures for the fiscal year 2026-27. The audit was conducted in accordance with applicable auditing standards and industry best practices.</p>
+            
+            <div class="subsection-title">Scope of Audit</div>
+            <p>Our audit encompassed financial statement verification, internal control assessment, regulatory compliance review, operational efficiency analysis, and risk management evaluation.</p>
+            
+            <div class="subsection-title">Auditor's Opinion</div>
+            <p><strong>In our professional opinion, the financial statements present a true and fair view of the organization&#x27;s financial position as of the audit date, subject to the observations and recommendations outlined in this report.</strong></p>
+            
+            <div class="subsection-title">Key Findings</div>
+            <ul class="key-findings-list">
+                <li>Financial statements are materially accurate and comply with applicable accounting standards</li>
+                <li>Internal control systems are adequate with minor improvements recommended</li>
+                <li>Operational processes demonstrate sound governance and management oversight</li>
+                <li>Compliance procedures are generally effective with opportunities for enhancement</li>
+                <li>Risk management framework is robust and appropriately implemented</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Financial Overview Section -->
+    <div class="section">
+        <div class="section-title">Financial Overview</div>
+        <div class="financial-grid">
+            <div class="financial-card revenue">
+                <div class="financial-label">Total Revenue</div>
+                <div class="financial-value">₹24,50,00,000</div>
+            </div>
+            <div class="financial-card expense">
+                <div class="financial-label">Total Expenses</div>
+                <div class="financial-value">₹18,75,00,000</div>
+            </div>
+            <div class="financial-card profit">
+                <div class="financial-label">Net Profit</div>
+                <div class="financial-value">₹5,75,00,000</div>
+            </div>
+            <div class="financial-card assets">
+                <div class="financial-label">Total Assets</div>
+                <div class="financial-value">₹45,25,00,000</div>
+            </div>
+            <div class="financial-card liabilities">
+                <div class="financial-label">Total Liabilities</div>
+                <div class="financial-value">₹22,10,00,000</div>
+            </div>
+            <div class="financial-card equity">
+                <div class="financial-label">Shareholders' Equity</div>
+                <div class="financial-value">₹23,15,00,000</div>
+            </div>
+        </div>
+        <div class="content">
+            <p><strong>Cash Flow:</strong> Positive - ₹8,40,00,000</p>
+            <p><strong>Profit Margin:</strong> 23.5%</p>
+            <p>The organization has demonstrated strong financial performance during the audit period with healthy revenue growth, controlled expenses, and improved profitability margins compared to the previous fiscal year.</p>
+        </div>
+    </div>
+
+    <!-- Audit Findings Section -->
+    <div class="section">
+        <div class="section-title">Detailed Audit Findings</div>
+        <div class="finding-card">
+            <div class="finding-header">
+                <div class="finding-category">
+                    Financial Controls
+                    <span class="finding-risk Low">Low risk</span>
+                </div>
+                <div class="finding-status Satisfactory">Satisfactory</div>
+            </div>
+            <div class="finding-section">
+                <div class="finding-label">Observation</div>
+                <div class="finding-text">The organization maintains comprehensive financial controls with appropriate segregation of duties. All material transactions are properly authorized, recorded, and reconciled.</div>
+            </div>
+            <div class="finding-section">
+                <div class="finding-label">Recommendation</div>
+                <div class="finding-text recommendation">Implement automated reconciliation tools for high-volume transaction accounts to further enhance accuracy and efficiency.</div>
+            </div>
+            <div class="finding-section">
+                <div class="finding-label">Management Response</div>
+                <div class="finding-text management-response">Accepted - Implementation planned for Q3 FY2026-27</div>
+            </div>
+        </div>
+        <div class="finding-card">
+            <div class="finding-header">
+                <div class="finding-category">
+                    Revenue Recognition
+                    <span class="finding-risk Low">Low risk</span>
+                </div>
+                <div class="finding-status Compliant">Compliant</div>
+            </div>
+            <div class="finding-section">
+                <div class="finding-label">Observation</div>
+                <div class="finding-text">Revenue recognition policies comply with applicable accounting standards (Ind AS 115). Supporting documentation for revenue transactions is adequately maintained.</div>
+            </div>
+            <div class="finding-section">
+                <div class="finding-label">Recommendation</div>
+                <div class="finding-text recommendation">Enhance documentation for complex multi-element arrangements to provide additional clarity for future audits.</div>
+            </div>
+            <div class="finding-section">
+                <div class="finding-label">Management Response</div>
+                <div class="finding-text management-response">Accepted - Enhanced templates being developed</div>
+            </div>
+        </div>
+        <div class="finding-card">
+            <div class="finding-header">
+                <div class="finding-category">
+                    Inventory Management
+                    <span class="finding-risk Medium">Medium risk</span>
+                </div>
+                <div class="finding-status Requires Attention">Requires Attention</div>
+            </div>
+            <div class="finding-section">
+                <div class="finding-label">Observation</div>
+                <div class="finding-text">Physical inventory counts revealed minor discrepancies with recorded balances in two warehouse locations. Differences attributable to timing and data entry errors.</div>
+            </div>
+            <div class="finding-section">
+                <div class="finding-label">Recommendation</div>
+                <div class="finding-text recommendation">Implement real-time inventory tracking system and conduct monthly cycle counts for high-value items.</div>
+            </div>
+            <div class="finding-section">
+                <div class="finding-label">Management Response</div>
+                <div class="finding-text management-response">Accepted - RFID system implementation initiated</div>
+            </div>
+        </div>
+        <div class="finding-card">
+            <div class="finding-header">
+                <div class="finding-category">
+                    Compliance &amp; Regulatory
+                    <span class="finding-risk Low">Low risk</span>
+                </div>
+                <div class="finding-status Satisfactory">Satisfactory</div>
+            </div>
+            <div class="finding-section">
+                <div class="finding-label">Observation</div>
+                <div class="finding-text">The organization demonstrates strong compliance with applicable tax regulations, labor laws, and industry-specific requirements. All statutory filings are current.</div>
+            </div>
+            <div class="finding-section">
+                <div class="finding-label">Recommendation</div>
+                <div class="finding-text recommendation">Establish automated compliance monitoring dashboard for proactive tracking of regulatory obligations.</div>
+            </div>
+            <div class="finding-section">
+                <div class="finding-label">Management Response</div>
+                <div class="finding-text management-response">Under consideration - Cost-benefit analysis in progress</div>
+            </div>
+        </div>
+        <div class="finding-card">
+            <div class="finding-header">
+                <div class="finding-category">
+                    IT Systems &amp; Controls
+                    <span class="finding-risk Medium">Medium risk</span>
+                </div>
+                <div class="finding-status Adequate">Adequate</div>
+            </div>
+            <div class="finding-section">
+                <div class="finding-label">Observation</div>
+                <div class="finding-text">Information technology controls are generally effective. Access controls, data backup procedures, and cybersecurity measures are appropriately implemented.</div>
+            </div>
+            <div class="finding-section">
+                <div class="finding-label">Recommendation</div>
+                <div class="finding-text recommendation">Conduct comprehensive IT security audit and implement multi-factor authentication across all critical systems.</div>
+            </div>
+            <div class="finding-section">
+                <div class="finding-label">Management Response</div>
+                <div class="finding-text management-response">Accepted - MFA rollout scheduled for completion by Q2 FY2026-27</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Internal Control Assessment -->
+    <div class="section">
+        <div class="section-title">Internal Control Assessment</div>
+        <div class="control-assessment">
+            <div class="control-item">
+                <div class="control-name">Control Environment</div>
+                <div class="control-rating">Strong - Management demonstrates commitment to integrity, ethical values, and competence.</div>
+            </div>
+            <div class="control-item">
+                <div class="control-name">Risk Assessment</div>
+                <div class="control-rating">Adequate - The organization has established processes to identify and analyze relevant risks.</div>
+            </div>
+            <div class="control-item">
+                <div class="control-name">Control Activities</div>
+                <div class="control-rating">Effective - Policies and procedures are in place to ensure management directives are carried out.</div>
+            </div>
+            <div class="control-item">
+                <div class="control-name">Information & Communication</div>
+                <div class="control-rating">Good - Relevant information is identified, captured, and communicated in a timely manner.</div>
+            </div>
+            <div class="control-item">
+                <div class="control-name">Monitoring</div>
+                <div class="control-rating">Satisfactory - Internal control systems are monitored and deficiencies are communicated promptly.</div>
+            </div>
+            <div class="control-item">
+                <div class="control-name"><strong>Overall Rating</strong></div>
+                <div class="control-rating"><strong>Satisfactory with opportunities for continuous improvement</strong></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Compliance Status -->
+    <div class="section">
+        <div class="section-title">Compliance Status</div>
+        <div class="compliance-grid">
+            <div class="compliance-card">
+                <div class="compliance-title">Tax Compliance</div>
+                <div class="compliance-status">Full compliance with Income Tax Act, GST regulations, and all applicable tax statutes</div>
+            </div>
+            <div class="compliance-card">
+                <div class="compliance-title">Statutory Compliance</div>
+                <div class="compliance-status">All statutory registers, records, and filings are maintained and current</div>
+            </div>
+            <div class="compliance-card">
+                <div class="compliance-title">Regulatory Compliance</div>
+                <div class="compliance-status">Compliance with industry-specific regulations and licensing requirements verified</div>
+            </div>
+            <div class="compliance-card">
+                <div class="compliance-title">Labor Compliance</div>
+                <div class="compliance-status">Adherence to labor laws, employee benefits, and workplace safety regulations confirmed</div>
+            </div>
+        </div>
+        <div class="content">
+            <p><strong>Overall Compliance Status:</strong> Compliant with no material violations or regulatory concerns identified</p>
+        </div>
+    </div>
+
+    <!-- Recommendations & Action Plan -->
+    <div class="section">
+        <div class="section-title">Recommendations & Action Plan</div>
+        <div class="recommendation-card priority-High">
+            <div class="recommendation-header">
+                <span class="priority-badge High">High Priority</span>
+            </div>
+            <div class="recommendation-title">Implement automated inventory tracking system with RFID technology</div>
+            <div class="recommendation-details">
+                <div class="detail-item">
+                    <div class="detail-label">Expected Benefit</div>
+                    <div class="detail-value">Real-time inventory visibility, reduced discrepancies, improved operational efficiency</div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">Timeline</div>
+                    <div class="detail-value">3-6 months</div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">Estimated Investment</div>
+                    <div class="detail-value">₹15,00,000 - ₹25,00,000</div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">Responsible Party</div>
+                    <div class="detail-value">Operations Manager &amp; IT Head</div>
+                </div>
+            </div>
+        </div>
+        <div class="recommendation-card priority-High">
+            <div class="recommendation-header">
+                <span class="priority-badge High">High Priority</span>
+            </div>
+            <div class="recommendation-title">Deploy multi-factor authentication across all critical business systems</div>
+            <div class="recommendation-details">
+                <div class="detail-item">
+                    <div class="detail-label">Expected Benefit</div>
+                    <div class="detail-value">Enhanced cybersecurity posture, reduced risk of unauthorized access</div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">Timeline</div>
+                    <div class="detail-value">2-3 months</div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">Estimated Investment</div>
+                    <div class="detail-value">₹8,00,000 - ₹12,00,000</div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">Responsible Party</div>
+                    <div class="detail-value">Chief Technology Officer</div>
+                </div>
+            </div>
+        </div>
+        <div class="recommendation-card priority-Medium">
+            <div class="recommendation-header">
+                <span class="priority-badge Medium">Medium Priority</span>
+            </div>
+            <div class="recommendation-title">Establish automated compliance monitoring and alert system</div>
+            <div class="recommendation-details">
+                <div class="detail-item">
+                    <div class="detail-label">Expected Benefit</div>
+                    <div class="detail-value">Proactive compliance management, reduced risk of regulatory violations</div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">Timeline</div>
+                    <div class="detail-value">4-6 months</div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">Estimated Investment</div>
+                    <div class="detail-value">₹10,00,000 - ₹18,00,000</div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">Responsible Party</div>
+                    <div class="detail-value">Compliance Officer &amp; CFO</div>
+                </div>
+            </div>
+        </div>
+        <div class="recommendation-card priority-Medium">
+            <div class="recommendation-header">
+                <span class="priority-badge Medium">Medium Priority</span>
+            </div>
+            <div class="recommendation-title">Enhance revenue documentation for complex multi-element arrangements</div>
+            <div class="recommendation-details">
+                <div class="detail-item">
+                    <div class="detail-label">Expected Benefit</div>
+                    <div class="detail-value">Improved audit trail, clearer revenue recognition justification</div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">Timeline</div>
+                    <div class="detail-value">1-2 months</div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">Estimated Investment</div>
+                    <div class="detail-value">Minimal - Internal process improvement</div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">Responsible Party</div>
+                    <div class="detail-value">Finance Controller</div>
+                </div>
+            </div>
+        </div>
+        <div class="recommendation-card priority-Low">
+            <div class="recommendation-header">
+                <span class="priority-badge Low">Low Priority</span>
+            </div>
+            <div class="recommendation-title">Implement automated bank reconciliation tools for high-volume accounts</div>
+            <div class="recommendation-details">
+                <div class="detail-item">
+                    <div class="detail-label">Expected Benefit</div>
+                    <div class="detail-value">Reduced manual effort, faster month-end close, improved accuracy</div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">Timeline</div>
+                    <div class="detail-value">3-4 months</div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">Estimated Investment</div>
+                    <div class="detail-value">₹5,00,000 - ₹8,00,000</div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">Responsible Party</div>
+                    <div class="detail-value">Accounts Manager</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Conclusion -->
+    <div class="section">
+        <div class="section-title">Conclusion</div>
+        <div class="conclusion-box">
+            <div class="conclusion-text">Based on our comprehensive audit examination, we conclude that Leverage  maintains sound financial management practices, effective internal controls, and strong regulatory compliance. The financial statements present a true and fair view of the organization's financial position and performance for the fiscal year 2026-27.
+
+While our audit identified several areas for improvement, none of the findings represent material weaknesses or significant deficiencies that would impact our overall opinion. The management has demonstrated responsiveness to our recommendations and has committed to implementing appropriate corrective actions within defined timelines.
+
+We commend the organization for maintaining transparent financial practices, robust governance frameworks, and proactive risk management. The recommendations outlined in this report are designed to further strengthen internal controls, enhance operational efficiency, and position the organization for continued growth and success.
+
+We appreciate the cooperation and assistance provided by management and staff throughout the audit process. We remain available for any clarifications or additional guidance regarding the implementation of our recommendations.</div>
+        </div>
+    </div>
+
+    <!-- Appendices -->
+    <div class="appendices-section">
+        <div class="appendices-title">📎 Appendices</div>
+        <ul class="appendices-list">
+            <li>Appendix A: Detailed Financial Statements</li>
+            <li>Appendix B: Internal Control Testing Documentation</li>
+            <li>Appendix C: Compliance Checklist and Evidence</li>
+            <li>Appendix D: Management Representation Letter</li>
+            <li>Appendix E: Audit Methodology and Sampling Approach</li>
+        </ul>
+    </div>
+
+    <!-- Disclaimer -->
+    <div class="disclaimer">
+        <div class="disclaimer-title">⚠️ Disclaimer</div>
+        <div class="disclaimer-text">This audit report is intended solely for the use of management, the board of directors, and regulatory authorities as applicable. It should not be distributed to or used by parties other than those specified without our prior written consent. The findings and recommendations are based on information available as of the audit date and conditions existing at that time.</div>
+    </div>
+
+    <!-- Signature Section -->
+    <div class="signature-grid">
+        <div class="sig-card">
+            <div class="sig-title">Lead Auditor</div>
+            <div class="sig-line"></div>
+            <div class="sig-info"><span class="sig-label">Name:</span> [Lead Auditor Name]</div>
+            <div class="sig-info"><span class="sig-label">Credentials:</span> Chartered Accountant</div>
+            <div class="sig-info"><span class="sig-label">Firm:</span> CA rajesh khanna</div>
+            <div class="sig-info"><span class="sig-label">Membership No:</span> XXXXX</div>
+            <div class="sig-info"><span class="sig-label">Date:</span> March 3, 2026</div>
+            <div class="sig-info"><span class="sig-label">Place:</span> India</div>
+        </div>
+        <div class="sig-card">
+            <div class="sig-title">Management Acknowledgment</div>
+            <div class="sig-line"></div>
+            <div class="sig-info"><span class="sig-label">Signature:</span> _________________________</div>
+            <div class="sig-line"></div>
+            <div class="sig-info"><span class="sig-label">Name & Title:</span> _________________________</div>
+            <div class="sig-line"></div>
+            <div class="sig-info"><span class="sig-label">Date:</span> _________________________</div>
+        </div>
+    </div>
+
+    <div class="footer">
+        <p>Generated with MM Docs AI • Professional Workspace</p>
+    </div>
+</body>
+
+</html>

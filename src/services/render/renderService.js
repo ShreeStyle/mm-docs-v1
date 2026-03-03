@@ -147,6 +147,10 @@ const getTemplateForDocumentType = (documentType) => {
         'invoice': 'invoice',
         'gst_invoice': 'gst_invoice',
         'audit_report': 'audit_report',
+        'gst_filing_summary': 'gst_filing_summary',
+        'gst_filing': 'gst_filing_summary',
+        'policy_document': 'policy_document',
+        'regulatory_filing': 'regulatory_filing',
         'proposal': 'proposal',
         'resume': 'resume',
         'marketing_brief': 'marketing_brief'
@@ -231,9 +235,12 @@ exports.renderDocument = async (document, brandKit) => {
         const footerHTML = generateFooterHTML(brandKit);
 
         // Prepare data for template
+        const docObj = document.toObject();
         const data = {
-            ...document.toObject(),
-            ...document.content, // Spread the content fields to root level for Handlebars
+            _id: docObj._id,
+            title: docObj.title,
+            type: docObj.type,
+            ...docObj.content, // Spread the content fields to root level for Handlebars
             brandKit: brandKit ? brandKit.toObject() : {},
             brandCSS,
             brandHeader,
@@ -245,6 +252,25 @@ exports.renderDocument = async (document, brandKit) => {
             fontFamily: brandKit?.fontFamily || 'Inter',
             generatedDate: new Date().toLocaleDateString()
         };
+
+        // Debug logging to verify array structures
+        if (document.type === 'audit_report' && data.auditFindings) {
+            console.log('🔍 AUDIT REPORT DEBUG:');
+            console.log('  - auditFindings type:', typeof data.auditFindings);
+            console.log('  - auditFindings is Array?:', Array.isArray(data.auditFindings));
+            console.log('  - auditFindings length:', data.auditFindings?.length);
+            if (Array.isArray(data.auditFindings) && data.auditFindings.length > 0) {
+                console.log('  - First finding structure:', JSON.stringify(data.auditFindings[0]).substring(0, 150));
+            }
+            if (data.executiveSummary?.keyFindings) {
+                console.log('  - keyFindings type:', typeof data.executiveSummary.keyFindings);
+                console.log('  - keyFindings is Array?:', Array.isArray(data.executiveSummary.keyFindings));
+                console.log('  - keyFindings length:', data.executiveSummary.keyFindings?.length);
+                if (Array.isArray(data.executiveSummary.keyFindings)) {
+                    console.log('  - keyFindings:', JSON.stringify(data.executiveSummary.keyFindings));
+                }
+            }
+        }
 
         return template(data);
 

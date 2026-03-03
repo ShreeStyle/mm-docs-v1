@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{title}}</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, sans-serif;
+            line-height: 1.7;
+            color: #1f2937;
+            max-width: 850px;
+            margin: 0 auto;
+            padding: 40px;
+            background: white;
+            font-size: 14px;
+        }
+
+        .header {
+            text-align: center;
+            padding-bottom: 28px;
+            margin-bottom: 36px;
+            border-bottom: 3px solid #2563eb;
+        }
+
+        .doc-title {
+            font-size: 32px;
+            font-weight: 800;
+            color: #2563eb;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            margin-bottom: 10px;
+        }
+
+        .doc-subtitle {
+            font-size: 16px;
+            font-weight: 500;
+            color: #6b7280;
+            margin-bottom: 8px;
+        }
+
+        .policy-badge {
+            display: inline-block;
+            padding: 6px 16px;
+            border-radius: 9999px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            background: #dbeafe;
+            color: #1e40af;
+            margin-top: 12px;
+        }
+
+        .company-section {
+            background: #f9fafb;
+            border-left: 4px solid #2563eb;
+            padding: 20px;
+            margin-bottom: 32px;
+            border-radius: 6px;
+        }
+
+        .company-name {
+            font-size: 22px;
+            font-weight: 700;
+            color: #111827;
+            margin-bottom: 8px;
+        }
+
+        .company-detail {
+            font-size: 13px;
+            color: #4b5563;
+            line-height: 1.6;
+            margin-bottom: 4px;
+        }
+
+        .meta-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 32px;
+        }
+
+        .meta-card {
+            background: #ffffff;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 16px;
+        }
+
+        .meta-label {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: #9ca3af;
+            font-weight: 600;
+            margin-bottom: 6px;
+        }
+
+        .meta-value {
+            font-size: 15px;
+            font-weight: 600;
+            color: #111827;
+        }
+
+        .section-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: #111827;
+            margin: 32px 0 16px 0;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #e5e7eb;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .section-title::before {
+            content: '';
+            width: 4px;
+            height: 24px;
+            background: #2563eb;
+            border-radius: 2px;
+        }
+
+        .section-content {
+            color: #374151;
+            line-height: 1.8;
+            margin-bottom: 24px;
+        }
+
+        .section-content p {
+            margin-bottom: 16px;
+        }
+
+        .section-content ul,
+        .section-content ol {
+            margin-left: 24px;
+            margin-bottom: 16px;
+        }
+
+        .section-content li {
+            margin-bottom: 8px;
+            color: #4b5563;
+        }
+
+        .policy-item {
+            background: #f9fafb;
+            border-left: 3px solid #60a5fa;
+            padding: 16px;
+            margin-bottom: 16px;
+            border-radius: 4px;
+        }
+
+        .policy-item-title {
+            font-size: 15px;
+            font-weight: 700;
+            color: #1e40af;
+            margin-bottom: 8px;
+        }
+
+        .policy-item-content {
+            font-size: 13px;
+            color: #4b5563;
+            line-height: 1.7;
+        }
+
+        .highlight-box {
+            background: #eff6ff;
+            border: 1px solid #bfdbfe;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 24px 0;
+        }
+
+        .highlight-box-title {
+            font-size: 14px;
+            font-weight: 700;
+            color: #1e40af;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+
+        .highlight-box-content {
+            font-size: 13px;
+            color: #1e40af;
+            line-height: 1.7;
+        }
+
+        .violation-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 24px;
+        }
+
+        .violation-table th {
+            background: #2563eb;
+            color: white;
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+
+        .violation-table td {
+            padding: 12px;
+            border-bottom: 1px solid #e5e7eb;
+            font-size: 13px;
+            color: #4b5563;
+        }
+
+        .violation-table tr:hover {
+            background: #f9fafb;
+        }
+
+        .approval-section {
+            margin-top: 48px;
+            padding-top: 24px;
+            border-top: 2px solid #e5e7eb;
+        }
+
+        .signature-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 32px;
+            margin-top: 32px;
+        }
+
+        .signature-block {
+            text-align: center;
+        }
+
+        .signature-line {
+            border-top: 2px solid #111827;
+            padding-top: 8px;
+            margin-bottom: 6px;
+            font-weight: 600;
+            color: #111827;
+            font-size: 14px;
+        }
+
+        .signature-title {
+            font-size: 12px;
+            color: #6b7280;
+        }
+
+        .footer {
+            margin-top: 48px;
+            padding-top: 20px;
+            border-top: 2px solid #e5e7eb;
+            text-align: center;
+            color: #9ca3af;
+            font-size: 11px;
+        }
+
+        .footer-note {
+            margin-bottom: 6px;
+        }
+
+        @media print {
+            body {
+                padding: 20px;
+            }
+
+            .section-title {
+                page-break-after: avoid;
+            }
+
+            .policy-item {
+                page-break-inside: avoid;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="header">
+        <div class="doc-title">{{policyTitle}}</div>
+        <div class="doc-subtitle">{{#if policySubtitle}}{{policySubtitle}}{{else}}Company Policy Document{{/if}}</div>
+        <div class="policy-badge">{{#if policyType}}{{policyType}}{{else}}Internal Policy{{/if}}</div>
+    </div>
+
+    <div class="company-section">
+        <div class="company-name">{{companyName}}</div>
+        {{#if companyAddress}}<div class="company-detail">{{{companyAddress}}}</div>{{/if}}
+    </div>
+
+    <div class="meta-grid">
+        <div class="meta-card">
+            <div class="meta-label">Effective Date</div>
+            <div class="meta-value">{{#if effectiveDate}}{{effectiveDate}}{{else}}{{generatedDate}}{{/if}}</div>
+        </div>
+        {{#if version}}
+        <div class="meta-card">
+            <div class="meta-label">Version</div>
+            <div class="meta-value">{{version}}</div>
+        </div>
+        {{/if}}
+        {{#if department}}
+        <div class="meta-card">
+            <div class="meta-label">Department</div>
+            <div class="meta-value">{{department}}</div>
+        </div>
+        {{/if}}
+    </div>
+
+    {{#if policyPurpose}}
+    <div class="section-title">Policy Purpose</div>
+    <div class="section-content">
+        <p>{{policyPurpose}}</p>
+    </div>
+    {{/if}}
+
+    {{#if policyScope}}
+    <div class="section-title">Scope and Applicability</div>
+    <div class="section-content">
+        <p>{{policyScope}}</p>
+    </div>
+    {{/if}}
+
+    {{#if policyGuidelines}}
+    <div class="section-title">Policy Guidelines</div>
+    <div class="section-content">
+        {{{policyGuidelines}}}
+    </div>
+    {{/if}}
+
+    {{#if sections}}
+    {{#each sections}}
+    <div class="section-title">{{this.heading}}</div>
+    <div class="section-content">
+        {{{this.content}}}
+    </div>
+    {{/each}}
+    {{/if}}
+
+    {{#if procedures}}
+    <div class="section-title">Procedures and Compliance</div>
+    {{#each procedures}}
+    <div class="policy-item">
+        <div class="policy-item-title">{{this.title}}</div>
+        <div class="policy-item-content">{{this.description}}</div>
+    </div>
+    {{/each}}
+    {{/if}}
+
+    {{#if violations}}
+    <div class="section-title">Violations and Consequences</div>
+    <div class="section-content">
+        <p>Non-compliance with this policy may result in disciplinary action as outlined below:</p>
+    </div>
+    <table class="violation-table">
+        <thead>
+            <tr>
+                <th>Violation Type</th>
+                <th>Consequence</th>
+                <th>Severity Level</th>
+            </tr>
+        </thead>
+        <tbody>
+            {{#each violations}}
+            <tr>
+                <td>{{this.type}}</td>
+                <td>{{this.consequence}}</td>
+                <td>{{this.severity}}</td>
+            </tr>
+            {{/each}}
+        </tbody>
+    </table>
+    {{/if}}
+
+    <div class="highlight-box">
+        <div class="highlight-box-title">⚠️ Important Notice</div>
+        <div class="highlight-box-content">
+            {{#if importantNotice}}
+            {{importantNotice}}
+            {{else}}
+            All employees, contractors, and stakeholders are required to read, understand, and comply with this policy. Any questions or concerns regarding this policy should be directed to the appropriate department head or human resources department. This policy may be updated from time to time, and all concerned parties will be notified of any changes.
+            {{/if}}
+        </div>
+    </div>
+
+    {{#if reviewDate}}
+    <div class="section-content">
+        <p style="font-weight: 600; color: #1e40af;">Next Review Date: {{reviewDate}}</p>
+    </div>
+    {{/if}}
+
+    <div class="approval-section">
+        <p style="text-align: center; font-weight: 600; color: #111827; margin-bottom: 16px;">
+            This policy has been reviewed and approved by:
+        </p>
+        <div class="signature-grid">
+            <div class="signature-block">
+                <div style="height: 60px;"></div>
+                <div class="signature-line">{{#if approver1Name}}{{approver1Name}}{{else}}Management{{/if}}</div>
+                <div class="signature-title">{{#if approver1Title}}{{approver1Title}}{{else}}Authorized Signatory{{/if}}</div>
+            </div>
+            <div class="signature-block">
+                <div style="height: 60px;"></div>
+                <div class="signature-line">{{#if approver2Name}}{{approver2Name}}{{else}}HR Department{{/if}}</div>
+                <div class="signature-title">{{#if approver2Title}}{{approver2Title}}{{else}}Human Resources{{/if}}</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="footer">
+        <div class="footer-note">
+            This is an official policy document of {{companyName}}.
+        </div>
+        <div class="footer-note">
+            Generated on {{generatedDate}}
+        </div>
+        {{#if footerText}}
+        <div class="footer-note" style="margin-top: 12px;">
+            {{footerText}}
+        </div>
+        {{else}}
+        <div class="footer-note" style="margin-top: 12px;">
+            Generated with MM Docs AI • Professional Workspace
+        </div>
+        {{/if}}
+    </div>
+</body>
+
+</html>

@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GST Filing Summary</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, sans-serif;
+            line-height: 1.6;
+            color: #1f2937;
+            max-width: 850px;
+            margin: 0 auto;
+            padding: 40px;
+            background: white;
+            font-size: 13px;
+        }
+
+        .header {
+            text-align: center;
+            padding-bottom: 24px;
+            margin-bottom: 32px;
+            border-bottom: 3px solid #7c3aed;
+        }
+
+        .doc-title {
+            font-size: 32px;
+            font-weight: 800;
+            color: #7c3aed;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 8px;
+        }
+
+        .doc-subtitle {
+            font-size: 18px;
+            font-weight: 600;
+            color: #6b7280;
+            margin-bottom: 12px;
+        }
+
+        .filing-badge {
+            display: inline-block;
+            padding: 6px 16px;
+            border-radius: 9999px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            background: #f3e8ff;
+            color: #7c3aed;
+            margin-top: 8px;
+        }
+
+        .company-section {
+            background: #f9fafb;
+            border-left: 4px solid #7c3aed;
+            padding: 20px;
+            margin-bottom: 28px;
+            border-radius: 6px;
+        }
+
+        .company-name {
+            font-size: 20px;
+            font-weight: 700;
+            color: #111827;
+            margin-bottom: 8px;
+        }
+
+        .company-detail {
+            font-size: 13px;
+            color: #4b5563;
+            line-height: 1.6;
+            margin-bottom: 4px;
+        }
+
+        .company-detail strong {
+            color: #111827;
+            font-weight: 600;
+        }
+
+        .filing-meta {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+            margin-bottom: 32px;
+        }
+
+        .meta-card {
+            background: #ffffff;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 16px;
+        }
+
+        .meta-label {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: #9ca3af;
+            font-weight: 600;
+            margin-bottom: 6px;
+        }
+
+        .meta-value {
+            font-size: 15px;
+            font-weight: 600;
+            color: #111827;
+        }
+
+        .section-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #111827;
+            margin-bottom: 16px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid #e5e7eb;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .section-title::before {
+            content: '';
+            width: 4px;
+            height: 20px;
+            background: #7c3aed;
+            border-radius: 2px;
+        }
+
+        .financial-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-bottom: 32px;
+        }
+
+        .financial-card {
+            background: #f9fafb;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 20px;
+        }
+
+        .financial-label {
+            font-size: 12px;
+            color: #6b7280;
+            margin-bottom: 6px;
+        }
+
+        .financial-amount {
+            font-size: 24px;
+            font-weight: 700;
+            color: #111827;
+        }
+
+        .financial-amount.positive {
+            color: #059669;
+        }
+
+        .financial-amount.negative {
+            color: #dc2626;
+        }
+
+        .tax-breakdown {
+            background: #ffffff;
+            border: 2px solid #7c3aed;
+            border-radius: 10px;
+            padding: 24px;
+            margin-bottom: 32px;
+        }
+
+        .tax-breakdown-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: #7c3aed;
+            margin-bottom: 16px;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+
+        .tax-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid #e5e7eb;
+            font-size: 14px;
+        }
+
+        .tax-row:last-child {
+            border-bottom: none;
+        }
+
+        .tax-row.total {
+            font-weight: 700;
+            font-size: 16px;
+            color: #7c3aed;
+            padding-top: 16px;
+            border-top: 2px solid #7c3aed;
+            margin-top: 8px;
+        }
+
+        .tax-label {
+            color: #4b5563;
+        }
+
+        .tax-value {
+            font-weight: 600;
+            color: #111827;
+        }
+
+        .summary-section {
+            background: #f9fafb;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 24px;
+        }
+
+        .summary-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px dashed #d1d5db;
+        }
+
+        .summary-item:last-child {
+            border-bottom: none;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .status-badge.filed {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .status-badge.pending {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .compliance-note {
+            background: #eff6ff;
+            border-left: 4px solid #3b82f6;
+            padding: 16px;
+            border-radius: 4px;
+            margin-bottom: 24px;
+        }
+
+        .compliance-note-title {
+            font-size: 13px;
+            font-weight: 700;
+            color: #1e40af;
+            margin-bottom: 8px;
+        }
+
+        .compliance-note-text {
+            font-size: 12px;
+            color: #1e40af;
+            line-height: 1.6;
+        }
+
+        .footer {
+            margin-top: 48px;
+            padding-top: 20px;
+            border-top: 2px solid #e5e7eb;
+            text-align: center;
+            color: #9ca3af;
+            font-size: 11px;
+        }
+
+        .footer-note {
+            margin-bottom: 8px;
+        }
+
+        @media print {
+            body {
+                padding: 20px;
+            }
+
+            .financial-grid {
+                break-inside: avoid;
+            }
+
+            .tax-breakdown {
+                break-inside: avoid;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="header">
+        <div class="doc-title">GST Filing Summary</div>
+        <div class="doc-subtitle">Goods and Services Tax Return Summary</div>
+        <div class="filing-badge">{{returnType}}</div>
+    </div>
+
+    <div class="company-section">
+        <div class="company-name">{{companyName}}</div>
+        <div class="company-detail">{{{companyAddress}}}</div>
+        <div class="company-detail"><strong>GSTIN:</strong> {{gstNumber}}</div>
+    </div>
+
+    <div class="filing-meta">
+        <div class="meta-card">
+            <div class="meta-label">Filing Period</div>
+            <div class="meta-value">{{filingPeriod}}</div>
+        </div>
+        <div class="meta-card">
+            <div class="meta-label">Return Type</div>
+            <div class="meta-value">{{returnType}}</div>
+        </div>
+        <div class="meta-card">
+            <div class="meta-label">Filing Date</div>
+            <div class="meta-value">{{#if filingDate}}{{filingDate}}{{else}}{{generatedDate}}{{/if}}</div>
+        </div>
+    </div>
+
+    <div class="section-title">Financial Overview</div>
+    <div class="financial-grid">
+        <div class="financial-card">
+            <div class="financial-label">Total Sales (Turnover)</div>
+            <div class="financial-amount">₹{{totalSales}}</div>
+        </div>
+        <div class="financial-card">
+            <div class="financial-label">Total Purchases</div>
+            <div class="financial-amount">₹{{totalPurchases}}</div>
+        </div>
+    </div>
+
+    <div class="section-title">Tax Computation</div>
+    <div class="tax-breakdown">
+        <div class="tax-breakdown-title">GST Summary</div>
+
+        <div class="tax-row">
+            <div class="tax-label">Output Tax (Tax on Sales)</div>
+            <div class="tax-value">₹{{outputTax}}</div>
+        </div>
+
+        <div class="tax-row">
+            <div class="tax-label">Input Tax Credit (ITC)</div>
+            <div class="tax-value">₹{{inputTax}}</div>
+        </div>
+
+        {{#if interestPayable}}
+        <div class="tax-row">
+            <div class="tax-label">Interest Payable</div>
+            <div class="tax-value">₹{{interestPayable}}</div>
+        </div>
+        {{/if}}
+
+        {{#if lateFee}}
+        <div class="tax-row">
+            <div class="tax-label">Late Fee</div>
+            <div class="tax-value">₹{{lateFee}}</div>
+        </div>
+        {{/if}}
+
+        <div class="tax-row total">
+            <div class="tax-label">Net Tax Payable</div>
+            <div class="tax-value">₹{{#if netTaxPayable}}{{netTaxPayable}}{{else}}{{calc outputTax inputTax}}{{/if}}</div>
+        </div>
+    </div>
+
+    {{#if taxableSupplies}}
+    <div class="section-title">Taxable Supplies Breakdown</div>
+    <div class="summary-section">
+        {{#each taxableSupplies}}
+        <div class="summary-item">
+            <span>{{this.description}}</span>
+            <span style="font-weight: 600;">₹{{this.amount}}</span>
+        </div>
+        {{/each}}
+    </div>
+    {{/if}}
+
+    {{#if complianceStatus}}
+    <div class="section-title">Filing Status</div>
+    <div class="summary-section">
+        <div class="summary-item">
+            <span>Compliance Status</span>
+            <span class="status-badge {{#if (eq complianceStatus 'Filed')}}filed{{else}}pending{{/if}}">{{complianceStatus}}</span>
+        </div>
+        {{#if filingReference}}
+        <div class="summary-item">
+            <span>Filing Reference Number</span>
+            <span style="font-weight: 600;">{{filingReference}}</span>
+        </div>
+        {{/if}}
+    </div>
+    {{/if}}
+
+    <div class="compliance-note">
+        <div class="compliance-note-title">⚠️ Important Compliance Information</div>
+        <div class="compliance-note-text">
+            This GST filing summary is prepared based on the information provided. Please ensure all figures are accurate before final submission to the GST portal. Late filing may result in interest and penalties as per GST regulations. For detailed filing requirements, please refer to the official GST portal or consult with your tax advisor.
+        </div>
+    </div>
+
+    {{#if remarks}}
+    <div class="section-title">Additional Remarks</div>
+    <div class="summary-section">
+        <p style="color: #4b5563; line-height: 1.8;">{{remarks}}</p>
+    </div>
+    {{/if}}
+
+    <div class="footer">
+        <div class="footer-note">
+            This is a system-generated GST filing summary document.
+        </div>
+        <div class="footer-note">
+            Generated on {{generatedDate}} | {{companyName}}
+        </div>
+        {{#if footerText}}
+        <div class="footer-note" style="margin-top: 12px;">
+            {{footerText}}
+        </div>
+        {{else}}
+        <div class="footer-note" style="margin-top: 12px;">
+            Generated with MM Docs AI • Professional Workspace
+        </div>
+        {{/if}}
+    </div>
+</body>
+
+</html>
