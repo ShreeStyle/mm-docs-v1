@@ -1819,3 +1819,82 @@ button {
     font-size: 20px;
   }
 }
+
+/* ============================================================
+   ADDITIONAL RESPONSIVE RULES FOR INNER PAGES
+   ============================================================ */
+
+/* Settings page grid */
+@media (max-width: 768px) {
+  .settings-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .doc-card-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .doc-meta-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .doc-table {
+    font-size: 12px;
+  }
+
+  .doc-table th,
+  .doc-table td {
+    padding: 8px;
+  }
+
+  .view-header h1 {
+    font-size: 24px;
+  }
+
+  .feature-view,
+  .document-view,
+  .search-container,
+  .inbox-list {
+    max-width: 100%;
+  }
+
+  .search-bar-expanded {
+    padding: 14px 16px;
+  }
+
+  .search-bar-expanded input {
+    font-size: 15px;
+  }
+
+  .home-view {
+    max-width: 100%;
+  }
+
+  /* Auth card more compact on mobile */
+  .auth-card {
+    padding: 32px 20px;
+    border-radius: 20px;
+  }
+
+  .login-page-container {
+    padding: 20px 16px;
+    align-items: flex-start;
+    padding-top: 60px;
+  }
+}
+
+@media (max-width: 480px) {
+  .doc-card-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .auth-card {
+    padding: 24px 16px;
+  }
+
+  .settings-card {
+    padding: 16px;
+  }
+}

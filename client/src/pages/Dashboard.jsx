@@ -11,7 +11,7 @@ import {
     Paperclip, AtSign, Globe, FileText, Bot, Zap,
     ChevronRight, Layout, LogOut, BarChart, Star,
     TrendingUp, DollarSign, Shield, Users, Bell,
-    Filter, Download, Eye, Edit3, Archive, User
+    Filter, Download, Eye, Edit3, Archive, User, Menu, X
 } from 'lucide-react';
 
 const LogoIcon = () => (
@@ -52,6 +52,22 @@ export default function Dashboard() {
     const [validationErrors, setValidationErrors] = useState([]);
 
     const [isPro, setIsPro] = useState(user?.plan === 'pro');
+
+    // Responsive state
+    const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
+    const [isTablet, setIsTablet] = useState(window.innerWidth <= 1024);
+    const [sidebarOpen, setSidebarOpen] = useState(false);
+
+    useEffect(() => {
+        const handleResize = () => {
+            const w = window.innerWidth;
+            setIsMobile(w <= 768);
+            setIsTablet(w <= 1024);
+            if (w > 768) setSidebarOpen(false);
+        };
+        window.addEventListener('resize', handleResize);
+        return () => window.removeEventListener('resize', handleResize);
+    }, []);
 
     // Document viewing and downloading functions
     const handleViewDocument = (doc) => {
@@ -137,192 +153,225 @@ export default function Dashboard() {
     };
     // Sidebar Component
     const Sidebar = () => (
-        <div style={{
-            width: '280px',
-            height: '100vh',
-            backgroundColor: '#FAFAFA',
-            borderRight: '1px solid #E5E7EB',
-            position: 'fixed',
-            left: 0,
-            top: 0,
-            display: 'flex',
-            flexDirection: 'column',
-            zIndex: 1000
-        }}>
-            {/* Logo Section */}
+        <>
+            {/* Mobile Overlay */}
+            {isMobile && sidebarOpen && (
+                <div
+                    onClick={() => setSidebarOpen(false)}
+                    style={{
+                        position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
+                        backgroundColor: 'rgba(0,0,0,0.5)', zIndex: 999
+                    }}
+                />
+            )}
             <div style={{
-                padding: '24px',
-                borderBottom: '1px solid #E5E7EB',
+                width: '280px',
+                height: '100vh',
+                backgroundColor: '#FAFAFA',
+                borderRight: '1px solid #E5E7EB',
+                position: 'fixed',
+                left: isMobile ? (sidebarOpen ? '0' : '-280px') : '0',
+                top: 0,
                 display: 'flex',
-                alignItems: 'center',
-                gap: '12px'
+                flexDirection: 'column',
+                zIndex: 1000,
+                transition: 'left 0.3s ease',
+                overflowY: 'auto'
             }}>
-                <LogoIcon />
-                <div>
-                    <h1 style={{
-                        fontSize: '20px',
-                        fontWeight: '700',
-                        color: '#111827',
-                        margin: 0,
-                        fontFamily: 'Inter, sans-serif'
-                    }}>MM Docs</h1>
-                    <p style={{
-                        fontSize: '12px',
-                        color: '#6B7280',
-                        margin: 0,
-                        fontWeight: '500'
-                    }}>AI Document Platform</p>
-                </div>
-            </div>
-
-            {/* Navigation Menu */}
-            <nav style={{ flex: 1, padding: '24px 16px' }}>
-                {sidebarItems.map((item) => {
-                    const Icon = item.icon;
-                    return (
-                        <button
-                            key={item.id}
-                            onClick={() => {
-                                if (item.id === 'templates') {
-                                    setSelectedCategory(null);
-                                    setSelectedDocType(null);
-                                }
-                                setGeneratedDoc(null);
-                                setCurrentView(item.id);
-                            }}
-                            style={{
-                                width: '100%',
-                                display: 'flex',
-                                alignItems: 'center',
-                                gap: '12px',
-                                padding: '12px 16px',
-                                marginBottom: '4px',
-                                backgroundColor: item.active ? '#F97316' : 'transparent',
-                                color: item.active ? 'white' : '#6B7280',
-                                border: 'none',
-                                borderRadius: '12px',
-                                fontSize: '14px',
-                                fontWeight: '500',
-                                cursor: 'pointer',
-                                transition: 'all 0.2s ease',
-                                textAlign: 'left'
-                            }}
-                            onMouseEnter={(e) => {
-                                if (!item.active) {
-                                    e.target.style.backgroundColor = '#F3F4F6';
-                                    e.target.style.color = '#374151';
-                                }
-                            }}
-                            onMouseLeave={(e) => {
-                                if (!item.active) {
-                                    e.target.style.backgroundColor = 'transparent';
-                                    e.target.style.color = '#6B7280';
-                                }
-                            }}
-                        >
-                            <Icon size={20} />
-                            {item.label}
-                        </button>
-                    );
-                })}
-            </nav>
-
-            {/* Profile Section */}
-            <div style={{
-                padding: '24px',
-                borderTop: '1px solid #E5E7EB',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '12px'
-            }}>
+                {/* Logo Section */}
                 <div style={{
-                    width: '40px',
-                    height: '40px',
-                    borderRadius: '10px',
-                    backgroundColor: '#F97316',
+                    padding: '24px',
+                    borderBottom: '1px solid #E5E7EB',
                     display: 'flex',
                     alignItems: 'center',
-                    justifyContent: 'center',
-                    color: 'white',
-                    fontWeight: '600',
-                    fontSize: '16px'
+                    gap: '12px'
                 }}>
-                    {user?.name?.charAt(0) || 'U'}
+                    <LogoIcon />
+                    <div style={{ flex: 1 }}>
+                        <h1 style={{
+                            fontSize: '20px',
+                            fontWeight: '700',
+                            color: '#111827',
+                            margin: 0,
+                            fontFamily: 'Inter, sans-serif'
+                        }}>MM Docs</h1>
+                        <p style={{
+                            fontSize: '12px',
+                            color: '#6B7280',
+                            margin: 0,
+                            fontWeight: '500'
+                        }}>AI Document Platform</p>
+                    </div>
+                    {isMobile && (
+                        <button
+                            onClick={() => setSidebarOpen(false)}
+                            style={{ padding: '6px', background: 'transparent', border: 'none', cursor: 'pointer', borderRadius: '6px', color: '#6B7280', display: 'flex', alignItems: 'center' }}
+                        >
+                            <X size={20} />
+                        </button>
+                    )}
                 </div>
-                <div style={{ flex: 1 }}>
-                    <p style={{
-                        fontSize: '14px',
+
+                {/* Navigation Menu */}
+                <nav style={{ flex: 1, padding: '24px 16px' }}>
+                    {sidebarItems.map((item) => {
+                        const Icon = item.icon;
+                        return (
+                            <button
+                                key={item.id}
+                                onClick={() => {
+                                    if (item.id === 'templates') {
+                                        setSelectedCategory(null);
+                                        setSelectedDocType(null);
+                                    }
+                                    setGeneratedDoc(null);
+                                    setCurrentView(item.id);
+                                    if (isMobile) setSidebarOpen(false);
+                                }}
+                                style={{
+                                    width: '100%',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    gap: '12px',
+                                    padding: '12px 16px',
+                                    marginBottom: '4px',
+                                    backgroundColor: item.active ? '#F97316' : 'transparent',
+                                    color: item.active ? 'white' : '#6B7280',
+                                    border: 'none',
+                                    borderRadius: '12px',
+                                    fontSize: '14px',
+                                    fontWeight: '500',
+                                    cursor: 'pointer',
+                                    transition: 'all 0.2s ease',
+                                    textAlign: 'left'
+                                }}
+                                onMouseEnter={(e) => {
+                                    if (!item.active) {
+                                        e.target.style.backgroundColor = '#F3F4F6';
+                                        e.target.style.color = '#374151';
+                                    }
+                                }}
+                                onMouseLeave={(e) => {
+                                    if (!item.active) {
+                                        e.target.style.backgroundColor = 'transparent';
+                                        e.target.style.color = '#6B7280';
+                                    }
+                                }}
+                            >
+                                <Icon size={20} />
+                                {item.label}
+                            </button>
+                        );
+                    })}
+                </nav>
+
+                {/* Profile Section */}
+                <div style={{
+                    padding: '24px',
+                    borderTop: '1px solid #E5E7EB',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '12px'
+                }}>
+                    <div style={{
+                        width: '40px',
+                        height: '40px',
+                        borderRadius: '10px',
+                        backgroundColor: '#F97316',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        color: 'white',
                         fontWeight: '600',
-                        color: '#111827',
-                        margin: 0
-                    }}>{user?.name || 'User'}</p>
-                    <p style={{
-                        fontSize: '12px',
-                        color: '#6B7280',
-                        margin: 0
-                    }}>{isPro ? 'Pro Plan' : 'Free Plan'}</p>
+                        fontSize: '16px'
+                    }}>
+                        {user?.name?.charAt(0) || 'U'}
+                    </div>
+                    <div style={{ flex: 1 }}>
+                        <p style={{
+                            fontSize: '14px',
+                            fontWeight: '600',
+                            color: '#111827',
+                            margin: 0
+                        }}>{user?.name || 'User'}</p>
+                        <p style={{
+                            fontSize: '12px',
+                            color: '#6B7280',
+                            margin: 0
+                        }}>{isPro ? 'Pro Plan' : 'Free Plan'}</p>
+                    </div>
+                    <button
+                        onClick={handleLogout}
+                        style={{
+                            padding: '8px',
+                            backgroundColor: 'transparent',
+                            border: 'none',
+                            borderRadius: '8px',
+                            color: '#6B7280',
+                            cursor: 'pointer',
+                            transition: 'all 0.2s ease'
+                        }}
+                        onMouseEnter={(e) => {
+                            e.target.style.backgroundColor = '#F3F4F6';
+                            e.target.style.color = '#374151';
+                        }}
+                        onMouseLeave={(e) => {
+                            e.target.style.backgroundColor = 'transparent';
+                            e.target.style.color = '#6B7280';
+                        }}
+                    >
+                        <LogOut size={16} />
+                    </button>
                 </div>
-                <button
-                    onClick={handleLogout}
-                    style={{
-                        padding: '8px',
-                        backgroundColor: 'transparent',
-                        border: 'none',
-                        borderRadius: '8px',
-                        color: '#6B7280',
-                        cursor: 'pointer',
-                        transition: 'all 0.2s ease'
-                    }}
-                    onMouseEnter={(e) => {
-                        e.target.style.backgroundColor = '#F3F4F6';
-                        e.target.style.color = '#374151';
-                    }}
-                    onMouseLeave={(e) => {
-                        e.target.style.backgroundColor = 'transparent';
-                        e.target.style.color = '#6B7280';
-                    }}
-                >
-                    <LogOut size={16} />
-                </button>
             </div>
-        </div>
+        </>
     );
     // Top Header Component
     const TopHeader = () => (
         <div style={{
-            height: '80px',
+            height: isMobile ? '60px' : '80px',
             backgroundColor: 'white',
             borderBottom: '1px solid #E5E7EB',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
-            padding: '0 32px',
+            padding: isMobile ? '0 16px' : '0 32px',
             position: 'sticky',
             top: 0,
             zIndex: 100
         }}>
-            <div>
-                <h1 style={{
-                    fontSize: '28px',
-                    fontWeight: '700',
-                    color: '#111827',
-                    margin: 0,
-                    textTransform: 'capitalize'
-                }}>{currentView === 'dashboard' ? 'Dashboard' : currentView.replace(/([A-Z])/g, ' $1').trim()}</h1>
-                {currentView === 'dashboard' && (
-                    <p style={{
-                        fontSize: '16px',
-                        color: '#6B7280',
-                        margin: '4px 0 0 0'
-                    }}>Good evening, {user?.name?.split(' ')[0]} – MM Docs Excellence & Strategic Mastery</p>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                {isMobile && (
+                    <button
+                        onClick={() => setSidebarOpen(true)}
+                        style={{ padding: '8px', border: 'none', background: 'transparent', cursor: 'pointer', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                    >
+                        <Menu size={24} color="#374151" />
+                    </button>
                 )}
+                <div>
+                    <h1 style={{
+                        fontSize: isMobile ? '18px' : '28px',
+                        fontWeight: '700',
+                        color: '#111827',
+                        margin: 0,
+                        textTransform: 'capitalize'
+                    }}>{currentView === 'dashboard' ? 'Dashboard' : currentView.replace(/([A-Z])/g, ' $1').trim()}</h1>
+                    {currentView === 'dashboard' && !isMobile && (
+                        <p style={{
+                            fontSize: '16px',
+                            color: '#6B7280',
+                            margin: '4px 0 0 0'
+                        }}>Good evening, {user?.name?.split(' ')[0]} – MM Docs Excellence & Strategic Mastery</p>
+                    )}
+                </div>
             </div>
 
-            <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-                {/* Search Bar */}
-                <div style={{
+            <div style={{ display: 'flex', alignItems: 'center', gap: isMobile ? '8px' : '16px' }}>
+                {/* Search Bar - hidden on mobile */}
+                {!isMobile && <div style={{
                     position: 'relative',
-                    width: '320px'
+                    width: isTablet ? '200px' : '320px'
                 }}>
                     <Search
                         size={20}
@@ -362,12 +411,12 @@ export default function Dashboard() {
                             e.target.style.boxShadow = 'none';
                         }}
                     />
-                </div>
+                </div>}
 
                 {/* Notifications */}
                 <button style={{
-                    width: '44px',
-                    height: '44px',
+                    width: isMobile ? '36px' : '44px',
+                    height: isMobile ? '36px' : '44px',
                     borderRadius: '12px',
                     border: '1px solid #E5E7EB',
                     backgroundColor: 'white',
@@ -378,13 +427,13 @@ export default function Dashboard() {
                     transition: 'all 0.2s ease',
                     position: 'relative'
                 }}>
-                    <Bell size={20} color="#6B7280" />
+                    <Bell size={isMobile ? 18 : 20} color="#6B7280" />
                     <div style={{
                         position: 'absolute',
-                        top: '8px',
-                        right: '8px',
-                        width: '8px',
-                        height: '8px',
+                        top: '6px',
+                        right: '6px',
+                        width: '7px',
+                        height: '7px',
                         backgroundColor: '#EF4444',
                         borderRadius: '50%'
                     }} />
@@ -392,8 +441,8 @@ export default function Dashboard() {
 
                 {/* Profile Avatar */}
                 <div style={{
-                    width: '44px',
-                    height: '44px',
+                    width: isMobile ? '36px' : '44px',
+                    height: isMobile ? '36px' : '44px',
                     borderRadius: '12px',
                     backgroundColor: '#F97316',
                     display: 'flex',
@@ -401,7 +450,7 @@ export default function Dashboard() {
                     justifyContent: 'center',
                     color: 'white',
                     fontWeight: '600',
-                    fontSize: '16px',
+                    fontSize: isMobile ? '14px' : '16px',
                     cursor: 'pointer'
                 }}>
                     {user?.name?.charAt(0) || 'U'}
@@ -411,12 +460,12 @@ export default function Dashboard() {
     );
     // Dashboard Overview Page
     const DashboardOverview = () => (
-        <div style={{ padding: '32px' }}>
+        <div style={{ padding: isMobile ? '16px' : '32px' }}>
             {/* Overview Cards */}
             <div style={{
                 display: 'grid',
-                gridTemplateColumns: 'repeat(4, 1fr)',
-                gap: '24px',
+                gridTemplateColumns: isMobile ? 'repeat(2, 1fr)' : isTablet ? 'repeat(2, 1fr)' : 'repeat(4, 1fr)',
+                gap: isMobile ? '12px' : '24px',
                 marginBottom: '32px'
             }}>
                 {/* Total Documents */}
@@ -584,7 +633,7 @@ export default function Dashboard() {
                 </div>
             </div>
             {/* Main Content Grid */}
-            <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '32px' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : isTablet ? '1fr' : '2fr 1fr', gap: isMobile ? '16px' : '32px' }}>
                 {/* Recent Activity */}
                 <div style={{
                     backgroundColor: 'white',
@@ -607,7 +656,7 @@ export default function Dashboard() {
                         }}>Your latest document generation activity</p>
                     </div>
 
-                    <div style={{ 
+                    <div style={{
                         padding: '0',
                         maxHeight: '500px',
                         overflowY: 'auto'
@@ -789,7 +838,7 @@ export default function Dashboard() {
     );
     // Create Document Page
     const CreateDocumentPage = () => (
-        <div style={{ padding: '32px' }}>
+        <div style={{ padding: isMobile ? '16px' : '32px' }}>
             {!selectedCategory ? (
                 <>
                     <div style={{ marginBottom: '32px', textAlign: 'center' }}>
@@ -808,8 +857,8 @@ export default function Dashboard() {
 
                     <div style={{
                         display: 'grid',
-                        gridTemplateColumns: 'repeat(5, 1fr)',
-                        gap: '24px',
+                        gridTemplateColumns: isMobile ? 'repeat(2, 1fr)' : isTablet ? 'repeat(3, 1fr)' : 'repeat(5, 1fr)',
+                        gap: isMobile ? '12px' : '24px',
                         maxWidth: '1200px',
                         margin: '0 auto'
                     }}>
@@ -895,8 +944,8 @@ export default function Dashboard() {
 
                         <div style={{
                             display: 'grid',
-                            gridTemplateColumns: 'repeat(2, 1fr)',
-                            gap: '24px',
+                            gridTemplateColumns: isMobile ? '1fr' : 'repeat(2, 1fr)',
+                            gap: isMobile ? '12px' : '24px',
                             maxWidth: '800px',
                             margin: '0 auto'
                         }}>
@@ -1219,28 +1268,30 @@ export default function Dashboard() {
         console.log('Documents in MyDocumentsPage:', docs);
 
         return (
-            <div style={{ padding: '32px' }}>
+            <div style={{ padding: isMobile ? '16px' : '32px' }}>
                 <div style={{
                     display: 'flex',
+                    flexDirection: isMobile ? 'column' : 'row',
                     justifyContent: 'space-between',
-                    alignItems: 'center',
+                    alignItems: isMobile ? 'flex-start' : 'center',
+                    gap: isMobile ? '16px' : '0',
                     marginBottom: '32px'
                 }}>
                     <div>
                         <h2 style={{
-                            fontSize: '28px',
+                            fontSize: isMobile ? '22px' : '28px',
                             fontWeight: '700',
                             color: '#111827',
                             margin: 0
                         }}>My Documents</h2>
                         <p style={{
-                            fontSize: '16px',
+                            fontSize: '14px',
                             color: '#6B7280',
                             margin: '4px 0 0 0'
                         }}>Manage and organize your generated documents</p>
                     </div>
 
-                    <div style={{ display: 'flex', gap: '12px' }}>
+                    <div style={{ display: 'flex', gap: '12px', flexShrink: 0 }}>
                         <button style={{
                             padding: '10px 16px',
                             backgroundColor: 'white',
@@ -1288,8 +1339,8 @@ export default function Dashboard() {
                 }}>
                     {docs.length > 0 ? (
                         <div>
-                            {/* Table Header */}
-                            <div style={{
+                            {/* Table Header - hidden on mobile, use card view instead */}
+                            {!isMobile && <div style={{
                                 display: 'grid',
                                 gridTemplateColumns: '2fr 1fr 1fr 1fr 1fr',
                                 gap: '16px',
@@ -1306,19 +1357,20 @@ export default function Dashboard() {
                                 <div>Created Date</div>
                                 <div>Status</div>
                                 <div>Actions</div>
-                            </div>
+                            </div>}
 
                             {/* Table Rows */}
                             {docs.map((doc, index) => (
                                 <div
                                     key={doc._id || index}
                                     style={{
-                                        display: 'grid',
-                                        gridTemplateColumns: '2fr 1fr 1fr 1fr 1fr',
+                                        display: isMobile ? 'flex' : 'grid',
+                                        flexDirection: isMobile ? 'column' : undefined,
+                                        gridTemplateColumns: isMobile ? undefined : '2fr 1fr 1fr 1fr 1fr',
                                         gap: '16px',
-                                        padding: '16px 24px',
+                                        padding: isMobile ? '16px' : '16px 24px',
                                         borderBottom: index < docs.length - 1 ? '1px solid #F3F4F6' : 'none',
-                                        alignItems: 'center'
+                                        alignItems: isMobile ? undefined : 'center'
                                     }}
                                 >
                                     <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
@@ -1948,7 +2000,7 @@ export default function Dashboard() {
                 ...prev,
                 [fieldId]: value
             }));
-            
+
             // Clear validation errors when user starts filling the form
             if (validationErrors.length > 0) {
                 setValidationErrors([]);
@@ -2361,7 +2413,7 @@ HR Department
         const handleGenerate = async () => {
             setIsGenerating(true);
             setValidationErrors([]); // Clear previous errors
-            
+
             try {
                 // Validate required fields
                 const requiredFields = formFields.filter(field => field.required);
@@ -2423,7 +2475,7 @@ HR Department
                 // Call the document generation endpoint
                 console.log('🔄 Fetching document generation API');
                 console.log('🔑 Token:', token ? 'Present' : 'Missing');
-                
+
                 const response = await fetch(getApiUrl('/api/documents/generate'), {
                     method: 'POST',
                     headers: {
@@ -2552,89 +2604,90 @@ HR Department
                                     </p>
                                 </div>
                             )}
-                            
+
                             {formFields.map((field) => {
                                 const hasError = field.required && validationErrors.includes(field.label);
                                 const borderColor = hasError ? '#EF4444' : '#D1D5DB';
-                                
+
                                 return (
-                                <div key={field.id}>
-                                    <label style={{
-                                        display: 'block',
-                                        fontSize: '14px',
-                                        fontWeight: '600',
-                                        color: hasError ? '#EF4444' : '#374151',
-                                        marginBottom: '6px'
-                                    }}>
-                                        {field.label} {field.required && <span style={{ color: '#EF4444' }}>*</span>}
-                                    </label>
-                                    {field.type === 'textarea' ? (
-                                        <textarea
-                                            value={formData[field.id] || ''}
-                                            onChange={(e) => handleInputChange(field.id, e.target.value)}
-                                            placeholder={field.placeholder}
-                                            rows={3}
-                                            style={{
-                                                width: '100%',
-                                                padding: '12px',
-                                                border: `2px solid ${borderColor}`,
-                                                borderRadius: '8px',
-                                                fontSize: '14px',
-                                                fontFamily: 'Inter, sans-serif',
-                                                resize: 'vertical',
-                                                outline: 'none',
-                                                transition: 'border-color 0.2s ease',
-                                                backgroundColor: hasError ? '#FEF2F2' : 'white'
-                                            }}
-                                            onFocus={(e) => e.target.style.borderColor = hasError ? '#EF4444' : '#F97316'}
-                                            onBlur={(e) => e.target.style.borderColor = borderColor}
-                                        />
-                                    ) : field.type === 'select' ? (
-                                        <select
-                                            value={formData[field.id] || ''}
-                                            onChange={(e) => handleInputChange(field.id, e.target.value)}
-                                            style={{
-                                                width: '100%',
-                                                padding: '12px',
-                                                border: `2px solid ${borderColor}`,
-                                                borderRadius: '8px',
-                                                fontSize: '14px',
-                                                fontFamily: 'Inter, sans-serif',
-                                                outline: 'none',
-                                                transition: 'border-color 0.2s ease',
-                                                backgroundColor: hasError ? '#FEF2F2' : 'white'
-                                            }}
-                                            onFocus={(e) => e.target.style.borderColor = hasError ? '#EF4444' : '#F97316'}
-                                            onBlur={(e) => e.target.style.borderColor = borderColor}
-                                        >
-                                            <option value="">Select {field.label}</option>
-                                            {field.options?.map(option => (
-                                                <option key={option} value={option}>{option}</option>
-                                            ))}
-                                        </select>
-                                    ) : (
-                                        <input
-                                            type={field.type}
-                                            value={formData[field.id] || ''}
-                                            onChange={(e) => handleInputChange(field.id, e.target.value)}
-                                            placeholder={field.placeholder}
-                                            style={{
-                                                width: '100%',
-                                                padding: '12px',
-                                                border: `2px solid ${borderColor}`,
-                                                borderRadius: '8px',
-                                                fontSize: '14px',
-                                                fontFamily: 'Inter, sans-serif',
-                                                outline: 'none',
-                                                transition: 'border-color 0.2s ease',
-                                                backgroundColor: hasError ? '#FEF2F2' : 'white'
-                                            }}
-                                            onFocus={(e) => e.target.style.borderColor = hasError ? '#EF4444' : '#F97316'}
-                                            onBlur={(e) => e.target.style.borderColor = borderColor}
-                                        />
-                                    )}
-                                </div>
-                            )})}
+                                    <div key={field.id}>
+                                        <label style={{
+                                            display: 'block',
+                                            fontSize: '14px',
+                                            fontWeight: '600',
+                                            color: hasError ? '#EF4444' : '#374151',
+                                            marginBottom: '6px'
+                                        }}>
+                                            {field.label} {field.required && <span style={{ color: '#EF4444' }}>*</span>}
+                                        </label>
+                                        {field.type === 'textarea' ? (
+                                            <textarea
+                                                value={formData[field.id] || ''}
+                                                onChange={(e) => handleInputChange(field.id, e.target.value)}
+                                                placeholder={field.placeholder}
+                                                rows={3}
+                                                style={{
+                                                    width: '100%',
+                                                    padding: '12px',
+                                                    border: `2px solid ${borderColor}`,
+                                                    borderRadius: '8px',
+                                                    fontSize: '14px',
+                                                    fontFamily: 'Inter, sans-serif',
+                                                    resize: 'vertical',
+                                                    outline: 'none',
+                                                    transition: 'border-color 0.2s ease',
+                                                    backgroundColor: hasError ? '#FEF2F2' : 'white'
+                                                }}
+                                                onFocus={(e) => e.target.style.borderColor = hasError ? '#EF4444' : '#F97316'}
+                                                onBlur={(e) => e.target.style.borderColor = borderColor}
+                                            />
+                                        ) : field.type === 'select' ? (
+                                            <select
+                                                value={formData[field.id] || ''}
+                                                onChange={(e) => handleInputChange(field.id, e.target.value)}
+                                                style={{
+                                                    width: '100%',
+                                                    padding: '12px',
+                                                    border: `2px solid ${borderColor}`,
+                                                    borderRadius: '8px',
+                                                    fontSize: '14px',
+                                                    fontFamily: 'Inter, sans-serif',
+                                                    outline: 'none',
+                                                    transition: 'border-color 0.2s ease',
+                                                    backgroundColor: hasError ? '#FEF2F2' : 'white'
+                                                }}
+                                                onFocus={(e) => e.target.style.borderColor = hasError ? '#EF4444' : '#F97316'}
+                                                onBlur={(e) => e.target.style.borderColor = borderColor}
+                                            >
+                                                <option value="">Select {field.label}</option>
+                                                {field.options?.map(option => (
+                                                    <option key={option} value={option}>{option}</option>
+                                                ))}
+                                            </select>
+                                        ) : (
+                                            <input
+                                                type={field.type}
+                                                value={formData[field.id] || ''}
+                                                onChange={(e) => handleInputChange(field.id, e.target.value)}
+                                                placeholder={field.placeholder}
+                                                style={{
+                                                    width: '100%',
+                                                    padding: '12px',
+                                                    border: `2px solid ${borderColor}`,
+                                                    borderRadius: '8px',
+                                                    fontSize: '14px',
+                                                    fontFamily: 'Inter, sans-serif',
+                                                    outline: 'none',
+                                                    transition: 'border-color 0.2s ease',
+                                                    backgroundColor: hasError ? '#FEF2F2' : 'white'
+                                                }}
+                                                onFocus={(e) => e.target.style.borderColor = hasError ? '#EF4444' : '#F97316'}
+                                                onBlur={(e) => e.target.style.borderColor = borderColor}
+                                            />
+                                        )}
+                                    </div>
+                                )
+                            })}
                         </div>
 
                         {/* Generate Button */}
@@ -2836,12 +2889,14 @@ HR Department
         }
 
         return (
-            <div style={{ padding: '20px', maxHeight: '100vh', overflow: 'hidden' }}>
+            <div style={{ padding: isMobile ? '16px' : '20px', maxHeight: '100vh', overflow: 'hidden' }}>
                 {/* Compact Header */}
                 <div style={{
                     display: 'flex',
+                    flexDirection: isMobile ? 'column' : 'row',
                     justifyContent: 'space-between',
-                    alignItems: 'center',
+                    alignItems: isMobile ? 'flex-start' : 'center',
+                    gap: isMobile ? '12px' : '0',
                     marginBottom: '16px',
                     paddingBottom: '12px',
                     borderBottom: '1px solid #E5E7EB'
@@ -4682,9 +4737,9 @@ HR Department
                                 Manage your account and application preferences
                             </p>
                         </div>
-                        
-                        <div style={{ 
-                            display: 'grid', 
+
+                        <div style={{
+                            display: 'grid',
                             gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))',
                             gap: '24px'
                         }}>
@@ -4701,9 +4756,9 @@ HR Department
                                     transition: 'all 0.3s ease'
                                 }}
                             >
-                                <div style={{ 
-                                    width: '48px', 
-                                    height: '48px', 
+                                <div style={{
+                                    width: '48px',
+                                    height: '48px',
                                     borderRadius: '12px',
                                     background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
                                     display: 'flex',
@@ -4719,8 +4774,8 @@ HR Department
                                 <p style={{ fontSize: '14px', color: '#6B7280', lineHeight: '1.5' }}>
                                     Customize your brand colors, logo, fonts, and footer details for all documents
                                 </p>
-                                <div style={{ 
-                                    marginTop: '16px', 
+                                <div style={{
+                                    marginTop: '16px',
                                     color: '#667eea',
                                     fontSize: '14px',
                                     fontWeight: '600',
@@ -4731,7 +4786,7 @@ HR Department
                                     Configure Branding <ChevronRight size={16} />
                                 </div>
                             </motion.div>
-                            
+
                             {/* Account Settings Card */}
                             <motion.div
                                 whileHover={{ y: -4, boxShadow: '0 12px 24px rgba(0,0,0,0.12)' }}
@@ -4745,9 +4800,9 @@ HR Department
                                     opacity: 0.6
                                 }}
                             >
-                                <div style={{ 
-                                    width: '48px', 
-                                    height: '48px', 
+                                <div style={{
+                                    width: '48px',
+                                    height: '48px',
                                     borderRadius: '12px',
                                     background: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
                                     display: 'flex',
@@ -4763,8 +4818,8 @@ HR Department
                                 <p style={{ fontSize: '14px', color: '#6B7280', lineHeight: '1.5' }}>
                                     Manage your profile, email, password, and account preferences
                                 </p>
-                                <div style={{ 
-                                    marginTop: '16px', 
+                                <div style={{
+                                    marginTop: '16px',
                                     color: '#9CA3AF',
                                     fontSize: '14px',
                                     fontWeight: '600'
@@ -4772,7 +4827,7 @@ HR Department
                                     Coming Soon
                                 </div>
                             </motion.div>
-                            
+
                             {/* Notifications Card */}
                             <motion.div
                                 whileHover={{ y: -4, boxShadow: '0 12px 24px rgba(0,0,0,0.12)' }}
@@ -4786,9 +4841,9 @@ HR Department
                                     opacity: 0.6
                                 }}
                             >
-                                <div style={{ 
-                                    width: '48px', 
-                                    height: '48px', 
+                                <div style={{
+                                    width: '48px',
+                                    height: '48px',
                                     borderRadius: '12px',
                                     background: 'linear-gradient(135deg, #fa709a 0%, #fee140 100%)',
                                     display: 'flex',
@@ -4804,8 +4859,8 @@ HR Department
                                 <p style={{ fontSize: '14px', color: '#6B7280', lineHeight: '1.5' }}>
                                     Configure email and in-app notification preferences
                                 </p>
-                                <div style={{ 
-                                    marginTop: '16px', 
+                                <div style={{
+                                    marginTop: '16px',
                                     color: '#9CA3AF',
                                     fontSize: '14px',
                                     fontWeight: '600'
@@ -4836,7 +4891,7 @@ HR Department
                 `}
             </style>
             <Sidebar />
-            <div style={{ marginLeft: '280px' }}>
+            <div style={{ marginLeft: isMobile ? '0' : '280px' }}>
                 <TopHeader />
                 <main>
                     {renderMainContent()}
