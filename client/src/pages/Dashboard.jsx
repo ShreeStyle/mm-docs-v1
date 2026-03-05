@@ -11,7 +11,7 @@ import {
     Paperclip, AtSign, Globe, FileText, Bot, Zap,
     ChevronRight, Layout, LogOut, BarChart, Star,
     TrendingUp, DollarSign, Shield, Users, Bell,
-    Filter, Download, Eye, Edit3, Archive, User, Menu, X
+    Filter, Download, Eye, Edit3, Archive, User, Menu, X, PenTool, CreditCard
 } from 'lucide-react';
 
 const LogoIcon = () => (
@@ -57,6 +57,7 @@ export default function Dashboard() {
     const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
     const [isTablet, setIsTablet] = useState(window.innerWidth <= 1024);
     const [sidebarOpen, setSidebarOpen] = useState(false);
+    const [documentsExpanded, setDocumentsExpanded] = useState(true);
 
     useEffect(() => {
         const handleResize = () => {
@@ -108,14 +109,50 @@ export default function Dashboard() {
             alert("Failed to download document. Please try again.");
         }
     };
-    // Sidebar menu items
-    const sidebarItems = [
-        { id: 'dashboard', label: 'Dashboard', icon: Home, active: currentView === 'dashboard' },
-        { id: 'create', label: 'Create Document', icon: Plus, active: currentView === 'create' },
-        { id: 'documents', label: 'My Documents', icon: FileText, active: currentView === 'documents' },
-        { id: 'templates', label: 'Template Library', icon: Layers, active: currentView === 'templates' || ['hr', 'legal', 'sales', 'finance', 'compliance'].includes(currentView) },
-        { id: 'compliance-center', label: 'Compliance Center', icon: Shield, active: currentView === 'compliance-center' },
-        { id: 'settings', label: 'Settings', icon: Settings, active: currentView === 'settings' }
+    // Sidebar menu items structured into sections
+    const sidebarSections = [
+        {
+            title: null,
+            items: [
+                { id: 'dashboard', label: 'Home', icon: Home, active: currentView === 'dashboard' },
+                { id: 'inbox', label: 'Inbox', icon: Inbox, badge: 13, active: currentView === 'inbox' },
+                { id: 'dev-center', label: 'Dev center', icon: Layers, active: currentView === 'dev-center' },
+                { id: 'reports', label: 'Reports', icon: BarChart, active: currentView === 'reports' },
+                { id: 'create', label: 'Create Document', icon: Plus, active: currentView === 'create' }
+            ]
+        },
+        {
+            title: 'APPS',
+            items: [
+                {
+                    id: 'documents',
+                    label: 'Documents',
+                    icon: FileText,
+                    active: ['documents', 'templates', 'overview', 'content-library', 'catalog', 'embeds'].includes(currentView) || ['hr', 'legal', 'sales', 'finance', 'compliance'].includes(currentView),
+                    hasSubmenu: true,
+                    submenu: [
+                        { id: 'documents', label: 'Overview', active: currentView === 'documents' },
+                        { id: 'templates', label: 'Templates', active: currentView === 'templates' || ['hr', 'legal', 'sales', 'finance', 'compliance'].includes(currentView) },
+                        { id: 'content-library', label: 'Content library', active: currentView === 'content-library' },
+                        { id: 'catalog', label: 'Catalog', active: currentView === 'catalog' },
+                        { id: 'embeds', label: 'Embeds', active: currentView === 'embeds' }
+                    ]
+                },
+                { id: 'notary', label: 'Notary', icon: Edit3, active: currentView === 'notary' },
+                { id: 'contacts', label: 'Contacts', icon: User, active: currentView === 'contacts' },
+                { id: 'rooms', label: 'Rooms', icon: Archive, active: currentView === 'rooms' },
+                { id: 'automations', label: 'Automations', icon: Zap, active: currentView === 'automations' },
+                { id: 'forms', label: 'Forms', icon: Layout, active: currentView === 'forms' },
+                { id: 'compliance-center', label: 'Compliance Center', icon: Shield, active: currentView === 'compliance-center' }
+            ]
+        },
+        {
+            title: 'EXPLORE',
+            items: [
+                { id: 'marketplace', label: 'Marketplace', icon: Layout, active: currentView === 'marketplace' },
+                { id: 'template-gallery', label: 'Template gallery', icon: Layers, active: currentView === 'template-gallery' }
+            ]
+        }
     ];
 
     // Load data on component mount
@@ -213,56 +250,181 @@ export default function Dashboard() {
                 </div>
 
                 {/* Navigation Menu */}
-                <nav style={{ flex: 1, padding: '24px 16px' }}>
-                    {sidebarItems.map((item) => {
-                        const Icon = item.icon;
-                        return (
-                            <button
-                                key={item.id}
-                                onClick={() => {
-                                    if (item.id === 'templates') {
-                                        setSelectedCategory(null);
-                                        setSelectedDocType(null);
-                                    }
-                                    setGeneratedDoc(null);
-                                    setCurrentView(item.id);
-                                    if (isMobile) setSidebarOpen(false);
-                                }}
-                                style={{
-                                    width: '100%',
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    gap: '12px',
-                                    padding: '12px 16px',
-                                    marginBottom: '4px',
-                                    backgroundColor: item.active ? '#F97316' : 'transparent',
-                                    color: item.active ? 'white' : '#6B7280',
-                                    border: 'none',
-                                    borderRadius: '12px',
-                                    fontSize: '14px',
-                                    fontWeight: '500',
-                                    cursor: 'pointer',
-                                    transition: 'all 0.2s ease',
-                                    textAlign: 'left'
-                                }}
-                                onMouseEnter={(e) => {
-                                    if (!item.active) {
-                                        e.target.style.backgroundColor = '#F3F4F6';
-                                        e.target.style.color = '#374151';
-                                    }
-                                }}
-                                onMouseLeave={(e) => {
-                                    if (!item.active) {
-                                        e.target.style.backgroundColor = 'transparent';
-                                        e.target.style.color = '#6B7280';
-                                    }
-                                }}
-                            >
-                                <Icon size={20} />
-                                {item.label}
-                            </button>
-                        );
-                    })}
+                <nav style={{ flex: 1, padding: '24px 16px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                    {sidebarSections.map((section, sIdx) => (
+                        <div key={sIdx} style={{ marginBottom: section.title ? '12px' : '0' }}>
+                            {section.title && (
+                                <p style={{
+                                    fontSize: '12px',
+                                    fontWeight: '600',
+                                    color: '#9CA3AF',
+                                    margin: '0 0 8px 12px',
+                                    letterSpacing: '0.05em'
+                                }}>{section.title}</p>
+                            )}
+                            {section.items.map((item) => {
+                                const Icon = item.icon;
+                                const isDocGroup = item.hasSubmenu;
+
+                                return (
+                                    <div key={item.id} style={{ marginBottom: '4px' }}>
+                                        <button
+                                            onClick={() => {
+                                                if (isDocGroup) {
+                                                    setDocumentsExpanded(!documentsExpanded);
+                                                } else {
+                                                    if (item.id === 'templates') {
+                                                        setSelectedCategory(null);
+                                                        setSelectedDocType(null);
+                                                    }
+                                                    setGeneratedDoc(null);
+                                                    setCurrentView(item.id);
+                                                    if (isMobile) setSidebarOpen(false);
+                                                }
+                                            }}
+                                            style={{
+                                                width: '100%',
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                                justifyContent: 'space-between',
+                                                padding: '10px 12px',
+                                                backgroundColor: item.active && !isDocGroup ? '#F97316' : 'transparent',
+                                                color: item.active && !isDocGroup ? 'white' : '#6B7280',
+                                                border: 'none',
+                                                borderRadius: '8px',
+                                                fontSize: '14px',
+                                                fontWeight: item.active && !isDocGroup ? '600' : '500',
+                                                cursor: 'pointer',
+                                                transition: 'all 0.2s ease',
+                                                textAlign: 'left'
+                                            }}
+                                            onMouseEnter={(e) => {
+                                                if (!(item.active && !isDocGroup)) {
+                                                    e.currentTarget.style.backgroundColor = '#F3F4F6';
+                                                }
+                                            }}
+                                            onMouseLeave={(e) => {
+                                                if (!(item.active && !isDocGroup)) {
+                                                    e.currentTarget.style.backgroundColor = 'transparent';
+                                                }
+                                            }}
+                                        >
+                                            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                                                <Icon size={20} color={item.active && !isDocGroup ? 'white' : '#6B7280'} />
+                                                <span>{item.label}</span>
+                                            </div>
+                                            {item.badge && (
+                                                <div style={{
+                                                    backgroundColor: '#EF4444',
+                                                    color: 'white',
+                                                    fontSize: '12px',
+                                                    fontWeight: '600',
+                                                    padding: '2px 6px',
+                                                    borderRadius: '12px'
+                                                }}>
+                                                    {item.badge}
+                                                </div>
+                                            )}
+                                            {isDocGroup && (
+                                                <ChevronDown
+                                                    size={16}
+                                                    style={{
+                                                        color: '#6B7280',
+                                                        transform: documentsExpanded ? 'rotate(180deg)' : 'rotate(0deg)',
+                                                        transition: 'transform 0.2s ease'
+                                                    }}
+                                                />
+                                            )}
+                                        </button>
+
+                                        {/* Submenu */}
+                                        {isDocGroup && documentsExpanded && item.submenu && (
+                                            <div style={{ paddingLeft: '32px', marginTop: '4px', display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                                                {item.submenu.map((subItem) => (
+                                                    <button
+                                                        key={subItem.id}
+                                                        onClick={() => {
+                                                            if (subItem.id === 'templates') {
+                                                                setSelectedCategory(null);
+                                                                setSelectedDocType(null);
+                                                            }
+                                                            setGeneratedDoc(null);
+                                                            setCurrentView(subItem.id);
+                                                            if (isMobile) setSidebarOpen(false);
+                                                        }}
+                                                        style={{
+                                                            width: '100%',
+                                                            textAlign: 'left',
+                                                            padding: '8px 12px',
+                                                            backgroundColor: subItem.active ? '#F3F4F6' : 'transparent',
+                                                            color: subItem.active ? '#F97316' : '#6B7280',
+                                                            border: 'none',
+                                                            borderRadius: '6px',
+                                                            fontSize: '14px',
+                                                            fontWeight: subItem.active ? '500' : '400',
+                                                            cursor: 'pointer',
+                                                            transition: 'all 0.2s ease'
+                                                        }}
+                                                        onMouseEnter={(e) => {
+                                                            if (!subItem.active) {
+                                                                e.target.style.color = '#374151';
+                                                            }
+                                                        }}
+                                                        onMouseLeave={(e) => {
+                                                            if (!subItem.active) {
+                                                                e.target.style.color = '#6B7280';
+                                                            }
+                                                        }}
+                                                    >
+                                                        {subItem.label}
+                                                    </button>
+                                                ))}
+                                            </div>
+                                        )}
+                                    </div>
+                                );
+                            })}
+                        </div>
+                    ))}
+
+                    {/* Settings and Invite people at bottom of navigation */}
+                    <div style={{ marginTop: 'auto', borderTop: '1px solid #E5E7EB', paddingTop: '16px' }}>
+                        <button
+                            onClick={() => setCurrentView('settings')}
+                            style={{
+                                width: '100%', display: 'flex', alignItems: 'center', gap: '12px',
+                                padding: '10px 12px', marginBottom: '4px', backgroundColor: currentView === 'settings' ? '#F97316' : 'transparent',
+                                color: currentView === 'settings' ? 'white' : '#6B7280', border: 'none', borderRadius: '8px',
+                                fontSize: '14px', fontWeight: currentView === 'settings' ? '600' : '500', cursor: 'pointer', transition: 'all 0.2s ease'
+                            }}
+                            onMouseEnter={(e) => {
+                                if (currentView !== 'settings') e.currentTarget.style.backgroundColor = '#F3F4F6';
+                            }}
+                            onMouseLeave={(e) => {
+                                if (currentView !== 'settings') e.currentTarget.style.backgroundColor = 'transparent';
+                            }}
+                        >
+                            <Settings size={20} color={currentView === 'settings' ? 'white' : '#6B7280'} />
+                            <span>Settings</span>
+                        </button>
+                        <button
+                            style={{
+                                width: '100%', display: 'flex', alignItems: 'center', gap: '12px',
+                                padding: '10px 12px', backgroundColor: 'transparent',
+                                color: '#6B7280', border: 'none', borderRadius: '8px',
+                                fontSize: '14px', fontWeight: '500', cursor: 'pointer', transition: 'all 0.2s ease'
+                            }}
+                            onMouseEnter={(e) => {
+                                e.currentTarget.style.backgroundColor = '#F3F4F6';
+                            }}
+                            onMouseLeave={(e) => {
+                                e.currentTarget.style.backgroundColor = 'transparent';
+                            }}
+                        >
+                            <UserPlus size={20} color="#6B7280" />
+                            <span>Invite people</span>
+                        </button>
+                    </div>
                 </nav>
 
                 {/* Profile Section */}
@@ -412,6 +574,29 @@ export default function Dashboard() {
                         }}
                     />
                 </div>}
+
+                {/* Localization */}
+                <button style={{
+                    width: isMobile ? '36px' : '44px',
+                    height: isMobile ? '36px' : '44px',
+                    borderRadius: '12px',
+                    border: '1px solid #E5E7EB',
+                    backgroundColor: 'white',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    cursor: 'pointer',
+                    transition: 'all 0.2s ease',
+                    position: 'relative'
+                }}
+                    onMouseEnter={(e) => {
+                        e.currentTarget.style.backgroundColor = '#F9FAFB';
+                    }}
+                    onMouseLeave={(e) => {
+                        e.currentTarget.style.backgroundColor = 'white';
+                    }}>
+                    <Globe size={isMobile ? 18 : 20} color="#6B7280" />
+                </button>
 
                 {/* Notifications */}
                 <button style={{
@@ -632,6 +817,26 @@ export default function Dashboard() {
                     </div>
                 </div>
             </div>
+            {/* Workflow Pipeline */}
+            <div style={{ marginBottom: '32px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
+                    <h3 style={{ fontSize: '18px', fontWeight: '600', color: '#111827', margin: 0 }}>Document Pipeline</h3>
+                </div>
+                <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(4, 1fr)', gap: '16px' }}>
+                    {['Drafts', 'Pending Review', 'Awaiting Signature', 'Completed'].map((stage, idx) => (
+                        <div key={idx} style={{ backgroundColor: '#F9FAFB', borderRadius: '12px', padding: '16px', border: '1px solid #E5E7EB' }}>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
+                                <span style={{ fontSize: '14px', fontWeight: '600', color: '#374151' }}>{stage}</span>
+                                <span style={{ backgroundColor: '#E5E7EB', color: '#4B5563', padding: '2px 8px', borderRadius: '12px', fontSize: '12px', fontWeight: '600' }}>{Math.floor(Math.random() * 5) + 1}</span>
+                            </div>
+                            <div style={{ minHeight: '60px', border: '2px dashed #D1D5DB', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#9CA3AF', fontSize: '12px' }}>
+                                Drop documents here
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            </div>
+
             {/* Main Content Grid */}
             <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : isTablet ? '1fr' : '2fr 1fr', gap: isMobile ? '16px' : '32px' }}>
                 {/* Recent Activity */}
@@ -831,6 +1036,45 @@ export default function Dashboard() {
                                 </button>
                             ))}
                         </div>
+                    </div>
+                </div>
+            </div>
+
+            {/* Analytics Section */}
+            <div style={{ marginTop: '32px', display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(2, 1fr)', gap: '24px' }}>
+                <div style={{ backgroundColor: 'white', borderRadius: '16px', border: '1px solid #E5E7EB', padding: '24px', boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)' }}>
+                    <h3 style={{ fontSize: '16px', fontWeight: '600', color: '#111827', marginBottom: '16px' }}>Document Turnaround Time</h3>
+                    <div style={{ height: '200px', display: 'flex', alignItems: 'flex-end', gap: '16px', borderBottom: '1px solid #E5E7EB', paddingBottom: '16px' }}>
+                        {[40, 70, 45, 90, 60, 80, 50].map((h, i) => (
+                            <div key={i} style={{ flex: 1, backgroundColor: '#FEF3E2', borderRadius: '4px 4px 0 0', height: `${h}%`, position: 'relative' }}>
+                                <div style={{ backgroundColor: '#F97316', position: 'absolute', bottom: 0, left: 0, right: 0, height: `${h * 0.7}%`, borderRadius: '4px 4px 0 0' }} />
+                            </div>
+                        ))}
+                    </div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', paddingTop: '8px', color: '#6B7280', fontSize: '12px' }}>
+                        <span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span><span>Sun</span>
+                    </div>
+                </div>
+                <div style={{ backgroundColor: 'white', borderRadius: '16px', border: '1px solid #E5E7EB', padding: '24px', boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)' }}>
+                    <h3 style={{ fontSize: '16px', fontWeight: '600', color: '#111827', marginBottom: '16px' }}>Team Activity</h3>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                        {[
+                            { name: 'Sarah J.', action: 'Signed NDA', time: '2 mins ago' },
+                            { name: 'Mike T.', action: 'Created Sales Proposal', time: '1 hour ago' },
+                            { name: 'Legal Team', action: 'Approved Employment Contract', time: '3 hours ago' },
+                            { name: 'Finance Dept', action: 'Generated Invoice', time: '5 hours ago' }
+                        ].map((activity, idx) => (
+                            <div key={idx} style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                                <div style={{ width: '32px', height: '32px', borderRadius: '50%', backgroundColor: '#FEF3E2', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '12px', fontWeight: '600', color: '#F97316' }}>
+                                    {activity.name.charAt(0)}
+                                </div>
+                                <div style={{ flex: 1 }}>
+                                    <p style={{ fontSize: '14px', fontWeight: '500', color: '#111827', margin: 0 }}>{activity.name}</p>
+                                    <p style={{ fontSize: '12px', color: '#6B7280', margin: 0 }}>{activity.action}</p>
+                                </div>
+                                <span style={{ fontSize: '12px', color: '#9CA3AF' }}>{activity.time}</span>
+                            </div>
+                        ))}
                     </div>
                 </div>
             </div>
@@ -2936,6 +3180,44 @@ HR Department
 
                     <div style={{ display: 'flex', gap: '6px' }}>
                         <button
+                            onClick={() => console.log('E-sign requested')}
+                            style={{
+                                padding: '6px 12px',
+                                backgroundColor: 'white',
+                                border: '1px solid #E5E7EB',
+                                borderRadius: '6px',
+                                fontSize: '11px',
+                                fontWeight: '600',
+                                color: '#10B981',
+                                cursor: 'pointer',
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '4px'
+                            }}
+                        >
+                            <PenTool size={12} />
+                            Sign
+                        </button>
+                        <button
+                            onClick={() => console.log('Payment requested')}
+                            style={{
+                                padding: '6px 12px',
+                                backgroundColor: 'white',
+                                border: '1px solid #E5E7EB',
+                                borderRadius: '6px',
+                                fontSize: '11px',
+                                fontWeight: '600',
+                                color: '#8B5CF6',
+                                cursor: 'pointer',
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '4px'
+                            }}
+                        >
+                            <CreditCard size={12} />
+                            Pay
+                        </button>
+                        <button
                             onClick={() => handleDownloadDocument(generatedDoc._id, 'pdf')}
                             style={{
                                 padding: '6px 12px',
@@ -2976,238 +3258,319 @@ HR Department
                     </div>
                 </div>
 
-                {/* Compact Document Content */}
-                <div style={{
-                    backgroundColor: 'white',
-                    borderRadius: '12px',
-                    border: '1px solid #E5E7EB',
-                    boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)',
-                    overflow: 'hidden',
-                    height: 'calc(100vh - 140px)'
-                }}>
+                {/* Split Context */}
+                <div style={{ display: 'flex', gap: '16px', height: 'calc(100vh - 140px)' }}>
+                    {/* Compact Document Content */}
                     <div style={{
-                        height: '100%',
-                        overflowY: 'auto',
-                        padding: '20px'
+                        flex: 3,
+                        backgroundColor: 'white',
+                        borderRadius: '12px',
+                        border: '1px solid #E5E7EB',
+                        boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)',
+                        overflow: 'hidden'
                     }}>
-                        {/* Company Header - Compact */}
                         <div style={{
-                            textAlign: 'center',
-                            marginBottom: '20px',
-                            paddingBottom: '12px',
-                            borderBottom: '2px solid #F97316'
+                            height: '100%',
+                            overflowY: 'auto',
+                            padding: '20px'
                         }}>
+                            {/* Company Header - Compact */}
                             <div style={{
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                gap: '8px',
-                                marginBottom: '6px'
+                                textAlign: 'center',
+                                marginBottom: '20px',
+                                paddingBottom: '12px',
+                                borderBottom: '2px solid #F97316'
                             }}>
                                 <div style={{
-                                    width: '24px',
-                                    height: '24px',
-                                    borderRadius: '6px',
-                                    backgroundColor: '#F97316',
                                     display: 'flex',
                                     alignItems: 'center',
                                     justifyContent: 'center',
-                                    color: 'white',
-                                    fontSize: '12px',
-                                    fontWeight: '600'
+                                    gap: '8px',
+                                    marginBottom: '6px'
                                 }}>
-                                    {(brandKit?.name || generatedDoc.content?.companyName || 'MM').charAt(0)}
+                                    <div style={{
+                                        width: '24px',
+                                        height: '24px',
+                                        borderRadius: '6px',
+                                        backgroundColor: '#F97316',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                        color: 'white',
+                                        fontSize: '12px',
+                                        fontWeight: '600'
+                                    }}>
+                                        {(brandKit?.name || generatedDoc.content?.companyName || 'MM').charAt(0)}
+                                    </div>
+                                    <div>
+                                        <h1 style={{
+                                            fontSize: '16px',
+                                            fontWeight: '700',
+                                            color: '#111827',
+                                            margin: 0
+                                        }}>{brandKit?.name || generatedDoc.content?.companyName || 'MM Docs'}</h1>
+                                        <p style={{
+                                            fontSize: '10px',
+                                            color: '#6B7280',
+                                            margin: 0
+                                        }}>{generatedDoc.content?.companyAddress || 'Professional Document Platform'}</p>
+                                    </div>
                                 </div>
-                                <div>
-                                    <h1 style={{
-                                        fontSize: '16px',
-                                        fontWeight: '700',
-                                        color: '#111827',
-                                        margin: 0
-                                    }}>{brandKit?.name || generatedDoc.content?.companyName || 'MM Docs'}</h1>
-                                    <p style={{
-                                        fontSize: '10px',
-                                        color: '#6B7280',
-                                        margin: 0
-                                    }}>{generatedDoc.content?.companyAddress || 'Professional Document Platform'}</p>
+                            </div>
+
+                            {/* Document Title - Compact */}
+                            <div style={{ textAlign: 'center', marginBottom: '20px' }}>
+                                <h2 style={{
+                                    fontSize: '20px',
+                                    fontWeight: '700',
+                                    color: '#111827',
+                                    margin: '0 0 4px 0',
+                                    textTransform: 'uppercase',
+                                    letterSpacing: '0.5px'
+                                }}>
+                                    {generatedDoc.content?.title || generatedDoc.title}
+                                </h2>
+                                <p style={{
+                                    fontSize: '11px',
+                                    color: '#6B7280',
+                                    margin: 0
+                                }}>
+                                    {generatedDoc.content?.date || new Date().toLocaleDateString('en-US', {
+                                        year: 'numeric',
+                                        month: 'long',
+                                        day: 'numeric'
+                                    })}
+                                </p>
+                            </div>
+
+                            {/* AI Generated Content Display */}
+                            <div style={{
+                                fontSize: '12px',
+                                lineHeight: '1.5',
+                                color: '#374151',
+                                fontFamily: 'Inter, sans-serif'
+                            }}>
+                                {typeof generatedDoc.content === 'string' ? (
+                                    // Handle string content
+                                    generatedDoc.content.split('\n').map((line, i) => (
+                                        <p key={i} style={{
+                                            marginBottom: line.trim() ? '10px' : '5px',
+                                            fontSize: line.length < 50 && line.trim() ? '14px' : '12px',
+                                            fontWeight: line.length < 50 && line.trim() ? '600' : '400',
+                                            color: line.length < 50 && line.trim() ? '#111827' : '#374151'
+                                        }}>
+                                            {line || '\u00A0'}
+                                        </p>
+                                    ))
+                                ) : generatedDoc.content && typeof generatedDoc.content === 'object' ? (
+                                    // Handle structured content from AI
+                                    <div>
+                                        {/* Render all content fields dynamically */}
+                                        {Object.entries(generatedDoc.content).map(([key, value]) => {
+                                            // Skip certain meta fields
+                                            if (['title', 'date', 'companyName', 'companyAddress'].includes(key)) {
+                                                return null;
+                                            }
+
+                                            return (
+                                                <div key={key} style={{ marginBottom: '16px' }}>
+                                                    {/* Field Title */}
+                                                    <h3 style={{
+                                                        fontSize: '13px',
+                                                        fontWeight: '600',
+                                                        color: '#111827',
+                                                        marginBottom: '8px',
+                                                        borderLeft: '3px solid #F97316',
+                                                        paddingLeft: '8px',
+                                                        textTransform: 'capitalize'
+                                                    }}>
+                                                        {key.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())}
+                                                    </h3>
+
+                                                    {/* Field Content */}
+                                                    <div style={{ paddingLeft: '12px' }}>
+                                                        {Array.isArray(value) ? (
+                                                            // Handle arrays (lists)
+                                                            <ul style={{
+                                                                listStyle: 'none',
+                                                                padding: 0,
+                                                                margin: 0
+                                                            }}>
+                                                                {value.map((item, index) => (
+                                                                    <li key={index} style={{
+                                                                        display: 'flex',
+                                                                        alignItems: 'flex-start',
+                                                                        marginBottom: '6px',
+                                                                        fontSize: '12px',
+                                                                        lineHeight: '1.4'
+                                                                    }}>
+                                                                        <span style={{
+                                                                            color: '#F97316',
+                                                                            marginRight: '8px',
+                                                                            fontSize: '12px',
+                                                                            fontWeight: '600'
+                                                                        }}>•</span>
+                                                                        <span style={{ color: '#374151' }}>
+                                                                            {typeof item === 'object' ? JSON.stringify(item, null, 2) : item}
+                                                                        </span>
+                                                                    </li>
+                                                                ))}
+                                                            </ul>
+                                                        ) : typeof value === 'object' && value !== null ? (
+                                                            // Handle nested objects
+                                                            <div style={{
+                                                                backgroundColor: '#F9FAFB',
+                                                                padding: '12px',
+                                                                borderRadius: '6px',
+                                                                border: '1px solid #E5E7EB'
+                                                            }}>
+                                                                {Object.entries(value).map(([subKey, subValue]) => (
+                                                                    <div key={subKey} style={{ marginBottom: '8px' }}>
+                                                                        <span style={{
+                                                                            fontSize: '11px',
+                                                                            fontWeight: '600',
+                                                                            color: '#6B7280',
+                                                                            textTransform: 'uppercase',
+                                                                            display: 'block',
+                                                                            marginBottom: '2px'
+                                                                        }}>
+                                                                            {subKey.replace(/([A-Z])/g, ' $1')}
+                                                                        </span>
+                                                                        <span style={{
+                                                                            fontSize: '12px',
+                                                                            color: '#111827',
+                                                                            fontWeight: '500'
+                                                                        }}>
+                                                                            {typeof subValue === 'object' ? JSON.stringify(subValue, null, 2) : subValue}
+                                                                        </span>
+                                                                    </div>
+                                                                ))}
+                                                            </div>
+                                                        ) : (
+                                                            // Handle simple text values
+                                                            <p style={{
+                                                                fontSize: '12px',
+                                                                lineHeight: '1.5',
+                                                                color: '#374151',
+                                                                margin: 0,
+                                                                whiteSpace: 'pre-wrap'
+                                                            }}>
+                                                                {value}
+                                                            </p>
+                                                        )}
+                                                    </div>
+                                                </div>
+                                            );
+                                        })}
+                                    </div>
+                                ) : (
+                                    // Fallback for any other content type
+                                    <div style={{
+                                        textAlign: 'center',
+                                        padding: '40px',
+                                        color: '#6B7280'
+                                    }}>
+                                        <p>Document content could not be displayed</p>
+                                        <p style={{ fontSize: '11px', marginTop: '8px' }}>
+                                            Content type: {typeof generatedDoc.content}
+                                        </p>
+                                    </div>
+                                )}
+                            </div>
+
+                            {/* Compact Footer */}
+                            <div style={{
+                                marginTop: '20px',
+                                paddingTop: '12px',
+                                borderTop: '1px solid #E5E7EB',
+                                textAlign: 'center'
+                            }}>
+                                <p style={{
+                                    fontSize: '9px',
+                                    color: '#9CA3AF',
+                                    margin: 0
+                                }}>
+                                    Generated with MM Docs AI • {brandKit?.name || "Professional"} Workspace
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Right AI Sidebar: Risk Intelligence & Collaboration */}
+                    <div style={{
+                        flex: 1,
+                        display: 'flex',
+                        flexDirection: 'column',
+                        gap: '16px',
+                        overflowY: 'auto'
+                    }}>
+                        {/* Risk Intelligence Panel */}
+                        <div style={{
+                            backgroundColor: 'white',
+                            borderRadius: '12px',
+                            border: '1px solid #E5E7EB',
+                            boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)',
+                            padding: '16px'
+                        }}>
+                            <h3 style={{ fontSize: '14px', fontWeight: '600', color: '#111827', marginBottom: '12px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                <Shield size={16} color="#F97316" /> Clause & Risk AI
+                            </h3>
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                                <div style={{ backgroundColor: '#FEF2F2', padding: '10px', borderRadius: '8px', borderLeft: '3px solid #EF4444' }}>
+                                    <p style={{ fontSize: '12px', fontWeight: '600', color: '#991B1B', margin: '0 0 4px 0' }}>High Risk: Termination Clause</p>
+                                    <p style={{ fontSize: '11px', color: '#B91C1C', margin: 0 }}>Missing standard 30-day notice period for termination at will.</p>
+                                </div>
+                                <div style={{ backgroundColor: '#FFFBEB', padding: '10px', borderRadius: '8px', borderLeft: '3px solid #F59E0B' }}>
+                                    <p style={{ fontSize: '12px', fontWeight: '600', color: '#92400E', margin: '0 0 4px 0' }}>Attention: Non-Compete</p>
+                                    <p style={{ fontSize: '11px', color: '#B45309', margin: 0 }}>Duration exceeds standard 1-year industry average. Consider revising.</p>
                                 </div>
                             </div>
                         </div>
 
-                        {/* Document Title - Compact */}
-                        <div style={{ textAlign: 'center', marginBottom: '20px' }}>
-                            <h2 style={{
-                                fontSize: '20px',
-                                fontWeight: '700',
-                                color: '#111827',
-                                margin: '0 0 4px 0',
-                                textTransform: 'uppercase',
-                                letterSpacing: '0.5px'
-                            }}>
-                                {generatedDoc.content?.title || generatedDoc.title}
-                            </h2>
-                            <p style={{
-                                fontSize: '11px',
-                                color: '#6B7280',
-                                margin: 0
-                            }}>
-                                {generatedDoc.content?.date || new Date().toLocaleDateString('en-US', {
-                                    year: 'numeric',
-                                    month: 'long',
-                                    day: 'numeric'
-                                })}
-                            </p>
-                        </div>
-
-                        {/* AI Generated Content Display */}
+                        {/* Collaboration Panel */}
                         <div style={{
-                            fontSize: '12px',
-                            lineHeight: '1.5',
-                            color: '#374151',
-                            fontFamily: 'Inter, sans-serif'
+                            backgroundColor: 'white',
+                            borderRadius: '12px',
+                            border: '1px solid #E5E7EB',
+                            boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)',
+                            padding: '16px',
+                            flex: 1,
+                            display: 'flex',
+                            flexDirection: 'column'
                         }}>
-                            {typeof generatedDoc.content === 'string' ? (
-                                // Handle string content
-                                generatedDoc.content.split('\n').map((line, i) => (
-                                    <p key={i} style={{
-                                        marginBottom: line.trim() ? '10px' : '5px',
-                                        fontSize: line.length < 50 && line.trim() ? '14px' : '12px',
-                                        fontWeight: line.length < 50 && line.trim() ? '600' : '400',
-                                        color: line.length < 50 && line.trim() ? '#111827' : '#374151'
-                                    }}>
-                                        {line || '\u00A0'}
-                                    </p>
-                                ))
-                            ) : generatedDoc.content && typeof generatedDoc.content === 'object' ? (
-                                // Handle structured content from AI
-                                <div>
-                                    {/* Render all content fields dynamically */}
-                                    {Object.entries(generatedDoc.content).map(([key, value]) => {
-                                        // Skip certain meta fields
-                                        if (['title', 'date', 'companyName', 'companyAddress'].includes(key)) {
-                                            return null;
-                                        }
-
-                                        return (
-                                            <div key={key} style={{ marginBottom: '16px' }}>
-                                                {/* Field Title */}
-                                                <h3 style={{
-                                                    fontSize: '13px',
-                                                    fontWeight: '600',
-                                                    color: '#111827',
-                                                    marginBottom: '8px',
-                                                    borderLeft: '3px solid #F97316',
-                                                    paddingLeft: '8px',
-                                                    textTransform: 'capitalize'
-                                                }}>
-                                                    {key.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())}
-                                                </h3>
-
-                                                {/* Field Content */}
-                                                <div style={{ paddingLeft: '12px' }}>
-                                                    {Array.isArray(value) ? (
-                                                        // Handle arrays (lists)
-                                                        <ul style={{
-                                                            listStyle: 'none',
-                                                            padding: 0,
-                                                            margin: 0
-                                                        }}>
-                                                            {value.map((item, index) => (
-                                                                <li key={index} style={{
-                                                                    display: 'flex',
-                                                                    alignItems: 'flex-start',
-                                                                    marginBottom: '6px',
-                                                                    fontSize: '12px',
-                                                                    lineHeight: '1.4'
-                                                                }}>
-                                                                    <span style={{
-                                                                        color: '#F97316',
-                                                                        marginRight: '8px',
-                                                                        fontSize: '12px',
-                                                                        fontWeight: '600'
-                                                                    }}>•</span>
-                                                                    <span style={{ color: '#374151' }}>
-                                                                        {typeof item === 'object' ? JSON.stringify(item, null, 2) : item}
-                                                                    </span>
-                                                                </li>
-                                                            ))}
-                                                        </ul>
-                                                    ) : typeof value === 'object' && value !== null ? (
-                                                        // Handle nested objects
-                                                        <div style={{
-                                                            backgroundColor: '#F9FAFB',
-                                                            padding: '12px',
-                                                            borderRadius: '6px',
-                                                            border: '1px solid #E5E7EB'
-                                                        }}>
-                                                            {Object.entries(value).map(([subKey, subValue]) => (
-                                                                <div key={subKey} style={{ marginBottom: '8px' }}>
-                                                                    <span style={{
-                                                                        fontSize: '11px',
-                                                                        fontWeight: '600',
-                                                                        color: '#6B7280',
-                                                                        textTransform: 'uppercase',
-                                                                        display: 'block',
-                                                                        marginBottom: '2px'
-                                                                    }}>
-                                                                        {subKey.replace(/([A-Z])/g, ' $1')}
-                                                                    </span>
-                                                                    <span style={{
-                                                                        fontSize: '12px',
-                                                                        color: '#111827',
-                                                                        fontWeight: '500'
-                                                                    }}>
-                                                                        {typeof subValue === 'object' ? JSON.stringify(subValue, null, 2) : subValue}
-                                                                    </span>
-                                                                </div>
-                                                            ))}
-                                                        </div>
-                                                    ) : (
-                                                        // Handle simple text values
-                                                        <p style={{
-                                                            fontSize: '12px',
-                                                            lineHeight: '1.5',
-                                                            color: '#374151',
-                                                            margin: 0,
-                                                            whiteSpace: 'pre-wrap'
-                                                        }}>
-                                                            {value}
-                                                        </p>
-                                                    )}
-                                                </div>
-                                            </div>
-                                        );
-                                    })}
+                            <h3 style={{ fontSize: '14px', fontWeight: '600', color: '#111827', marginBottom: '12px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                <Users size={16} color="#F97316" /> Team Activity
+                            </h3>
+                            <div style={{ flex: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                                <div style={{ display: 'flex', alignItems: 'flex-start', gap: '8px' }}>
+                                    <div style={{ width: '24px', height: '24px', borderRadius: '50%', backgroundColor: '#E5E7EB', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '10px', fontWeight: '600' }}>U</div>
+                                    <div>
+                                        <p style={{ fontSize: '12px', color: '#111827', margin: 0 }}><span style={{ fontWeight: '600' }}>You</span> generated this draft.</p>
+                                        <p style={{ fontSize: '10px', color: '#9CA3AF', margin: 0 }}>2 hours ago</p>
+                                    </div>
                                 </div>
-                            ) : (
-                                // Fallback for any other content type
-                                <div style={{
-                                    textAlign: 'center',
-                                    padding: '40px',
-                                    color: '#6B7280'
-                                }}>
-                                    <p>Document content could not be displayed</p>
-                                    <p style={{ fontSize: '11px', marginTop: '8px' }}>
-                                        Content type: {typeof generatedDoc.content}
-                                    </p>
+                                <div style={{ display: 'flex', alignItems: 'flex-start', gap: '8px' }}>
+                                    <div style={{ width: '24px', height: '24px', borderRadius: '50%', backgroundColor: '#FEF3E2', color: '#F97316', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '10px', fontWeight: '600' }}>M</div>
+                                    <div>
+                                        <p style={{ fontSize: '12px', color: '#111827', margin: 0 }}><span style={{ fontWeight: '600' }}>Mike T.</span> suggested a change in Liability section.</p>
+                                        <p style={{ fontSize: '10px', color: '#9CA3AF', margin: 0 }}>30 mins ago</p>
+                                    </div>
                                 </div>
-                            )}
-                        </div>
-
-                        {/* Compact Footer */}
-                        <div style={{
-                            marginTop: '20px',
-                            paddingTop: '12px',
-                            borderTop: '1px solid #E5E7EB',
-                            textAlign: 'center'
-                        }}>
-                            <p style={{
-                                fontSize: '9px',
-                                color: '#9CA3AF',
-                                margin: 0
+                            </div>
+                            <button style={{
+                                marginTop: '12px',
+                                padding: '8px',
+                                backgroundColor: '#F9FAFB',
+                                border: '1px solid #E5E7EB',
+                                borderRadius: '8px',
+                                fontSize: '12px',
+                                fontWeight: '600',
+                                color: '#374151',
+                                cursor: 'pointer',
+                                width: '100%'
                             }}>
-                                Generated with MM Docs AI • {brandKit?.name || "Professional"} Workspace
-                            </p>
+                                + Invite Collaborator
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -3229,12 +3592,20 @@ HR Department
 
         const templateCategories = {
             all: 'All Templates',
-            hr: 'HR Documents',
-            legal: 'Legal Documents',
-            sales: 'Sales Documents',
-            finance: 'Finance Documents',
-            compliance: 'Compliance Documents'
+            hr: 'HR',
+            legal: 'Legal',
+            sales: 'Sales',
+            finance: 'Finance',
+            compliance: 'Compliance'
         };
+
+        const industryPacks = [
+            { id: 'startup', label: '🚀 Startup Pack', count: 8 },
+            { id: 'healthcare', label: '🏥 Healthcare', count: 6 },
+            { id: 'real_estate', label: '🏠 Real Estate', count: 5 },
+            { id: 'ecommerce', label: '🛒 E-Commerce', count: 7 },
+            { id: 'education', label: '🎓 Education', count: 5 }
+        ];
 
         const templates = {
             hr: [
@@ -4424,8 +4795,71 @@ HR Department
                     }}>Ready-to-use document structures. Select a template to create a document with your data.</p>
                 </div>
 
-                {/* Templates Grid - All Templates Displayed */}
+                {/* Industry Packs */}
                 <div style={{ marginBottom: '24px' }}>
+                    <h3 style={{ fontSize: '16px', fontWeight: '600', color: '#111827', marginBottom: '12px' }}>🌐 Industry Packs</h3>
+                    <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap', marginBottom: '20px' }}>
+                        {industryPacks.map(pack => (
+                            <button key={pack.id} style={{
+                                padding: '8px 16px',
+                                backgroundColor: 'white',
+                                border: '1px solid #E5E7EB',
+                                borderRadius: '20px',
+                                fontSize: '13px',
+                                fontWeight: '500',
+                                color: '#374151',
+                                cursor: 'pointer',
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '6px',
+                                transition: 'all 0.2s ease'
+                            }}
+                                onMouseEnter={(e) => {
+                                    e.currentTarget.style.backgroundColor = '#FEF3E2';
+                                    e.currentTarget.style.borderColor = '#F97316';
+                                    e.currentTarget.style.color = '#F97316';
+                                }}
+                                onMouseLeave={(e) => {
+                                    e.currentTarget.style.backgroundColor = 'white';
+                                    e.currentTarget.style.borderColor = '#E5E7EB';
+                                    e.currentTarget.style.color = '#374151';
+                                }}>
+                                {pack.label}
+                                <span style={{ backgroundColor: '#F3F4F6', padding: '1px 6px', borderRadius: '10px', fontSize: '11px' }}>{pack.count}</span>
+                            </button>
+                        ))}
+                    </div>
+
+                    {/* Role Filters */}
+                    <h3 style={{ fontSize: '16px', fontWeight: '600', color: '#111827', marginBottom: '12px' }}>👤 By Role</h3>
+                    <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap', marginBottom: '20px' }}>
+                        {['HR Manager', 'Sales Rep', 'Legal Counsel', 'Finance Lead', 'Founder'].map((role, i) => (
+                            <button key={i} style={{
+                                padding: '6px 14px',
+                                backgroundColor: '#F9FAFB',
+                                border: '1px solid #E5E7EB',
+                                borderRadius: '20px',
+                                fontSize: '13px',
+                                fontWeight: '500',
+                                color: '#6B7280',
+                                cursor: 'pointer',
+                                transition: 'all 0.2s ease'
+                            }}
+                                onMouseEnter={(e) => {
+                                    e.currentTarget.style.backgroundColor = '#FEF3E2';
+                                    e.currentTarget.style.color = '#F97316';
+                                    e.currentTarget.style.borderColor = '#F97316';
+                                }}
+                                onMouseLeave={(e) => {
+                                    e.currentTarget.style.backgroundColor = '#F9FAFB';
+                                    e.currentTarget.style.color = '#6B7280';
+                                    e.currentTarget.style.borderColor = '#E5E7EB';
+                                }}>
+                                {role}
+                            </button>
+                        ))}
+                    </div>
+
                     <p style={{
                         fontSize: '14px',
                         color: '#6B7280',
@@ -4868,6 +5302,52 @@ HR Department
                                     Coming Soon
                                 </div>
                             </motion.div>
+
+                            {/* Smart Document Memory Card */}
+                            <motion.div
+                                whileHover={{ y: -4, boxShadow: '0 12px 24px rgba(0,0,0,0.12)' }}
+                                style={{
+                                    background: 'white',
+                                    borderRadius: '12px',
+                                    padding: '24px',
+                                    boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
+                                    cursor: 'pointer',
+                                    transition: 'all 0.3s ease'
+                                }}
+                            >
+                                <div style={{
+                                    width: '48px',
+                                    height: '48px',
+                                    borderRadius: '12px',
+                                    background: 'linear-gradient(135deg, #F97316 0%, #EA580C 100%)',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    marginBottom: '16px'
+                                }}>
+                                    <Sparkles size={24} color="white" />
+                                </div>
+                                <h3 style={{ fontSize: '18px', fontWeight: '600', color: '#111827', marginBottom: '8px' }}>
+                                    Smart Document Memory
+                                </h3>
+                                <p style={{ fontSize: '14px', color: '#6B7280', lineHeight: '1.5' }}>
+                                    AI remembers your company name, roles, and preferences across all documents automatically
+                                </p>
+                                <div style={{ marginTop: '16px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                                    {['Company: MM Docs', 'Industry: Technology', 'Language: English'].map((item, i) => (
+                                        <div key={i} style={{
+                                            display: 'flex', alignItems: 'center', gap: '8px',
+                                            backgroundColor: '#FEF3E2', borderRadius: '6px', padding: '6px 10px'
+                                        }}>
+                                            <div style={{ width: '6px', height: '6px', borderRadius: '50%', backgroundColor: '#F97316', flexShrink: 0 }} />
+                                            <span style={{ fontSize: '12px', color: '#92400E', fontWeight: '500' }}>{item}</span>
+                                        </div>
+                                    ))}
+                                </div>
+                                <div style={{ marginTop: '16px', color: '#F97316', fontSize: '14px', fontWeight: '600', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                                    Configure Memory <ChevronRight size={16} />
+                                </div>
+                            </motion.div>
                         </div>
                     </div>
                 );
@@ -4897,6 +5377,38 @@ HR Department
                     {renderMainContent()}
                 </main>
             </div>
+
+            {/* Global AI Assistant Floating Button */}
+            <button
+                style={{
+                    position: 'fixed',
+                    bottom: '24px',
+                    right: '24px',
+                    width: '56px',
+                    height: '56px',
+                    borderRadius: '28px',
+                    backgroundColor: '#F97316',
+                    color: 'white',
+                    border: 'none',
+                    boxShadow: '0 4px 12px rgba(249, 115, 22, 0.3)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    cursor: 'pointer',
+                    zIndex: 1000,
+                    transition: 'all 0.2s ease'
+                }}
+                onMouseEnter={(e) => {
+                    e.currentTarget.style.transform = 'scale(1.05)';
+                    e.currentTarget.style.backgroundColor = '#EA580C';
+                }}
+                onMouseLeave={(e) => {
+                    e.currentTarget.style.transform = 'scale(1)';
+                    e.currentTarget.style.backgroundColor = '#F97316';
+                }}
+            >
+                <Bot size={28} />
+            </button>
         </div>
     );
 }
