@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { api } from '../utils/api';
 import { getApiUrl } from '../config/api';
@@ -23,6 +23,7 @@ const LogoIcon = () => (
 export default function Dashboard() {
     const { user, logout, login, token } = useAuth();
     const navigate = useNavigate();
+    const location = useLocation();
 
     // Navigation state
     const [currentView, setCurrentView] = useState('dashboard');
@@ -147,6 +148,13 @@ export default function Dashboard() {
         fetchData();
     }, [token]);
 
+    // Set initial view based on URL path
+    useEffect(() => {
+        if (location.pathname === '/dashboard/templates') {
+            setCurrentView('templates');
+        }
+    }, [location.pathname]);
+
     const handleLogout = () => {
         logout();
         navigate('/');
@@ -223,6 +231,7 @@ export default function Dashboard() {
                                     if (item.id === 'templates') {
                                         setSelectedCategory(null);
                                         setSelectedDocType(null);
+                                        navigate('/dashboard/templates');
                                     }
                                     setGeneratedDoc(null);
                                     setCurrentView(item.id);
@@ -3220,6 +3229,32 @@ HR Department
         const [selectedCategory, setSelectedCategory] = useState('all');
         const [selectedTemplate, setSelectedTemplate] = useState(null);
         const [previewMode, setPreviewMode] = useState(false);
+        const [templates, setTemplates] = useState([]);
+        const [loading, setLoading] = useState(true);
+
+        // Fetch templates from API on mount
+        useEffect(() => {
+            fetchTemplatesFromAPI();
+        }, [selectedCategory]);
+
+        const fetchTemplatesFromAPI = async () => {
+            try {
+                setLoading(true);
+                const params = selectedCategory !== 'all' ? `?category=${selectedCategory}` : '';
+                const response = await api.get(`/templates${params}`);
+                
+                if (response.success) {
+                    console.log('✅ Fetched templates:', response.data);
+                    setTemplates(response.data);
+                } else {
+                    console.error('Failed to fetch templates:', response);
+                }
+            } catch (error) {
+                console.error('Error fetching templates:', error);
+            } finally {
+                setLoading(false);
+            }
+        };
 
         // Debug logging for preview mode
         useEffect(() => {
@@ -3236,238 +3271,28 @@ HR Department
             compliance: 'Compliance Documents'
         };
 
-        const templates = {
-            hr: [
-                {
-                    id: 'offer_letter',
-                    name: 'Offer Letter',
-                    description: 'Professional employment offer letter with compensation details',
-                    icon: '📄',
-                    preview: 'Employment offer with salary, benefits, and terms',
-                    fields: ['candidateName', 'position', 'salary', 'startDate', 'department'],
-                    color: '#3B82F6'
-                },
-                {
-                    id: 'appointment_letter',
-                    name: 'Appointment Letter',
-                    description: 'Official appointment confirmation letter',
-                    icon: '📋',
-                    preview: 'Formal appointment with role details and conditions',
-                    fields: ['employeeName', 'position', 'department', 'appointmentDate'],
-                    color: '#10B981'
-                },
-                {
-                    id: 'experience_certificate',
-                    name: 'Experience Certificate',
-                    description: 'Work experience verification certificate',
-                    icon: '🏆',
-                    preview: 'Professional experience validation document',
-                    fields: ['employeeName', 'position', 'joiningDate', 'relievingDate'],
-                    color: '#F59E0B'
-                },
-                {
-                    id: 'warning_letter',
-                    name: 'Warning Letter',
-                    description: 'Employee disciplinary warning letter',
-                    icon: '⚠️',
-                    preview: 'Formal warning for policy violations',
-                    fields: ['employeeName', 'violationType', 'incidentDescription'],
-                    color: '#EF4444'
-                },
-                {
-                    id: 'onboarding_letter',
-                    name: 'Onboarding Letter',
-                    description: 'Welcome and onboarding instructions',
-                    icon: '👋',
-                    preview: 'New employee welcome and orientation guide',
-                    fields: ['employeeName', 'position', 'startDate', 'orientation'],
-                    color: '#8B5CF6'
-                }
-            ],
-            legal: [
-                {
-                    id: 'nda',
-                    name: 'Non-Disclosure Agreement',
-                    description: 'Confidentiality and non-disclosure agreement',
-                    icon: '🔒',
-                    preview: 'Legal confidentiality protection document',
-                    fields: ['partyName', 'effectiveDate', 'duration', 'purpose'],
-                    color: '#059669'
-                },
-                {
-                    id: 'service_agreement',
-                    name: 'Service Agreement',
-                    description: 'Professional service contract agreement',
-                    icon: '📝',
-                    preview: 'Comprehensive service terms and conditions',
-                    fields: ['clientName', 'serviceType', 'duration', 'terms'],
-                    color: '#7C3AED'
-                },
-                {
-                    id: 'terms_of_service',
-                    name: 'Terms of Service',
-                    description: 'User terms and conditions for services',
-                    icon: '📜',
-                    preview: 'Legal terms governing service usage',
-                    fields: ['serviceName', 'effectiveDate', 'userObligations', 'restrictions'],
-                    color: '#0891B2'
-                },
-                {
-                    id: 'privacy_policy',
-                    name: 'Privacy Policy',
-                    description: 'Data privacy and protection policy',
-                    icon: '🛡️',
-                    preview: 'Comprehensive privacy and data protection document',
-                    fields: ['serviceName', 'dataCollected', 'dataUsage', 'dataSecurity'],
-                    color: '#6366F1'
-                },
-                {
-                    id: 'mou',
-                    name: 'Memorandum of Understanding',
-                    description: 'Formal agreement between parties',
-                    icon: '🤝',
-                    preview: 'MOU outlining mutual understanding and cooperation',
-                    fields: ['partyName', 'purpose', 'duration', 'effectiveDate'],
-                    color: '#8B5CF6'
-                }
-            ],
-            sales: [
-                {
-                    id: 'business_proposal',
-                    name: 'Business Proposal',
-                    description: 'Professional business proposal document',
-                    icon: '💼',
-                    preview: 'Comprehensive business proposal with pricing',
-                    fields: ['clientName', 'projectTitle', 'projectValue', 'timeline'],
-                    color: '#DC2626'
-                },
-                {
-                    id: 'sales_contract',
-                    name: 'Sales Contract',
-                    description: 'Formal sales agreement contract',
-                    icon: '🤝',
-                    preview: 'Binding sales contract with terms and conditions',
-                    fields: ['buyerName', 'productDescription', 'quantity', 'totalAmount'],
-                    color: '#DB2777'
-                },
-                {
-                    id: 'partnership_agreement',
-                    name: 'Partnership Agreement',
-                    description: 'Business partnership contract',
-                    icon: '👥',
-                    preview: 'Legal partnership agreement with profit sharing',
-                    fields: ['partnerName', 'businessName', 'capitalContribution', 'profitSharingRatio'],
-                    color: '#9333EA'
-                },
-                {
-                    id: 'quotation',
-                    name: 'Quotation',
-                    description: 'Price quotation and service details',
-                    icon: '💰',
-                    preview: 'Detailed pricing and service quotation',
-                    fields: ['clientName', 'quotationNumber', 'totalAmount', 'validUntil'],
-                    color: '#EA580C'
-                }
-            ],
-            finance: [
-                {
-                    id: 'invoice',
-                    name: 'Invoice',
-                    description: 'Professional invoice for services/products',
-                    icon: '🧾',
-                    preview: 'Standard billing invoice with payment terms',
-                    fields: ['clientName', 'invoiceNumber', 'totalAmount', 'dueDate'],
-                    color: '#0891B2'
-                },
-                {
-                    id: 'gst_invoice',
-                    name: 'GST Invoice',
-                    description: 'GST compliant invoice with tax calculations',
-                    icon: '📊',
-                    preview: 'Tax compliant invoice with GST breakdown',
-                    fields: ['clientName', 'gstNumber', 'baseAmount', 'invoiceDate'],
-                    color: '#7C2D12'
-                },
-                {
-                    id: 'purchase_order',
-                    name: 'Purchase Order',
-                    description: 'Official purchase order for vendors',
-                    icon: '📦',
-                    preview: 'Formal purchase order with item details',
-                    fields: ['vendorName', 'poNumber', 'itemDescription', 'totalAmount'],
-                    color: '#0D9488'
-                },
-                {
-                    id: 'receipt',
-                    name: 'Receipt',
-                    description: 'Payment receipt acknowledgment',
-                    icon: '🧾',
-                    preview: 'Official payment receipt confirmation',
-                    fields: ['customerName', 'receiptNumber', 'amount', 'paymentMethod'],
-                    color: '#65A30D'
-                },
-                {
-                    id: 'credit_note',
-                    name: 'Credit Note',
-                    description: 'Credit note for returns or adjustments',
-                    icon: '📝',
-                    preview: 'Credit memo for invoice adjustments',
-                    fields: ['clientName', 'creditNoteNumber', 'creditAmount', 'reason'],
-                    color: '#CA8A04'
-                }
-            ],
-            compliance: [
-                {
-                    id: 'audit_report',
-                    name: 'Audit Report',
-                    description: 'Financial and compliance audit report',
-                    icon: '🔍',
-                    preview: 'Comprehensive audit findings and recommendations',
-                    fields: ['auditPeriod', 'auditType', 'auditorName', 'findings'],
-                    color: '#BE185D'
-                },
-                {
-                    id: 'gst_filing_summary',
-                    name: 'GST Filing Summary',
-                    description: 'GST return filing summary report',
-                    icon: '📑',
-                    preview: 'Detailed GST filing summary with tax calculations',
-                    fields: ['gstNumber', 'filingPeriod', 'returnType', 'totalSales'],
-                    color: '#C026D3'
-                },
-                {
-                    id: 'policy_document',
-                    name: 'Policy Document',
-                    description: 'Company policy and guidelines document',
-                    icon: '📋',
-                    preview: 'Official organizational policy document',
-                    fields: ['policyTitle', 'policyNumber', 'effectiveDate', 'policyObjective'],
-                    color: '#7C3AED'
-                },
-                {
-                    id: 'regulatory_filing',
-                    name: 'Regulatory Filing',
-                    description: 'Government and regulatory compliance filing',
-                    icon: '🏛️',
-                    preview: 'Official regulatory submission document',
-                    fields: ['filingType', 'filingNumber', 'regulatoryBody', 'filingDate'],
-                    color: '#4F46E5'
-                }
-            ]
-        };
-
         const getAllTemplates = () => {
-            // Always return all templates - no category filtering
-            return Object.values(templates).flat();
+            return templates;
         };
 
         const handleTemplateSelect = (template) => {
+            // For PDF templates, download directly
+            if (template.templateType === 'pdf') {
+                console.log('📥 Downloading PDF template:', template.pdfUrl);
+                const link = document.createElement('a');
+                link.href = `http://localhost:5000${template.pdfUrl}`;
+                link.download = `${template.name}.pdf`;
+                link.target = '_blank';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                return;
+            }
+
             console.log('🔴 REDIRECTING TO EDITOR:', template.name);
             console.trace('Called from:');
             // Find the category for this template
-            const templateCategory = Object.keys(templates).find(cat =>
-                templates[cat].some(t => t.id === template.id)
-            );
+            const templateCategory = template.category;
 
             // Set the states in the main Dashboard component
             setSelectedCategory(templateCategory);
@@ -3710,6 +3535,118 @@ HR Department
             };
 
             const data = placeholderData[template.id] || {};
+
+            // For Letter of Recommendation, show the actual PDF
+            if (template.id === 'letter-of-recommendation-001') {
+                return (
+                    <div style={{
+                        position: 'fixed',
+                        top: 0,
+                        left: 0,
+                        right: 0,
+                        bottom: 0,
+                        backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        zIndex: 1000
+                    }}>
+                        <div style={{
+                            backgroundColor: 'white',
+                            borderRadius: '16px',
+                            padding: '24px',
+                            maxWidth: '1100px',
+                            width: '95%',
+                            height: '90vh',
+                            position: 'relative',
+                            boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.3)',
+                            display: 'flex',
+                            flexDirection: 'column'
+                        }}>
+                            {/* Close Button */}
+                            <button
+                                onClick={onClose}
+                                style={{
+                                    position: 'absolute',
+                                    top: '16px',
+                                    right: '16px',
+                                    width: '36px',
+                                    height: '36px',
+                                    borderRadius: '50%',
+                                    border: 'none',
+                                    backgroundColor: '#EF4444',
+                                    color: 'white',
+                                    cursor: 'pointer',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    fontSize: '20px',
+                                    fontWeight: 'bold',
+                                    zIndex: 10
+                                }}
+                            >
+                                ×
+                            </button>
+
+                            {/* Template Header */}
+                            <div style={{ marginBottom: '16px' }}>
+                                <h3 style={{
+                                    fontSize: '20px',
+                                    fontWeight: '600',
+                                    color: '#111827',
+                                    margin: '0 0 4px 0',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    gap: '8px'
+                                }}>
+                                    <span>{template.icon}</span>
+                                    {template.name}
+                                </h3>
+                                <p style={{
+                                    fontSize: '13px',
+                                    color: '#6B7280',
+                                    margin: 0
+                                }}>{template.description}</p>
+                            </div>
+
+                            {/* PDF Viewer */}
+                            <div style={{ flex: 1, overflow: 'hidden', borderRadius: '8px', border: '1px solid #E5E7EB' }}>
+                                <iframe
+                                    src="/uploads/template-previews/letter-of-recommendation-preview.pdf"
+                                    style={{
+                                        width: '100%',
+                                        height: '100%',
+                                        border: 'none'
+                                    }}
+                                    title="Letter of Recommendation Preview"
+                                />
+                            </div>
+
+                            {/* Use Template Button */}
+                            <button
+                                onClick={() => {
+                                    onClose();
+                                    handleTemplateSelect(template);
+                                }}
+                                style={{
+                                    marginTop: '16px',
+                                    width: '100%',
+                                    padding: '14px',
+                                    backgroundColor: '#10B981',
+                                    color: 'white',
+                                    border: 'none',
+                                    borderRadius: '8px',
+                                    fontSize: '15px',
+                                    fontWeight: '600',
+                                    cursor: 'pointer'
+                                }}
+                            >
+                                Use This Template
+                            </button>
+                        </div>
+                    </div>
+                );
+            }
 
             return (
                 <div style={{
@@ -4436,186 +4373,171 @@ HR Department
                 {/* Templates Grid */}
                 <div style={{
                     display: 'grid',
-                    gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))',
-                    gap: '24px'
+                    gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
+                    gap: '20px'
                 }}>
-                    {getAllTemplates().map((template) => (
+                    {loading ? (
+                        <div style={{ textAlign: 'center', padding: '60px', gridColumn: '1 / -1' }}>
+                            <div style={{ fontSize: '14px', color: '#6B7280' }}>Loading templates...</div>
+                        </div>
+                    ) : getAllTemplates().map((template) => (
                         <div
-                            key={template.id}
+                            key={template.templateId}
                             onClick={(e) => {
-                                console.log('📦 CARD CLICKED:', template.name);
-                                console.log('Event target:', e.target.tagName);
-                                console.log('Event currentTarget:', e.currentTarget.tagName);
-                                handlePreviewTemplate(template);
+                                if (!e.target.closest('button')) {
+                                    handleTemplateSelect(template);
+                                }
                             }}
                             style={{
                                 backgroundColor: 'white',
                                 border: '1px solid #E5E7EB',
-                                borderRadius: '16px',
-                                padding: '24px',
+                                borderRadius: '12px',
+                                padding: '16px',
                                 boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)',
                                 transition: 'all 0.2s ease',
-                                cursor: 'pointer'
+                                cursor: 'pointer',
+                                position: 'relative'
                             }}
                             onMouseEnter={(e) => {
                                 e.currentTarget.style.transform = 'translateY(-4px)';
-                                e.currentTarget.style.boxShadow = '0 8px 25px rgba(0, 0, 0, 0.15)';
-                                e.currentTarget.style.borderColor = template.color;
+                                e.currentTarget.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.15)';
                             }}
                             onMouseLeave={(e) => {
                                 e.currentTarget.style.transform = 'translateY(0)';
                                 e.currentTarget.style.boxShadow = '0 1px 3px rgba(0, 0, 0, 0.1)';
-                                e.currentTarget.style.borderColor = '#E5E7EB';
                             }}
                         >
-                            {/* Template Header */}
-                            <div style={{
-                                display: 'flex',
-                                alignItems: 'center',
-                                gap: '12px',
-                                marginBottom: '16px'
-                            }}>
+                            {/* Featured Badge */}
+                            {template.metadata?.featured && (
                                 <div style={{
-                                    width: '48px',
-                                    height: '48px',
+                                    position: 'absolute',
+                                    top: '-10px',
+                                    right: '20px',
+                                    backgroundColor: '#F97316',
+                                    color: 'white',
+                                    padding: '4px 12px',
                                     borderRadius: '12px',
-                                    backgroundColor: `${template.color}15`,
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'center',
-                                    fontSize: '24px'
+                                    fontSize: '11px',
+                                    fontWeight: '600',
+                                    textTransform: 'uppercase',
+                                    letterSpacing: '0.5px',
+                                    boxShadow: '0 2px 8px rgba(249, 115, 22, 0.3)',
+                                    zIndex: 10
                                 }}>
-                                    {template.icon}
+                                    ⭐ Featured
                                 </div>
-                                <div style={{ flex: 1 }}>
-                                    <h3 style={{
-                                        fontSize: '16px',
-                                        fontWeight: '600',
-                                        color: '#111827',
-                                        margin: '0 0 4px 0'
-                                    }}>{template.name}</h3>
-                                    <div style={{
-                                        backgroundColor: `${template.color}15`,
-                                        color: template.color,
-                                        padding: '2px 8px',
-                                        borderRadius: '12px',
-                                        fontSize: '11px',
-                                        fontWeight: '600',
-                                        display: 'inline-block'
-                                    }}>
-                                        {templateCategories[Object.keys(templates).find(cat =>
-                                            templates[cat].some(t => t.id === template.id)
-                                        )]}
-                                    </div>
-                                </div>
-                            </div>
+                            )}
 
-                            {/* Template Description */}
-                            <p style={{
-                                fontSize: '14px',
-                                color: '#6B7280',
-                                margin: '0 0 16px 0',
-                                lineHeight: '1.4'
-                            }}>{template.description}</p>
-
-                            {/* Template Preview */}
+                            {/* Visual Document Preview */}
                             <div style={{
+                                width: '100%',
+                                height: '320px',
                                 backgroundColor: '#F9FAFB',
-                                border: '1px solid #F3F4F6',
                                 borderRadius: '8px',
-                                padding: '12px',
-                                marginBottom: '16px'
+                                marginBottom: '12px',
+                                overflow: 'hidden',
+                                border: '1px solid #E5E7EB',
+                                position: 'relative'
                             }}>
-                                <div style={{
-                                    fontSize: '12px',
-                                    color: '#9CA3AF',
-                                    fontWeight: '500',
-                                    marginBottom: '4px'
-                                }}>Preview:</div>
-                                <div style={{
-                                    fontSize: '13px',
-                                    color: '#374151',
-                                    fontStyle: 'italic'
-                                }}>{template.preview}</div>
+                                {template.templateType === 'pdf' ? (
+                                    <>
+                                        {/* PDF Preview - YOUR GREEN GREY PDF! */}
+                                        <iframe
+                                            src={`http://localhost:5000${template.pdfUrl}#toolbar=0&navpanes=0&scrollbar=0`}
+                                            style={{
+                                                width: '100%',
+                                                height: '100%',
+                                                border: 'none',
+                                                pointerEvents: 'none',
+                                                transform: 'scale(1)',
+                                                transformOrigin: 'top left'
+                                            }}
+                                            title={`${template.name} preview`}
+                                        />
+                                        {/* PandaDoc-style badge */}
+                                        <div style={{
+                                            position: 'absolute',
+                                            top: '8px',
+                                            left: '8px',
+                                            backgroundColor: 'white',
+                                            padding: '4px 8px',
+                                            borderRadius: '4px',
+                                            fontSize: '10px',
+                                            fontWeight: '600',
+                                            color: '#059669',
+                                            boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            gap: '4px'
+                                        }}>
+                                            <span style={{ fontSize: '12px' }}>📄</span> PandaDoc
+                                        </div>
+                                    </>
+                                ) : (
+                                    <div style={{
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                        height: '100%',
+                                        fontSize: '64px',
+                                        opacity: 0.3
+                                    }}>
+                                        {template.icon || '📄'}
+                                    </div>
+                                )}
                             </div>
 
-                            {/* Required Fields */}
-                            <div style={{ marginBottom: '20px' }}>
-                                <div style={{
-                                    fontSize: '12px',
-                                    color: '#9CA3AF',
-                                    fontWeight: '500',
-                                    marginBottom: '8px'
-                                }}>Required Fields:</div>
-                                <div style={{
-                                    display: 'flex',
-                                    flexWrap: 'wrap',
-                                    gap: '4px'
-                                }}>
-                                    {template.fields.slice(0, 3).map((field) => (
-                                        <span
-                                            key={field}
-                                            style={{
-                                                backgroundColor: '#F3F4F6',
-                                                color: '#6B7280',
-                                                padding: '2px 6px',
-                                                borderRadius: '4px',
-                                                fontSize: '11px',
-                                                fontWeight: '500'
-                                            }}
-                                        >
-                                            {field}
-                                        </span>
-                                    ))}
-                                    {template.fields.length > 3 && (
-                                        <span style={{
-                                            color: '#9CA3AF',
-                                            fontSize: '11px',
-                                            fontWeight: '500'
-                                        }}>
-                                            +{template.fields.length - 3} more
-                                        </span>
-                                    )}
-                                </div>
+                            {/* Template Title */}
+                            <h3 style={{
+                                fontSize: '15px',
+                                fontWeight: '600',
+                                color: '#111827',
+                                margin: '0 0 6px 0',
+                                overflow: 'hidden',
+                                textOverflow: 'ellipsis',
+                                whiteSpace: 'nowrap'
+                            }}>{template.name}</h3>
+
+                            {/* Creator info */}
+                            <div style={{
+                                fontSize: '11px',
+                                color: '#9CA3AF',
+                                marginBottom: '14px',
+                                display: 'flex',
+                                flexDirection: 'column',
+                                gap: '2px'
+                            }}>
+                                <div>Prepared for: <span style={{ color: '#6B7280' }}>Your Company</span></div>
+                                <div>Created by: <span style={{ color: '#6B7280' }}>{templateCategories[template.category] || 'Professional'}</span></div>
                             </div>
 
                             {/* Action Button */}
-                            <div style={{
-                                display: 'flex',
-                                gap: '8px'
-                            }}>
-                                <button
-                                    onClick={(e) => {
-                                        console.log('🔘 BUTTON CLICKED:', template.name);
-                                        console.log('Opening preview...');
-                                        e.stopPropagation();
-                                        handlePreviewTemplate(template);
-                                    }}
-                                    style={{
-                                        flex: 1,
-                                        padding: '12px 20px',
-                                        backgroundColor: template.color,
-                                        color: 'white',
-                                        border: 'none',
-                                        borderRadius: '8px',
-                                        fontSize: '14px',
-                                        fontWeight: '600',
-                                        cursor: 'pointer',
-                                        transition: 'all 0.2s ease',
-                                        boxShadow: `0 2px 8px ${template.color}30`
-                                    }}
-                                    onMouseEnter={(e) => {
-                                        e.target.style.transform = 'translateY(-2px)';
-                                        e.target.style.boxShadow = `0 4px 12px ${template.color}40`;
-                                    }}
-                                    onMouseLeave={(e) => {
-                                        e.target.style.transform = 'translateY(0)';
-                                        e.target.style.boxShadow = `0 2px 8px ${template.color}30`;
-                                    }}
-                                >
-                                    Preview Template
-                                </button>
-                            </div>
+                            <button
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleTemplateSelect(template);
+                                }}
+                                style={{
+                                    width: '100%',
+                                    padding: '10px',
+                                    backgroundColor: '#F97316',
+                                    color: 'white',
+                                    border: 'none',
+                                    borderRadius: '6px',
+                                    fontSize: '13px',
+                                    fontWeight: '600',
+                                    cursor: 'pointer',
+                                    transition: 'all 0.2s ease'
+                                }}
+                                onMouseEnter={(e) => {
+                                    e.currentTarget.style.backgroundColor = '#EA580C';
+                                }}
+                                onMouseLeave={(e) => {
+                                    e.currentTarget.style.backgroundColor = '#F97316';
+                                }}
+                            >
+                                {template.templateType === 'pdf' ? 'Download PDF' : 'Use this template'}
+                            </button>
                         </div>
                     ))}
                 </div>
@@ -4628,7 +4550,7 @@ HR Department
                     gap: '24px'
                 }}>
                     {Object.entries(templateCategories).slice(1).map(([key, label]) => {
-                        const categoryTemplates = templates[key] || [];
+                        const categoryTemplates = templates.filter(t => t.category === key);
                         const colors = ['#3B82F6', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6'];
                         const colorIndex = Object.keys(templateCategories).slice(1).indexOf(key);
 

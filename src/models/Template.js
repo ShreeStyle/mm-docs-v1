@@ -23,6 +23,14 @@ const templateSchema = new mongoose.Schema({
         type: String,
         default: '📄'
     },
+    displayOrder: {
+        type: Number,
+        default: null // null means no special ordering, sort by name
+    },
+    previewImage: {
+        type: String,
+        default: null // Path to preview image/PDF
+    },
     requiredFields: [{
         fieldName: {
             type: String,
@@ -63,16 +71,22 @@ const templateSchema = new mongoose.Schema({
             type: Boolean,
             default: true
         },
+        featured: {
+            type: Boolean,
+            default: false
+        },
         usageCount: {
             type: Number,
             default: 0
-        }
+        },
+        createdAt: Date,
+        updatedAt: Date
     }
 }, {
     timestamps: true
 });
 
-// Single index for efficient queries
-templateSchema.index({ category: 1, 'metadata.isActive': 1 });
+// Index for efficient queries including displayOrder
+templateSchema.index({ displayOrder: 1, category: 1, 'metadata.isActive': 1 });
 
 module.exports = mongoose.model('Template', templateSchema);

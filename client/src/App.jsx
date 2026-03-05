@@ -8,6 +8,8 @@ import Dashboard from './pages/Dashboard';
 import TemplatesPage from './pages/TemplatesPage';
 import CreateDocument from './pages/CreateDocument';
 import BrandSettings from './pages/BrandSettings';
+import DocumentRecipients from './pages/DocumentRecipients';
+import DocumentEditor from './pages/DocumentEditor';
 import './styles/Dashboard.css';
 
 function App() {
@@ -20,8 +22,10 @@ function App() {
           <Route path="/signup" element={<Signup />} />
           <Route path="/product" element={<Dashboard />} />
           <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/dashboard/templates" element={<TemplatesPage />} />
+          <Route path="/dashboard/templates" element={<Dashboard />} />
           <Route path="/dashboard/create-document/:templateId" element={<CreateDocument />} />
+          <Route path="/document/recipients/:templateId" element={<DocumentRecipients />} />
+          <Route path="/document/editor/:documentId" element={<DocumentEditor />} />
           <Route path="/settings/brand" element={<BrandSettings />} />
         </Routes>
       </Router>

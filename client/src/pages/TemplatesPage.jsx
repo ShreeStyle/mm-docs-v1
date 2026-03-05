@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Eye, Loader2, ArrowLeft } from 'lucide-react';
+import { Eye, Loader2 } from 'lucide-react';
 import { api } from '../utils/api';
 
 const TemplatesPage = () => {
@@ -25,8 +25,25 @@ const TemplatesPage = () => {
             const params = selectedCategory !== 'all' ? `?category=${selectedCategory}` : '';
             const response = await api.get(`/templates${params}`);
 
+            console.log('🔍 API Response:', response);
+            console.log('🔍 Templates received:', response.data?.length);
+            console.log('🔍 First 3 templates:', response.data?.slice(0, 3));
+            console.log('🔍 Template types:', response.data?.map(t => `${t.name}: ${t.templateType}`));
+
             if (response.success) {
-                setTemplates(response.data);
+                // Sort templates by displayOrder (ascending), then by name
+                const sortedTemplates = response.data.sort((a, b) => {
+                    // Featured templates (with displayOrder) come first
+                    if (a.displayOrder && !b.displayOrder) return -1;
+                    if (!a.displayOrder && b.displayOrder) return 1;
+                    if (a.displayOrder && b.displayOrder) return a.displayOrder - b.displayOrder;
+                    // Then sort by name
+                    return a.name.localeCompare(b.name);
+                });
+                
+                console.log('🔍 After sorting:', sortedTemplates.map(t => `${t.name} (${t.displayOrder})`));
+                
+                setTemplates(sortedTemplates);
             }
         } catch (error) {
             console.error('Error fetching templates:', error);
@@ -48,17 +65,34 @@ const TemplatesPage = () => {
     };
 
     const handleTemplateSelect = (template) => {
-        console.log('Navigating to create document with template:', template.templateId);
-        // Navigate to create document page with template ID
-        navigate(`/dashboard/create-document/${template.templateId}`);
+        // For PDF templates, download the PDF directly
+        if (template.templateType === 'pdf') {
+            console.log('📥 Opening PDF template:', template.pdfUrl);
+            const link = document.createElement('a');
+            link.href = `http://localhost:5000${template.pdfUrl}`;
+            link.download = `${template.name}.pdf`;
+            link.target = '_blank';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            return;
+        }
+        
+        console.log('Navigating to recipients page with template:', template.templateId);
+        // Navigate to add recipients page first
+        navigate(`/document/recipients/${template.templateId}`);
     };
 
     const handlePreviewTemplate = async (template) => {
-        console.log('Previewing template:', template.templateId);
+        console.log('🔍 Previewing template:', template.templateId);
+        console.log('🔍 Template Type:', template.templateType);
+        console.log('🔍 PDF URL:', template.pdfUrl);
         try {
             // Fetch full template data including content
             const response = await api.get(`/templates/${template.templateId}`);
-            console.log('Template preview response:', response);
+            console.log('📦 Template preview response:', response);
+            console.log('📦 Response template type:', response.data?.templateType);
+            console.log('📦 Response PDF URL:', response.data?.pdfUrl);
             if (response.success) {
                 setSelectedTemplate(response.data);
                 setPreviewMode(true);
@@ -80,6 +114,10 @@ const TemplatesPage = () => {
     // Enhanced Preview Modal Component
     const PreviewModal = ({ template, onClose }) => {
         if (!template) return null;
+        
+        console.log('🎨 PreviewModal rendering with template:', template.name);
+        console.log('🎨 Is PDF template?', template.templateType === 'pdf');
+        console.log('🎨 PDF URL:', template.pdfUrl);
 
         const getPreviewContent = () => {
             let content = template.content || '';
@@ -237,70 +275,101 @@ const TemplatesPage = () => {
                         </div>
                     </div>
 
-                    {/* Required Fields */}
-                    <div style={{ marginBottom: '24px' }}>
-                        <h4 style={{
-                            fontSize: '16px',
-                            fontWeight: '600',
-                            color: '#374151',
-                            marginBottom: '12px'
-                        }}>Required Fields:</h4>
-                        <div style={{
-                            display: 'grid',
-                            gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
-                            gap: '8px'
-                        }}>
-                            {template.requiredFields?.map((field) => (
-                                <div
-                                    key={field.fieldName}
+                    {/* For PDF templates, show PDF viewer */}
+                    {template.templateType === 'pdf' ? (
+                        <div style={{ marginBottom: '24px' }}>
+                            <h4 style={{
+                                fontSize: '16px',
+                                fontWeight: '600',
+                                color: '#374151',
+                                marginBottom: '12px'
+                            }}>PDF Preview:</h4>
+                            <div style={{
+                                border: '1px solid #E5E7EB',
+                                borderRadius: '8px',
+                                overflow: 'hidden',
+                                height: '600px',
+                                backgroundColor: '#F9FAFB'
+                            }}>
+                                <iframe
+                                    src={`http://localhost:5000${template.pdfUrl}`}
                                     style={{
-                                        backgroundColor: '#F3F4F6',
-                                        padding: '8px 12px',
-                                        borderRadius: '6px',
-                                        fontSize: '12px'
+                                        width: '100%',
+                                        height: '100%',
+                                        border: 'none'
                                     }}
-                                >
-                                    <div style={{ fontWeight: '600', color: '#374151' }}>
-                                        {field.label}
-                                    </div>
-                                    <div style={{ color: '#6B7280', fontSize: '11px' }}>
-                                        {field.fieldType} {field.required && '(Required)'}
-                                    </div>
+                                    title={template.name}
+                                />
+                            </div>
+                        </div>
+                    ) : (
+                        <>
+                            {/* Required Fields */}
+                            <div style={{ marginBottom: '24px' }}>
+                                <h4 style={{
+                                    fontSize: '16px',
+                                    fontWeight: '600',
+                                    color: '#374151',
+                                    marginBottom: '12px'
+                                }}>Required Fields:</h4>
+                                <div style={{
+                                    display: 'grid',
+                                    gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+                                    gap: '8px'
+                                }}>
+                                    {template.requiredFields?.map((field) => (
+                                        <div
+                                            key={field.fieldName}
+                                            style={{
+                                                backgroundColor: '#F3F4F6',
+                                                padding: '8px 12px',
+                                                borderRadius: '6px',
+                                                fontSize: '12px'
+                                            }}
+                                        >
+                                            <div style={{ fontWeight: '600', color: '#374151' }}>
+                                                {field.label}
+                                            </div>
+                                            <div style={{ color: '#6B7280', fontSize: '11px' }}>
+                                                {field.fieldType} {field.required && '(Required)'}
+                                            </div>
+                                        </div>
+                                    ))}
                                 </div>
-                            ))}
-                        </div>
-                    </div>
+                            </div>
 
-                    {/* Template Preview */}
-                    <div style={{
-                        backgroundColor: '#F9FAFB',
-                        border: '1px solid #E5E7EB',
-                        borderRadius: '8px',
-                        padding: '24px',
-                        marginBottom: '24px',
-                        maxHeight: '400px',
-                        overflow: 'auto'
-                    }}>
-                        <h4 style={{
-                            fontSize: '14px',
-                            fontWeight: '600',
-                            color: '#374151',
-                            marginBottom: '16px'
-                        }}>Document Preview:</h4>
+                            {/* Template Preview */}
+                            <div style={{
+                                backgroundColor: '#F9FAFB',
+                                border: '1px solid #E5E7EB',
+                                borderRadius: '8px',
+                                padding: '24px',
+                                marginBottom: '24px',
+                                maxHeight: '400px',
+                                overflow: 'auto'
+                            }}>
+                                <h4 style={{
+                                    fontSize: '14px',
+                                    fontWeight: '600',
+                                    color: '#374151',
+                                    marginBottom: '16px'
+                                }}>Document Preview:</h4>
 
-                        <div style={{
-                            fontFamily: 'Times New Roman, serif',
-                            fontSize: '12px',
-                            lineHeight: '1.6',
-                            color: '#000',
-                            backgroundColor: 'white',
-                            padding: '20px',
-                            borderRadius: '4px',
-                            border: '1px solid #E5E7EB'
-                        }}>
-                            <div dangerouslySetInnerHTML={{ __html: getPreviewContent() }} />
-                        </div>
-                    </div>
+                                <div style={{
+                                    fontFamily: 'Times New Roman, serif',
+                                    fontSize: '12px',
+                                    lineHeight: '1.6',
+                                    color: '#000',
+                                    backgroundColor: 'white',
+                                    padding: '20px',
+                                    borderRadius: '4px',
+                                    border: '1px solid #E5E7EB'
+                                }}>
+                                    <div dangerouslySetInnerHTML={{ __html: getPreviewContent() }} />
+                                </div>
+                            </div>
+                        </>
+                    )}
 
                     {/* Action Buttons */}
                     <div style={{
@@ -339,7 +408,7 @@ const TemplatesPage = () => {
                                 cursor: 'pointer'
                             }}
                         >
-                            Use This Template
+                            {template.templateType === 'pdf' ? 'Download PDF' : 'Use This Template'}
                         </button>
                     </div>
                 </div>
@@ -359,38 +428,8 @@ const TemplatesPage = () => {
     return (
         <div style={{ padding: '32px', backgroundColor: '#F8F9FB', minHeight: '100vh' }}>
             {/* Header */}
+            {/* Page Header */}
             <div style={{ marginBottom: '32px' }}>
-                <button
-                    onClick={() => navigate('/dashboard')}
-                    style={{
-                        display: 'inline-flex',
-                        alignItems: 'center',
-                        gap: '8px',
-                        padding: '8px 16px',
-                        backgroundColor: 'white',
-                        color: '#374151',
-                        border: '1px solid #E5E7EB',
-                        borderRadius: '8px',
-                        fontSize: '14px',
-                        fontWeight: '500',
-                        cursor: 'pointer',
-                        marginBottom: '20px',
-                        transition: 'all 0.2s ease'
-                    }}
-                    onMouseEnter={(e) => {
-                        e.currentTarget.style.backgroundColor = '#F9FAFB';
-                        e.currentTarget.style.borderColor = '#F97316';
-                        e.currentTarget.style.color = '#F97316';
-                    }}
-                    onMouseLeave={(e) => {
-                        e.currentTarget.style.backgroundColor = 'white';
-                        e.currentTarget.style.borderColor = '#E5E7EB';
-                        e.currentTarget.style.color = '#374151';
-                    }}
-                >
-                    <ArrowLeft size={16} />
-                    Back to Dashboard
-                </button>
                 <h2 style={{
                     fontSize: '28px',
                     fontWeight: '700',
@@ -468,8 +507,8 @@ const TemplatesPage = () => {
             {!loading && (
                 <div style={{
                     display: 'grid',
-                    gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))',
-                    gap: '24px'
+                    gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
+                    gap: '20px'
                 }}>
                     {templates.map((template) => (
                         <div
@@ -477,148 +516,159 @@ const TemplatesPage = () => {
                             style={{
                                 backgroundColor: 'white',
                                 border: '1px solid #E5E7EB',
-                                borderRadius: '16px',
-                                padding: '24px',
+                                borderRadius: '12px',
+                                padding: '16px',
                                 boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)',
                                 transition: 'all 0.2s ease',
-                                cursor: 'pointer'
+                                cursor: 'pointer',
+                                position: 'relative'
                             }}
                             onMouseEnter={(e) => {
                                 e.currentTarget.style.transform = 'translateY(-4px)';
-                                e.currentTarget.style.boxShadow = '0 8px 25px rgba(0, 0, 0, 0.15)';
+                                e.currentTarget.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.15)';
                             }}
                             onMouseLeave={(e) => {
                                 e.currentTarget.style.transform = 'translateY(0)';
                                 e.currentTarget.style.boxShadow = '0 1px 3px rgba(0, 0, 0, 0.1)';
                             }}
+                            onClick={(e) => {
+                                handleTemplateSelect(template);
+                            }}
                         >
-                            {/* Template Header */}
-                            <div style={{
-                                display: 'flex',
-                                alignItems: 'center',
-                                gap: '12px',
-                                marginBottom: '16px'
-                            }}>
+                            {/* Featured Badge */}
+                            {template.metadata?.featured && (
                                 <div style={{
-                                    width: '48px',
-                                    height: '48px',
+                                    position: 'absolute',
+                                    top: '-10px',
+                                    right: '20px',
+                                    backgroundColor: '#F97316',
+                                    color: 'white',
+                                    padding: '4px 12px',
                                     borderRadius: '12px',
-                                    backgroundColor: '#FEF3E2',
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'center',
-                                    fontSize: '24px'
+                                    fontSize: '11px',
+                                    fontWeight: '600',
+                                    textTransform: 'uppercase',
+                                    letterSpacing: '0.5px',
+                                    boxShadow: '0 2px 8px rgba(249, 115, 22, 0.3)',
+                                    zIndex: 10
                                 }}>
-                                    {template.icon}
+                                    ⭐ Featured
                                 </div>
-                                <div style={{ flex: 1 }}>
-                                    <h3 style={{
-                                        fontSize: '16px',
-                                        fontWeight: '600',
-                                        color: '#111827',
-                                        margin: '0 0 4px 0'
-                                    }}>{template.name}</h3>
-                                    <div style={{
-                                        backgroundColor: '#FEF3E2',
-                                        color: '#F97316',
-                                        padding: '2px 8px',
-                                        borderRadius: '12px',
-                                        fontSize: '11px',
-                                        fontWeight: '600',
-                                        display: 'inline-block'
-                                    }}>
-                                        {categoryMap[template.category]}
-                                    </div>
-                                </div>
-                            </div>
+                            )}
 
-                            {/* Template Description */}
-                            <p style={{
-                                fontSize: '14px',
-                                color: '#6B7280',
-                                margin: '0 0 16px 0',
-                                lineHeight: '1.4'
-                            }}>{template.description}</p>
-
-                            {/* Required Fields Count */}
+                            {/* Visual Document Preview */}
                             <div style={{
+                                width: '100%',
+                                height: '320px',
                                 backgroundColor: '#F9FAFB',
-                                border: '1px solid #F3F4F6',
                                 borderRadius: '8px',
-                                padding: '12px',
-                                marginBottom: '16px'
+                                marginBottom: '12px',
+                                overflow: 'hidden',
+                                border: '1px solid #E5E7EB',
+                                position: 'relative'
                             }}>
-                                <div style={{
-                                    fontSize: '12px',
-                                    color: '#9CA3AF',
-                                    fontWeight: '500',
-                                    marginBottom: '4px'
-                                }}>Required Fields:</div>
-                                <div style={{
+                                {(() => {
+                                    console.log(`🎯 Rendering ${template.name}: templateType="${template.templateType}", pdfUrl="${template.pdfUrl}"`);
+                                    return template.templateType === 'pdf' ? (
+                                    <>
+                                        {/* PDF Preview */}
+                                        <iframe
+                                            src={`http://localhost:5000${template.pdfUrl}#toolbar=0&navpanes=0&scrollbar=0`}
+                                            style={{
+                                                width: '100%',
+                                                height: '100%',
+                                                border: 'none',
+                                                pointerEvents: 'none',
+                                                transform: 'scale(1)',
+                                                transformOrigin: 'top left'
+                                            }}
+                                            title={`${template.name} preview`}
+                                        />
+                                        {/* Small logo badge */}
+                                        <div style={{
+                                            position: 'absolute',
+                                            top: '8px',
+                                            left: '8px',
+                                            backgroundColor: 'white',
+                                            padding: '4px 8px',
+                                            borderRadius: '4px',
+                                            fontSize: '10px',
+                                            fontWeight: '600',
+                                            color: '#059669',
+                                            boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            gap: '4px'
+                                        }}>
+                                            <span style={{ fontSize: '12px' }}>📄</span> PandaDoc
+                                        </div>
+                                    </>
+                                ) : (
+                                    <div style={{
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                        height: '100%',
+                                        fontSize: '64px',
+                                        opacity: 0.3
+                                    }}>
+                                        {template.icon}
+                                    </div>
+                                );
+                                })()}
+                            </div>
+
+                            {/* Template Title */}
+                            <h3 style={{
+                                fontSize: '15px',
+                                fontWeight: '600',
+                                color: '#111827',
+                                margin: '0 0 6px 0',
+                                overflow: 'hidden',
+                                textOverflow: 'ellipsis',
+                                whiteSpace: 'nowrap'
+                            }}>{template.name}</h3>
+
+                            {/* Creator info */}
+                            <div style={{
+                                fontSize: '11px',
+                                color: '#9CA3AF',
+                                marginBottom: '14px',
+                                display: 'flex',
+                                flexDirection: 'column',
+                                gap: '2px'
+                            }}>
+                                <div>Prepared for: <span style={{ color: '#6B7280' }}>Your Company</span></div>
+                                <div>Created by: <span style={{ color: '#6B7280' }}>{categoryMap[template.category]}</span></div>
+                            </div>
+
+                            {/* Action Button */}
+                            <button
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleTemplateSelect(template);
+                                }}
+                                style={{
+                                    width: '100%',
+                                    padding: '10px',
+                                    backgroundColor: '#F97316',
+                                    color: 'white',
+                                    border: 'none',
+                                    borderRadius: '6px',
                                     fontSize: '13px',
-                                    color: '#374151',
-                                    fontWeight: '500'
-                                }}>{template.requiredFields?.length || 0} fields to fill</div>
-                            </div>
-
-                            {/* Usage Stats */}
-                            <div style={{
-                                display: 'flex',
-                                justifyContent: 'space-between',
-                                alignItems: 'center',
-                                marginBottom: '20px',
-                                fontSize: '12px',
-                                color: '#9CA3AF'
-                            }}>
-                                <span>Used {template.metadata?.usageCount || 0} times</span>
-                                <span>v{template.metadata?.version || '1.0.0'}</span>
-                            </div>
-
-                            {/* Action Buttons */}
-                            <div style={{
-                                display: 'flex',
-                                gap: '8px'
-                            }}>
-                                <button
-                                    onClick={(e) => {
-                                        e.stopPropagation();
-                                        handleTemplateSelect(template);
-                                    }}
-                                    style={{
-                                        flex: 1,
-                                        padding: '10px 16px',
-                                        backgroundColor: '#F97316',
-                                        color: 'white',
-                                        border: 'none',
-                                        borderRadius: '8px',
-                                        fontSize: '14px',
-                                        fontWeight: '600',
-                                        cursor: 'pointer',
-                                        transition: 'all 0.2s ease'
-                                    }}
-                                >
-                                    Use Template
-                                </button>
-                                <button
-                                    onClick={(e) => {
-                                        e.stopPropagation();
-                                        handlePreviewTemplate(template);
-                                    }}
-                                    style={{
-                                        padding: '10px 12px',
-                                        backgroundColor: 'transparent',
-                                        color: '#F97316',
-                                        border: '1px solid #F97316',
-                                        borderRadius: '8px',
-                                        fontSize: '14px',
-                                        fontWeight: '600',
-                                        cursor: 'pointer',
-                                        transition: 'all 0.2s ease'
-                                    }}
-                                >
-                                    <Eye size={16} />
-                                </button>
-                            </div>
+                                    fontWeight: '600',
+                                    cursor: 'pointer',
+                                    transition: 'all 0.2s ease'
+                                }}
+                                onMouseEnter={(e) => {
+                                    e.currentTarget.style.backgroundColor = '#EA580C';
+                                }}
+                                onMouseLeave={(e) => {
+                                    e.currentTarget.style.backgroundColor = '#F97316';
+                                }}
+                            >
+                                Use this template
+                            </button>
                         </div>
                     ))}
                 </div>

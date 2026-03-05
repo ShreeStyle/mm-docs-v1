@@ -37,11 +37,13 @@ const onboardingRoutes = require("./routes/onboardingRoutes");
 const templateRoutes = require("./routes/templateRoutes");
 const paymentRoutes = require("./routes/paymentRoutes");
 const subscriptionRoutes = require("./routes/subscriptionRoutes");
+const documentEditorRoutes = require("./routes/documentEditorRoutes");
 
 app.use("/api/users", userRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/brand-kit", brandKitRoutes);
 app.use("/api/documents", documentRoutes);
+app.use("/api/documents", documentEditorRoutes); // Document editor routes
 app.use("/api/ai", aiRoutes);
 app.use("/api/public", publicRoutes);
 app.use("/api/onboarding", onboardingRoutes);

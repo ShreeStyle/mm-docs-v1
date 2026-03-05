@@ -1103,6 +1103,36 @@ const TEMPLATE_LIBRARY = {
                 contactForVerification: "[HR Contact Email/Phone]",
                 date: "[Current Date]"
             }
+        },
+        {
+            id: "letter_of_recommendation",
+            title: "Letter of Recommendation",
+            category: "hr_documents",
+            description: "Professional letter of recommendation with clean design and formal layout",
+            tags: ["HR", "recommendation", "reference", "employment", "professional"],
+            templateFile: "recommendation_letter.hbs",
+            content: {
+                title: "Letter of Recommendation",
+                date: "[Current Date]",
+                recommenderName: "Isabelle Casarez",
+                recommenderTitle: "Digital Marketing Director",
+                recommenderCompany: "Strategea Branding",
+                recommenderAddress: "63 Ivy Road Hawkville, GA, USA 31036",
+                recommenderPhone: "+123-456-7890",
+                recommenderEmail: "isabelle.casarez@example.com",
+                recipientName: "Ms. Casarez",
+                candidateName: "[Candidate Name]",
+                candidatePosition: "[Candidate Position]",
+                relationshipDuration: "[Duration - e.g., 3 years]",
+                introduction: "For your introduction, state your name, your profession or role title, and how you know the person you will recommend. Include a brief greeting and the background of why you're writing. Make it clear and professional from the start.",
+                bodyParagraph1: "In the body paragraphs, elaborate on the candidate's skills, achievements, and qualifications. Provide specific examples of their work performance, character traits, and accomplishments that make them suitable for the position or opportunity they're pursuing.",
+                bodyParagraph2: "Continue highlighting the candidate's strengths and unique qualities. Mention their ability to work in teams, leadership skills, problem-solving capabilities, or any other relevant competencies. Be specific and provide concrete examples that demonstrate their value.",
+                bodyParagraph3: "Further emphasize the candidate's professional growth, dedication, and potential. Discuss their work ethic, reliability, and any special projects or initiatives they successfully completed under your guidance or observation.",
+                conclusion: "Finally, the conclusion summarizes all the attributes that make the recommended person fit for the role. State your enthusiastic endorsement and mention that you are available to be contacted regarding the matter. Include your contact information for follow-up.",
+                closingStatement: "I am confident that [Candidate Name] will be an excellent addition to your organization and will continue to demonstrate the same level of excellence and dedication that they have consistently shown.",
+                signature: "[Signature]",
+                signatureDate: "[Date]"
+            }
         }
     ],
 

@@ -14,7 +14,7 @@ exports.getAllTemplates = async (req, res) => {
 
         const templates = await Template.find(filter)
             .select('-content') // Don't send full content in list view
-            .sort({ category: 1, name: 1 });
+            .sort({ displayOrder: 1, category: 1, name: 1 }); // Sort by displayOrder first, then category, then name
 
         res.json({
             success: true,

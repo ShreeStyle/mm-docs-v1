@@ -1,0 +1,35 @@
+/* Main Layout Styles */
+.main-layout {
+    display: flex;
+    min-height: 100vh;
+    background: #F8F9FB;
+    width: 100%;
+}
+
+.main-content {
+    flex: 1;
+    margin-left: 260px;
+    transition: margin-left 0.3s ease;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    background: #F8F9FB;
+}
+
+/* When sidebar is collapsed */
+.main-sidebar.collapsed ~ .main-content {
+    margin-left: 72px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .main-content {
+        margin-left: 0;
+        padding-top: 60px;
+    }
+
+    .main-sidebar.collapsed ~ .main-content {
+        margin-left: 0;
+    }
+}
