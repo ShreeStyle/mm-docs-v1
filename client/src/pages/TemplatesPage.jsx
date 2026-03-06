@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Eye, Loader2 } from 'lucide-react';
+import { Eye, Loader2, ArrowLeft } from 'lucide-react';
 import { api } from '../utils/api';
 
 const TemplatesPage = () => {
@@ -414,6 +414,37 @@ const TemplatesPage = () => {
 
     return (
         <div style={{ padding: '32px', backgroundColor: '#F8F9FB', minHeight: '100vh' }}>
+            {/* Back Button */}
+            <button
+                onClick={() => navigate('/dashboard')}
+                style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '8px',
+                    padding: '8px 16px',
+                    marginBottom: '24px',
+                    backgroundColor: 'white',
+                    border: '1px solid #E5E7EB',
+                    borderRadius: '8px',
+                    color: '#6B7280',
+                    fontSize: '14px',
+                    fontWeight: '500',
+                    cursor: 'pointer',
+                    transition: 'all 0.2s ease'
+                }}
+                onMouseEnter={(e) => {
+                    e.target.style.backgroundColor = '#F3F4F6';
+                    e.target.style.borderColor = '#D1D5DB';
+                }}
+                onMouseLeave={(e) => {
+                    e.target.style.backgroundColor = 'white';
+                    e.target.style.borderColor = '#E5E7EB';
+                }}
+            >
+                <ArrowLeft size={16} />
+                Back to Dashboard
+            </button>
+
             {/* Header */}
             {/* Page Header */}
             <div style={{ marginBottom: '28px' }}>

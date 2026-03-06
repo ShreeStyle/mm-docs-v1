@@ -46,7 +46,7 @@ export default function Login() {
 
             console.log('✅ Login successful:', data);
             login(data.user, data.token);
-            navigate('/product');
+            navigate('/dashboard');
             
         } catch (error) {
             console.error('Login error:', error);

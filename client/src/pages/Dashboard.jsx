@@ -109,14 +109,14 @@ export default function Dashboard() {
             alert("Failed to download document. Please try again.");
         }
     };
-    // Sidebar menu items
+    // Sidebar menu items - active state based on current route
     const sidebarItems = [
-        { id: 'dashboard', label: 'Dashboard', icon: Home, active: currentView === 'dashboard' },
-        { id: 'create', label: 'Create Document', icon: Plus, active: currentView === 'create' },
-        { id: 'documents', label: 'My Documents', icon: FileText, active: currentView === 'documents' },
-        { id: 'templates', label: 'Template Library', icon: Layers, active: currentView === 'templates' || ['hr', 'legal', 'sales', 'finance', 'compliance'].includes(currentView) },
-        { id: 'compliance-center', label: 'Compliance Center', icon: Shield, active: currentView === 'compliance-center' },
-        { id: 'settings', label: 'Settings', icon: Settings, active: currentView === 'settings' }
+        { id: 'dashboard', label: 'Dashboard', icon: Home, active: location.pathname === '/dashboard' },
+        { id: 'create', label: 'Create Document', icon: Plus, active: location.pathname === '/documents/create' },
+        { id: 'documents', label: 'My Documents', icon: FileText, active: location.pathname === '/documents' },
+        { id: 'templates', label: 'Template Library', icon: Layers, active: location.pathname === '/templates' },
+        { id: 'compliance-center', label: 'Compliance Center', icon: Shield, active: location.pathname === '/compliance' },
+        { id: 'settings', label: 'Settings', icon: Settings, active: location.pathname === '/settings' }
     ];
 
     // Load data on component mount
@@ -228,13 +228,20 @@ export default function Dashboard() {
                             <button
                                 key={item.id}
                                 onClick={() => {
-                                    if (item.id === 'templates') {
-                                        setSelectedCategory(null);
-                                        setSelectedDocType(null);
-                                        navigate('/dashboard/templates');
+                                    // Navigate to proper routes
+                                    if (item.id === 'dashboard') {
+                                        navigate('/dashboard');
+                                    } else if (item.id === 'documents') {
+                                        navigate('/documents');
+                                    } else if (item.id === 'compliance-center') {
+                                        navigate('/compliance');
+                                    } else if (item.id === 'settings') {
+                                        navigate('/settings');
+                                    } else if (item.id === 'templates') {
+                                        navigate('/templates');
+                                    } else if (item.id === 'create') {
+                                        navigate('/documents/create');
                                     }
-                                    setGeneratedDoc(null);
-                                    setCurrentView(item.id);
                                     if (isMobile) setSidebarOpen(false);
                                 }}
                                 style={{

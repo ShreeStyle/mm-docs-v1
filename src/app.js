@@ -38,6 +38,16 @@ const templateRoutes = require("./routes/templateRoutes");
 const paymentRoutes = require("./routes/paymentRoutes");
 const subscriptionRoutes = require("./routes/subscriptionRoutes");
 const documentEditorRoutes = require("./routes/documentEditorRoutes");
+const catalogRoutes = require("./routes/catalogRoutes");
+const analyticsRoutes = require("./routes/analyticsRoutes");
+const chatRoutes = require("./routes/chatRoutes");
+const clauseRoutes = require("./routes/clauseRoutes");
+const collaborationRoutes = require("./routes/collaborationRoutes");
+const memoryRoutes = require("./routes/memoryRoutes");
+const settingsRoutes = require("./routes/settingsRoutes");
+const signatureRoutes = require("./routes/signatureRoutes");
+const workflowRoutes = require("./routes/workflowRoutes");
+const complianceRoutes = require("./routes/complianceRoutes");
 
 app.use("/api/users", userRoutes);
 app.use("/api/auth", authRoutes);
@@ -50,6 +60,16 @@ app.use("/api/onboarding", onboardingRoutes);
 app.use("/api/templates", templateRoutes);
 app.use("/api/payments", paymentRoutes);
 app.use("/api/subscriptions", subscriptionRoutes);
+app.use("/api/catalog", catalogRoutes);
+app.use("/api/analytics", analyticsRoutes);
+app.use("/api/chat", chatRoutes);
+app.use("/api/clauses", clauseRoutes);
+app.use("/api/collaboration", collaborationRoutes);
+app.use("/api/memory", memoryRoutes);
+app.use("/api/settings", settingsRoutes);
+app.use("/api/signatures", signatureRoutes);
+app.use("/api/workflows", workflowRoutes);
+app.use("/api/compliance", complianceRoutes);
 
 // Health Check API
 app.get("/api/health", (req, res) => {

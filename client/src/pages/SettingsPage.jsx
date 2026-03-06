@@ -1,6 +1,25 @@
-import { Settings as SettingsIcon, User, Shield, Palette, Bell, Plug } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { Settings as SettingsIcon, User, Shield, Palette, Bell, Plug, ArrowLeft } from 'lucide-react';
+import { api } from '../utils/api';
 
 const SettingsPage = () => {
+    const navigate = useNavigate();
+    const [settingsData, setSettingsData] = useState(null);
+
+    useEffect(() => {
+        fetchSettings();
+    }, []);
+
+    const fetchSettings = async () => {
+        try {
+            const response = await api.get('/settings/account');
+            setSettingsData(response);
+        } catch (error) {
+            console.error('Error fetching settings:', error);
+        }
+    };
+
     const settingsSections = [
         { 
             title: 'Account Settings', 
@@ -37,6 +56,25 @@ const SettingsPage = () => {
     return (
         <div style={{ padding: '32px', minHeight: '100vh', background: '#F8F9FB' }}>
             <div style={{ maxWidth: '1000px', margin: '0 auto' }}>
+                <button
+                    onClick={() => navigate('/dashboard')}
+                    style={{
+                        backgroundColor: 'transparent',
+                        border: 'none',
+                        color: '#6B7280',
+                        fontSize: '14px',
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '8px',
+                        marginBottom: '24px',
+                        padding: '8px 0'
+                    }}
+                >
+                    <ArrowLeft size={16} />
+                    Back to Dashboard
+                </button>
+                
                 <div style={{ marginBottom: '32px' }}>
                     <h1 style={{ fontSize: '28px', fontWeight: '700', color: '#111827', margin: '0 0 8px 0' }}>
                         Settings
