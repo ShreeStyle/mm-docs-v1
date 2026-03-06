@@ -6,6 +6,7 @@ import Login from './pages/Login';
 import Signup from './pages/Signup';
 import Dashboard from './pages/Dashboard';
 import TemplatesPage from './pages/TemplatesPage';
+import DocumentTemplateEditor from './pages/DocumentTemplateEditor';
 import CreateDocument from './pages/CreateDocument';
 import BrandSettings from './pages/BrandSettings';
 import DocumentRecipients from './pages/DocumentRecipients';
@@ -22,7 +23,8 @@ function App() {
           <Route path="/signup" element={<Signup />} />
           <Route path="/product" element={<Dashboard />} />
           <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/dashboard/templates" element={<Dashboard />} />
+          <Route path="/dashboard/templates" element={<TemplatesPage />} />
+          <Route path="/template/editor/:templateId" element={<DocumentTemplateEditor />} />
           <Route path="/dashboard/create-document/:templateId" element={<CreateDocument />} />
           <Route path="/document/recipients/:templateId" element={<DocumentRecipients />} />
           <Route path="/document/editor/:documentId" element={<DocumentEditor />} />

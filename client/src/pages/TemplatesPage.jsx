@@ -65,22 +65,9 @@ const TemplatesPage = () => {
     };
 
     const handleTemplateSelect = (template) => {
-        // For PDF templates, download the PDF directly
-        if (template.templateType === 'pdf') {
-            console.log('📥 Opening PDF template:', template.pdfUrl);
-            const link = document.createElement('a');
-            link.href = `http://localhost:5000${template.pdfUrl}`;
-            link.download = `${template.name}.pdf`;
-            link.target = '_blank';
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-            return;
-        }
-        
-        console.log('Navigating to recipients page with template:', template.templateId);
-        // Navigate to add recipients page first
-        navigate(`/document/recipients/${template.templateId}`);
+        console.log('Opening template editor for:', template.templateId);
+        // Navigate to Canva-style template editor
+        navigate(`/template/editor/${template.templateId}`);
     };
 
     const handlePreviewTemplate = async (template) => {
@@ -429,18 +416,23 @@ const TemplatesPage = () => {
         <div style={{ padding: '32px', backgroundColor: '#F8F9FB', minHeight: '100vh' }}>
             {/* Header */}
             {/* Page Header */}
-            <div style={{ marginBottom: '32px' }}>
+            <div style={{ marginBottom: '28px' }}>
                 <h2 style={{
-                    fontSize: '28px',
+                    fontSize: '32px',
                     fontWeight: '700',
                     color: '#111827',
                     margin: '0 0 8px 0'
                 }}>Document Templates</h2>
                 <p style={{
-                    fontSize: '16px',
+                    fontSize: '15px',
                     color: '#6B7280',
+                    margin: '0 0 16px 0'
+                }}>Ready-to-use document structures. Select a template to create a document with your data.</p>
+                <p style={{
+                    fontSize: '13px',
+                    color: '#9CA3AF',
                     margin: 0
-                }}>Professional templates for all your business document needs</p>
+                }}>Showing all {templates.length} {templates.length === 1 ? 'template' : 'templates'}</p>
             </div>
 
             {/* Error Message */}
@@ -507,8 +499,8 @@ const TemplatesPage = () => {
             {!loading && (
                 <div style={{
                     display: 'grid',
-                    gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
-                    gap: '20px'
+                    gridTemplateColumns: 'repeat(3, 1fr)',
+                    gap: '24px'
                 }}>
                     {templates.map((template) => (
                         <div
@@ -517,7 +509,7 @@ const TemplatesPage = () => {
                                 backgroundColor: 'white',
                                 border: '1px solid #E5E7EB',
                                 borderRadius: '12px',
-                                padding: '16px',
+                                padding: '20px',
                                 boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)',
                                 transition: 'all 0.2s ease',
                                 cursor: 'pointer',
@@ -559,7 +551,7 @@ const TemplatesPage = () => {
                             {/* Visual Document Preview */}
                             <div style={{
                                 width: '100%',
-                                height: '320px',
+                                height: '380px',
                                 backgroundColor: '#F9FAFB',
                                 borderRadius: '8px',
                                 marginBottom: '12px',
@@ -620,10 +612,10 @@ const TemplatesPage = () => {
 
                             {/* Template Title */}
                             <h3 style={{
-                                fontSize: '15px',
+                                fontSize: '16px',
                                 fontWeight: '600',
                                 color: '#111827',
-                                margin: '0 0 6px 0',
+                                margin: '0 0 8px 0',
                                 overflow: 'hidden',
                                 textOverflow: 'ellipsis',
                                 whiteSpace: 'nowrap'
@@ -631,15 +623,15 @@ const TemplatesPage = () => {
 
                             {/* Creator info */}
                             <div style={{
-                                fontSize: '11px',
+                                fontSize: '12px',
                                 color: '#9CA3AF',
-                                marginBottom: '14px',
+                                marginBottom: '16px',
                                 display: 'flex',
                                 flexDirection: 'column',
-                                gap: '2px'
+                                gap: '4px'
                             }}>
-                                <div>Prepared for: <span style={{ color: '#6B7280' }}>Your Company</span></div>
-                                <div>Created by: <span style={{ color: '#6B7280' }}>{categoryMap[template.category]}</span></div>
+                                <div>Prepared for: <span style={{ color: '#6B7280', fontWeight: '500' }}>Your Company</span></div>
+                                <div>Created by: <span style={{ color: '#6B7280', fontWeight: '500' }}>{categoryMap[template.category]}</span></div>
                             </div>
 
                             {/* Action Button */}
@@ -650,12 +642,12 @@ const TemplatesPage = () => {
                                 }}
                                 style={{
                                     width: '100%',
-                                    padding: '10px',
+                                    padding: '12px',
                                     backgroundColor: '#F97316',
                                     color: 'white',
                                     border: 'none',
-                                    borderRadius: '6px',
-                                    fontSize: '13px',
+                                    borderRadius: '8px',
+                                    fontSize: '14px',
                                     fontWeight: '600',
                                     cursor: 'pointer',
                                     transition: 'all 0.2s ease'
@@ -667,7 +659,7 @@ const TemplatesPage = () => {
                                     e.currentTarget.style.backgroundColor = '#F97316';
                                 }}
                             >
-                                Use this template
+                                Download PDF
                             </button>
                         </div>
                     ))}
