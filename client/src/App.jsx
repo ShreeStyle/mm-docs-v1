@@ -11,6 +11,7 @@ import CreateDocument from './pages/CreateDocument';
 import BrandSettings from './pages/BrandSettings';
 import DocumentRecipients from './pages/DocumentRecipients';
 import DocumentEditor from './pages/DocumentEditor';
+import SignatureTest from './pages/SignatureTest';
 import './styles/Dashboard.css';
 
 function App() {
@@ -21,6 +22,7 @@ function App() {
           <Route path="/" element={<><Navbar /><Landing /></>} />
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
+          <Route path="/signature-test" element={<SignatureTest />} />
           <Route path="/product" element={<Dashboard />} />
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/dashboard/templates" element={<TemplatesPage />} />

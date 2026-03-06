@@ -11,7 +11,7 @@ import {
     Stamp 
 } from 'lucide-react';
 
-const FieldsPanel = ({ onFieldDragStart }) => {
+const FieldsPanel = ({ onFieldDragStart, onSignatureClick }) => {
     const fieldTypes = [
         {
             type: 'signature',
@@ -79,6 +79,12 @@ const FieldsPanel = ({ onFieldDragStart }) => {
         e.dataTransfer.setData('field', JSON.stringify(field));
         onFieldDragStart?.(field);
     };
+    
+    const handleFieldClick = (field) => {
+        if (field.type === 'signature' || field.type === 'initials') {
+            onSignatureClick?.(field);
+        }
+    };
 
     return (
         <div className="fields-panel">
@@ -95,6 +101,8 @@ const FieldsPanel = ({ onFieldDragStart }) => {
                             className="field-item"
                             draggable
                             onDragStart={(e) => handleDragStart(e, field)}
+                            onClick={() => handleFieldClick(field)}
+                            style={{ cursor: field.type === 'signature' || field.type === 'initials' ? 'pointer' : 'grab' }}
                         >
                             <div className="field-icon">
                                 <Icon size={20} />

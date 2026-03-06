@@ -34,23 +34,44 @@ const DocumentPreview = ({ document, fields, onFieldDrop, onFieldSelect }) => {
     }, [fields, currentPage, zoom, document]);
 
     const drawField = (ctx, field, index) => {
-        const { position, size, fieldType, properties } = field;
+        const { position, size, fieldType, properties, value, completed } = field;
         
         // Field border
-        ctx.strokeStyle = properties.assignedTo === 'CLIENT' ? '#F97316' : '#8B5CF6';
+        ctx.strokeStyle = completed ? '#10b981' : (properties.assignedTo === 'CLIENT' ? '#F97316' : '#8B5CF6');
         ctx.lineWidth = 2;
         ctx.strokeRect(position.x, position.y, size.width, size.height);
         
         // Field background
-        ctx.fillStyle = properties.assignedTo === 'CLIENT' 
-            ? 'rgba(249, 115, 22, 0.1)' 
-            : 'rgba(139, 92, 246, 0.1)';
+        ctx.fillStyle = completed 
+            ? 'rgba(16, 185, 129, 0.1)'
+            : (properties.assignedTo === 'CLIENT' 
+                ? 'rgba(249, 115, 22, 0.1)' 
+                : 'rgba(139, 92, 246, 0.1)');
         ctx.fillRect(position.x, position.y, size.width, size.height);
         
-        // Field label
-        ctx.fillStyle = '#1e293b';
-        ctx.font = '12px Arial';
-        ctx.fillText(field.label, position.x + 5, position.y + 15);
+        // If signature is completed, draw the signature
+        if (completed && fieldType === 'signature' && value) {
+            if (typeof value === 'string') {
+                // Draw image signature
+                const img = new Image();
+                img.src = value;
+                img.onload = () => {
+                    ctx.drawImage(img, position.x + 5, position.y + 5, size.width - 10, size.height - 10);
+                };
+            } else if (typeof value === 'object' && value.type === 'text') {
+                // Draw text signature
+                ctx.save();
+                ctx.fillStyle = value.color;
+                ctx.font = `italic ${Math.min(size.height - 10, 24)}px ${value.font}`;
+                ctx.fillText(value.text, position.x + 10, position.y + size.height - 15);
+                ctx.restore();
+            }
+        } else {
+            // Field label
+            ctx.fillStyle = '#1e293b';
+            ctx.font = '12px Arial';
+            ctx.fillText(field.label, position.x + 5, position.y + 15);
+        }
     };
 
     const handleCanvasDrop = (e) => {
@@ -65,6 +86,27 @@ const DocumentPreview = ({ document, fields, onFieldDrop, onFieldSelect }) => {
 
     const handleCanvasDragOver = (e) => {
         e.preventDefault();
+    };
+    
+    const handleCanvasClick = (e) => {
+        const rect = canvasRef.current.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        
+        // Find which field was clicked
+        const clickedField = fields.find(field => {
+            if (field.page !== currentPage) return false;
+            
+            const { position, size } = field;
+            return x >= position.x && 
+                   x <= position.x + size.width && 
+                   y >= position.y && 
+                   y <= position.y + size.height;
+        });
+        
+        if (clickedField) {
+            onFieldSelect(clickedField);
+        }
     };
 
     const handleZoomIn = () => setZoom(prev => Math.min(prev + 25, 200));
@@ -119,6 +161,7 @@ const DocumentPreview = ({ document, fields, onFieldDrop, onFieldSelect }) => {
                         height={canvasSize.height}
                         onDrop={handleCanvasDrop}
                         onDragOver={handleCanvasDragOver}
+                        onClick={handleCanvasClick}
                         style={{ display: 'block', cursor: 'crosshair' }}
                     />
                 </div>

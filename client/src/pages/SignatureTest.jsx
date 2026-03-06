@@ -1,47 +1,19 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import { Eye, Send, Loader2, Save, X, Pencil, Type, Upload, Trash2, Check } from 'lucide-react';
-import { api } from '../utils/api';
-import DocumentPreview from '../components/DocumentEditor/DocumentPreview';
-import FieldsPanel from '../components/DocumentEditor/FieldsPanel';
-import DrawingTools from '../components/DocumentEditor/DrawingTools';
+import React, { useState, useRef, useEffect } from 'react';
+import { X, Pencil, Type, Upload, Trash2, Check } from 'lucide-react';
 import '../styles/DocumentEditor.css';
 
-const DocumentEditor = () => {
-    const { documentId } = useParams();
-    const navigate = useNavigate();
-    const [document, setDocument] = useState(null);
-    const [fields, setFields] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const [saving, setSaving] = useState(false);
-    const [error, setError] = useState(null);
-    const [selectedField, setSelectedField] = useState(null);
-    const [activeTool, setActiveTool] = useState('pencil');
-    const [activeColor, setActiveColor] = useState('#000000');
-    
-    // Signature Modal State
-    const [showSignatureModal, setShowSignatureModal] = useState(false);
-    const [signatureTab, setSignatureTab] = useState('draw'); // 'draw', 'type', 'upload'
-    const [signatureData, setSignatureData] = useState(null);
-    const [currentSignatureField, setCurrentSignatureField] = useState(null);
-    
-    // Type Tab State
+const SignatureTest = () => {
+    const [showSignatureModal, setShowSignatureModal] = useState(true);
+    const [signatureTab, setSignatureTab] = useState('draw');
     const [typedName, setTypedName] = useState('');
     const [selectedFont, setSelectedFont] = useState('Brush Script MT, cursive');
     const [signatureColor, setSignatureColor] = useState('#000000');
-    
-    // Upload Tab State
     const [uploadedImage, setUploadedImage] = useState(null);
+    const [savedSignature, setSavedSignature] = useState(null);
     
-    // Draw Tab State
     const signatureCanvasRef = useRef(null);
     const [isDrawing, setIsDrawing] = useState(false);
-
-    useEffect(() => {
-        fetchDocument();
-    }, [documentId]);
     
-    // Initialize signature canvas when modal opens
     useEffect(() => {
         if (showSignatureModal && signatureTab === 'draw' && signatureCanvasRef.current) {
             const canvas = signatureCanvasRef.current;
@@ -50,56 +22,7 @@ const DocumentEditor = () => {
             ctx.fillRect(0, 0, canvas.width, canvas.height);
         }
     }, [showSignatureModal, signatureTab]);
-
-    const fetchDocument = async () => {
-        try {
-            setLoading(true);
-            const response = await api.get(`/documents/${documentId}`);
-            if (response.success) {
-                setDocument(response.data);
-                setFields(response.data.fields || []);
-            }
-        } catch (err) {
-            console.error('Error fetching document:', err);
-            setError('Failed to load document');
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    const handleFieldDrop = (fieldData, position, page) => {
-        const newField = {
-            fieldType: fieldData.type,
-            label: fieldData.label,
-            page,
-            position,
-            size: {
-                width: 200,
-                height: fieldData.type === 'signature' ? 60 : 40
-            },
-            properties: {
-                required: false,
-                assignedTo: 'CLIENT', // Default assignment
-                defaultValue: '',
-                validation: {}
-            }
-        };
-
-        setFields(prev => [...prev, newField]);
-        autoSave([...fields, newField]);
-    };
-
-    const handleFieldSelect = (field) => {
-        setSelectedField(field);
-        
-        // If signature field is selected, open signature modal
-        if (field.fieldType === 'signature') {
-            setCurrentSignatureField(field);
-            setShowSignatureModal(true);
-        }
-    };
     
-    // Signature Canvas Drawing Functions
     const startDrawing = (e) => {
         const canvas = signatureCanvasRef.current;
         const ctx = canvas.getContext('2d');
@@ -115,8 +38,7 @@ const DocumentEditor = () => {
     
     const draw = (e) => {
         if (!isDrawing) return;
-        
-        e.preventDefault(); // Prevent scrolling on touch devices
+        e.preventDefault();
         
         const canvas = signatureCanvasRef.current;
         const ctx = canvas.getContext('2d');
@@ -140,7 +62,8 @@ const DocumentEditor = () => {
     const clearSignatureCanvas = () => {
         const canvas = signatureCanvasRef.current;
         const ctx = canvas.getContext('2d');
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = 'white';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
     };
     
     const handleUploadSignature = (e) => {
@@ -158,7 +81,6 @@ const DocumentEditor = () => {
         let signatureValue = null;
         
         if (signatureTab === 'draw') {
-            // Get canvas data as image
             const canvas = signatureCanvasRef.current;
             signatureValue = canvas.toDataURL();
         } else if (signatureTab === 'type') {
@@ -177,163 +99,75 @@ const DocumentEditor = () => {
             return;
         }
         
-        // Update the field with signature data
-        setFields(prev => prev.map(f => 
-            f === currentSignatureField 
-                ? { ...f, value: signatureValue, completed: true }
-                : f
-        ));
-        
-        // Close modal and reset
-        setShowSignatureModal(false);
-        setSignatureData(signatureValue);
-        resetSignatureModal();
+        setSavedSignature(signatureValue);
+        alert('Signature saved! Check below the modal.');
     };
-    
-    const resetSignatureModal = () => {
-        setTypedName('');
-        setUploadedImage(null);
-        if (signatureCanvasRef.current) {
-            clearSignatureCanvas();
-        }
-    };
-    
-    const closeSignatureModal = () => {
-        setShowSignatureModal(false);
-        setCurrentSignatureField(null);
-        resetSignatureModal();
-    };
-
-    const autoSave = async (updatedFields) => {
-        try {
-            await api.put(`/documents/${documentId}/fields`, { fields: updatedFields });
-        } catch (err) {
-            console.error('Auto-save failed:', err);
-        }
-    };
-
-    const handleSave = async () => {
-        try {
-            setSaving(true);
-            await api.put(`/documents/${documentId}`, {
-                fields,
-                status: 'draft'
-            });
-            alert('Document saved successfully!');
-        } catch (err) {
-            console.error('Error saving document:', err);
-            setError('Failed to save document');
-        } finally {
-            setSaving(false);
-        }
-    };
-
-    const handleSend = async () => {
-        try {
-            setSaving(true);
-            await api.post(`/documents/${documentId}/send`, {
-                fields
-            });
-            alert('Document sent successfully!');
-            navigate('/dashboard/documents');
-        } catch (err) {
-            console.error('Error sending document:', err);
-            setError('Failed to send document');
-        } finally {
-            setSaving(false);
-        }
-    };
-
-    if (loading) {
-        return (
-            <div className="editor-loading">
-                <Loader2 className="spinner" size={48} />
-                <p>Loading document editor...</p>
-            </div>
-        );
-    }
-
-    if (error) {
-        return (
-            <div className="editor-error">
-                <p>{error}</p>
-                <button onClick={() => navigate('/dashboard')}>Back to Dashboard</button>
-            </div>
-        );
-    }
 
     return (
-        <div className="document-editor">
-            {/* Header */}
-            <div className="editor-header">
-                <h1 className="editor-title">{document?.title || 'Untitled Document'}</h1>
-                <div className="editor-actions">
-                    <button 
-                        className="btn-secondary" 
-                        onClick={() => {
-                            setCurrentSignatureField({ fieldType: 'signature' });
-                            setShowSignatureModal(true);
-                        }}
-                        style={{ background: '#F97316', color: 'white', border: 'none' }}
-                    >
-                        <Pencil size={16} />
-                        Test Signature Modal
-                    </button>
-                    <button className="btn-secondary" onClick={handleSave} disabled={saving}>
-                        <Save size={16} />
-                        {saving ? 'Saving...' : 'Save'}
-                    </button>
-                    <button className="btn-secondary">
-                        <Eye size={16} />
-                        Preview
-                    </button>
-                    <button className="btn-primary" onClick={handleSend}>
-                        <Send size={16} />
-                        Review and Send
-                    </button>
-                </div>
-            </div>
-
-            {/* Main Editor Layout */}
-            <div className="editor-main">
-                {/* Document Preview (Left) */}
-                <DocumentPreview
-                    document={document}
-                    fields={fields}
-                    onFieldDrop={handleFieldDrop}
-                    onFieldSelect={handleFieldSelect}
-                />
-
-                {/* Fields Panel (Right) */}
-                <div className="right-sidebar">
-                    <FieldsPanel
-                        onFieldDragStart={(field) => console.log('Dragging field:', field)}
-                        onSignatureClick={(field) => {
-                            setCurrentSignatureField({ fieldType: field.type });
-                            setShowSignatureModal(true);
-                        }}
-                    />
-                    <DrawingTools
-                        onToolSelect={setActiveTool}
-                        activeTool={activeTool}
-                        onColorChange={setActiveColor}
-                        activeColor={activeColor}
-                    />
-                </div>
+        <div style={{ padding: '2rem', background: '#f8fafc', minHeight: '100vh' }}>
+            <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
+                <h1 style={{ fontSize: '2rem', fontWeight: 'bold', marginBottom: '1rem' }}>
+                    Signature Modal Test Page
+                </h1>
+                <p style={{ marginBottom: '2rem', color: '#64748b' }}>
+                    This page demonstrates the signature creation modal with all three methods.
+                </p>
+                
+                <button 
+                    onClick={() => setShowSignatureModal(true)}
+                    style={{
+                        padding: '1rem 2rem',
+                        background: '#F97316',
+                        color: 'white',
+                        border: 'none',
+                        borderRadius: '8px',
+                        fontSize: '1rem',
+                        fontWeight: '600',
+                        cursor: 'pointer',
+                        marginBottom: '2rem'
+                    }}
+                >
+                    Open Signature Modal
+                </button>
+                
+                {savedSignature && (
+                    <div style={{ 
+                        background: 'white', 
+                        padding: '2rem', 
+                        borderRadius: '12px',
+                        boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+                        marginTop: '2rem'
+                    }}>
+                        <h2 style={{ marginBottom: '1rem', fontSize: '1.5rem' }}>Saved Signature:</h2>
+                        {typeof savedSignature === 'string' ? (
+                            <img src={savedSignature} alt="Signature" style={{ maxWidth: '100%', border: '1px solid #e2e8f0' }} />
+                        ) : (
+                            <div 
+                                style={{ 
+                                    fontFamily: savedSignature.font,
+                                    color: savedSignature.color,
+                                    fontSize: '48px',
+                                    fontStyle: 'italic',
+                                    padding: '1rem'
+                                }}
+                            >
+                                {savedSignature.text}
+                            </div>
+                        )}
+                    </div>
+                )}
             </div>
             
-            {/* Signature Creation Modal */}
             {showSignatureModal && (
-                <div className="signature-modal-overlay" onClick={closeSignatureModal}>
+                <div className="signature-modal-overlay" onClick={() => setShowSignatureModal(false)}>
                     <div className="signature-modal" onClick={(e) => e.stopPropagation()}>
                         <div className="signature-modal-header">
                             <h2>Create Signature</h2>
-                            <button className="close-modal-btn" onClick={closeSignatureModal}>
+                            <button className="close-modal-btn" onClick={() => setShowSignatureModal(false)}>
                                 <X size={20} />
                             </button>
                         </div>
                         
-                        {/* Tabs */}
                         <div className="signature-tabs">
                             <button 
                                 className={`signature-tab ${signatureTab === 'draw' ? 'active' : ''}`}
@@ -358,9 +192,7 @@ const DocumentEditor = () => {
                             </button>
                         </div>
                         
-                        {/* Tab Content */}
                         <div className="signature-modal-content">
-                            {/* Draw Tab */}
                             {signatureTab === 'draw' && (
                                 <div className="signature-draw-tab">
                                     <p className="tab-instruction">Draw your signature below using your mouse or touch device</p>
@@ -401,7 +233,6 @@ const DocumentEditor = () => {
                                 </div>
                             )}
                             
-                            {/* Type Tab */}
                             {signatureTab === 'type' && (
                                 <div className="signature-type-tab">
                                     <p className="tab-instruction">Type your name and select a signature style</p>
@@ -467,7 +298,6 @@ const DocumentEditor = () => {
                                 </div>
                             )}
                             
-                            {/* Upload Tab */}
                             {signatureTab === 'upload' && (
                                 <div className="signature-upload-tab">
                                     <p className="tab-instruction">Upload an image of your signature (PNG, JPG)</p>
@@ -503,9 +333,8 @@ const DocumentEditor = () => {
                             )}
                         </div>
                         
-                        {/* Modal Actions */}
                         <div className="signature-modal-actions">
-                            <button className="btn-cancel" onClick={closeSignatureModal}>
+                            <button className="btn-cancel" onClick={() => setShowSignatureModal(false)}>
                                 Cancel
                             </button>
                             <button 
@@ -527,4 +356,4 @@ const DocumentEditor = () => {
     );
 };
 
-export default DocumentEditor;
+export default SignatureTest;

@@ -694,3 +694,426 @@
         justify-content: stretch;
     }
 }
+
+/* ======================================
+   SIGNATURE MODAL STYLES
+   ====================================== */
+
+.signature-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10000;
+    animation: fadeIn 0.2s ease-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+.signature-modal {
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    width: 90%;
+    max-width: 700px;
+    max-height: 90vh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    animation: slideUp 0.3s ease-out;
+}
+
+@keyframes slideUp {
+    from {
+        transform: translateY(50px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.signature-modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1.5rem 2rem;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.signature-modal-header h2 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #1e293b;
+    margin: 0;
+}
+
+.close-modal-btn {
+    background: none;
+    border: none;
+    color: #64748b;
+    cursor: pointer;
+    padding: 0.5rem;
+    border-radius: 8px;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.close-modal-btn:hover {
+    background: #f1f5f9;
+    color: #1e293b;
+}
+
+/* Signature Tabs */
+.signature-tabs {
+    display: flex;
+    gap: 0.5rem;
+    padding: 1rem 2rem 0;
+    border-bottom: 2px solid #e2e8f0;
+}
+
+.signature-tab {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.5rem;
+    background: none;
+    border: none;
+    color: #64748b;
+    font-weight: 500;
+    cursor: pointer;
+    border-radius: 8px 8px 0 0;
+    transition: all 0.2s;
+    position: relative;
+}
+
+.signature-tab:hover {
+    background: #f8fafc;
+    color: #1e293b;
+}
+
+.signature-tab.active {
+    color: #F97316;
+    background: white;
+}
+
+.signature-tab.active::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: #F97316;
+}
+
+/* Modal Content */
+.signature-modal-content {
+    padding: 2rem;
+    flex: 1;
+    overflow-y: auto;
+}
+
+.tab-instruction {
+    color: #64748b;
+    font-size: 0.95rem;
+    margin: 0 0 1.5rem 0;
+    text-align: center;
+}
+
+/* Draw Tab */
+.signature-draw-tab {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.signature-canvas {
+    border: 2px solid #e2e8f0;
+    border-radius: 12px;
+    cursor: crosshair;
+    background: white;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.clear-canvas-btn {
+    margin-top: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.5rem;
+    background: white;
+    border: 2px solid #e2e8f0;
+    color: #64748b;
+    border-radius: 8px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.clear-canvas-btn:hover {
+    background: #fef2f2;
+    border-color: #fecaca;
+    color: #dc2626;
+}
+
+/* Type Tab */
+.signature-type-tab {
+    display: flex;
+    flex-direction: column;
+}
+
+.signature-name-input {
+    width: 100%;
+    padding: 1rem 1.25rem;
+    font-size: 1.1rem;
+    border: 2px solid #e2e8f0;
+    border-radius: 12px;
+    transition: all 0.2s;
+    margin-bottom: 1.5rem;
+}
+
+.signature-name-input:focus {
+    outline: none;
+    border-color: #F97316;
+    box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.1);
+}
+
+.signature-preview-label {
+    font-weight: 600;
+    color: #1e293b;
+    margin-bottom: 1rem;
+    font-size: 0.95rem;
+}
+
+.signature-font-preview-container {
+    margin-bottom: 1.5rem;
+}
+
+.font-options {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.font-option {
+    padding: 1.25rem;
+    border: 2px solid #e2e8f0;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.2s;
+    background: white;
+}
+
+.font-option:hover {
+    border-color: #F97316;
+    background: #fff7ed;
+    transform: translateX(4px);
+}
+
+.font-option.selected {
+    border-color: #F97316;
+    background: #fff7ed;
+    box-shadow: 0 4px 12px rgba(249, 115, 22, 0.15);
+}
+
+.font-preview {
+    text-align: center;
+    padding: 0.5rem;
+}
+
+/* Color Picker */
+.signature-color-picker {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem;
+    background: #f8fafc;
+    border-radius: 12px;
+}
+
+.signature-color-picker label {
+    font-weight: 600;
+    color: #1e293b;
+    font-size: 0.95rem;
+}
+
+.color-options {
+    display: flex;
+    gap: 0.75rem;
+}
+
+.color-btn {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: 3px solid transparent;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+}
+
+.color-btn:hover {
+    transform: scale(1.1);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.color-btn.selected {
+    border-color: #F97316;
+    box-shadow: 0 0 0 2px white, 0 0 0 4px #F97316;
+}
+
+/* Upload Tab */
+.signature-upload-tab {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.upload-area {
+    width: 100%;
+    border: 2px dashed #cbd5e1;
+    border-radius: 16px;
+    padding: 3rem 2rem;
+    text-align: center;
+    background: #f8fafc;
+    transition: all 0.2s;
+}
+
+.upload-area:hover {
+    border-color: #F97316;
+    background: #fff7ed;
+}
+
+.upload-label {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+    cursor: pointer;
+    color: #475569;
+}
+
+.upload-label svg {
+    color: #F97316;
+}
+
+.upload-label span:first-of-type {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #1e293b;
+}
+
+.upload-hint {
+    font-size: 0.875rem;
+    color: #94a3b8;
+}
+
+.uploaded-signature-preview {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.5rem;
+}
+
+.uploaded-signature-preview img {
+    max-width: 100%;
+    max-height: 200px;
+    border: 2px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 1rem;
+    background: white;
+}
+
+.remove-upload-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.5rem;
+    background: white;
+    border: 2px solid #e2e8f0;
+    color: #64748b;
+    border-radius: 8px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.remove-upload-btn:hover {
+    background: #fef2f2;
+    border-color: #fecaca;
+    color: #dc2626;
+}
+
+/* Modal Actions */
+.signature-modal-actions {
+    display: flex;
+    gap: 1rem;
+    padding: 1.5rem 2rem;
+    border-top: 1px solid #e2e8f0;
+    background: #f8fafc;
+}
+
+.btn-cancel {
+    flex: 1;
+    padding: 0.875rem 1.5rem;
+    background: white;
+    border: 2px solid #e2e8f0;
+    color: #64748b;
+    font-weight: 600;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-size: 1rem;
+}
+
+.btn-cancel:hover {
+    background: #f8fafc;
+    border-color: #cbd5e1;
+    color: #1e293b;
+}
+
+.btn-apply {
+    flex: 2;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.875rem 1.5rem;
+    background: linear-gradient(135deg, #F97316 0%, #ea580c 100%);
+    border: none;
+    color: white;
+    font-weight: 600;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-size: 1rem;
+}
+
+.btn-apply:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(249, 115, 22, 0.3);
+}
+
+.btn-apply:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
