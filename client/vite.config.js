@@ -15,5 +15,16 @@ export default defineConfig({
   build: {
     outDir: 'dist',
     sourcemap: false,
+    chunkSizeWarningLimit: 1000,
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          'react-vendor': ['react', 'react-dom', 'react-router-dom'],
+          'editor-vendor': ['@tiptap/react', '@tiptap/starter-kit', '@tiptap/extension-text-align', '@tiptap/extension-underline', '@tiptap/extension-color', '@tiptap/extension-text-style', '@tiptap/extension-highlight', '@tiptap/extension-link'],
+          'animation-vendor': ['framer-motion'],
+          'icon-vendor': ['lucide-react']
+        }
+      }
+    }
   }
 })

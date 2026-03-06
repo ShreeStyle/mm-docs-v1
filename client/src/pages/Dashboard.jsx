@@ -1117,7 +1117,6 @@ export default function Dashboard() {
                                     key={docType.id}
                                     onClick={() => setSelectedDocType(docType.id)}
                                     style={{
-                                        backgroundColor: 'white',
                                         border: selectedDocType === docType.id ? '2px solid #F97316' : '2px solid #E5E7EB',
                                         borderRadius: '12px',
                                         padding: '20px 16px',
