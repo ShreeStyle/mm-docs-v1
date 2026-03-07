@@ -54,7 +54,7 @@ const DocumentEditor = () => {
     const fetchDocument = async () => {
         try {
             setLoading(true);
-            const response = await api.get(`/documents/${documentId}`);
+            const response = await api.get(`/document-editor/${documentId}`);
             if (response.success) {
                 setDocument(response.data);
                 setFields(response.data.fields || []);
@@ -206,7 +206,7 @@ const DocumentEditor = () => {
 
     const autoSave = async (updatedFields) => {
         try {
-            await api.put(`/documents/${documentId}/fields`, { fields: updatedFields });
+            await api.put(`/document-editor/${documentId}/fields`, { fields: updatedFields });
         } catch (err) {
             console.error('Auto-save failed:', err);
         }
@@ -215,7 +215,7 @@ const DocumentEditor = () => {
     const handleSave = async () => {
         try {
             setSaving(true);
-            await api.put(`/documents/${documentId}`, {
+            await api.put(`/document-editor/${documentId}`, {
                 fields,
                 status: 'draft'
             });
@@ -231,7 +231,7 @@ const DocumentEditor = () => {
     const handleSend = async () => {
         try {
             setSaving(true);
-            await api.post(`/documents/${documentId}/send`, {
+            await api.post(`/document-editor/${documentId}/send`, {
                 fields
             });
             alert('Document sent successfully!');

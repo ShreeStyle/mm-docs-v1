@@ -10,7 +10,8 @@
     "dev:client": "npm run dev --prefix client",
     "dev:all": "concurrently \"npm run dev\" \"npm run dev:client\"",
     "build": "cd client && npm install && npm run build",
-    "vercel-build": "npm run build"
+    "vercel-build": "npm run build",
+    "seed:demo": "node src/scripts/seedDemoUser.js"
   },
   "keywords": [],
   "author": "",

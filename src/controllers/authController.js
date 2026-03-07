@@ -11,22 +11,46 @@ const generateOTP = () => {
 // Direct login with email and password
 exports.login = async (req, res) => {
   try {
+    console.log('🔐 Login attempt:', { email: req.body.email });
+    
     const { email, password } = req.body;
 
+    // Validate input
+    if (!email || !password) {
+      console.log('❌ Missing email or password');
+      return res.status(400).json({ message: "Email and password are required" });
+    }
+
     // Find user
+    console.log('🔍 Searching for user:', email);
     const user = await User.findOne({ email });
     if (!user) {
+      console.log('❌ User not found:', email);
       return res.status(404).json({ message: "User not found" });
     }
 
+    console.log('✅ User found:', { id: user._id, email: user.email, hasPassword: !!user.password });
+
+    // Check if password exists
+    if (!user.password) {
+      console.error('❌ User has no password set:', email);
+      return res.status(500).json({ message: "Account configuration error. Please contact support." });
+    }
+
     // Check password
+    console.log('🔐 Verifying password...');
     const isMatch = await bcrypt.compare(password, user.password);
+    console.log('🔐 Password match:', isMatch);
+    
     if (!isMatch) {
+      console.log('❌ Invalid password for:', email);
       return res.status(400).json({ message: "Invalid credentials" });
     }
 
     // Generate JWT token
+    console.log('🎫 Generating token...');
     const token = generateToken(user._id);
+    console.log('✅ Token generated');
 
     console.log(`✅ Login successful for ${user.email}`);
 
@@ -41,7 +65,8 @@ exports.login = async (req, res) => {
     });
 
   } catch (err) {
-    console.error("Login error:", err);
+    console.error("❌ Login error:", err);
+    console.error("❌ Error stack:", err.stack);
     res.status(500).json({ message: "Login failed", error: err.message });
   }
 };

@@ -96,7 +96,7 @@ const DocumentRecipients = () => {
             setError(null);
 
             // Create document with recipients
-            const response = await api.post('/documents/create-from-template', {
+            const response = await api.post('/document-editor/create-from-template', {
                 templateId,
                 name: documentName,
                 recipients: validation.recipients
@@ -117,7 +117,7 @@ const DocumentRecipients = () => {
     const handleSkip = async () => {
         try {
             setSaving(true);
-            const response = await api.post('/documents/create-from-template', {
+            const response = await api.post('/document-editor/create-from-template', {
                 templateId,
                 name: documentName,
                 recipients: []

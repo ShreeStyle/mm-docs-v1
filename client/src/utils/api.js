@@ -21,7 +21,17 @@ const apiRequest = async (endpoint, options = {}) => {
 
     try {
         const response = await fetch(`${API_BASE_URL}${endpoint}`, config);
-        const data = await response.json();
+        
+        // Try to parse JSON, but handle cases where it might not be JSON
+        let data;
+        const contentType = response.headers.get('content-type');
+        if (contentType && contentType.includes('application/json')) {
+            data = await response.json();
+        } else {
+            const text = await response.text();
+            console.error('Non-JSON response:', text);
+            data = { message: 'Server returned an invalid response' };
+        }
 
         if (!response.ok) {
             // Handle token expiration
@@ -35,7 +45,7 @@ const apiRequest = async (endpoint, options = {}) => {
                     window.location.href = '/login';
                 }
             }
-            throw new Error(data.message || 'Something went wrong');
+            throw new Error(data.message || `HTTP error! status: ${response.status}`);
         }
 
         return data;

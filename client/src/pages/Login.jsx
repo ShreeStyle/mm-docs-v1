@@ -28,6 +28,8 @@ export default function Login() {
         setError('');
 
         try {
+            console.log('🔐 Attempting login to:', getApiUrl('/api/auth/login'));
+            
             const response = await fetch(getApiUrl('/api/auth/login'), {
                 method: 'POST',
                 headers: { 
@@ -38,9 +40,29 @@ export default function Login() {
                 body: JSON.stringify(formData)
             });
 
-            const data = await response.json();
+            console.log('📥 Response status:', response.status);
+            console.log('📥 Response headers:', response.headers);
+
+            // Try to parse JSON response
+            let data;
+            const contentType = response.headers.get('content-type');
+            if (contentType && contentType.includes('application/json')) {
+                data = await response.json();
+            } else {
+                const text = await response.text();
+                console.error('❌ Non-JSON response:', text);
+                throw new Error('Server returned an invalid response. Please try again later.');
+            }
 
             if (!response.ok) {
+                // Provide more helpful error messages
+                if (response.status === 404) {
+                    throw new Error(`User not found. Please check your email or sign up first.`);
+                } else if (response.status === 400) {
+                    throw new Error(data.message || 'Invalid credentials. Please check your email and password.');
+                } else if (response.status === 500) {
+                    throw new Error(`Server error: ${data.message || 'Please try again later.'}`);
+                }
                 throw new Error(data.message || `HTTP error! status: ${response.status}`);
             }
 
@@ -49,8 +71,8 @@ export default function Login() {
             navigate('/dashboard');
             
         } catch (error) {
-            console.error('Login error:', error);
-            setError(error.message || 'Error connecting to backend');
+            console.error('❌ Login error:', error);
+            setError(error.message || 'Error connecting to backend. Please check your internet connection.');
         } finally {
             setIsLoading(false);
         }
@@ -89,6 +111,13 @@ export default function Login() {
                         textAlign: 'center'
                     }}>
                         {error}
+                        {error.includes('User not found') && (
+                            <div style={{ marginTop: '8px' }}>
+                                <Link to="/signup" style={{ color: '#7C3AED', textDecoration: 'underline' }}>
+                                    Create a new account →
+                                </Link>
+                            </div>
+                        )}
                     </div>
                 )}
 

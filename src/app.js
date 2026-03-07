@@ -52,8 +52,8 @@ const complianceRoutes = require("./routes/complianceRoutes");
 app.use("/api/users", userRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/brand-kit", brandKitRoutes);
+app.use("/api/document-editor", documentEditorRoutes); // Document editor routes (PandaDoc-style)
 app.use("/api/documents", documentRoutes);
-app.use("/api/documents", documentEditorRoutes); // Document editor routes
 app.use("/api/ai", aiRoutes);
 app.use("/api/public", publicRoutes);
 app.use("/api/onboarding", onboardingRoutes);
