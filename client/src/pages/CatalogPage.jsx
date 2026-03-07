@@ -20,8 +20,9 @@ import {
     Layers
 } from 'lucide-react';
 import '../styles/CatalogPage.css';
+import { API_BASE_URL } from '../config/api';
 
-const API_URL = 'http://localhost:5000/api';
+const API_URL = API_BASE_URL;
 
 const CatalogPage = () => {
     const [viewMode, setViewMode] = useState('grid'); // 'grid' or 'list'

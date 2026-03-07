@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { api } from '../utils/api';
-import { getApiUrl } from '../config/api';
+import { getApiUrl, BASE_URL } from '../config/api';
 import {
     Search, Home, Inbox, Settings, Layers, Trash2,
     UserPlus, ChevronDown, Plus, Sparkles, Clock,
@@ -3286,7 +3286,7 @@ HR Department
             if (template.templateType === 'pdf') {
                 console.log('📥 Downloading PDF template:', template.pdfUrl);
                 const link = document.createElement('a');
-                link.href = `http://localhost:5000${template.pdfUrl}`;
+                link.href = `${BASE_URL}${template.pdfUrl}`;
                 link.download = `${template.name}.pdf`;
                 link.target = '_blank';
                 document.body.appendChild(link);
@@ -4449,7 +4449,7 @@ HR Department
                                     <>
                                         {/* PDF Preview - YOUR GREEN GREY PDF! */}
                                         <iframe
-                                            src={`http://localhost:5000${template.pdfUrl}#toolbar=0&navpanes=0&scrollbar=0`}
+                                            src={`${BASE_URL}${template.pdfUrl}#toolbar=0&navpanes=0&scrollbar=0`}
                                             style={{
                                                 width: '100%',
                                                 height: '100%',

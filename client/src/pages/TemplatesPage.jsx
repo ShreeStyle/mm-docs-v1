@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Eye, Loader2, ArrowLeft } from 'lucide-react';
 import { api } from '../utils/api';
+import { BASE_URL } from '../config/api';
 
 const TemplatesPage = () => {
     const navigate = useNavigate();
@@ -279,7 +280,7 @@ const TemplatesPage = () => {
                                 backgroundColor: '#F9FAFB'
                             }}>
                                 <iframe
-                                    src={`http://localhost:5000${template.pdfUrl}`}
+                                    src={`${BASE_URL}${template.pdfUrl}`}
                                     style={{
                                         width: '100%',
                                         height: '100%',
@@ -596,7 +597,7 @@ const TemplatesPage = () => {
                                     <>
                                         {/* PDF Preview */}
                                         <iframe
-                                            src={`http://localhost:5000${template.pdfUrl}#toolbar=0&navpanes=0&scrollbar=0`}
+                                            src={`${BASE_URL}${template.pdfUrl}#toolbar=0&navpanes=0&scrollbar=0`}
                                             style={{
                                                 width: '100%',
                                                 height: '100%',
