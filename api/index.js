@@ -1,36 +1,44 @@
 // API entry point for Vercel Serverless Functions
-// Note: .env files are not deployed to Vercel, environment variables come from Vercel dashboard
 if (process.env.NODE_ENV !== 'production') {
   require("dotenv").config();
 }
 
-const connectDB = require("../src/config/db");
+const mongoose = require("mongoose");
+const app = require("../src/app");
 
-// Global connection state
-let cachedDb = null;
+// Global connection cache
+let isConnected = false;
 
 const connectToDatabase = async () => {
-  if (cachedDb) {
-    console.log("=> Using cached database connection");
-    return cachedDb;
+  if (isConnected && mongoose.connection.readyState === 1) {
+    console.log("=> Using existing database connection");
+    return;
   }
 
   try {
-    console.log("=> Connecting to database...");
-    console.log("=> MONGODB_URI exists:", !!process.env.MONGODB_URI);
-    console.log("=> JWT_SECRET exists:", !!process.env.JWT_SECRET);
+    const mongoUri = process.env.MONGODB_URI || process.env.MONGO_URI;
     
-    cachedDb = await connectDB();
-    console.log("=> Database connection established successfully");
-    return cachedDb;
+    if (!mongoUri) {
+      throw new Error("MONGODB_URI not found");
+    }
+
+    mongoose.set('strictQuery', false);
+    
+    await mongoose.connect(mongoUri, {
+      serverSelectionTimeoutMS: 30000,
+      socketTimeoutMS: 45000,
+    });
+
+    isConnected = true;
+    console.log("=> MongoDB connected:", mongoose.connection.host);
   } catch (error) {
-    console.error("=> Database connection failed:", error.message);
-    cachedDb = null;
+    console.error("=> Database connection error:", error.message);
+    isConnected = false;
     throw error;
   }
 };
 
-// Export the handler for Vercel
+// Export handler for Vercel
 module.exports = async (req, res) => {
   // Set CORS headers
   res.setHeader('Access-Control-Allow-Credentials', 'true');
@@ -40,23 +48,18 @@ module.exports = async (req, res) => {
 
   // Handle preflight
   if (req.method === 'OPTIONS') {
-    res.status(200).end();
-    return;
+    return res.status(200).end();
   }
 
   try {
-    console.log(`=> [${new Date().toISOString()}] ${req.method} ${req.url}`);
-    
-    // Connect to database first
+    // Connect to database
     await connectToDatabase();
     
-    // Load and execute Express app
-    const app = require("../src/app");
+    // Handle request with Express app
     return app(req, res);
     
   } catch (error) {
     console.error("=> Handler error:", error.message);
-    console.error("=> Stack:", error.stack);
     
     if (!res.headersSent) {
       return res.status(500).json({ 
