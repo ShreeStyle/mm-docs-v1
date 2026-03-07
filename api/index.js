@@ -1,57 +1,68 @@
 // API entry point for Vercel Serverless Functions
-require("dotenv").config();
-const app = require("../src/app");
+// Note: .env files are not deployed to Vercel, environment variables come from Vercel dashboard
+if (process.env.NODE_ENV !== 'production') {
+  require("dotenv").config();
+}
+
 const connectDB = require("../src/config/db");
 
-// Connect to MongoDB (connection will be reused across invocations)
-let isConnected = false;
+// Global connection state
+let cachedDb = null;
 
 const connectToDatabase = async () => {
-  if (isConnected) {
-    console.log("=> Using existing database connection");
-    return;
+  if (cachedDb) {
+    console.log("=> Using cached database connection");
+    return cachedDb;
   }
 
   try {
-    await connectDB();
-    isConnected = true;
-    console.log("=> New database connection established");
+    console.log("=> Connecting to database...");
+    console.log("=> MONGODB_URI exists:", !!process.env.MONGODB_URI);
+    console.log("=> JWT_SECRET exists:", !!process.env.JWT_SECRET);
+    
+    cachedDb = await connectDB();
+    console.log("=> Database connection established successfully");
+    return cachedDb;
   } catch (error) {
     console.error("=> Database connection failed:", error.message);
-    isConnected = false;
+    cachedDb = null;
     throw error;
   }
 };
 
-// Export the Express app as a serverless function
+// Export the handler for Vercel
 module.exports = async (req, res) => {
-  // Set CORS headers for all responses
+  // Set CORS headers
   res.setHeader('Access-Control-Allow-Credentials', 'true');
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS,PATCH,DELETE,POST,PUT');
   res.setHeader('Access-Control-Allow-Headers', 'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version, Authorization');
 
-  // Handle preflight requests
+  // Handle preflight
   if (req.method === 'OPTIONS') {
     res.status(200).end();
     return;
   }
 
   try {
-    console.log(`=> ${req.method} ${req.url}`);
+    console.log(`=> [${new Date().toISOString()}] ${req.method} ${req.url}`);
     
-    // Ensure database is connected
+    // Connect to database first
     await connectToDatabase();
     
-    // Pass the request to Express app
+    // Load and execute Express app
+    const app = require("../src/app");
     return app(req, res);
+    
   } catch (error) {
-    console.error("=> Function error:", error.message);
+    console.error("=> Handler error:", error.message);
+    console.error("=> Stack:", error.stack);
     
     if (!res.headersSent) {
       return res.status(500).json({ 
         error: "Internal Server Error",
-        message: "An error occurred. Please try again later."
+        message: "Database connection failed. Please try again later.",
+        hint: "Check Vercel environment variables: MONGODB_URI and JWT_SECRET"
       });
     }
   }
