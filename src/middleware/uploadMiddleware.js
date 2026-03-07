@@ -2,16 +2,23 @@ const multer = require("multer");
 const path = require("path");
 const fs = require("fs");
 
-// Ensure uploads directory exists
+// Ensure uploads directory exists (skip in serverless environments)
 const uploadsDir = path.join(__dirname, "../../uploads");
 const logosDir = path.join(uploadsDir, "logos");
 
-if (!fs.existsSync(uploadsDir)) {
-    fs.mkdirSync(uploadsDir, { recursive: true });
-}
+// Only create directories if not in serverless environment
+if (!process.env.VERCEL && !process.env.LAMBDA_TASK_ROOT) {
+  try {
+    if (!fs.existsSync(uploadsDir)) {
+      fs.mkdirSync(uploadsDir, { recursive: true });
+    }
 
-if (!fs.existsSync(logosDir)) {
-    fs.mkdirSync(logosDir, { recursive: true });
+    if (!fs.existsSync(logosDir)) {
+      fs.mkdirSync(logosDir, { recursive: true });
+    }
+  } catch (error) {
+    console.log("Note: Could not create upload directories (normal in serverless):", error.message);
+  }
 }
 
 // Configure storage
