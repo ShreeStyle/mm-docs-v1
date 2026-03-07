@@ -11,7 +11,7 @@ const generateOTP = () => {
 // Direct login with email and password
 exports.login = async (req, res) => {
   try {
-    console.log('🔐 Login attempt:', { email: req.body.email });
+    console.log('🔐 Login attempt:', { email: req.body?.email, hasBody: !!req.body });
     
     const { email, password } = req.body;
 
@@ -21,12 +21,26 @@ exports.login = async (req, res) => {
       return res.status(400).json({ message: "Email and password are required" });
     }
 
+    // Check database connection
+    const mongoose = require('mongoose');
+    if (mongoose.connection.readyState !== 1) {
+      console.error('❌ Database not connected. ReadyState:', mongoose.connection.readyState);
+      return res.status(503).json({ 
+        message: "Database connection error. Please try again in a moment.",
+        hint: "The server is starting up. Please wait a few seconds and try again."
+      });
+    }
+
     // Find user
     console.log('🔍 Searching for user:', email);
-    const user = await User.findOne({ email });
+    const user = await User.findOne({ email }).maxTimeMS(5000); // 5 second timeout
+    
     if (!user) {
       console.log('❌ User not found:', email);
-      return res.status(404).json({ message: "User not found" });
+      return res.status(404).json({ 
+        message: "User not found. Please check your email or sign up first.",
+        hint: "If you're trying to use demo@test.com, this user may not exist in the production database."
+      });
     }
 
     console.log('✅ User found:', { id: user._id, email: user.email, hasPassword: !!user.password });
@@ -34,7 +48,10 @@ exports.login = async (req, res) => {
     // Check if password exists
     if (!user.password) {
       console.error('❌ User has no password set:', email);
-      return res.status(500).json({ message: "Account configuration error. Please contact support." });
+      return res.status(500).json({ 
+        message: "Account configuration error. Please contact support.",
+        hint: "This account was not set up correctly."
+      });
     }
 
     // Check password
@@ -44,7 +61,7 @@ exports.login = async (req, res) => {
     
     if (!isMatch) {
       console.log('❌ Invalid password for:', email);
-      return res.status(400).json({ message: "Invalid credentials" });
+      return res.status(400).json({ message: "Invalid credentials. Please check your password." });
     }
 
     // Generate JWT token
@@ -65,9 +82,27 @@ exports.login = async (req, res) => {
     });
 
   } catch (err) {
-    console.error("❌ Login error:", err);
+    console.error("❌ Login error:", err.message);
+    console.error("❌ Error name:", err.name);
     console.error("❌ Error stack:", err.stack);
-    res.status(500).json({ message: "Login failed", error: err.message });
+    
+    // Provide specific error messages based on error type
+    let message = "Login failed. Please try again.";
+    let hint = null;
+    
+    if (err.name === 'MongooseError' || err.name === 'MongoError') {
+      message = "Database connection error. Please try again.";
+      hint = "The server is connecting to the database. Please wait a moment.";
+    } else if (err.message?.includes('timeout')) {
+      message = "Request timeout. Please try again.";
+      hint = "The server may be starting up. Try again in a few seconds.";
+    }
+    
+    res.status(500).json({ 
+      message, 
+      error: err.message,
+      hint
+    });
   }
 };
 

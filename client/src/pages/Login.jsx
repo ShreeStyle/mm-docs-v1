@@ -55,15 +55,23 @@ export default function Login() {
             }
 
             if (!response.ok) {
+                // Build error message with hint if available
+                let errorMessage = data.message || `HTTP error! status: ${response.status}`;
+                if (data.hint) {
+                    errorMessage += `\n\n${data.hint}`;
+                }
+                
                 // Provide more helpful error messages
                 if (response.status === 404) {
-                    throw new Error(`User not found. Please check your email or sign up first.`);
+                    throw new Error(errorMessage || 'User not found. Please check your email or sign up first.');
                 } else if (response.status === 400) {
-                    throw new Error(data.message || 'Invalid credentials. Please check your email and password.');
+                    throw new Error(errorMessage || 'Invalid credentials. Please check your email and password.');
+                } else if (response.status === 503) {
+                    throw new Error(errorMessage || 'Service temporarily unavailable. Please try again in a moment.');
                 } else if (response.status === 500) {
-                    throw new Error(`Server error: ${data.message || 'Please try again later.'}`);
+                    throw new Error(errorMessage || 'Server error. Please try again later.');
                 }
-                throw new Error(data.message || `HTTP error! status: ${response.status}`);
+                throw new Error(errorMessage);
             }
 
             console.log('✅ Login successful:', data);
@@ -108,7 +116,8 @@ export default function Login() {
                         borderRadius: '6px',
                         marginBottom: '20px',
                         fontSize: '14px',
-                        textAlign: 'center'
+                        textAlign: 'center',
+                        whiteSpace: 'pre-line'
                     }}>
                         {error}
                         {error.includes('User not found') && (

@@ -71,13 +71,49 @@ app.use("/api/signatures", signatureRoutes);
 app.use("/api/workflows", workflowRoutes);
 app.use("/api/compliance", complianceRoutes);
 
-// Health Check API
-app.get("/api/health", (req, res) => {
-  res.json({
+// Health Check API with database status
+app.get("/api/health", async (req, res) => {
+  const mongoose = require('mongoose');
+  
+  const health = {
     status: "OK",
     message: "Backend is running 🚀",
-    environment: process.env.NODE_ENV || 'development'
-  });
+    environment: process.env.NODE_ENV || 'development',
+    timestamp: new Date().toISOString(),
+    database: {
+      connected: mongoose.connection.readyState === 1,
+      readyState: mongoose.connection.readyState,
+      readyStates: {
+        0: 'disconnected',
+        1: 'connected',
+        2: 'connecting',
+        3: 'disconnecting'
+      },
+      host: mongoose.connection.readyState === 1 ? mongoose.connection.host : 'not connected'
+    },
+    config: {
+      hasMongoUri: !!process.env.MONGODB_URI || !!process.env.MONGO_URI,
+      hasJwtSecret: !!process.env.JWT_SECRET,
+      hasOpenAI: !!process.env.OPENAI_API_KEY,
+      nodeEnv: process.env.NODE_ENV
+    }
+  };
+
+  // Test database query if connected
+  if (mongoose.connection.readyState === 1) {
+    try {
+      const User = require('./models/User');
+      const userCount = await User.countDocuments().maxTimeMS(3000);
+      health.database.userCount = userCount;
+      health.database.queryTest = 'success';
+    } catch (err) {
+      health.database.queryTest = 'failed';
+      health.database.queryError = err.message;
+    }
+  }
+
+  const statusCode = health.database.connected ? 200 : 503;
+  res.status(statusCode).json(health);
 });
 
 // Serve static frontend files in production (for Render deployment)
