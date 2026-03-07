@@ -28,21 +28,46 @@ export default function Signup() {
         setError(null);
 
         try {
+            console.log('📝 Attempting signup to:', getApiUrl('/api/auth/signup'));
+            
             const response = await fetch(getApiUrl('/api/auth/signup'), {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                },
                 body: JSON.stringify(formData)
             });
 
+            console.log('📥 Response status:', response.status);
+
+            // Try to parse JSON response
+            let data;
+            const contentType = response.headers.get('content-type');
+            if (contentType && contentType.includes('application/json')) {
+                data = await response.json();
+            } else {
+                const text = await response.text();
+                console.error('❌ Non-JSON response:', text);
+                throw new Error('Server returned an invalid response. Please try again later.');
+            }
+
             if (response.ok) {
+                console.log('✅ Signup successful');
                 setIsSuccess(true);
                 setTimeout(() => navigate('/login'), 2000);
             } else {
-                const data = await response.json();
-                setError(data.message || 'Signup failed');
+                // Provide more helpful error messages
+                if (response.status === 400 && data.message?.includes('already registered')) {
+                    throw new Error('This email is already registered. Please login instead.');
+                } else if (response.status === 500) {
+                    throw new Error(`Server error: ${data.message || 'Please try again later.'}`);
+                }
+                throw new Error(data.message || 'Signup failed. Please try again.');
             }
         } catch (err) {
-            setError('Error connecting to backend server');
+            console.error('❌ Signup error:', err);
+            setError(err.message || 'Error connecting to backend server');
         } finally {
             setIsLoading(false);
         }

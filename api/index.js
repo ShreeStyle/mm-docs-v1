@@ -39,10 +39,6 @@ module.exports = async (req, res) => {
 
   try {
     console.log(`=> ${req.method} ${req.url}`);
-    console.log(`=> Headers:`, JSON.stringify(req.headers, null, 2));
-    if (req.body) {
-      console.log(`=> Body:`, JSON.stringify(req.body, null, 2));
-    }
     
     // Ensure database is connected
     await connectToDatabase();
@@ -50,16 +46,12 @@ module.exports = async (req, res) => {
     // Pass the request to Express app
     return app(req, res);
   } catch (error) {
-    console.error("=> Function error:", error);
-    console.error("=> Error stack:", error.stack);
+    console.error("=> Function error:", error.message);
     
     if (!res.headersSent) {
       return res.status(500).json({ 
         error: "Internal Server Error",
-        message: process.env.NODE_ENV === 'production' 
-          ? 'An error occurred. Please try again later.' 
-          : error.message,
-        details: process.env.NODE_ENV === 'development' ? error.stack : undefined
+        message: "An error occurred. Please try again later."
       });
     }
   }
