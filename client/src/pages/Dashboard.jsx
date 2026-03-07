@@ -150,8 +150,18 @@ export default function Dashboard() {
 
     // Set initial view based on URL path
     useEffect(() => {
-        if (location.pathname === '/dashboard/templates') {
+        if (location.pathname === '/dashboard' || location.pathname === '/') {
+            setCurrentView('dashboard');
+        } else if (location.pathname === '/documents/create') {
+            setCurrentView('create');
+        } else if (location.pathname === '/documents') {
+            setCurrentView('documents');
+        } else if (location.pathname === '/templates' || location.pathname === '/dashboard/templates') {
             setCurrentView('templates');
+        } else if (location.pathname === '/compliance') {
+            setCurrentView('compliance-center');
+        } else if (location.pathname === '/settings') {
+            setCurrentView('settings');
         }
     }, [location.pathname]);
 
@@ -853,431 +863,304 @@ export default function Dashboard() {
         </div>
     );
     // Create Document Page
-    const CreateDocumentPage = () => (
-        <div style={{ padding: isMobile ? '16px' : '32px' }}>
-            {!selectedCategory ? (
-                <>
-                    <div style={{ marginBottom: '32px', textAlign: 'center' }}>
-                        <h2 style={{
-                            fontSize: '32px',
-                            fontWeight: '700',
-                            color: '#111827',
-                            margin: '0 0 8px 0'
-                        }}>Select Category</h2>
-                        <p style={{
-                            fontSize: '18px',
-                            color: '#6B7280',
-                            margin: 0
-                        }}>Choose the document category to get started</p>
-                    </div>
+    const CreateDocumentPage = () => {
+        // Document categories definition
+        const categories = [
+            {
+                id: 'hr',
+                name: 'HR Documents',
+                icon: Users,
+                description: 'Employment letters and HR forms',
+                color: '#6366F1',
+                bgColor: '#EEF2FF'
+            },
+            {
+                id: 'legal',
+                name: 'Legal Documents',
+                icon: Shield,
+                description: 'Contracts and legal agreements',
+                color: '#8B5CF6',
+                bgColor: '#F5F3FF'
+            },
+            {
+                id: 'sales',
+                name: 'Sales Documents',
+                icon: TrendingUp,
+                description: 'Proposals and sales agreements',
+                color: '#0EA5E9',
+                bgColor: '#F0F9FF'
+            },
+            {
+                id: 'finance',
+                name: 'Finance Documents',
+                icon: DollarSign,
+                description: 'Invoices and financial records',
+                color: '#10B981',
+                bgColor: '#F0FDF4'
+            },
+            {
+                id: 'compliance',
+                name: 'Compliance Documents',
+                icon: CheckSquare,
+                description: 'Regulatory and compliance filings',
+                color: '#F59E0B',
+                bgColor: '#FFFBEB'
+            }
+        ];
 
+        // All document types organized by category
+        const documentsByCategory = {
+            hr: [
+                { label: 'Offer Letter', type: 'offer_letter' },
+                { label: 'Appointment Letter', type: 'appointment_letter' },
+                { label: 'Onboarding Letter', type: 'onboarding_letter' },
+                { label: 'Experience Certificate', type: 'experience_certificate' },
+                { label: 'Warning Letter', type: 'warning_letter' }
+            ],
+            legal: [
+                { label: 'NDA', type: 'nda' },
+                { label: 'Service Agreement', type: 'service_agreement' },
+                { label: 'Terms of Service', type: 'terms_of_service' },
+                { label: 'Privacy Policy', type: 'privacy_policy' },
+                { label: 'MOU', type: 'mou' }
+            ],
+            sales: [
+                { label: 'Business Proposal', type: 'business_proposal' },
+                { label: 'Quotation', type: 'quotation' },
+                { label: 'Sales Contract', type: 'sales_contract' },
+                { label: 'Partnership Agreement', type: 'partnership_agreement' }
+            ],
+            finance: [
+                { label: 'Invoice', type: 'invoice' },
+                { label: 'Purchase Order', type: 'purchase_order' },
+                { label: 'Receipt', type: 'receipt' },
+                { label: 'GST Invoice', type: 'gst_invoice' },
+                { label: 'Credit Note', type: 'credit_note' }
+            ],
+            compliance: [
+                { label: 'GST Filing Summary', type: 'gst_filing_summary' },
+                { label: 'Audit Report', type: 'audit_report' },
+                { label: 'Policy Document', type: 'policy_document' },
+                { label: 'Regulatory Filing', type: 'regulatory_filing' }
+            ]
+        };
+
+        // If currentView is a category (hr, legal, etc.), show documents in that category
+        if (['hr', 'legal', 'sales', 'finance', 'compliance'].includes(currentView)) {
+            const category = categories.find(cat => cat.id === currentView);
+            const documents = documentsByCategory[currentView];
+
+            return (
+                <div style={{
+                    padding: isMobile ? '16px' : '32px',
+                    maxWidth: '700px',
+                    margin: '0 auto'
+                }}>
                     <div style={{
-                        display: 'grid',
-                        gridTemplateColumns: isMobile ? 'repeat(2, 1fr)' : isTablet ? 'repeat(3, 1fr)' : 'repeat(5, 1fr)',
-                        gap: isMobile ? '12px' : '24px',
-                        maxWidth: '1200px',
-                        margin: '0 auto'
+                        backgroundColor: 'white',
+                        borderRadius: '12px',
+                        border: '1px solid #E5E7EB',
+                        boxShadow: '0 1px 3px rgba(0, 0, 0, 0.08)',
+                        overflow: 'hidden'
                     }}>
-                        {[
-                            { id: 'hr', label: 'HR', icon: UserPlus, color: '#3B82F6', bgColor: '#EFF6FF' },
-                            { id: 'legal', label: 'Legal', icon: Shield, color: '#10B981', bgColor: '#ECFDF5' },
-                            { id: 'sales', label: 'Sales', icon: TrendingUp, color: '#F59E0B', bgColor: '#FFFBEB' },
-                            { id: 'finance', label: 'Finance', icon: DollarSign, color: '#EF4444', bgColor: '#FEF2F2' },
-                            { id: 'compliance', label: 'Compliance', icon: CheckSquare, color: '#8B5CF6', bgColor: '#F3E8FF' }
-                        ].map((category) => {
-                            const Icon = category.icon;
-                            return (
-                                <div
-                                    key={category.id}
-                                    onClick={() => {
-                                        setSelectedCategory(category.id);
-                                        setCurrentView(category.id);
-                                    }}
-                                    style={{
-                                        backgroundColor: 'white',
-                                        border: '2px solid #E5E7EB',
-                                        borderRadius: '20px',
-                                        padding: '32px 24px',
-                                        textAlign: 'center',
-                                        cursor: 'pointer',
-                                        transition: 'all 0.3s ease',
-                                        boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)',
-                                        minHeight: '180px',
-                                        display: 'flex',
-                                        flexDirection: 'column',
-                                        alignItems: 'center',
-                                        justifyContent: 'center'
-                                    }}
-                                    onMouseEnter={(e) => {
-                                        e.target.style.borderColor = '#F97316';
-                                        e.target.style.transform = 'translateY(-4px)';
-                                        e.target.style.boxShadow = '0 8px 25px rgba(249, 115, 22, 0.15)';
-                                    }}
-                                    onMouseLeave={(e) => {
-                                        e.target.style.borderColor = '#E5E7EB';
-                                        e.target.style.transform = 'translateY(0)';
-                                        e.target.style.boxShadow = '0 1px 3px rgba(0, 0, 0, 0.1)';
-                                    }}
-                                >
-                                    <div style={{
-                                        width: '64px',
-                                        height: '64px',
-                                        borderRadius: '16px',
-                                        backgroundColor: category.bgColor,
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        justifyContent: 'center',
-                                        marginBottom: '16px'
-                                    }}>
-                                        <Icon size={32} color={category.color} />
-                                    </div>
+                        <div style={{ padding: '24px', borderBottom: '1px solid #F3F4F6' }}>
+                            <button
+                                onClick={() => setCurrentView('create')}
+                                style={{
+                                    background: 'none',
+                                    border: 'none',
+                                    color: '#6B7280',
+                                    cursor: 'pointer',
+                                    fontSize: '14px',
+                                    padding: '0',
+                                    marginBottom: '16px',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    gap: '6px',
+                                    fontWeight: '500'
+                                }}
+                                onMouseEnter={(e) => e.target.style.color = '#111827'}
+                                onMouseLeave={(e) => e.target.style.color = '#6B7280'}
+                            >
+                                <ChevronRight size={16} style={{ transform: 'rotate(180deg)' }} />
+                                Back to Categories
+                            </button>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
+                                <div style={{
+                                    width: '48px',
+                                    height: '48px',
+                                    borderRadius: '10px',
+                                    backgroundColor: category.bgColor,
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    color: category.color
+                                }}>
+                                    <category.icon size={24} strokeWidth={2} />
+                                </div>
+                                <div>
                                     <h3 style={{
-                                        fontSize: '18px',
+                                        fontSize: '20px',
                                         fontWeight: '600',
                                         color: '#111827',
-                                        margin: 0
-                                    }}>{category.label}</h3>
+                                        margin: 0,
+                                        letterSpacing: '-0.01em'
+                                    }}>{category.name}</h3>
+                                    <p style={{
+                                        fontSize: '14px',
+                                        color: '#6B7280',
+                                        margin: '2px 0 0 0'
+                                    }}>{category.description}</p>
                                 </div>
-                            );
-                        })}
-                    </div>
-
-                    {/* AI Suggestions */}
-                    <div style={{ marginTop: '48px' }}>
-                        <div style={{ textAlign: 'center', marginBottom: '32px' }}>
-                            <h3 style={{
-                                fontSize: '24px',
-                                fontWeight: '600',
-                                color: '#111827',
-                                margin: '0 0 8px 0'
-                            }}>AI Suggestions</h3>
-                            <p style={{
-                                fontSize: '16px',
-                                color: '#6B7280',
-                                margin: 0
-                            }}>Popular templates to get you started</p>
+                            </div>
                         </div>
 
-                        <div style={{
-                            display: 'grid',
-                            gridTemplateColumns: isMobile ? '1fr' : 'repeat(2, 1fr)',
-                            gap: isMobile ? '12px' : '24px',
-                            maxWidth: '800px',
-                            margin: '0 auto'
-                        }}>
-                            {[
-                                { label: 'Create Offer Letter', category: 'hr', type: 'offer_letter', icon: FileText },
-                                { label: 'Generate Invoice', category: 'finance', type: 'invoice', icon: DollarSign },
-                                { label: 'Business Proposal', category: 'sales', type: 'proposal', icon: TrendingUp },
-                                { label: 'Generate NDA', category: 'legal', type: 'nda', icon: Shield }
-                            ].map((suggestion, index) => {
-                                const Icon = suggestion.icon;
-                                return (
+                        <div style={{ padding: '20px 24px 24px' }}>
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                                {documents.map((doc, index) => (
                                     <button
                                         key={index}
                                         onClick={() => {
-                                            setSelectedCategory(suggestion.category);
-                                            setSelectedDocType(suggestion.type);
-                                            setCurrentView(suggestion.category);
+                                            setSelectedCategory(currentView);
+                                            setSelectedDocType(doc.type);
+                                            setCurrentView('generate-document');
                                         }}
                                         style={{
+                                            width: '100%',
+                                            padding: '14px 16px',
                                             backgroundColor: 'white',
+                                            color: '#374151',
                                             border: '1px solid #E5E7EB',
-                                            borderRadius: '16px',
-                                            padding: '24px',
+                                            borderRadius: '8px',
+                                            fontSize: '15px',
+                                            fontWeight: '500',
+                                            cursor: 'pointer',
+                                            textAlign: 'left',
+                                            transition: 'all 0.15s ease',
                                             display: 'flex',
                                             alignItems: 'center',
-                                            gap: '16px',
-                                            cursor: 'pointer',
-                                            transition: 'all 0.2s ease',
-                                            textAlign: 'left'
+                                            justifyContent: 'space-between'
                                         }}
                                         onMouseEnter={(e) => {
-                                            e.target.style.borderColor = '#F97316';
-                                            e.target.style.backgroundColor = '#FEF3E2';
-                                            e.target.style.transform = 'translateY(-2px)';
+                                            e.currentTarget.style.borderColor = category.color;
+                                            e.currentTarget.style.backgroundColor = category.bgColor;
+                                            e.currentTarget.style.color = category.color;
+                                            e.currentTarget.style.transform = 'translateX(4px)';
                                         }}
                                         onMouseLeave={(e) => {
-                                            e.target.style.borderColor = '#E5E7EB';
-                                            e.target.style.backgroundColor = 'white';
-                                            e.target.style.transform = 'translateY(0)';
+                                            e.currentTarget.style.borderColor = '#E5E7EB';
+                                            e.currentTarget.style.color = '#374151';
+                                            e.currentTarget.style.backgroundColor = 'white';
+                                            e.currentTarget.style.transform = 'translateX(0)';
                                         }}
                                     >
-                                        <div style={{
-                                            width: '48px',
-                                            height: '48px',
-                                            borderRadius: '12px',
-                                            backgroundColor: '#FEF3E2',
-                                            display: 'flex',
-                                            alignItems: 'center',
-                                            justifyContent: 'center'
-                                        }}>
-                                            <Icon size={24} color="#F97316" />
-                                        </div>
-                                        <div>
-                                            <h4 style={{
-                                                fontSize: '16px',
-                                                fontWeight: '600',
-                                                color: '#111827',
-                                                margin: 0
-                                            }}>{suggestion.label}</h4>
-                                            <p style={{
-                                                fontSize: '14px',
-                                                color: '#6B7280',
-                                                margin: '4px 0 0 0'
-                                            }}>Generate professional {suggestion.label.toLowerCase()}</p>
-                                        </div>
+                                        <span>{doc.label}</span>
+                                        <ChevronRight size={18} style={{ opacity: 0.4 }} />
                                     </button>
-                                );
-                            })}
+                                ))}
+                            </div>
                         </div>
                     </div>
-                </>
-            ) : (
-                <div>
-                    <button
-                        onClick={() => setSelectedCategory(null)}
-                        style={{
-                            backgroundColor: 'transparent',
-                            border: 'none',
-                            color: '#6B7280',
-                            fontSize: '14px',
-                            cursor: 'pointer',
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: '4px',
-                            marginBottom: '24px',
-                            padding: '8px 0'
-                        }}
-                    >
-                        ← Back to Categories
-                    </button>
+                </div>
+            );
+        }
 
+        // Otherwise, show category selection (Step 1)
+        return (
+            <div style={{
+                padding: isMobile ? '16px' : '32px',
+                maxWidth: '1000px',
+                margin: '0 auto'
+            }}>
+                <div style={{ 
+                    marginBottom: '32px',
+                    textAlign: 'center'
+                }}>
                     <h2 style={{
                         fontSize: '28px',
                         fontWeight: '700',
                         color: '#111827',
                         margin: '0 0 8px 0',
-                        textTransform: 'capitalize'
-                    }}>
-                        {selectedCategory} Documents
-                    </h2>
+                        letterSpacing: '-0.02em'
+                    }}>Create Document</h2>
                     <p style={{
                         fontSize: '16px',
                         color: '#6B7280',
-                        margin: '0 0 32px 0'
-                    }}>Choose a document type to generate</p>
+                        margin: 0
+                    }}>Select a document category to get started</p>
+                </div>
 
-                    <div style={{
-                        display: 'grid',
-                        gridTemplateColumns: 'repeat(5, 1fr)',
-                        gap: '12px'
-                    }}>
-                        {(() => {
-                            const documentTypes = {
-                                hr: [
-                                    { id: 'offer_letter', label: 'Offer Letter', icon: '📄', description: 'Employment offer letter' },
-                                    { id: 'appointment_letter', label: 'Appointment Letter', icon: '📋', description: 'Official appointment letter' },
-                                    { id: 'onboarding_letter', label: 'Onboarding Letter', icon: '👋', description: 'Welcome and onboarding letter' },
-                                    { id: 'experience_certificate', label: 'Experience Certificate', icon: '🏆', description: 'Work experience certificate' },
-                                    { id: 'warning_letter', label: 'Warning Letter', icon: '⚠️', description: 'Employee warning letter' }
-                                ],
-                                legal: [
-                                    { id: 'nda', label: 'NDA', icon: '🔒', description: 'Non-disclosure agreement' },
-                                    { id: 'service_agreement', label: 'Service Agreement', icon: '📝', description: 'Service contract agreement' },
-                                    { id: 'terms_of_service', label: 'Terms of Service', icon: '📜', description: 'Terms and conditions' },
-                                    { id: 'privacy_policy', label: 'Privacy Policy', icon: '🛡️', description: 'Privacy policy document' },
-                                    { id: 'mou', label: 'MOU', icon: '🤝', description: 'Memorandum of understanding' }
-                                ],
-                                sales: [
-                                    { id: 'business_proposal', label: 'Business Proposal', icon: '💼', description: 'Business proposal document' },
-                                    { id: 'quotation', label: 'Quotation', icon: '💰', description: 'Price quotation' },
-                                    { id: 'sales_contract', label: 'Sales Contract', icon: '📋', description: 'Sales agreement contract' },
-                                    { id: 'partnership_agreement', label: 'Partnership Agreement', icon: '🤝', description: 'Business partnership agreement' }
-                                ],
-                                finance: [
-                                    { id: 'invoice', label: 'Invoice', icon: '🧾', description: 'Standard invoice' },
-                                    { id: 'purchase_order', label: 'Purchase Order', icon: '📦', description: 'Purchase order document' },
-                                    { id: 'receipt', label: 'Receipt', icon: '🧾', description: 'Payment receipt' },
-                                    { id: 'gst_invoice', label: 'GST Invoice', icon: '📊', description: 'GST compliant invoice' },
-                                    { id: 'credit_note', label: 'Credit Note', icon: '💳', description: 'Credit note document' }
-                                ],
-                                compliance: [
-                                    { id: 'gst_filing_summary', label: 'GST Filing Summary', icon: '📈', description: 'GST filing summary report' },
-                                    { id: 'audit_report', label: 'Audit Report', icon: '🔍', description: 'Financial audit report' },
-                                    { id: 'policy_document', label: 'Policy Document', icon: '📋', description: 'Company policy document' },
-                                    { id: 'regulatory_filing', label: 'Regulatory Filing', icon: '🏛️', description: 'Regulatory compliance filing' }
-                                ]
-                            };
-
-                            const currentTypes = documentTypes[selectedCategory] || [];
-
-                            return currentTypes.map((docType) => (
-                                <div
-                                    key={docType.id}
-                                    onClick={() => setSelectedDocType(docType.id)}
-                                    style={{
-                                        border: selectedDocType === docType.id ? '2px solid #F97316' : '2px solid #E5E7EB',
-                                        borderRadius: '12px',
-                                        padding: '20px 16px',
-                                        textAlign: 'center',
-                                        cursor: 'pointer',
-                                        transition: 'all 0.2s ease',
-                                        boxShadow: selectedDocType === docType.id ? '0 4px 12px rgba(249, 115, 22, 0.15)' : '0 1px 3px rgba(0, 0, 0, 0.1)',
-                                        minHeight: '140px',
-                                        display: 'flex',
-                                        flexDirection: 'column',
-                                        alignItems: 'center',
-                                        justifyContent: 'center',
-                                        backgroundColor: selectedDocType === docType.id ? '#FEF3E2' : 'white'
-                                    }}
-                                    onMouseEnter={(e) => {
-                                        if (selectedDocType !== docType.id) {
-                                            e.target.style.borderColor = '#F97316';
-                                            e.target.style.transform = 'translateY(-2px)';
-                                            e.target.style.boxShadow = '0 4px 12px rgba(249, 115, 22, 0.1)';
-                                        }
-                                    }}
-                                    onMouseLeave={(e) => {
-                                        if (selectedDocType !== docType.id) {
-                                            e.target.style.borderColor = '#E5E7EB';
-                                            e.target.style.transform = 'translateY(0)';
-                                            e.target.style.boxShadow = '0 1px 3px rgba(0, 0, 0, 0.1)';
-                                        }
-                                    }}
-                                >
-                                    <div style={{
-                                        fontSize: '32px',
-                                        marginBottom: '12px'
-                                    }}>
-                                        {docType.icon}
-                                    </div>
-                                    <h3 style={{
-                                        fontSize: '14px',
-                                        fontWeight: '600',
-                                        color: '#111827',
-                                        margin: '0 0 6px 0',
-                                        textAlign: 'center',
-                                        lineHeight: '1.2'
-                                    }}>{docType.label}</h3>
-                                    <p style={{
-                                        fontSize: '11px',
-                                        color: '#6B7280',
-                                        margin: 0,
-                                        textAlign: 'center',
-                                        lineHeight: '1.3'
-                                    }}>{docType.description}</p>
+                <div style={{
+                    display: 'grid',
+                    gridTemplateColumns: isMobile ? '1fr' : isTablet ? 'repeat(2, 1fr)' : 'repeat(3, 1fr)',
+                    gap: '20px'
+                }}>
+                    {categories.map((category) => {
+                        const CategoryIcon = category.icon;
+                        return (
+                            <button
+                                key={category.id}
+                                onClick={() => setCurrentView(category.id)}
+                                style={{
+                                    padding: '28px 24px',
+                                    backgroundColor: 'white',
+                                    border: '1px solid #E5E7EB',
+                                    borderRadius: '12px',
+                                    cursor: 'pointer',
+                                    textAlign: 'left',
+                                    transition: 'all 0.2s ease',
+                                    display: 'flex',
+                                    flexDirection: 'column',
+                                    gap: '16px',
+                                    boxShadow: '0 1px 2px rgba(0, 0, 0, 0.05)'
+                                }}
+                                onMouseEnter={(e) => {
+                                    e.currentTarget.style.borderColor = category.color;
+                                    e.currentTarget.style.backgroundColor = category.bgColor;
+                                    e.currentTarget.style.transform = 'translateY(-4px)';
+                                    e.currentTarget.style.boxShadow = '0 8px 16px rgba(0, 0, 0, 0.1)';
+                                }}
+                                onMouseLeave={(e) => {
+                                    e.currentTarget.style.borderColor = '#E5E7EB';
+                                    e.currentTarget.style.backgroundColor = 'white';
+                                    e.currentTarget.style.transform = 'translateY(0)';
+                                    e.currentTarget.style.boxShadow = '0 1px 2px rgba(0, 0, 0, 0.05)';
+                                }}
+                            >
+                                <div style={{
+                                    width: '56px',
+                                    height: '56px',
+                                    borderRadius: '12px',
+                                    backgroundColor: category.bgColor,
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    color: category.color
+                                }}>
+                                    <CategoryIcon size={28} strokeWidth={2} />
                                 </div>
-                            ));
-                        })()}
-                    </div>
-
-                    {selectedDocType && (
-                        <div style={{
-                            marginTop: '32px',
-                            padding: '24px',
-                            backgroundColor: 'white',
-                            borderRadius: '16px',
-                            border: '1px solid #E5E7EB',
-                            boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)'
-                        }}>
-                            <div style={{
-                                display: 'flex',
-                                justifyContent: 'space-between',
-                                alignItems: 'center',
-                                marginBottom: '16px'
-                            }}>
                                 <div>
-                                    <h3 style={{
+                                    <h4 style={{
                                         fontSize: '18px',
                                         fontWeight: '600',
                                         color: '#111827',
-                                        margin: '0 0 4px 0'
-                                    }}>Ready to Generate</h3>
+                                        margin: '0 0 6px 0',
+                                        letterSpacing: '-0.01em'
+                                    }}>{category.name}</h4>
                                     <p style={{
                                         fontSize: '14px',
                                         color: '#6B7280',
-                                        margin: 0
-                                    }}>
-                                        Selected: {(() => {
-                                            const allTypes = {
-                                                hr: [
-                                                    { id: 'offer_letter', label: 'Offer Letter' },
-                                                    { id: 'appointment_letter', label: 'Appointment Letter' },
-                                                    { id: 'onboarding_letter', label: 'Onboarding Letter' },
-                                                    { id: 'experience_certificate', label: 'Experience Certificate' },
-                                                    { id: 'warning_letter', label: 'Warning Letter' }
-                                                ],
-                                                legal: [
-                                                    { id: 'nda', label: 'NDA - Non Disclosure Agreement' },
-                                                    { id: 'service_agreement', label: 'Service Agreement' },
-                                                    { id: 'terms_of_service', label: 'Terms of Service' },
-                                                    { id: 'privacy_policy', label: 'Privacy Policy' },
-                                                    { id: 'mou', label: 'MOU - Memorandum of Understanding' }
-                                                ],
-                                                sales: [
-                                                    { id: 'business_proposal', label: 'Business Proposal' },
-                                                    { id: 'quotation', label: 'Quotation' },
-                                                    { id: 'sales_contract', label: 'Sales Contract' },
-                                                    { id: 'partnership_agreement', label: 'Partnership Agreement' }
-                                                ],
-                                                finance: [
-                                                    { id: 'invoice', label: 'Invoice' },
-                                                    { id: 'purchase_order', label: 'Purchase Order' },
-                                                    { id: 'receipt', label: 'Receipt' },
-                                                    { id: 'gst_invoice', label: 'GST Invoice' },
-                                                    { id: 'credit_note', label: 'Credit Note' }
-                                                ],
-                                                compliance: [
-                                                    { id: 'gst_filing_summary', label: 'GST Filing Summary' },
-                                                    { id: 'audit_report', label: 'Audit Report' },
-                                                    { id: 'policy_document', label: 'Policy Document' },
-                                                    { id: 'regulatory_filing', label: 'Regulatory Filing' }
-                                                ]
-                                            };
-                                            const currentTypes = allTypes[selectedCategory] || [];
-                                            const selectedType = currentTypes.find(type => type.id === selectedDocType);
-                                            return selectedType ? selectedType.label : selectedDocType;
-                                        })()}
-                                    </p>
+                                        margin: 0,
+                                        lineHeight: '1.5'
+                                    }}>{category.description}</p>
                                 </div>
-                                <button
-                                    onClick={() => {
-                                        setCurrentView('generate-document');
-                                    }}
-                                    style={{
-                                        padding: '12px 24px',
-                                        backgroundColor: '#F97316',
-                                        border: 'none',
-                                        borderRadius: '8px',
-                                        fontSize: '14px',
-                                        fontWeight: '600',
-                                        color: 'white',
-                                        cursor: 'pointer',
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        gap: '8px',
-                                        transition: 'all 0.2s ease'
-                                    }}
-                                    onMouseEnter={(e) => {
-                                        e.target.style.backgroundColor = '#EA580C';
-                                        e.target.style.transform = 'translateY(-1px)';
-                                    }}
-                                    onMouseLeave={(e) => {
-                                        e.target.style.backgroundColor = '#F97316';
-                                        e.target.style.transform = 'translateY(0)';
-                                    }}
-                                >
-                                    <Sparkles size={16} />
-                                    Generate Document
-                                </button>
-                            </div>
-                        </div>
-                    )}
+                            </button>
+                        );
+                    })}
                 </div>
-            )}
-        </div>
-    );
+            </div>
+        );
+    };
     // My Documents Page
     const MyDocumentsPage = () => {
         console.log('Documents in MyDocumentsPage:', docs);
@@ -4351,26 +4234,26 @@ HR Department
         };
 
         return (
-            <div style={{ padding: '32px' }}>
+            <div style={{ padding: '20px' }}>
                 {/* Header */}
-                <div style={{ marginBottom: '32px' }}>
+                <div style={{ marginBottom: '20px' }}>
                     <h2 style={{
-                        fontSize: '28px',
+                        fontSize: '24px',
                         fontWeight: '700',
                         color: '#111827',
-                        margin: '0 0 8px 0'
+                        margin: '0 0 6px 0'
                     }}>Document Templates</h2>
                     <p style={{
-                        fontSize: '16px',
+                        fontSize: '14px',
                         color: '#6B7280',
                         margin: 0
                     }}>Ready-to-use document structures. Select a template to create a document with your data.</p>
                 </div>
 
                 {/* Templates Grid - All Templates Displayed */}
-                <div style={{ marginBottom: '24px' }}>
+                <div style={{ marginBottom: '16px' }}>
                     <p style={{
-                        fontSize: '14px',
+                        fontSize: '13px',
                         color: '#6B7280',
                         margin: 0
                     }}>Showing all {getAllTemplates().length} templates</p>
@@ -4379,8 +4262,8 @@ HR Department
                 {/* Templates Grid */}
                 <div style={{
                     display: 'grid',
-                    gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
-                    gap: '20px'
+                    gridTemplateColumns: 'repeat(auto-fill, minmax(150px, 1fr))',
+                    gap: '10px'
                 }}>
                     {loading ? (
                         <div style={{ textAlign: 'center', padding: '60px', gridColumn: '1 / -1' }}>
@@ -4397,37 +4280,37 @@ HR Department
                             style={{
                                 backgroundColor: 'white',
                                 border: '1px solid #E5E7EB',
-                                borderRadius: '12px',
-                                padding: '16px',
-                                boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)',
+                                borderRadius: '6px',
+                                padding: '8px',
+                                boxShadow: '0 1px 2px rgba(0, 0, 0, 0.06)',
                                 transition: 'all 0.2s ease',
                                 cursor: 'pointer',
                                 position: 'relative'
                             }}
                             onMouseEnter={(e) => {
-                                e.currentTarget.style.transform = 'translateY(-4px)';
-                                e.currentTarget.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.15)';
+                                e.currentTarget.style.transform = 'translateY(-2px)';
+                                e.currentTarget.style.boxShadow = '0 3px 8px rgba(0, 0, 0, 0.1)';
                             }}
                             onMouseLeave={(e) => {
                                 e.currentTarget.style.transform = 'translateY(0)';
-                                e.currentTarget.style.boxShadow = '0 1px 3px rgba(0, 0, 0, 0.1)';
+                                e.currentTarget.style.boxShadow = '0 1px 2px rgba(0, 0, 0, 0.06)';
                             }}
                         >
                             {/* Featured Badge */}
                             {template.metadata?.featured && (
                                 <div style={{
                                     position: 'absolute',
-                                    top: '-10px',
-                                    right: '20px',
+                                    top: '-6px',
+                                    right: '10px',
                                     backgroundColor: '#F97316',
                                     color: 'white',
-                                    padding: '4px 12px',
-                                    borderRadius: '12px',
-                                    fontSize: '11px',
+                                    padding: '2px 8px',
+                                    borderRadius: '8px',
+                                    fontSize: '9px',
                                     fontWeight: '600',
                                     textTransform: 'uppercase',
-                                    letterSpacing: '0.5px',
-                                    boxShadow: '0 2px 8px rgba(249, 115, 22, 0.3)',
+                                    letterSpacing: '0.3px',
+                                    boxShadow: '0 1px 4px rgba(249, 115, 22, 0.3)',
                                     zIndex: 10
                                 }}>
                                     ⭐ Featured
@@ -4437,10 +4320,10 @@ HR Department
                             {/* Visual Document Preview */}
                             <div style={{
                                 width: '100%',
-                                height: '320px',
+                                height: '110px',
                                 backgroundColor: '#F9FAFB',
-                                borderRadius: '8px',
-                                marginBottom: '12px',
+                                borderRadius: '4px',
+                                marginBottom: '6px',
                                 overflow: 'hidden',
                                 border: '1px solid #E5E7EB',
                                 position: 'relative'
@@ -4495,10 +4378,10 @@ HR Department
 
                             {/* Template Title */}
                             <h3 style={{
-                                fontSize: '15px',
+                                fontSize: '13px',
                                 fontWeight: '600',
                                 color: '#111827',
-                                margin: '0 0 6px 0',
+                                margin: '0 0 4px 0',
                                 overflow: 'hidden',
                                 textOverflow: 'ellipsis',
                                 whiteSpace: 'nowrap'
@@ -4506,12 +4389,12 @@ HR Department
 
                             {/* Creator info */}
                             <div style={{
-                                fontSize: '11px',
+                                fontSize: '9px',
                                 color: '#9CA3AF',
-                                marginBottom: '14px',
+                                marginBottom: '8px',
                                 display: 'flex',
                                 flexDirection: 'column',
-                                gap: '2px'
+                                gap: '1px'
                             }}>
                                 <div>Prepared for: <span style={{ color: '#6B7280' }}>Your Company</span></div>
                                 <div>Created by: <span style={{ color: '#6B7280' }}>{templateCategories[template.category] || 'Professional'}</span></div>
@@ -4525,12 +4408,12 @@ HR Department
                                 }}
                                 style={{
                                     width: '100%',
-                                    padding: '10px',
+                                    padding: '6px',
                                     backgroundColor: '#F97316',
                                     color: 'white',
                                     border: 'none',
-                                    borderRadius: '6px',
-                                    fontSize: '13px',
+                                    borderRadius: '5px',
+                                    fontSize: '11px',
                                     fontWeight: '600',
                                     cursor: 'pointer',
                                     transition: 'all 0.2s ease'
