@@ -10,7 +10,8 @@ import {
     Bold, Italic, Underline, Palette, List, ListOrdered,
     Maximize, Grid, Moon, Sun, Printer, FolderOpen, FilePlus,
     MessageSquare, Share2, Crown, Plus, Minus,
-    Mail, Link2, Info, FileCheck, History, CheckCircle, Star, Shield, Building
+    Mail, Link2, Info, FileCheck, History, CheckCircle, Star, Shield, Building,
+    Clock, HelpCircle, Play, Database, Maximize2
 } from 'lucide-react';
 import { api } from '../utils/api';
 import '../styles/DocumentTemplateEditor.css';
@@ -19,6 +20,8 @@ const DocumentTemplateEditor = () => {
     const { templateId } = useParams();
     const navigate = useNavigate();
     const canvasRef = useRef(null);
+    const isRestoringFromHistory = useRef(false);
+    const historyRef = useRef({ history: [], index: -1 });
 
     // State management
     const [template, setTemplate] = useState(null);
@@ -71,6 +74,8 @@ const DocumentTemplateEditor = () => {
     const [showInsertMenu, setShowInsertMenu] = useState(false);
     const [showViewMenu, setShowViewMenu] = useState(false);
     const [showFormatMenu, setShowFormatMenu] = useState(false);
+    const [showInviteDropdown, setShowInviteDropdown] = useState(false);
+    const [showReviewDropdown, setShowReviewDropdown] = useState(false);
     
     // Feature modals
     const [showInviteModal, setShowInviteModal] = useState(false);
@@ -84,6 +89,19 @@ const DocumentTemplateEditor = () => {
     const [showReviewModal, setShowReviewModal] = useState(false);
     const [showUpgradeModal, setShowUpgradeModal] = useState(false);
     const [showLetterGenModal, setShowLetterGenModal] = useState(false);
+    const [showInsertVideoModal, setShowInsertVideoModal] = useState(false);
+    const [showPricingTableModal, setShowPricingTableModal] = useState(false);
+    const [showQuoteBuilderModal, setShowQuoteBuilderModal] = useState(false);
+    const [showTOCModal, setShowTOCModal] = useState(false);
+    
+    // Table insertion states
+    const [tableRows, setTableRows] = useState(3);
+    const [tableColumns, setTableColumns] = useState(3);
+    
+    // Invitation states
+    const [inviteEmail, setInviteEmail] = useState('');
+    const [inviteAccessLevel, setInviteAccessLevel] = useState('viewer');
+    const [isSendingInvite, setIsSendingInvite] = useState(false);
     
     // Clipboard and formatting states
     const [clipboard, setClipboard] = useState(null);
@@ -183,6 +201,57 @@ const DocumentTemplateEditor = () => {
         }
     };
 
+    // Initialize history with empty state on mount
+    useEffect(() => {
+        if (historyRef.current.history.length === 0) {
+            const initialState = JSON.parse(JSON.stringify(elements));
+            historyRef.current = { history: [initialState], index: 0 };
+            setHistory([initialState]);
+            setHistoryIndex(0);
+            console.log('History initialized with empty state');
+        }
+    }, []);
+
+    // Track element changes in history (for undo/redo)
+    useEffect(() => {
+        // Skip if restoring from history
+        if (isRestoringFromHistory.current) {
+            isRestoringFromHistory.current = false;
+            return;
+        }
+        
+        const currentHistory = historyRef.current.history;
+        const currentIndex = historyRef.current.index;
+        
+        // Check if this is a duplicate of the last history entry
+        if (currentHistory.length > 0 && currentIndex >= 0) {
+            const lastEntry = currentHistory[currentIndex];
+            if (JSON.stringify(lastEntry) === JSON.stringify(elements)) {
+                return; // Skip duplicate
+            }
+        }
+        
+        // Create a new history entry, discarding any "future" history after current index
+        const newHistory = currentHistory.slice(0, currentIndex + 1);
+        newHistory.push(JSON.parse(JSON.stringify(elements)));
+        
+        // Limit history to 50 entries
+        if (newHistory.length > 50) {
+            newHistory.shift();
+        }
+        
+        const newIndex = newHistory.length - 1;
+        
+        // Update ref (source of truth)
+        historyRef.current = { history: newHistory, index: newIndex };
+        
+        // Update state for UI (button disabled states)
+        setHistory(newHistory);
+        setHistoryIndex(newIndex);
+        
+        console.log('History updated:', { length: newHistory.length, index: newIndex });
+    }, [elements]);
+
     // Drag and drop field from sidebar
     const handleFieldDragStart = (field) => {
         setDraggedField(field);
@@ -253,12 +322,6 @@ const DocumentTemplateEditor = () => {
 
         setElements([...elements, newElement]);
         setDraggedField(null);
-        
-        // Add to history
-        const newHistory = history.slice(0, historyIndex + 1);
-        newHistory.push([...elements, newElement]);
-        setHistory(newHistory);
-        setHistoryIndex(newHistory.length - 1);
     };
 
     const handleCanvasDragOver = (e) => {
@@ -661,7 +724,15 @@ const DocumentTemplateEditor = () => {
     // Listen for Delete key
     useEffect(() => {
         const handleKeyDown = (e) => {
-            if ((e.key === 'Delete' || e.key === 'Backspace') && selectedElement && !showSignatureModal) {
+            // Don't delete element if user is typing in an input/textarea
+            const activeElement = document.activeElement;
+            const isTyping = activeElement && (
+                activeElement.tagName === 'INPUT' || 
+                activeElement.tagName === 'TEXTAREA' ||
+                activeElement.isContentEditable
+            );
+            
+            if ((e.key === 'Delete' || e.key === 'Backspace') && selectedElement && !showSignatureModal && !isTyping) {
                 e.preventDefault();
                 handleDeleteElement();
             }
@@ -670,6 +741,23 @@ const DocumentTemplateEditor = () => {
         window.addEventListener('keydown', handleKeyDown);
         return () => window.removeEventListener('keydown', handleKeyDown);
     }, [selectedElement, showSignatureModal]);
+    
+    // Close dropdowns when clicking outside
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            if (showInviteDropdown || showReviewDropdown) {
+                const target = event.target;
+                const isDropdown = target.closest('.action-dropdown-wrapper');
+                if (!isDropdown) {
+                    setShowInviteDropdown(false);
+                    setShowReviewDropdown(false);
+                }
+            }
+        };
+        
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => document.removeEventListener('mousedown', handleClickOutside);
+    }, [showInviteDropdown, showReviewDropdown]);
     
     // Toggle show more/less fields
     const toggleShowAllFields = () => {
@@ -686,6 +774,8 @@ const DocumentTemplateEditor = () => {
         setShowInsertMenu(false);
         setShowViewMenu(false);
         setShowFormatMenu(false);
+        setShowInviteDropdown(false);
+        setShowReviewDropdown(false);
     };
     
     // Toggle menu
@@ -723,6 +813,7 @@ const DocumentTemplateEditor = () => {
             setElements([]);
             setHistory([]);
             setHistoryIndex(-1);
+            historyRef.current = { history: [], index: -1 };
             closeAllMenus();
         }
     };
@@ -791,17 +882,55 @@ const DocumentTemplateEditor = () => {
     
     // EDIT MENU HANDLERS
     const handleUndo = () => {
-        if (historyIndex > 0) {
-            setHistoryIndex(historyIndex - 1);
-            setElements(history[historyIndex - 1]);
+        const currentIndex = historyRef.current.index;
+        const currentHistory = historyRef.current.history;
+        
+        console.log('Undo clicked:', { currentIndex, historyLength: currentHistory.length });
+        
+        if (currentIndex > 0) {
+            const newIndex = currentIndex - 1;
+            const restoredElements = JSON.parse(JSON.stringify(currentHistory[newIndex]));
+            
+            console.log('Undoing to index:', newIndex, 'Elements:', restoredElements.length);
+            
+            // Update ref first
+            historyRef.current.index = newIndex;
+            
+            // Set flag to prevent useEffect from adding to history
+            isRestoringFromHistory.current = true;
+            
+            // Restore elements
+            setElements(restoredElements);
+            setHistoryIndex(newIndex);
+        } else {
+            console.log('Cannot undo - at beginning of history');
         }
         closeAllMenus();
     };
     
     const handleRedo = () => {
-        if (historyIndex < history.length - 1) {
-            setHistoryIndex(historyIndex + 1);
-            setElements(history[historyIndex + 1]);
+        const currentIndex = historyRef.current.index;
+        const currentHistory = historyRef.current.history;
+        
+        console.log('Redo clicked:', { currentIndex, historyLength: currentHistory.length });
+        
+        if (currentIndex < currentHistory.length - 1) {
+            const newIndex = currentIndex + 1;
+            const restoredElements = JSON.parse(JSON.stringify(currentHistory[newIndex]));
+            
+            console.log('Redoing to index:', newIndex, 'Elements:', restoredElements.length);
+            
+            // Update ref first
+            historyRef.current.index = newIndex;
+            
+            // Set flag to prevent useEffect from adding to history
+            isRestoringFromHistory.current = true;
+            
+            // Restore elements
+            setElements(restoredElements);
+            setHistoryIndex(newIndex);
+        } else {
+            console.log('Cannot redo - at end of history');
         }
         closeAllMenus();
     };
@@ -980,6 +1109,284 @@ const DocumentTemplateEditor = () => {
         closeAllMenus();
     };
     
+    // NEW HANDLERS FOR ENHANCED FILE MENU
+    const handleRename = () => {
+        setIsEditingName(true);
+        closeAllMenus();
+    };
+    
+    const handleConvertToTemplate = async () => {
+        try {
+            const documentId = templateId; // Using templateId as documentId
+            const response = await api.post(`/documents/${documentId}/convert-to-template`);
+            if (response.success) {
+                alert(`✅ ${response.message}`);
+                // Optionally navigate to templates page
+                // navigate('/templates');
+            }
+        } catch (error) {
+            console.error('Error converting to template:', error);
+            alert('❌ Failed to convert document to template');
+        }
+        closeAllMenus();
+    };
+    
+    const handleMakeCopy = async () => {
+        try {
+            const documentId = templateId; // Using templateId as documentId
+            const response = await api.post(`/documents/${documentId}/copy`);
+            if (response.success) {
+                alert(`✅ ${response.message}`);
+                // Optionally navigate to the new document
+                // navigate(`/document-editor/${response.document._id}`);
+            }
+        } catch (error) {
+            console.error('Error copying document:', error);
+            alert('❌ Failed to copy document');
+        }
+        closeAllMenus();
+    };
+    
+    const handleWorkflowSetup = () => {
+        alert('Workflow setup - Premium feature!');
+        closeAllMenus();
+    };
+    
+    const handleESignature = () => {
+        alert('E-signature and verification');
+        closeAllMenus();
+    };
+    
+    const handleRecipients = () => {
+        alert('Manage recipients');
+        closeAllMenus();
+    };
+    
+    const handleDocumentSettings = () => {
+        alert('Document settings');
+        closeAllMenus();
+    };
+    
+    const handleMove = () => {
+        alert('Move document to folder');
+        closeAllMenus();
+    };
+    
+    const handleArchive = async () => {
+        if (window.confirm('Archive this document?')) {
+            try {
+                const documentId = templateId; // Using templateId as documentId
+                const response = await api.put(`/documents/${documentId}/archive`);
+                if (response.success) {
+                    alert(`✅ ${response.message}`);
+                    // Navigate back to documents list
+                    navigate('/documents');
+                }
+            } catch (error) {
+                console.error('Error archiving document:', error);
+                alert('❌ Failed to archive document');
+            }
+        }
+        closeAllMenus();
+    };
+    
+    const handleDownload = (format) => {
+        alert(`Downloading as ${format}...`);
+        closeAllMenus();
+    };
+    
+    // NEW HANDLERS FOR ENHANCED INSERT MENU
+    const handleInsertDocument = () => {
+        alert('Insert document');
+        closeAllMenus();
+    };
+    
+    const handleInsertCoverPage = () => {
+        const newElement = {
+            id: Date.now(),
+            type: 'cover-page',
+            name: 'Cover Page',
+            x: 50,
+            y: 50,
+            width: 700,
+            height: 900,
+            page: 1,
+            value: {
+                title: documentName,
+                subtitle: 'Document Subtitle',
+                author: userInfo.name,
+                date: new Date().toLocaleDateString()
+            },
+            completed: false
+        };
+        setElements([...elements, newElement]);
+        alert('✅ Cover page added!');
+        closeAllMenus();
+    };
+    
+    const handleInsertBlankPage = () => {
+        setTotalPages(totalPages + 1);
+        alert('Blank page added!');
+        closeAllMenus();
+    };
+    
+    const handleInsertAttachment = () => {
+        alert('Insert attachment - Premium feature!');
+        closeAllMenus();
+    };
+    
+    const handleAddFrom = () => {
+        alert('Add from library');
+        closeAllMenus();
+    };
+    
+    const handleFillableFields = () => {
+        alert('Fillable fields');
+        closeAllMenus();
+    };
+    
+    const handleInsertVideo = () => {
+        setShowInsertVideoModal(true);
+        closeAllMenus();
+    };
+    
+    const handleInsertPricingTable = () => {
+        setShowPricingTableModal(true);
+        closeAllMenus();
+    };
+    
+    const handleInsertQuoteBuilder = () => {
+        setShowQuoteBuilderModal(true);
+        closeAllMenus();
+    };
+    
+    const handleInsertTOC = () => {
+        setShowTOCModal(true);
+        closeAllMenus();
+    };
+    
+    const handleInsertPageBreak = () => {
+        const newElement = {
+            id: Date.now(),
+            type: 'page-break',
+            name: 'Page Break',
+            x: 50,
+            y: 100,
+            width: 700,
+            height: 2,
+            page: currentPage,
+            value: null,
+            completed: true
+        };
+        setElements([...elements, newElement]);
+        setTotalPages(totalPages + 1);
+        alert('✅ Page break inserted');
+        closeAllMenus();
+    };
+    
+    // NEW HANDLERS FOR ENHANCED VIEW MENU
+    const handleAllVariables = () => {
+        alert('Show all variables');
+        closeAllMenus();
+    };
+    
+    const handleContentLibrary = () => {
+        alert('Content library - Premium feature!');
+        closeAllMenus();
+    };
+    
+    const handlePagesPreview = () => {
+        alert('Pages preview');
+        closeAllMenus();
+    };
+    
+    const handleResolvedComments = () => {
+        alert('Resolved comments/suggestions');
+        closeAllMenus();
+    };
+    
+    const handleReviewData = () => {
+        alert('Review data');
+        closeAllMenus();
+    };
+    
+    const handleFullScreenPreview = () => {
+        handleToggleFullScreen();
+    };
+    
+    // NEW HANDLERS FOR ENHANCED FORMAT MENU
+    const handleStyleMenu = () => {
+        alert('Style menu');
+        closeAllMenus();
+    };
+    
+    const handleFontMenu = () => {
+        alert('Font selection');
+        closeAllMenus();
+    };
+    
+    const handleTextSizeMenu = () => {
+        alert('Text size selection');
+        closeAllMenus();
+    };
+    
+    const handleFormattingMenu = () => {
+        alert('Formatting options');
+        closeAllMenus();
+    };
+    
+    const handleAlignTextMenu = () => {
+        alert('Align text options');
+        closeAllMenus();
+    };
+    
+    const handleBulletsMenu = () => {
+        alert('Bullets and numbering');
+        closeAllMenus();
+    };
+    
+    const handleIndentMenu = () => {
+        alert('Indent options');
+        closeAllMenus();
+    };
+    
+    const handleLineSpacingMenu = () => {
+        alert('Line spacing');
+        closeAllMenus();
+    };
+    
+    const handleBorderStyles = () => {
+        alert('Border styles');
+        closeAllMenus();
+    };
+    
+    const handleInsertLinkFormat = () => {
+        setShowInsertLinkModal(true);
+        closeAllMenus();
+    };
+    
+    const handleClearFormatting = () => {
+        setIsBold(false);
+        setIsItalic(false);
+        setIsUnderline(false);
+        setFontFamily('Arial');
+        setFontSize(14);
+        setTextColor('#000000');
+        setTextAlign('left');
+        alert('Formatting cleared!');
+        closeAllMenus();
+    };
+    
+    const handleTheme = () => {
+        alert('Theme options');
+        closeAllMenus();
+    };
+    
+    const handleLayoutSetup = () => {
+        alert('Layout setup');
+        closeAllMenus();
+    };
+    
     // COLLABORATION HANDLERS
     const handleInvite = () => {
         setShowInviteModal(true);
@@ -1003,43 +1410,51 @@ const DocumentTemplateEditor = () => {
         const handleKeyboardShortcuts = (e) => {
             if (showSignatureModal || showInviteModal || showReviewModal) return;
             
+            // Check if user is typing in an input/textarea
+            const activeElement = document.activeElement;
+            const isTyping = activeElement && (
+                activeElement.tagName === 'INPUT' || 
+                activeElement.tagName === 'TEXTAREA' ||
+                activeElement.isContentEditable
+            );
+            
             // Ctrl/Cmd + Z = Undo
-            if ((e.ctrlKey || e.metaKey) && e.key === 'z' && !e.shiftKey) {
+            if ((e.ctrlKey || e.metaKey) && e.key === 'z' && !e.shiftKey && !isTyping) {
                 e.preventDefault();
                 handleUndo();
             }
             // Ctrl/Cmd + Y or Ctrl/Cmd + Shift + Z = Redo
-            if ((e.ctrlKey || e.metaKey) && (e.key === 'y' || (e.key === 'z' && e.shiftKey))) {
+            if ((e.ctrlKey || e.metaKey) && (e.key === 'y' || (e.key === 'z' && e.shiftKey)) && !isTyping) {
                 e.preventDefault();
                 handleRedo();
             }
-            // Ctrl/Cmd + X = Cut
-            if ((e.ctrlKey || e.metaKey) && e.key === 'x') {
+            // Ctrl/Cmd + X = Cut (only for elements, not text in inputs)
+            if ((e.ctrlKey || e.metaKey) && e.key === 'x' && !isTyping) {
                 e.preventDefault();
                 handleCut();
             }
-            // Ctrl/Cmd + C = Copy
-            if ((e.ctrlKey || e.metaKey) && e.key === 'c') {
+            // Ctrl/Cmd + C = Copy (only for elements, not text in inputs)
+            if ((e.ctrlKey || e.metaKey) && e.key === 'c' && !isTyping) {
                 e.preventDefault();
                 handleCopy();
             }
-            // Ctrl/Cmd + V = Paste
-            if ((e.ctrlKey || e.metaKey) && e.key === 'v') {
+            // Ctrl/Cmd + V = Paste (only for elements, not text in inputs)
+            if ((e.ctrlKey || e.metaKey) && e.key === 'v' && !isTyping) {
                 e.preventDefault();
                 handlePaste();
             }
-            // Ctrl/Cmd + S = Save
+            // Ctrl/Cmd + S = Save (always works)
             if ((e.ctrlKey || e.metaKey) && e.key === 's') {
                 e.preventDefault();
                 handleSaveDocument();
             }
-            // Ctrl/Cmd + F = Find
-            if ((e.ctrlKey || e.metaKey) && e.key === 'f') {
+            // Ctrl/Cmd + F = Find (only when not typing)
+            if ((e.ctrlKey || e.metaKey) && e.key === 'f' && !isTyping) {
                 e.preventDefault();
                 handleFindReplace();
             }
-            // Ctrl/Cmd + A = Select All
-            if ((e.ctrlKey || e.metaKey) && e.key === 'a') {
+            // Ctrl/Cmd + A = Select All (only for elements, not text in inputs)
+            if ((e.ctrlKey || e.metaKey) && e.key === 'a' && !isTyping) {
                 e.preventDefault();
                 handleSelectAll();
             }
@@ -1047,7 +1462,7 @@ const DocumentTemplateEditor = () => {
         
         window.addEventListener('keydown', handleKeyboardShortcuts);
         return () => window.removeEventListener('keydown', handleKeyboardShortcuts);
-    }, [elements, selectedElement, clipboard, showSignatureModal]);
+    }, [elements, selectedElement, clipboard, showSignatureModal, history, historyIndex]);
 
     // Toggle show more/less fields (duplicate removed)
 
@@ -1066,6 +1481,22 @@ const DocumentTemplateEditor = () => {
     
     // Render interactive field content
     const renderFieldContent = (element) => {
+        // Special handling for images - always show if they have a value
+        if (element.type === 'image' && element.value) {
+            return (
+                <img 
+                    src={element.value} 
+                    alt="Inserted image"
+                    style={{ 
+                        width: '100%', 
+                        height: '100%', 
+                        objectFit: 'contain',
+                        pointerEvents: 'none'
+                    }}
+                />
+            );
+        }
+        
         if (element.completed && element.value) {
             switch (element.type) {
                 case 'signature':
@@ -1119,9 +1550,478 @@ const DocumentTemplateEditor = () => {
                     return <input type="date" value={element.value} onChange={(e) => handleElementValueChange(element.id, e.target.value)} className="field-input" onClick={(e) => e.stopPropagation()} />;
                 case 'checkbox':
                     return <input type="checkbox" checked={element.value} onChange={(e) => handleElementValueChange(element.id, e.target.checked)} onClick={(e) => e.stopPropagation()} />;
+                case 'textbox':
+                    return (
+                        <textarea
+                            value={element.value}
+                            onChange={(e) => handleElementValueChange(element.id, e.target.value)}
+                            className="field-input textbox-input"
+                            onClick={(e) => e.stopPropagation()}
+                            style={{
+                                width: '100%',
+                                height: '100%',
+                                resize: 'none',
+                                border: 'none',
+                                padding: '8px',
+                                fontFamily: 'inherit',
+                                fontSize: '14px',
+                                outline: 'none'
+                            }}
+                        />
+                    );
+                case 'image':
+                    return (
+                        <img 
+                            src={element.value} 
+                            alt="Inserted image"
+                            style={{ 
+                                width: '100%', 
+                                height: '100%', 
+                                objectFit: 'contain',
+                                pointerEvents: 'none'
+                            }}
+                        />
+                    );
+                case 'table':
+                    if (element.value && element.value.data) {
+                        return (
+                            <div style={{ 
+                                width: '100%', 
+                                height: '100%', 
+                                overflow: 'auto',
+                                pointerEvents: 'auto'
+                            }}>
+                                <table style={{ 
+                                    width: '100%', 
+                                    borderCollapse: 'collapse',
+                                    fontSize: '12px'
+                                }}>
+                                    <tbody>
+                                        {element.value.data.map((row, rowIndex) => (
+                                            <tr key={rowIndex}>
+                                                {row.map((cell, colIndex) => (
+                                                    <td 
+                                                        key={colIndex}
+                                                        style={{
+                                                            border: '1px solid #cbd5e1',
+                                                            padding: '6px',
+                                                            minWidth: '60px'
+                                                        }}
+                                                    >
+                                                        <input
+                                                            type="text"
+                                                            value={cell}
+                                                            data-row={rowIndex}
+                                                            data-col={colIndex}
+                                                            data-element-id={element.id}
+                                                            onChange={(e) => {
+                                                                const newData = element.value.data.map((r, ri) =>
+                                                                    ri === rowIndex
+                                                                        ? r.map((c, ci) => ci === colIndex ? e.target.value : c)
+                                                                        : r
+                                                                );
+                                                                handleElementValueChange(element.id, {
+                                                                    ...element.value,
+                                                                    data: newData
+                                                                });
+                                                            }}
+                                                            onKeyDown={(e) => {
+                                                                const maxRow = element.value.data.length - 1;
+                                                                const maxCol = element.value.data[0].length - 1;
+                                                                let targetRow = rowIndex;
+                                                                let targetCol = colIndex;
+                                                                
+                                                                if (e.key === 'ArrowRight' && colIndex < maxCol) {
+                                                                    targetCol = colIndex + 1;
+                                                                    e.preventDefault();
+                                                                } else if (e.key === 'ArrowLeft' && colIndex > 0) {
+                                                                    targetCol = colIndex - 1;
+                                                                    e.preventDefault();
+                                                                } else if (e.key === 'ArrowDown' && rowIndex < maxRow) {
+                                                                    targetRow = rowIndex + 1;
+                                                                    e.preventDefault();
+                                                                } else if (e.key === 'ArrowUp' && rowIndex > 0) {
+                                                                    targetRow = rowIndex - 1;
+                                                                    e.preventDefault();
+                                                                } else if (e.key === 'Tab') {
+                                                                    e.preventDefault();
+                                                                    if (e.shiftKey) {
+                                                                        // Tab backwards
+                                                                        if (colIndex > 0) {
+                                                                            targetCol = colIndex - 1;
+                                                                        } else if (rowIndex > 0) {
+                                                                            targetRow = rowIndex - 1;
+                                                                            targetCol = maxCol;
+                                                                        }
+                                                                    } else {
+                                                                        // Tab forwards
+                                                                        if (colIndex < maxCol) {
+                                                                            targetCol = colIndex + 1;
+                                                                        } else if (rowIndex < maxRow) {
+                                                                            targetRow = rowIndex + 1;
+                                                                            targetCol = 0;
+                                                                        }
+                                                                    }
+                                                                }
+                                                                
+                                                                if (targetRow !== rowIndex || targetCol !== colIndex) {
+                                                                    const targetInput = document.querySelector(
+                                                                        `input[data-element-id="${element.id}"][data-row="${targetRow}"][data-col="${targetCol}"]`
+                                                                    );
+                                                                    if (targetInput) {
+                                                                        targetInput.focus();
+                                                                        targetInput.select();
+                                                                    }
+                                                                }
+                                                            }}
+                                                            onClick={(e) => e.stopPropagation()}
+                                                            style={{
+                                                                width: '100%',
+                                                                border: 'none',
+                                                                background: 'transparent',
+                                                                outline: 'none',
+                                                                fontSize: '12px',
+                                                                padding: '2px'
+                                                            }}
+                                                        />
+                                                    </td>
+                                                ))}
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            </div>
+                        );
+                    }
+                    return <div className="element-content">{element.name}</div>;
+                case 'video':
+                    if (element.value) {
+                        // Convert YouTube/Vimeo URLs to embed format
+                        let embedUrl = element.value;
+                        if (element.value.includes('youtube.com/watch?v=')) {
+                            const videoId = element.value.split('v=')[1]?.split('&')[0];
+                            embedUrl = `https://www.youtube.com/embed/${videoId}`;
+                        }  else if (element.value.includes('youtu.be/')) {
+                            const videoId = element.value.split('youtu.be/')[1]?.split('?')[0];
+                            embedUrl = `https://www.youtube.com/embed/${videoId}`;
+                        } else if (element.value.includes('vimeo.com/')) {
+                            const videoId = element.value.split('vimeo.com/')[1]?.split('?')[0];
+                            embedUrl = `https://player.vimeo.com/video/${videoId}`;
+                        }
+                        return (
+                            <iframe
+                                src={embedUrl}
+                                style={{
+                                    width: '100%',
+                                    height: '100%',
+                                    border: 'none',
+                                    borderRadius: '4px'
+                                }}
+                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                allowFullScreen
+                            />
+                        );
+                    }
+                    return <div className="element-content" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}><Play size={32} /></div>;
+                case 'pricing-table':
+                    if (element.value && element.value.plans) {
+                        return (
+                            <div style={{ 
+                                width: '100%', 
+                                height: '100%', 
+                                display: 'flex', 
+                                gap: '10px',
+                                padding: '10px',
+                                overflow: 'auto'
+                            }}>
+                                {element.value.plans.map((plan, index) => (
+                                    <div key={index} style={{
+                                        flex: 1,
+                                        border: '2px solid #e2e8f0',
+                                        borderRadius: '8px',
+                                        padding: '15px',
+                                        background: 'white',
+                                        textAlign: 'center'
+                                    }}>
+                                        <h3 style={{ fontSize: '18px', marginBottom: '10px', color: '#1e293b' }}>{plan.name}</h3>
+                                        <div style={{ fontSize: '24px', fontWeight: 'bold', marginBottom: '15px', color: '#F97316' }}>{plan.price}</div>
+                                        <ul style={{ listStyle: 'none', padding: 0, fontSize: '12px' }}>
+                                            {plan.features.map((feature, fi) => (
+                                                <li key={fi} style={{ padding: '5px 0', color: '#64748b' }}>✓ {feature}</li>
+                                            ))}
+                                        </ul>
+                                    </div>
+                                ))}
+                            </div>
+                        );
+                    }
+                    return <div className="element-content">Pricing Table</div>;
+                case 'quote-builder':
+                    if (element.value && element.value.items) {
+                        return (
+                            <div style={{ 
+                                width: '100%', 
+                                height: '100%', 
+                                padding: '15px',
+                                overflow: 'auto',
+                                background: 'white'
+                            }}>
+                                <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '12px' }}>
+                                    <thead>
+                                        <tr style={{ background: '#f8fafc', borderBottom: '2px solid #e2e8f0' }}>
+                                            <th style={{ padding: '8px', textAlign: 'left' }}>Description</th>
+                                            <th style={{ padding: '8px', textAlign: 'center' }}>Qty</th>
+                                            <th style={{ padding: '8px', textAlign: 'right' }}>Rate</th>
+                                            <th style={{ padding: '8px', textAlign: 'right' }}>Amount</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {element.value.items.map((item, index) => (
+                                            <tr key={index} style={{ borderBottom: '1px solid #f1f5f9' }}>
+                                                <td style={{ padding: '8px' }}>{item.description}</td>
+                                                <td style={{ padding: '8px', textAlign: 'center' }}>{item.quantity}</td>
+                                                <td style={{ padding: '8px', textAlign: 'right' }}>${item.rate}</td>
+                                                <td style={{ padding: '8px', textAlign: 'right' }}>${item.amount}</td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                    <tfoot>
+                                        <tr style={{ borderTop: '2px solid #e2e8f0' }}>
+                                            <td colSpan="3" style={{ padding: '8px', textAlign: 'right', fontWeight: 'bold' }}>Subtotal:</td>
+                                            <td style={{ padding: '8px', textAlign: 'right' }}>${element.value.subtotal}</td>
+                                        </tr>
+                                        <tr>
+                                            <td colSpan="3" style={{ padding: '8px', textAlign: 'right', fontWeight: 'bold' }}>Tax:</td>
+                                            <td style={{ padding: '8px', textAlign: 'right' }}>${element.value.tax}</td>
+                                        </tr>
+                                        <tr style={{ background: '#f8fafc', fontWeight: 'bold', fontSize: '14px' }}>
+                                            <td colSpan="3" style={{ padding: '8px', textAlign: 'right' }}>Total:</td>
+                                            <td style={{ padding: '8px', textAlign: 'right', color: '#F97316' }}>${element.value.total}</td>
+                                        </tr>
+                                    </tfoot>
+                                </table>
+                            </div>
+                        );
+                    }
+                    return <div className="element-content">Quote Builder</div>;
+                case 'toc':
+                    if (element.value && element.value.sections) {
+                        return (
+                            <div style={{ 
+                                width: '100%', 
+                                height: '100%', 
+                                padding: '15px',
+                                overflow: 'auto',
+                                background: 'white'
+                            }}>
+                                <h2 style={{ fontSize: '18px', marginBottom: '15px', color: '#1e293b' }}>Table of Contents</h2>
+                                <ul style={{ listStyle: 'none', padding: 0 }}>
+                                    {element.value.sections.map((section, index) => (
+                                        <li key={index} style={{ 
+                                            padding: '8px 0', 
+                                            borderBottom: '1px dotted #e2e8f0',
+                                            display: 'flex',
+                                            justifyContent: 'space-between',
+                                            fontSize: '13px'
+                                        }}>
+                                            <span>{section.title}</span>
+                                            <span style={{ color: '#64748b' }}>{section.page}</span>
+                                        </li>
+                                    ))}
+                                </ul>
+                            </div>
+                        );
+                    }
+                    return <div className="element-content">Table of Contents</div>;
+                case 'cover-page':
+                    if (element.value) {
+                        return (
+                            <div style={{ 
+                                width: '100%', 
+                                height: '100%', 
+                                display: 'flex',
+                                flexDirection: 'column',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                padding: '40px',
+                                background: 'linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)',
+                                border: '2px solid #cbd5e1',
+                                borderRadius: '8px'
+                            }}>
+                                <h1 style={{ fontSize: '32px', marginBottom: '20px', color: '#1e293b', textAlign: 'center' }}>
+                                    {element.value.title}
+                                </h1>
+                                <p style={{ fontSize: '18px', marginBottom: '15px', color: '#64748b' }}>
+                                    {element.value.subtitle}
+                                </p>
+                                <div style={{ marginTop: '30px', fontSize: '14px', color: '#94a3b8' }}>
+                                    <div>By: {element.value.author}</div>
+                                    <div>{element.value.date}</div>
+                                </div>
+                            </div>
+                        );
+                    }
+                    return <div className="element-content">Cover Page</div>;
+                case 'page-break':
+                    return (
+                        <div style={{
+                            width: '100%',
+                            height: '2px',
+                            background: '#cbd5e1',
+                            position: 'relative'
+                        }}>
+                            <span style={{
+                                position: 'absolute',
+                                left: '50%',
+                                top: '-10px',
+                                transform: 'translateX(-50%)',
+                                background: 'white',
+                                padding: '0 10px',
+                                fontSize: '10px',
+                                color: '#64748b'
+                            }}>
+                                Page Break
+                            </span>
+                        </div>
+                    );
                 default:
                     return <div className="element-content">{element.name}</div>;
             }
+        }
+        
+        // Handle textbox - always editable
+        if (element.type === 'textbox') {
+            return (
+                <textarea
+                    value={element.value || ''}
+                    onChange={(e) => handleElementValueChange(element.id, e.target.value)}
+                    className="field-input textbox-input"
+                    onClick={(e) => e.stopPropagation()}
+                    style={{
+                        width: '100%',
+                        height: '100%',
+                        resize: 'none',
+                        border: 'none',
+                        padding: '8px',
+                        fontFamily: 'inherit',
+                        fontSize: '14px',
+                        outline: 'none',
+                        background: 'transparent'
+                    }}
+                />
+            );
+        }
+        
+        // Handle table - always editable
+        if (element.type === 'table' && element.value && element.value.data) {
+            return (
+                <div style={{ 
+                    width: '100%', 
+                    height: '100%', 
+                    overflow: 'auto',
+                    pointerEvents: 'auto'
+                }}>
+                    <table style={{ 
+                        width: '100%', 
+                        borderCollapse: 'collapse',
+                        fontSize: '12px'
+                    }}>
+                        <tbody>
+                            {element.value.data.map((row, rowIndex) => (
+                                <tr key={rowIndex}>
+                                    {row.map((cell, colIndex) => (
+                                        <td 
+                                            key={colIndex}
+                                            style={{
+                                                border: '1px solid #cbd5e1',
+                                                padding: '6px',
+                                                minWidth: '60px'
+                                            }}
+                                        >
+                                            <input
+                                                type="text"
+                                                value={cell}
+                                                data-row={rowIndex}
+                                                data-col={colIndex}
+                                                data-element-id={element.id}
+                                                onChange={(e) => {
+                                                    const newData = element.value.data.map((r, ri) =>
+                                                        ri === rowIndex
+                                                            ? r.map((c, ci) => ci === colIndex ? e.target.value : c)
+                                                            : r
+                                                    );
+                                                    handleElementValueChange(element.id, {
+                                                        ...element.value,
+                                                        data: newData
+                                                    });
+                                                }}
+                                                onKeyDown={(e) => {
+                                                    const maxRow = element.value.data.length - 1;
+                                                    const maxCol = element.value.data[0].length - 1;
+                                                    let targetRow = rowIndex;
+                                                    let targetCol = colIndex;
+                                                    
+                                                    if (e.key === 'ArrowRight' && colIndex < maxCol) {
+                                                        targetCol = colIndex + 1;
+                                                        e.preventDefault();
+                                                    } else if (e.key === 'ArrowLeft' && colIndex > 0) {
+                                                        targetCol = colIndex - 1;
+                                                        e.preventDefault();
+                                                    } else if (e.key === 'ArrowDown' && rowIndex < maxRow) {
+                                                        targetRow = rowIndex + 1;
+                                                        e.preventDefault();
+                                                    } else if (e.key === 'ArrowUp' && rowIndex > 0) {
+                                                        targetRow = rowIndex - 1;
+                                                        e.preventDefault();
+                                                    } else if (e.key === 'Tab') {
+                                                        e.preventDefault();
+                                                        if (e.shiftKey) {
+                                                            // Tab backwards
+                                                            if (colIndex > 0) {
+                                                                targetCol = colIndex - 1;
+                                                            } else if (rowIndex > 0) {
+                                                                targetRow = rowIndex - 1;
+                                                                targetCol = maxCol;
+                                                            }
+                                                        } else {
+                                                            // Tab forwards
+                                                            if (colIndex < maxCol) {
+                                                                targetCol = colIndex + 1;
+                                                            } else if (rowIndex < maxRow) {
+                                                                targetRow = rowIndex + 1;
+                                                                targetCol = 0;
+                                                            }
+                                                        }
+                                                    }
+                                                    
+                                                    if (targetRow !== rowIndex || targetCol !== colIndex) {
+                                                        const targetInput = document.querySelector(
+                                                            `input[data-element-id="${element.id}"][data-row="${targetRow}"][data-col="${targetCol}"]`
+                                                        );
+                                                        if (targetInput) {
+                                                            targetInput.focus();
+                                                            targetInput.select();
+                                                        }
+                                                    }
+                                                }}
+                                                onClick={(e) => e.stopPropagation()}
+                                                style={{
+                                                    width: '100%',
+                                                    border: 'none',
+                                                    background: 'transparent',
+                                                    outline: 'none',
+                                                    fontSize: '12px',
+                                                    padding: '2px'
+                                                }}
+                                            />
+                                        </td>
+                                    ))}
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
+            );
         }
         
         // Show placeholder for empty fields - clickable for signature
@@ -1174,43 +2074,66 @@ const DocumentTemplateEditor = () => {
                         </button>
                         {showFileMenu && (
                             <div className="menu-dropdown">
+                                <button className="menu-dropdown-item" onClick={handleRename}>
+                                    <Pencil size={16} />
+                                    <span>Rename</span>
+                                </button>
+                                <div className="menu-divider"></div>
                                 <button className="menu-dropdown-item" onClick={handleNewDocument}>
                                     <FilePlus size={16} />
-                                    <span>New Document</span>
+                                    <span>Create new</span>
+                                    <ChevronDown size={14} style={{ marginLeft: 'auto', opacity: 0.5 }} />
                                 </button>
-                                <button className="menu-dropdown-item" onClick={handleOpenDocument}>
+                                <button className="menu-dropdown-item" onClick={handleConvertToTemplate}>
+                                    <FileText size={16} />
+                                    <span>Convert to Template</span>
+                                </button>
+                                <button className="menu-dropdown-item" onClick={handleMakeCopy}>
+                                    <Copy size={16} />
+                                    <span>Make a copy</span>
+                                </button>
+                                <div className="menu-divider"></div>
+                                <button className="menu-dropdown-item" onClick={handleWorkflowSetup}>
+                                    <Settings size={16} />
+                                    <span>Workflow setup</span>
+                                    <span className="try-badge">Try it out</span>
+                                </button>
+                                <button className="menu-dropdown-item" onClick={handleESignature}>
+                                    <PenTool size={16} />
+                                    <span>E-signature and verification</span>
+                                </button>
+                                <button className="menu-dropdown-item" onClick={handleRecipients}>
+                                    <Users size={16} />
+                                    <span>Recipients</span>
+                                    <ChevronDown size={14} style={{ marginLeft: 'auto', opacity: 0.5 }} />
+                                </button>
+                                <button className="menu-dropdown-item" onClick={handleDocumentSettings}>
+                                    <FileText size={16} />
+                                    <span>Document</span>
+                                    <ChevronDown size={14} style={{ marginLeft: 'auto', opacity: 0.5 }} />
+                                </button>
+                                <div className="menu-divider"></div>
+                                <button className="menu-dropdown-item" onClick={handleRename}>
+                                    <Pencil size={16} />
+                                    <span>Rename</span>
+                                </button>
+                                <button className="menu-dropdown-item" onClick={handleMove}>
                                     <FolderOpen size={16} />
-                                    <span>Open...</span>
+                                    <span>Move</span>
+                                </button>
+                                <button className="menu-dropdown-item" onClick={handleArchive}>
+                                    <Trash2 size={16} />
+                                    <span>Archive</span>
                                 </button>
                                 <div className="menu-divider"></div>
-                                <button className="menu-dropdown-item" onClick={handleSaveDocument}>
-                                    <Save size={16} />
-                                    <span>Save</span>
-                                    <kbd>Ctrl+S</kbd>
-                                </button>
-                                <button className="menu-dropdown-item" onClick={handleSaveAs}>
-                                    <Save size={16} />
-                                    <span>Save As...</span>
-                                </button>
-                                <div className="menu-divider"></div>
-                                <button className="menu-dropdown-item" onClick={() => handleExport('pdf')}>
+                                <button className="menu-dropdown-item" onClick={() => handleDownload('pdf')}>
                                     <Download size={16} />
-                                    <span>Export as PDF</span>
+                                    <span>Download</span>
+                                    <ChevronDown size={14} style={{ marginLeft: 'auto', opacity: 0.5 }} />
                                 </button>
-                                <button className="menu-dropdown-item" onClick={() => handleExport('docx')}>
-                                    <Download size={16} />
-                                    <span>Export as DOCX</span>
-                                </button>
-                                <div className="menu-divider"></div>
                                 <button className="menu-dropdown-item" onClick={handlePrint}>
                                     <Printer size={16} />
                                     <span>Print</span>
-                                    <kbd>Ctrl+P</kbd>
-                                </button>
-                                <div className="menu-divider"></div>
-                                <button className="menu-dropdown-item" onClick={handleCloseDocument}>
-                                    <X size={16} />
-                                    <span>Close</span>
                                 </button>
                             </div>
                         )}
@@ -1223,12 +2146,12 @@ const DocumentTemplateEditor = () => {
                         </button>
                         {showEditMenu && (
                             <div className="menu-dropdown">
-                                <button className="menu-dropdown-item" onClick={handleUndo}>
+                                <button className="menu-dropdown-item" onClick={handleUndo} disabled={historyIndex <= 0}>
                                     <Undo size={16} />
                                     <span>Undo</span>
                                     <kbd>Ctrl+Z</kbd>
                                 </button>
-                                <button className="menu-dropdown-item" onClick={handleRedo}>
+                                <button className="menu-dropdown-item" onClick={handleRedo} disabled={historyIndex >= history.length - 1}>
                                     <Redo size={16} />
                                     <span>Redo</span>
                                     <kbd>Ctrl+Y</kbd>
@@ -1277,35 +2200,70 @@ const DocumentTemplateEditor = () => {
                         </button>
                         {showInsertMenu && (
                             <div className="menu-dropdown">
+                                <button className="menu-dropdown-item" onClick={handleInsertDocument}>
+                                    <FileText size={16} />
+                                    <span>Insert document</span>
+                                </button>
+                                <div className="menu-divider"></div>
+                                <button className="menu-dropdown-item" onClick={handleInsertCoverPage}>
+                                    <FileText size={16} />
+                                    <span>Cover page</span>
+                                </button>
+                                <button className="menu-dropdown-item" onClick={handleInsertBlankPage}>
+                                    <FileText size={16} />
+                                    <span>Blank page</span>
+                                </button>
+                                <button className="menu-dropdown-item" onClick={handleInsertAttachment}>
+                                    <Link2 size={16} />
+                                    <span>Attachment</span>
+                                    <span className="try-badge">Try it out</span>
+                                </button>
+                                <button className="menu-dropdown-item" onClick={handleAddFrom}>
+                                    <Plus size={16} />
+                                    <span>Add from</span>
+                                    <ChevronDown size={14} style={{ marginLeft: 'auto', opacity: 0.5 }} />
+                                </button>
+                                <button className="menu-dropdown-item" onClick={handleFillableFields}>
+                                    <PenTool size={16} />
+                                    <span>Fillable fields</span>
+                                    <ChevronDown size={14} style={{ marginLeft: 'auto', opacity: 0.5 }} />
+                                </button>
+                                <div className="menu-divider"></div>
+                                <div className="menu-section-label">CONTENT</div>
+                                <button className="menu-dropdown-item" onClick={handleInsertTextBox}>
+                                    <Type size={16} />
+                                    <span>Text</span>
+                                </button>
                                 <button className="menu-dropdown-item" onClick={handleInsertImage}>
                                     <ImageIcon size={16} />
                                     <span>Image</span>
                                 </button>
-                                <button className="menu-dropdown-item" onClick={handleInsertTextBox}>
-                                    <Type size={16} />
-                                    <span>Text Box</span>
+                                <button className="menu-dropdown-item" onClick={handleInsertVideo}>
+                                    <Play size={16} />
+                                    <span>Video</span>
                                 </button>
                                 <button className="menu-dropdown-item" onClick={handleInsertTable}>
                                     <Table size={16} />
                                     <span>Table</span>
                                 </button>
-                                <button className="menu-dropdown-item" onClick={handleInsertLink}>
-                                    <Link size={16} />
-                                    <span>Hyperlink</span>
+                                <button className="menu-dropdown-item" onClick={handleInsertPricingTable}>
+                                    <CreditCard size={16} />
+                                    <span>Pricing table</span>
+                                    <span className="try-badge">Try it out</span>
+                                </button>
+                                <button className="menu-dropdown-item" onClick={handleInsertQuoteBuilder}>
+                                    <Building size={16} />
+                                    <span>Quote builder</span>
+                                    <span className="try-badge">Try it out</span>
+                                </button>
+                                <button className="menu-dropdown-item" onClick={handleInsertTOC}>
+                                    <List size={16} />
+                                    <span>Table of contents</span>
                                 </button>
                                 <div className="menu-divider"></div>
-                                <button className="menu-dropdown-item" onClick={handleInsertSignature}>
-                                    <PenTool size={16} />
-                                    <span>Signature</span>
-                                </button>
-                                <button className="menu-dropdown-item" onClick={handleInsertComment}>
-                                    <MessageSquare size={16} />
-                                    <span>Comment</span>
-                                </button>
-                                <div className="menu-divider"></div>
-                                <button className="menu-dropdown-item" onClick={handleGenerateLetterOfRec}>
-                                    <FileText size={16} />
-                                    <span>Letter of Recommendation</span>
+                                <button className="menu-dropdown-item" onClick={handleInsertPageBreak}>
+                                    <Scissors size={16} />
+                                    <span>Page break</span>
                                 </button>
                             </div>
                         )}
@@ -1318,52 +2276,31 @@ const DocumentTemplateEditor = () => {
                         </button>
                         {showViewMenu && (
                             <div className="menu-dropdown">
-                                <button className="menu-dropdown-item" onClick={handleZoomIn}>
-                                    <ZoomIn size={16} />
-                                    <span>Zoom In</span>
-                                    <kbd>+</kbd>
+                                <button className="menu-dropdown-item" onClick={handleAllVariables}>
+                                    <Database size={16} />
+                                    <span>All variables</span>
                                 </button>
-                                <button className="menu-dropdown-item" onClick={handleZoomOut}>
-                                    <ZoomOut size={16} />
-                                    <span>Zoom Out</span>
-                                    <kbd>-</kbd>
-                                </button>
-                                <button className="menu-dropdown-item" onClick={handleZoomReset}>
-                                    <Eye size={16} />
-                                    <span>Reset Zoom</span>
-                                </button>
-                                <div className="menu-divider"></div>
-                                <button className="menu-dropdown-item" onClick={handleToggleFullScreen}>
-                                    <Maximize size={16} />
-                                    <span>Full Screen</span>
-                                    <kbd>F11</kbd>
-                                </button>
-                                <div className="menu-divider"></div>
-                                <button className="menu-dropdown-item" onClick={() => handleChangeLayout('page')}>
+                                <button className="menu-dropdown-item" onClick={handleContentLibrary}>
                                     <FileText size={16} />
-                                    <span>Page Layout</span>
-                                    {pageLayout === 'page' && <Check size={14} />}
+                                    <span>Content library</span>
+                                    <span className="try-badge">Try it out</span>
                                 </button>
-                                <button className="menu-dropdown-item" onClick={() => handleChangeLayout('continuous')}>
+                                <button className="menu-dropdown-item" onClick={handlePagesPreview}>
                                     <FileText size={16} />
-                                    <span>Continuous</span>
-                                    {pageLayout === 'continuous' && <Check size={14} />}
+                                    <span>Pages preview</span>
+                                </button>
+                                <button className="menu-dropdown-item" onClick={handleResolvedComments}>
+                                    <MessageSquare size={16} />
+                                    <span>Resolved comments/suggestions</span>
+                                </button>
+                                <button className="menu-dropdown-item" onClick={handleReviewData}>
+                                    <Database size={16} />
+                                    <span>Review data</span>
                                 </button>
                                 <div className="menu-divider"></div>
-                                <button className="menu-dropdown-item" onClick={handleToggleGrid}>
-                                    <Grid size={16} />
-                                    <span>Show Grid</span>
-                                    {showGrid && <Check size={14} />}
-                                </button>
-                                <button className="menu-dropdown-item" onClick={handleToggleRuler}>
-                                    <Square size={16} />
-                                    <span>Show Ruler</span>
-                                    {showRuler && <Check size={14} />}
-                                </button>
-                                <div className="menu-divider"></div>
-                                <button className="menu-dropdown-item" onClick={handleToggleDarkMode}>
-                                    {darkMode ? <Sun size={16} /> : <Moon size={16} />}
-                                    <span>{darkMode ? 'Light Mode' : 'Dark Mode'}</span>
+                                <button className="menu-dropdown-item" onClick={handleFullScreenPreview}>
+                                    <Maximize2 size={16} />
+                                    <span>Full screen preview</span>
                                 </button>
                             </div>
                         )}
@@ -1376,64 +2313,76 @@ const DocumentTemplateEditor = () => {
                         </button>
                         {showFormatMenu && (
                             <div className="menu-dropdown">
-                                <button className="menu-dropdown-item" onClick={() => applyFormat('bold')}>
+                                <button className="menu-dropdown-item" onClick={handleStyleMenu}>
+                                    <Type size={16} />
+                                    <span>Style</span>
+                                    <span className="menu-value">Normal text</span>
+                                    <ChevronDown size={14} style={{ opacity: 0.5 }} />
+                                </button>
+                                <button className="menu-dropdown-item" onClick={handleFontMenu}>
+                                    <Type size={16} />
+                                    <span>Font</span>
+                                    <span className="menu-value">Arial</span>
+                                    <ChevronDown size={14} style={{ opacity: 0.5 }} />
+                                </button>
+                                <button className="menu-dropdown-item" onClick={handleTextSizeMenu}>
+                                    <Type size={16} />
+                                    <span>Text size</span>
+                                    <span className="menu-value">16</span>
+                                    <ChevronDown size={14} style={{ opacity: 0.5 }} />
+                                </button>
+                                <button className="menu-dropdown-item" onClick={handleFormattingMenu}>
                                     <Bold size={16} />
-                                    <span>Bold</span>
-                                    <kbd>Ctrl+B</kbd>
-                                    {isBold && <Check size={14} />}
-                                </button>
-                                <button className="menu-dropdown-item" onClick={() => applyFormat('italic')}>
-                                    <Italic size={16} />
-                                    <span>Italic</span>
-                                    <kbd>Ctrl+I</kbd>
-                                    {isItalic && <Check size={14} />}
-                                </button>
-                                <button className="menu-dropdown-item" onClick={() => applyFormat('underline')}>
-                                    <Underline size={16} />
-                                    <span>Underline</span>
-                                    <kbd>Ctrl+U</kbd>
-                                    {isUnderline && <Check size={14} />}
+                                    <span>Formatting</span>
+                                    <ChevronDown size={14} style={{ marginLeft: 'auto', opacity: 0.5 }} />
                                 </button>
                                 <div className="menu-divider"></div>
-                                <button className="menu-dropdown-item" onClick={() => applyFormat('textAlign', 'left')}>
+                                <button className="menu-dropdown-item" onClick={handleAlignTextMenu}>
                                     <AlignLeft size={16} />
-                                    <span>Align Left</span>
-                                    {textAlign === 'left' && <Check size={14} />}
+                                    <span>Align text</span>
+                                    <span className="menu-value">Align left</span>
+                                    <ChevronDown size={14} style={{ opacity: 0.5 }} />
                                 </button>
-                                <button className="menu-dropdown-item" onClick={() => applyFormat('textAlign', 'center')}>
-                                    <AlignCenter size={16} />
-                                    <span>Align Center</span>
-                                    {textAlign === 'center' && <Check size={14} />}
-                                </button>
-                                <button className="menu-dropdown-item" onClick={() => applyFormat('textAlign', 'right')}>
-                                    <AlignRight size={16} />
-                                    <span>Align Right</span>
-                                    {textAlign === 'right' && <Check size={14} />}
-                                </button>
-                                <button className="menu-dropdown-item" onClick={() => applyFormat('textAlign', 'justify')}>
-                                    <AlignJustify size={16} />
-                                    <span>Justify</span>
-                                    {textAlign === 'justify' && <Check size={14} />}
-                                </button>
-                                <div className="menu-divider"></div>
-                                <button className="menu-dropdown-item" onClick={() => applyFormat('list', 'bullet')}>
+                                <button className="menu-dropdown-item" onClick={handleBulletsMenu}>
                                     <List size={16} />
-                                    <span>Bullet List</span>
+                                    <span>Bullets and numbering</span>
+                                    <ChevronDown size={14} style={{ marginLeft: 'auto', opacity: 0.5 }} />
                                 </button>
-                                <button className="menu-dropdown-item" onClick={() => applyFormat('list', 'numbered')}>
-                                    <ListOrdered size={16} />
-                                    <span>Numbered List</span>
+                                <button className="menu-dropdown-item" onClick={handleIndentMenu}>
+                                    <AlignLeft size={16} />
+                                    <span>Indent</span>
+                                    <ChevronDown size={14} style={{ marginLeft: 'auto', opacity: 0.5 }} />
                                 </button>
                                 <div className="menu-divider"></div>
-                                <button className="menu-dropdown-item">
+                                <button className="menu-dropdown-item" onClick={handleLineSpacingMenu}>
+                                    <AlignJustify size={16} />
+                                    <span>Line spacing</span>
+                                    <span className="menu-value">1.25</span>
+                                    <ChevronDown size={14} style={{ opacity: 0.5 }} />
+                                </button>
+                                <button className="menu-dropdown-item" onClick={handleBorderStyles}>
+                                    <Square size={16} />
+                                    <span>Border styles</span>
+                                    <ChevronDown size={14} style={{ marginLeft: 'auto', opacity: 0.5 }} />
+                                </button>
+                                <div className="menu-divider"></div>
+                                <button className="menu-dropdown-item" onClick={handleInsertLinkFormat}>
+                                    <Link size={16} />
+                                    <span>Insert link</span>
+                                </button>
+                                <button className="menu-dropdown-item" onClick={handleClearFormatting}>
+                                    <X size={16} />
+                                    <span>Clear formatting</span>
+                                </button>
+                                <div className="menu-divider"></div>
+                                <button className="menu-dropdown-item" onClick={handleTheme}>
                                     <Palette size={16} />
-                                    <span>Text Color</span>
-                                     <input 
-                                        type="color" 
-                                        value={textColor}
-                                        onChange={(e) => applyFormat('textColor', e.target.value)}
-                                        className="color-input"
-                                    />
+                                    <span>Theme</span>
+                                    <ChevronDown size={14} style={{ marginLeft: 'auto', opacity: 0.5 }} />
+                                </button>
+                                <button className="menu-dropdown-item" onClick={handleLayoutSetup}>
+                                    <Settings size={16} />
+                                    <span>Layout setup</span>
                                 </button>
                             </div>
                         )}
@@ -1441,17 +2390,28 @@ const DocumentTemplateEditor = () => {
                 </div>
 
                 <div className="navbar-actions">
-                    <button className="action-btn secondary" onClick={handleInvite}>
-                        <User size={14} />
+                    <button className="action-btn trial" onClick={handleUpgrade}>
+                        <span>Start free trial</span>
+                    </button>
+                    
+                    <button 
+                        className="action-btn secondary" 
+                        onClick={() => setShowInviteModal(true)}
+                    >
+                        <Users size={16} />
                         <span>Invite</span>
                     </button>
-                    <button className="action-btn primary" onClick={handleReview}>
-                        <Send size={14} />
-                        <span>Review</span>
+                    
+                    <button 
+                        className="action-btn primary" 
+                        onClick={() => setShowReviewModal(true)}
+                    >
+                        <Send size={16} />
+                        <span>Review and send</span>
                     </button>
-                    <button className="action-btn premium" onClick={handleUpgrade}>
-                        <Crown size={14} />
-                        <span>Upgrade</span>
+                    
+                    <button className="action-btn icon-only" onClick={() => alert('Help center')}>
+                        <HelpCircle size={20} />
                     </button>
                 </div>
             </header>
@@ -1460,10 +2420,22 @@ const DocumentTemplateEditor = () => {
             <div className="editor-main">
                 {/* Left Toolbar */}
                 <aside className="left-toolbar">
-                    <button className="toolbar-btn" title="Undo" onClick={handleUndo}>
+                    <button 
+                        className="toolbar-btn" 
+                        title="Undo" 
+                        onClick={handleUndo}
+                        disabled={historyIndex <= 0}
+                        style={{ opacity: historyIndex <= 0 ? 0.5 : 1, cursor: historyIndex <= 0 ? 'not-allowed' : 'pointer' }}
+                    >
                         <Undo size={20} />
                     </button>
-                    <button className="toolbar-btn" title="Redo" onClick={handleRedo}>
+                    <button 
+                        className="toolbar-btn" 
+                        title="Redo" 
+                        onClick={handleRedo}
+                        disabled={historyIndex >= history.length - 1}
+                        style={{ opacity: historyIndex >= history.length - 1 ? 0.5 : 1, cursor: historyIndex >= history.length - 1 ? 'not-allowed' : 'pointer' }}
+                    >
                         <Redo size={20} />
                     </button>
                     <div className="toolbar-divider"></div>
@@ -1477,13 +2449,27 @@ const DocumentTemplateEditor = () => {
                         <ZoomOut size={20} />
                     </button>
                     <div className="toolbar-divider"></div>
-                    <button className="toolbar-btn" title="Text">
+                    <button className="toolbar-btn" title="Text" onClick={handleInsertTextBox}>
                         <Type size={20} />
                     </button>
-                    <button className="toolbar-btn" title="Image">
+                    <button className="toolbar-btn" title="Image" onClick={handleInsertImage}>
                         <ImageIcon size={20} />
                     </button>
-                    <button className="toolbar-btn" title="Shape">
+                    <button className="toolbar-btn" title="Shape" onClick={() => {
+                        const newElement = {
+                            id: Date.now(),
+                            type: 'shape',
+                            name: 'Shape',
+                            x: 100,
+                            y: 100,
+                            width: 100,
+                            height: 100,
+                            page: currentPage,
+                            value: 'rectangle',
+                            completed: false
+                        };
+                        setElements([...elements, newElement]);
+                    }}>
                         <Square size={20} />
                     </button>
                 </aside>
@@ -1940,13 +2926,21 @@ const DocumentTemplateEditor = () => {
                                         type="email" 
                                         placeholder="colleague@company.com, team@company.com..."
                                         className="invite-email-input"
+                                        value={inviteEmail}
+                                        onChange={(e) => setInviteEmail(e.target.value)}
                                     />
                                 </div>
                                 
                                 <label className="invite-label">Access level</label>
                                 <div className="role-options">
                                     <div className="role-option">
-                                        <input type="radio" name="role" id="viewer" defaultChecked />
+                                        <input 
+                                            type="radio" 
+                                            name="role" 
+                                            id="viewer" 
+                                            checked={inviteAccessLevel === 'viewer'}
+                                            onChange={() => setInviteAccessLevel('viewer')}
+                                        />
                                         <label htmlFor="viewer">
                                             <Eye size={16} />
                                             <div>
@@ -1956,7 +2950,13 @@ const DocumentTemplateEditor = () => {
                                         </label>
                                     </div>
                                     <div className="role-option">
-                                        <input type="radio" name="role" id="commenter" />
+                                        <input 
+                                            type="radio" 
+                                            name="role" 
+                                            id="commenter"
+                                            checked={inviteAccessLevel === 'commenter'}
+                                            onChange={() => setInviteAccessLevel('commenter')}
+                                        />
                                         <label htmlFor="commenter">
                                             <MessageSquare size={16} />
                                             <div>
@@ -1966,7 +2966,13 @@ const DocumentTemplateEditor = () => {
                                         </label>
                                     </div>
                                     <div className="role-option">
-                                        <input type="radio" name="role" id="editor" />
+                                        <input 
+                                            type="radio" 
+                                            name="role" 
+                                            id="editor"
+                                            checked={inviteAccessLevel === 'editor'}
+                                            onChange={() => setInviteAccessLevel('editor')}
+                                        />
                                         <label htmlFor="editor">
                                             <Edit3 size={16} />
                                             <div>
@@ -1977,12 +2983,36 @@ const DocumentTemplateEditor = () => {
                                     </div>
                                 </div>
 
-                                <button className="invite-send-btn" onClick={() => {
-                                    alert('Invitation sent successfully!');
-                                    setShowInviteModal(false);
-                                }}>
+                                <button 
+                                    className="invite-send-btn" 
+                                    onClick={async () => {
+                                        if (!inviteEmail.trim()) {
+                                            alert('Please enter at least one email address');
+                                            return;
+                                        }
+
+                                        setIsSendingInvite(true);
+                                        try {
+                                            const response = await api.post(`/documents/${templateId}/send-invitation`, {
+                                                recipientEmail: inviteEmail,
+                                                accessLevel: inviteAccessLevel
+                                            });
+
+                                            alert(response.message || 'Invitation sent successfully!');
+                                            setInviteEmail('');
+                                            setInviteAccessLevel('viewer');
+                                            setShowInviteModal(false);
+                                        } catch (error) {
+                                            console.error('Invitation failed:', error);
+                                            alert(error.message || 'Failed to send invitation. Please try again.');
+                                        } finally {
+                                            setIsSendingInvite(false);
+                                        }
+                                    }}
+                                    disabled={isSendingInvite}
+                                >
                                     <Send size={18} />
-                                    Send Invitation
+                                    {isSendingInvite ? 'Sending...' : 'Send Invitation'}
                                 </button>
                             </div>
 
@@ -2029,11 +3059,63 @@ const DocumentTemplateEditor = () => {
                             <div className="review-icon">
                                 <FileCheck size={28} />
                             </div>
-                            <h2>Document Review</h2>
-                            <p>Manage comments, track changes, and review history</p>
+                            <h2>Review and Send Document</h2>
+                            <p>Preview your document and send to recipients</p>
                         </div>
 
                         <div className="review-modal-body">
+                            {/* Send To Section */}
+                            <div className="send-section">
+                                <label className="send-label">
+                                    <Mail size={16} />
+                                    Send to
+                                </label>
+                                <div className="send-input-wrapper">
+                                    <input 
+                                        type="email" 
+                                        placeholder="Enter recipient email addresses..."
+                                        className="send-email-input"
+                                    />
+                                </div>
+                                
+                                <label className="send-label" style={{ marginTop: '16px' }}>
+                                    <MessageSquare size={16} />
+                                    Message (optional)
+                                </label>
+                                <textarea 
+                                    placeholder="Add a personal message..."
+                                    className="send-message-textarea"
+                                    rows="3"
+                                ></textarea>
+
+                                <div className="send-actions">
+                                    <button className="send-action-btn download" onClick={() => {
+                                        handleExport('pdf');
+                                        setShowReviewModal(false);
+                                    }}>
+                                        <Download size={18} />
+                                        Download PDF
+                                    </button>
+                                    
+                                    <button className="send-action-btn preview" onClick={() => {
+                                        window.open(`/api/documents/${templateId}/preview`, '_blank');
+                                    }}>
+                                        <Eye size={18} />
+                                        Preview
+                                    </button>
+
+                                    <button className="send-action-btn send-now" onClick={() => {
+                                        alert('✅ Document sent successfully!');
+                                        setShowReviewModal(false);
+                                    }}>
+                                        <Send size={18} />
+                                        Send Now
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div className="review-divider"></div>
+
                             <div className="review-actions-grid">
                                 <button className="review-action-card" onClick={() => {
                                     setShowCommentModal(true);
@@ -2057,7 +3139,7 @@ const DocumentTemplateEditor = () => {
                                     <p>{trackChanges ? 'Currently tracking' : 'Monitor all edits'}</p>
                                 </button>
 
-                                <button className="review-action-card">
+                                <button className="review-action-card" onClick={() => alert('View version history')}>
                                     <div className="action-card-icon history">
                                         <History size={24} />
                                     </div>
@@ -2065,7 +3147,7 @@ const DocumentTemplateEditor = () => {
                                     <p>View previous versions</p>
                                 </button>
 
-                                <button className="review-action-card">
+                                <button className="review-action-card" onClick={() => alert('✅ Document approved!')}>
                                     <div className="action-card-icon approve">
                                         <CheckCircle size={24} />
                                     </div>
@@ -2489,6 +3571,373 @@ Sincerely,
                                     <span>Click to upload image</span>
                                     <small>PNG, JPG, GIF up to 10MB</small>
                                 </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Insert Table Modal */}
+            {showInsertTableModal && (
+                <div className="modal-overlay" onClick={() => setShowInsertTableModal(false)}>
+                    <div className="feature-modal" onClick={(e) => e.stopPropagation()}>
+                        <div className="modal-header">
+                            <h2>Insert Table</h2>
+                            <button className="modal-close" onClick={() => setShowInsertTableModal(false)}>
+                                <X size={20} />
+                            </button>
+                        </div>
+                        <div className="modal-content">
+                            <div style={{ padding: '20px' }}>
+                                <div style={{ marginBottom: '20px' }}>
+                                    <label style={{ display: 'block', marginBottom: '8px', fontWeight: '500' }}>
+                                        Number of Rows
+                                    </label>
+                                    <input
+                                        type="number"
+                                        min="1"
+                                        max="20"
+                                        value={tableRows}
+                                        onChange={(e) => setTableRows(Math.max(1, Math.min(20, parseInt(e.target.value) || 1)))}
+                                        style={{
+                                            width: '100%',
+                                            padding: '8px 12px',
+                                            border: '1px solid #e2e8f0',
+                                            borderRadius: '6px',
+                                            fontSize: '14px'
+                                        }}
+                                    />
+                                </div>
+                                <div style={{ marginBottom: '20px' }}>
+                                    <label style={{ display: 'block', marginBottom: '8px', fontWeight: '500' }}>
+                                        Number of Columns
+                                    </label>
+                                    <input
+                                        type="number"
+                                        min="1"
+                                        max="10"
+                                        value={tableColumns}
+                                        onChange={(e) => setTableColumns(Math.max(1, Math.min(10, parseInt(e.target.value) || 1)))}
+                                        style={{
+                                            width: '100%',
+                                            padding: '8px 12px',
+                                            border: '1px solid #e2e8f0',
+                                            borderRadius: '6px',
+                                            fontSize: '14px'
+                                        }}
+                                    />
+                                </div>
+                                <button
+                                    onClick={() => {
+                                        const newElement = {
+                                            id: Date.now(),
+                                            type: 'table',
+                                            name: 'Table',
+                                            x: 100,
+                                            y: 100,
+                                            width: 400,
+                                            height: tableRows * 40 + 40, // Header + rows
+                                            page: currentPage,
+                                            value: {
+                                                rows: tableRows,
+                                                columns: tableColumns,
+                                                data: Array(tableRows).fill(null).map(() => 
+                                                    Array(tableColumns).fill('')
+                                                )
+                                            },
+                                            completed: false
+                                        };
+                                        setElements([...elements, newElement]);
+                                        setShowInsertTableModal(false);
+                                        setTableRows(3);
+                                        setTableColumns(3);
+                                    }}
+                                    style={{
+                                        width: '100%',
+                                        padding: '10px',
+                                        background: '#F97316',
+                                        color: 'white',
+                                        border: 'none',
+                                        borderRadius: '6px',
+                                        fontSize: '14px',
+                                        fontWeight: '500',
+                                        cursor: 'pointer',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                        gap: '8px'
+                                    }}
+                                >
+                                    <Table size={16} />
+                                    Insert Table
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Insert Video Modal */}
+            {showInsertVideoModal && (
+                <div className="modal-overlay" onClick={() => setShowInsertVideoModal(false)}>
+                    <div className="feature-modal" onClick={(e) => e.stopPropagation()}>
+                        <div className="modal-header">
+                            <h2>Insert Video</h2>
+                            <button className="modal-close" onClick={() => setShowInsertVideoModal(false)}>
+                                <X size={20} />
+                            </button>
+                        </div>
+                        <div className="modal-content">
+                            <div style={{ padding: '20px' }}>
+                                <div style={{ marginBottom: '20px' }}>
+                                    <label style={{ display: 'block', marginBottom: '8px', fontWeight: '500' }}>
+                                        Video URL (YouTube, Vimeo, etc.)
+                                    </label>
+                                    <input
+                                        type="url"
+                                        placeholder="https://www.youtube.com/watch?v=..."
+                                        id="video-url-input"
+                                        style={{
+                                            width: '100%',
+                                            padding: '8px 12px',
+                                            border: '1px solid #e2e8f0',
+                                            borderRadius: '6px',
+                                            fontSize: '14px'
+                                        }}
+                                    />
+                                </div>
+                                <button
+                                    onClick={() => {
+                                        const videoUrl = document.getElementById('video-url-input').value;
+                                        if (videoUrl) {
+                                            const newElement = {
+                                                id: Date.now(),
+                                                type: 'video',
+                                                name: 'Video',
+                                                x: 100,
+                                                y: 100,
+                                                width: 400,
+                                                height: 225,
+                                                page: currentPage,
+                                                value: videoUrl,
+                                                completed: false
+                                            };
+                                            setElements([...elements, newElement]);
+                                            setShowInsertVideoModal(false);
+                                        } else {
+                                            alert('Please enter a video URL');
+                                        }
+                                    }}
+                                    style={{
+                                        width: '100%',
+                                        padding: '10px',
+                                        background: '#F97316',
+                                        color: 'white',
+                                        border: 'none',
+                                        borderRadius: '6px',
+                                        fontSize: '14px',
+                                        fontWeight: '500',
+                                        cursor: 'pointer',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                        gap: '8px'
+                                    }}
+                                >
+                                    <Play size={16} />
+                                    Insert Video
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Pricing Table Modal */}
+            {showPricingTableModal && (
+                <div className="modal-overlay" onClick={() => setShowPricingTableModal(false)}>
+                    <div className="feature-modal" onClick={(e) => e.stopPropagation()}>
+                        <div className="modal-header">
+                            <h2>Insert Pricing Table</h2>
+                            <button className="modal-close" onClick={() => setShowPricingTableModal(false)}>
+                                <X size={20} />
+                            </button>
+                        </div>
+                        <div className="modal-content">
+                            <div style={{ padding: '20px' }}>
+                                <p style={{ marginBottom: '15px', color: '#64748b' }}>
+                                    Create a professional pricing table with multiple tiers
+                                </p>
+                                <button
+                                    onClick={() => {
+                                        const newElement = {
+                                            id: Date.now(),
+                                            type: 'pricing-table',
+                                            name: 'Pricing Table',
+                                            x: 50,
+                                            y: 100,
+                                            width: 600,
+                                            height: 400,
+                                            page: currentPage,
+                                            value: {
+                                                plans: [
+                                                    { name: 'Basic', price: '$9/mo', features: ['Feature 1', 'Feature 2', 'Feature 3'] },
+                                                    { name: 'Pro', price: '$29/mo', features: ['All Basic', 'Feature 4', 'Feature 5'] },
+                                                    { name: 'Enterprise', price: '$99/mo', features: ['All Pro', 'Feature 6', 'Priority Support'] }
+                                                ]
+                                            },
+                                            completed: false
+                                        };
+                                        setElements([...elements, newElement]);
+                                        setShowPricingTableModal(false);
+                                    }}
+                                    style={{
+                                        width: '100%',
+                                        padding: '10px',
+                                        background: '#F97316',
+                                        color: 'white',
+                                        border: 'none',
+                                        borderRadius: '6px',
+                                        fontSize: '14px',
+                                        fontWeight: '500',
+                                        cursor: 'pointer',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                        gap: '8px'
+                                    }}
+                                >
+                                    <CreditCard size={16} />
+                                    Insert Pricing Table
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Quote Builder Modal */}
+            {showQuoteBuilderModal && (
+                <div className="modal-overlay" onClick={() => setShowQuoteBuilderModal(false)}>
+                    <div className="feature-modal" onClick={(e) => e.stopPropagation()}>
+                        <div className="modal-header">
+                            <h2>Quote Builder</h2>
+                            <button className="modal-close" onClick={() => setShowQuoteBuilderModal(false)}>
+                                <X size={20} />
+                            </button>
+                        </div>
+                        <div className="modal-content">
+                            <div style={{ padding: '20px' }}>
+                                <p style={{ marginBottom: '15px', color: '#64748b' }}>
+                                    Build a professional quote with line items and totals
+                                </p>
+                                <button
+                                    onClick={() => {
+                                        const newElement = {
+                                            id: Date.now(),
+                                            type: 'quote-builder',
+                                            name: 'Quote',
+                                            x: 50,
+                                            y: 100,
+                                            width: 600,
+                                            height: 300,
+                                            page: currentPage,
+                                            value: {
+                                                items: [
+                                                    { description: 'Item 1', quantity: 1, rate: 100, amount: 100 },
+                                                    { description: 'Item 2', quantity: 2, rate: 50, amount: 100 }
+                                                ],
+                                                subtotal: 200,
+                                                tax: 20,
+                                                total: 220
+                                            },
+                                            completed: false
+                                        };
+                                        setElements([...elements, newElement]);
+                                        setShowQuoteBuilderModal(false);
+                                    }}
+                                    style={{
+                                        width: '100%',
+                                        padding: '10px',
+                                        background: '#F97316',
+                                        color: 'white',
+                                        border: 'none',
+                                        borderRadius: '6px',
+                                        fontSize: '14px',
+                                        fontWeight: '500',
+                                        cursor: 'pointer',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                        gap: '8px'
+                                    }}
+                                >
+                                    <FileText size={16} />
+                                    Insert Quote
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Table of Contents Modal */}
+            {showTOCModal && (
+                <div className="modal-overlay" onClick={() => setShowTOCModal(false)}>
+                    <div className="feature-modal" onClick={(e) => e.stopPropagation()}>
+                        <div className="modal-header">
+                            <h2>Table of Contents</h2>
+                            <button className="modal-close" onClick={() => setShowTOCModal(false)}>
+                                <X size={20} />
+                            </button>
+                        </div>
+                        <div className="modal-content">
+                            <div style={{ padding: '20px' }}>
+                                <p style={{ marginBottom: '15px', color: '#64748b' }}>
+                                    Automatically generate a table of contents from document headings
+                                </p>
+                                <button
+                                    onClick={() => {
+                                        const newElement = {
+                                            id: Date.now(),
+                                            type: 'toc',
+                                            name: 'Table of Contents',
+                                            x: 50,
+                                            y: 100,
+                                            width: 500,
+                                            height: 200,
+                                            page: currentPage,
+                                            value: {
+                                                sections: [
+                                                    { title: 'Introduction', page: 1 },
+                                                    { title: 'Main Content', page: 2 },
+                                                    { title: 'Conclusion', page: 3 }
+                                                ]
+                                            },
+                                            completed: false
+                                        };
+                                        setElements([...elements, newElement]);
+                                        setShowTOCModal(false);
+                                    }}
+                                    style={{
+                                        width: '100%',
+                                        padding: '10px',
+                                        background: '#F97316',
+                                        color: 'white',
+                                        border: 'none',
+                                        borderRadius: '6px',
+                                        fontSize: '14px',
+                                        fontWeight: '500',
+                                        cursor: 'pointer',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                        gap: '8px'
+                                    }}
+                                >
+                                    <List size={16} />
+                                    Insert Table of Contents
+                                </button>
                             </div>
                         </div>
                     </div>

@@ -277,3 +277,136 @@ exports.deleteDocument = async (req, res) => {
         res.status(500).json({ message: "Error deleting document", error: error.message });
     }
 };
+
+// Rename a document
+exports.renameDocument = async (req, res) => {
+    try {
+        const { title } = req.body;
+        if (!title || title.trim() === '') {
+            return res.status(400).json({ message: "Document title is required" });
+        }
+
+        const document = await Document.findOneAndUpdate(
+            { _id: req.params.id, userId: req.user.id },
+            { title: title.trim() },
+            { new: true, runValidators: true }
+        );
+
+        if (!document) {
+            return res.status(404).json({ message: "Document not found" });
+        }
+
+        res.json({ 
+            success: true, 
+            message: "Document renamed successfully", 
+            document 
+        });
+    } catch (error) {
+        res.status(500).json({ message: "Error renaming document", error: error.message });
+    }
+};
+
+// Make a copy of a document
+exports.copyDocument = async (req, res) => {
+    try {
+        const originalDocument = await Document.findOne({ _id: req.params.id, userId: req.user.id });
+        if (!originalDocument) {
+            return res.status(404).json({ message: "Document not found" });
+        }
+
+        // Create a copy with a new title
+        const copiedDocument = await Document.create({
+            userId: req.user.id,
+            title: `${originalDocument.title} (Copy)`,
+            type: originalDocument.type,
+            content: originalDocument.content,
+            brandKitId: originalDocument.brandKitId,
+            status: 'draft'
+        });
+
+        res.status(201).json({ 
+            success: true, 
+            message: "Document copied successfully", 
+            document: copiedDocument 
+        });
+    } catch (error) {
+        res.status(500).json({ message: "Error copying document", error: error.message });
+    }
+};
+
+// Archive a document
+exports.archiveDocument = async (req, res) => {
+    try {
+        const document = await Document.findOneAndUpdate(
+            { _id: req.params.id, userId: req.user.id },
+            { status: 'archived', archivedAt: new Date() },
+            { new: true, runValidators: true }
+        );
+
+        if (!document) {
+            return res.status(404).json({ message: "Document not found" });
+        }
+
+        res.json({ 
+            success: true, 
+            message: "Document archived successfully", 
+            document 
+        });
+    } catch (error) {
+        res.status(500).json({ message: "Error archiving document", error: error.message });
+    }
+};
+
+// Unarchive a document
+exports.unarchiveDocument = async (req, res) => {
+    try {
+        const document = await Document.findOneAndUpdate(
+            { _id: req.params.id, userId: req.user.id },
+            { status: 'draft', $unset: { archivedAt: "" } },
+            { new: true, runValidators: true }
+        );
+
+        if (!document) {
+            return res.status(404).json({ message: "Document not found" });
+        }
+
+        res.json({ 
+            success: true, 
+            message: "Document unarchived successfully", 
+            document 
+        });
+    } catch (error) {
+        res.status(500).json({ message: "Error unarchiving document", error: error.message });
+    }
+};
+
+// Convert document to template
+exports.convertToTemplate = async (req, res) => {
+    try {
+        const document = await Document.findOne({ _id: req.params.id, userId: req.user.id });
+        if (!document) {
+            return res.status(404).json({ message: "Document not found" });
+        }
+
+        const Template = require("../models/Template");
+
+        // Create a template from the document
+        const template = await Template.create({
+            userId: req.user.id,
+            name: document.title,
+            category: document.type,
+            description: `Template created from ${document.title}`,
+            preview: document.preview || null,
+            content: document.content,
+            isCustom: true
+        });
+
+        res.status(201).json({ 
+            success: true, 
+            message: "Document converted to template successfully", 
+            template 
+        });
+    } catch (error) {
+        res.status(500).json({ message: "Error converting to template", error: error.message });
+    }
+};

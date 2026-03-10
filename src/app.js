@@ -48,6 +48,7 @@ const settingsRoutes = require("./routes/settingsRoutes");
 const signatureRoutes = require("./routes/signatureRoutes");
 const workflowRoutes = require("./routes/workflowRoutes");
 const complianceRoutes = require("./routes/complianceRoutes");
+const emailRoutes = require("./routes/emailRoutes");
 
 app.use("/api/users", userRoutes);
 app.use("/api/auth", authRoutes);
@@ -70,6 +71,7 @@ app.use("/api/settings", settingsRoutes);
 app.use("/api/signatures", signatureRoutes);
 app.use("/api/workflows", workflowRoutes);
 app.use("/api/compliance", complianceRoutes);
+app.use("/api/email", emailRoutes);
 
 // Health Check API with database status
 app.get("/api/health", async (req, res) => {

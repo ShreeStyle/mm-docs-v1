@@ -65,13 +65,14 @@ const documentSchema = new mongoose.Schema({
     // Document status
     status: { 
         type: String, 
-        enum: ['draft', 'sent', 'in-progress', 'completed', 'cancelled'], 
+        enum: ['draft', 'sent', 'in-progress', 'completed', 'cancelled', 'archived'], 
         default: 'draft' 
     },
     
     // Tracking
     sentAt: Date,
     completedAt: Date,
+    archivedAt: Date,
     
 }, { timestamps: true });
 

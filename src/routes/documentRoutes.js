@@ -10,6 +10,11 @@ const {
     downloadDocument,
     downloadDocumentDocx,
     generateDocument,
+    renameDocument,
+    copyDocument,
+    archiveDocument,
+    unarchiveDocument,
+    convertToTemplate,
 } = require("../controllers/documentController");
 const {
     createShareLink,
@@ -23,6 +28,7 @@ const {
 } = require("../controllers/versionController");
 const {
     sendDocumentEmail,
+    sendInvitation,
 } = require("../controllers/emailController");
 const authMiddleware = require("../middleware/authMiddleware");
 const {
@@ -56,7 +62,15 @@ router.get("/:id/versions", getVersionHistory);
 router.get("/:id/versions/:versionNumber", getVersion);
 router.post("/:id/versions/:versionNumber/restore", restoreVersion);
 router.post("/:id/send-email", sendDocumentEmail);
+router.post("/:id/send-invitation", sendInvitation);
 router.put("/:id", updateDocument);
 router.delete("/:id", deleteDocument);
+
+// New document operations
+router.put("/:id/rename", renameDocument);
+router.post("/:id/copy", copyDocument);
+router.put("/:id/archive", archiveDocument);
+router.put("/:id/unarchive", unarchiveDocument);
+router.post("/:id/convert-to-template", convertToTemplate);
 
 module.exports = router;
