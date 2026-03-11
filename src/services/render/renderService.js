@@ -4,19 +4,19 @@ const path = require("path");
 
 // Load template function
 const loadTemplate = (templateName) => {
-    const templatePath = path.join(__dirname, "../../templates", `${templateName}.hbs`);
-    if (!fs.existsSync(templatePath)) {
-        throw new Error(`Template ${templateName} not found`);
-    }
-    const source = fs.readFileSync(templatePath, "utf8");
-    return handlebars.compile(source);
+  const templatePath = path.join(__dirname, "../../templates", `${templateName}.hbs`);
+  if (!fs.existsSync(templatePath)) {
+    throw new Error(`Template ${templateName} not found`);
+  }
+  const source = fs.readFileSync(templatePath, "utf8");
+  return handlebars.compile(source);
 };
 
 // Generate CSS variables from Brand Kit
 const generateBrandCSS = (brandKit) => {
-    if (!brandKit) {
-        // Default professional theme
-        return `
+  if (!brandKit) {
+    // Default professional theme
+    return `
         :root {
           --primary-color: #1e40af;
           --secondary-color: #64748b;
@@ -25,16 +25,16 @@ const generateBrandCSS = (brandKit) => {
           --font-secondary: 'Roboto', sans-serif;
         }
       `;
-    }
+  }
 
-    const primaryColor = brandKit.primaryColor || brandKit.colors?.[0] || "#1e40af";
-    const secondaryColor = brandKit.secondaryColor || brandKit.colors?.[1] || "#64748b";
-    const accentColor = brandKit.accentColor || brandKit.colors?.[2] || "#3b82f6";
-    const logoUrl = brandKit.logo || "";
-    const fontFamily = brandKit.fontFamily || brandKit.fonts?.primary || "Inter";
-    const fontSecondary = brandKit.fonts?.secondary || "Roboto";
+  const primaryColor = brandKit.primaryColor || brandKit.colors?.[0] || "#1e40af";
+  const secondaryColor = brandKit.secondaryColor || brandKit.colors?.[1] || "#64748b";
+  const accentColor = brandKit.accentColor || brandKit.colors?.[2] || "#3b82f6";
+  const logoUrl = brandKit.logo || "";
+  const fontFamily = brandKit.fontFamily || brandKit.fonts?.primary || "Inter";
+  const fontSecondary = brandKit.fonts?.secondary || "Roboto";
 
-    return `
+  return `
     :root {
       --primary-color: ${primaryColor};
       --secondary-color: ${secondaryColor};
@@ -133,149 +133,153 @@ const generateBrandCSS = (brandKit) => {
 
 // Map document types to professional templates
 const getTemplateForDocumentType = (documentType) => {
-    // Basic mapping for backward compatibility and clean names
-    const templateMap = {
-        'offer_letter': 'offer_letter',
-        'appointment_letter': 'appointment_letter',
-        'experience_certificate': 'experience_certificate',
-        'onboarding_letter': 'onboarding_letter',
-        'warning_letter': 'warning_letter',
-        'nda': 'nda',
-        'service_agreement': 'service_agreement',
-        'business_proposal': 'proposal',
-        'quotation': 'quotation',
-        'invoice': 'invoice',
-        'gst_invoice': 'gst_invoice',
-        'audit_report': 'audit_report',
-        'gst_filing_summary': 'gst_filing_summary',
-        'gst_filing': 'gst_filing_summary',
-        'policy_document': 'policy_document',
-        'regulatory_filing': 'regulatory_filing',
-        'proposal': 'proposal',
-        'resume': 'resume',
-        'marketing_brief': 'marketing_brief'
-    };
+  // Basic mapping for backward compatibility and clean names
+  const templateMap = {
+    'offer_letter': 'offer_letter',
+    'appointment_letter': 'appointment_letter',
+    'experience_certificate': 'experience_certificate',
+    'onboarding_letter': 'onboarding_letter',
+    'warning_letter': 'warning_letter',
+    'nda': 'nda',
+    'service_agreement': 'service_agreement',
+    'business_proposal': 'proposal',
+    'quotation': 'quotation',
+    'invoice': 'invoice',
+    'gst_invoice': 'gst_invoice',
+    'audit_report': 'audit_report',
+    'gst_filing_summary': 'gst_filing_summary',
+    'gst_filing': 'gst_filing_summary',
+    'policy_document': 'policy_document',
+    'regulatory_filing': 'regulatory_filing',
+    'proposal': 'proposal',
+    'resume': 'resume',
+    'marketing_brief': 'marketing_brief',
+    'letter_of_recommendation': 'recommendation_letter',
+    'letter-of-recommendation-001': 'recommendation_letter',
+    'email': 'email',
+    'sales_email': 'email'
+  };
 
-    // If it's in the map, use it
-    if (templateMap[documentType]) return templateMap[documentType];
+  // If it's in the map, use it
+  if (templateMap[documentType]) return templateMap[documentType];
 
-    // Handle new template IDs (e.g., service-agreement-001 -> service_agreement)
-    // Strip version/suffixes and convert hyphens to underscores
-    let sanitizedType = documentType
-        .replace(/-[0-9]+$/, '') // Remove -001, -002 etc
-        .replace(/-/g, '_');      // Convert hyphens to underscores
+  // Handle new template IDs (e.g., service-agreement-001 -> service_agreement)
+  // Strip version/suffixes and convert hyphens to underscores
+  let sanitizedType = documentType
+    .replace(/-[0-9]+$/, '') // Remove -001, -002 etc
+    .replace(/-/g, '_');      // Convert hyphens to underscores
 
-    return sanitizedType;
+  return sanitizedType;
 };
 
 // Generate brand header HTML
 const generateBrandHeader = (brandKit) => {
-    if (!brandKit) return '';
-    
-    const logoUrl = brandKit.logo ? `http://localhost:5000${brandKit.logo}` : '';
-    const brandName = brandKit.brandName || 'My Company';
-    
-    if (logoUrl) {
-        return `
+  if (!brandKit) return '';
+
+  const logoUrl = brandKit.logo ? `http://localhost:5000${brandKit.logo}` : '';
+  const brandName = brandKit.brandName || 'My Company';
+
+  if (logoUrl) {
+    return `
         <div class="brand-header">
             <img src="${logoUrl}" alt="${brandName}" class="brand-logo" />
             <h1 class="brand-name">${brandName}</h1>
         </div>
         `;
-    } else {
-        return `
+  } else {
+    return `
         <div class="brand-header">
             <h1 class="brand-name">${brandName}</h1>
         </div>
         `;
-    }
+  }
 };
 
 // Generate footer HTML
 const generateFooterHTML = (brandKit) => {
-    if (!brandKit || !brandKit.footer) return '';
-    
-    const footer = brandKit.footer;
-    const items = [];
-    
-    if (footer.website) items.push(`<div class="footer-contact-item">🌐 ${footer.website}</div>`);
-    if (footer.email) items.push(`<div class="footer-contact-item">✉️ ${footer.email}</div>`);
-    if (footer.phone) items.push(`<div class="footer-contact-item">📞 ${footer.phone}</div>`);
-    if (footer.address) items.push(`<div class="footer-contact-item">📍 ${footer.address}</div>`);
-    
-    if (items.length === 0 && !footer.customText) return '';
-    
-    let footerHTML = '<div class="document-footer">';
-    if (items.length > 0) {
-        footerHTML += '<div class="footer-contact">' + items.join('') + '</div>';
-    }
-    if (footer.customText) {
-        footerHTML += `<div class="footer-custom">${footer.customText}</div>`;
-    }
-    footerHTML += '</div>';
-    
-    return footerHTML;
+  if (!brandKit || !brandKit.footer) return '';
+
+  const footer = brandKit.footer;
+  const items = [];
+
+  if (footer.website) items.push(`<div class="footer-contact-item">🌐 ${footer.website}</div>`);
+  if (footer.email) items.push(`<div class="footer-contact-item">✉️ ${footer.email}</div>`);
+  if (footer.phone) items.push(`<div class="footer-contact-item">📞 ${footer.phone}</div>`);
+  if (footer.address) items.push(`<div class="footer-contact-item">📍 ${footer.address}</div>`);
+
+  if (items.length === 0 && !footer.customText) return '';
+
+  let footerHTML = '<div class="document-footer">';
+  if (items.length > 0) {
+    footerHTML += '<div class="footer-contact">' + items.join('') + '</div>';
+  }
+  if (footer.customText) {
+    footerHTML += `<div class="footer-custom">${footer.customText}</div>`;
+  }
+  footerHTML += '</div>';
+
+  return footerHTML;
 };
 
 exports.renderDocument = async (document, brandKit) => {
+  try {
+    const templateName = getTemplateForDocumentType(document.type);
+
+    // Ensure template exists, fallback to generic if specific type missing
+    let template;
     try {
-        const templateName = getTemplateForDocumentType(document.type);
-
-        // Ensure template exists, fallback to generic if specific type missing
-        let template;
-        try {
-            template = loadTemplate(templateName);
-        } catch (e) {
-            console.log(`Template ${templateName} not found, falling back to generic`);
-            template = loadTemplate("generic");
-        }
-
-        const brandCSS = generateBrandCSS(brandKit);
-        const brandHeader = generateBrandHeader(brandKit);
-        const footerHTML = generateFooterHTML(brandKit);
-
-        // Prepare data for template
-        const docObj = document.toObject();
-        const data = {
-            _id: docObj._id,
-            title: docObj.title,
-            type: docObj.type,
-            ...docObj.content, // Spread the content fields to root level for Handlebars
-            brandKit: brandKit ? brandKit.toObject() : {},
-            brandCSS,
-            brandHeader,
-            footerHTML,
-            brandName: brandKit?.brandName || 'My Company',
-            primaryColor: brandKit?.primaryColor || '#1e40af',
-            secondaryColor: brandKit?.secondaryColor || '#64748b',
-            accentColor: brandKit?.accentColor || '#3b82f6',
-            fontFamily: brandKit?.fontFamily || 'Inter',
-            generatedDate: new Date().toLocaleDateString()
-        };
-
-        // Debug logging to verify array structures
-        if (document.type === 'audit_report' && data.auditFindings) {
-            console.log('🔍 AUDIT REPORT DEBUG:');
-            console.log('  - auditFindings type:', typeof data.auditFindings);
-            console.log('  - auditFindings is Array?:', Array.isArray(data.auditFindings));
-            console.log('  - auditFindings length:', data.auditFindings?.length);
-            if (Array.isArray(data.auditFindings) && data.auditFindings.length > 0) {
-                console.log('  - First finding structure:', JSON.stringify(data.auditFindings[0]).substring(0, 150));
-            }
-            if (data.executiveSummary?.keyFindings) {
-                console.log('  - keyFindings type:', typeof data.executiveSummary.keyFindings);
-                console.log('  - keyFindings is Array?:', Array.isArray(data.executiveSummary.keyFindings));
-                console.log('  - keyFindings length:', data.executiveSummary.keyFindings?.length);
-                if (Array.isArray(data.executiveSummary.keyFindings)) {
-                    console.log('  - keyFindings:', JSON.stringify(data.executiveSummary.keyFindings));
-                }
-            }
-        }
-
-        return template(data);
-
-    } catch (error) {
-        console.error("Rendering Error:", error);
-        throw new Error("Failed to render document");
+      template = loadTemplate(templateName);
+    } catch (e) {
+      console.log(`Template ${templateName} not found, falling back to generic`);
+      template = loadTemplate("generic");
     }
+
+    const brandCSS = generateBrandCSS(brandKit);
+    const brandHeader = generateBrandHeader(brandKit);
+    const footerHTML = generateFooterHTML(brandKit);
+
+    // Prepare data for template
+    const docObj = document.toObject();
+    const data = {
+      _id: docObj._id,
+      title: docObj.title,
+      type: docObj.type,
+      ...docObj.content, // Spread the content fields to root level for Handlebars
+      brandKit: brandKit ? brandKit.toObject() : {},
+      brandCSS,
+      brandHeader,
+      footerHTML,
+      brandName: brandKit?.brandName || 'My Company',
+      primaryColor: brandKit?.primaryColor || '#1e40af',
+      secondaryColor: brandKit?.secondaryColor || '#64748b',
+      accentColor: brandKit?.accentColor || '#3b82f6',
+      fontFamily: brandKit?.fontFamily || 'Inter',
+      generatedDate: new Date().toLocaleDateString()
+    };
+
+    // Debug logging to verify array structures
+    if (document.type === 'audit_report' && data.auditFindings) {
+      console.log('🔍 AUDIT REPORT DEBUG:');
+      console.log('  - auditFindings type:', typeof data.auditFindings);
+      console.log('  - auditFindings is Array?:', Array.isArray(data.auditFindings));
+      console.log('  - auditFindings length:', data.auditFindings?.length);
+      if (Array.isArray(data.auditFindings) && data.auditFindings.length > 0) {
+        console.log('  - First finding structure:', JSON.stringify(data.auditFindings[0]).substring(0, 150));
+      }
+      if (data.executiveSummary?.keyFindings) {
+        console.log('  - keyFindings type:', typeof data.executiveSummary.keyFindings);
+        console.log('  - keyFindings is Array?:', Array.isArray(data.executiveSummary.keyFindings));
+        console.log('  - keyFindings length:', data.executiveSummary.keyFindings?.length);
+        if (Array.isArray(data.executiveSummary.keyFindings)) {
+          console.log('  - keyFindings:', JSON.stringify(data.executiveSummary.keyFindings));
+        }
+      }
+    }
+
+    return template(data);
+
+  } catch (error) {
+    console.error("Rendering Error:", error);
+    throw new Error("Failed to render document");
+  }
 };

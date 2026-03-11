@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <style>
+    {{{brandCSS}}}
+    body {
+      font-family: var(--font-primary), sans-serif;
+      color: #333;
+      padding: 40px;
+      line-height: 1.6;
+    }
+    h1 { color: var(--primary-color); margin-bottom: 20px; font-size: 24px;}
+    .subject { font-weight: bold; font-size: 18px; margin-bottom: 20px; border-bottom: 2px solid var(--accent-color); padding-bottom: 10px; }
+    .content { margin-top: 20px; }
+    .call-to-action { margin-top: 30px; font-weight: bold; background: #f9f9f9; padding: 15px; border-left: 4px solid var(--primary-color); }
+  </style>
+</head>
+<body>
+  {{{brandHeader}}}
+  
+  <div class="subject">Subject: {{subject}}</div>
+  
+  <div class="content">
+    <p>{{greeting}}</p>
+    <p>{{valueProposition}}</p>
+    <p>{{content.body}}</p>
+  </div>
+  
+  <div class="call-to-action">
+    <p>{{callToAction}}</p>
+  </div>
+
+  <div style="margin-top: 40px;">
+    {{#if signOff}}
+    <p style="white-space: pre-line;">{{signOff}}</p>
+    {{else}}
+    <p>Best regards,</p>
+    <p>{{brandName}}</p>
+    {{/if}}
+  </div>
+
+  {{{footerHTML}}}
+</body>
+</html>

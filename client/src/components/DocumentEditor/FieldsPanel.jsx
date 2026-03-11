@@ -1,17 +1,17 @@
 import React from 'react';
-import { 
-    PenTool, 
-    Type, 
-    Calendar, 
-    Upload, 
-    Circle, 
-    CheckSquare, 
-    ChevronDown, 
-    CreditCard, 
-    Stamp 
+import {
+    PenTool,
+    Type,
+    Calendar,
+    Upload,
+    Circle,
+    CheckSquare,
+    ChevronDown,
+    CreditCard,
+    Stamp
 } from 'lucide-react';
 
-const FieldsPanel = ({ onFieldDragStart, onSignatureClick }) => {
+const FieldsPanel = ({ onFieldDragStart, onFieldClick }) => {
     const fieldTypes = [
         {
             type: 'signature',
@@ -79,11 +79,9 @@ const FieldsPanel = ({ onFieldDragStart, onSignatureClick }) => {
         e.dataTransfer.setData('field', JSON.stringify(field));
         onFieldDragStart?.(field);
     };
-    
+
     const handleFieldClick = (field) => {
-        if (field.type === 'signature' || field.type === 'initials') {
-            onSignatureClick?.(field);
-        }
+        onFieldClick?.(field);
     };
 
     return (
@@ -91,7 +89,7 @@ const FieldsPanel = ({ onFieldDragStart, onSignatureClick }) => {
             <div className="panel-header">
                 <h3>Add Fillable Fields</h3>
             </div>
-            
+
             <div className="fields-list">
                 {fieldTypes.map((field) => {
                     const Icon = field.icon;
@@ -102,7 +100,7 @@ const FieldsPanel = ({ onFieldDragStart, onSignatureClick }) => {
                             draggable
                             onDragStart={(e) => handleDragStart(e, field)}
                             onClick={() => handleFieldClick(field)}
-                            style={{ cursor: field.type === 'signature' || field.type === 'initials' ? 'pointer' : 'grab' }}
+                            style={{ cursor: 'pointer' }}
                         >
                             <div className="field-icon">
                                 <Icon size={20} />
@@ -115,11 +113,11 @@ const FieldsPanel = ({ onFieldDragStart, onSignatureClick }) => {
                     );
                 })}
             </div>
-            
+
             <div className="panel-header" style={{ marginTop: '1rem' }}>
                 <h3>More Actions</h3>
             </div>
-            
+
             <div className="fields-list">
                 <button className="action-item">
                     <span>Manage Recipients</span>

@@ -36,37 +36,37 @@ const DocumentTemplateEditor = () => {
     const [draggedField, setDraggedField] = useState(null);
     const [history, setHistory] = useState([]);
     const [historyIndex, setHistoryIndex] = useState(-1);
-    
+
     // Element dragging and resizing on canvas
     const [isDraggingElement, setIsDraggingElement] = useState(false);
     const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
     const [isResizingElement, setIsResizingElement] = useState(false);
     const [resizeHandle, setResizeHandle] = useState(null);
     const [resizeStart, setResizeStart] = useState({ x: 0, y: 0, width: 0, height: 0, elementX: 0, elementY: 0 });
-    
+
     // Modal states
     const [showSignatureModal, setShowSignatureModal] = useState(false);
     const [signatureTab, setSignatureTab] = useState('draw'); // 'draw', 'type', 'upload'
     const [signatureText, setSignatureText] = useState('');
     const [signatureColor, setSignatureColor] = useState('#000000');
     const [currentSignatureElement, setCurrentSignatureElement] = useState(null);
-    
+
     // Draw Tab State
     const signatureCanvasRef = useRef(null);
     const [isDrawing, setIsDrawing] = useState(false);
-    
+
     // Type Tab State
     const [typedName, setTypedName] = useState('');
     const [selectedFont, setSelectedFont] = useState('Brush Script MT, cursive');
-    
+
     // Upload Tab State
     const [uploadedImage, setUploadedImage] = useState(null);
-    
+
     // Sidebar states
     const [showAllFields, setShowAllFields] = useState(false);
     const [sidebarWidth, setSidebarWidth] = useState(280);
     const [isResizingSidebar, setIsResizingSidebar] = useState(false);
-    
+
     // Menu dropdown states
     const [activeMenu, setActiveMenu] = useState(null);
     const [showFileMenu, setShowFileMenu] = useState(false);
@@ -76,7 +76,7 @@ const DocumentTemplateEditor = () => {
     const [showFormatMenu, setShowFormatMenu] = useState(false);
     const [showInviteDropdown, setShowInviteDropdown] = useState(false);
     const [showReviewDropdown, setShowReviewDropdown] = useState(false);
-    
+
     // Feature modals
     const [showInviteModal, setShowInviteModal] = useState(false);
     const [showExportModal, setShowExportModal] = useState(false);
@@ -93,16 +93,16 @@ const DocumentTemplateEditor = () => {
     const [showPricingTableModal, setShowPricingTableModal] = useState(false);
     const [showQuoteBuilderModal, setShowQuoteBuilderModal] = useState(false);
     const [showTOCModal, setShowTOCModal] = useState(false);
-    
+
     // Table insertion states
     const [tableRows, setTableRows] = useState(3);
     const [tableColumns, setTableColumns] = useState(3);
-    
+
     // Invitation states
     const [inviteEmail, setInviteEmail] = useState('');
     const [inviteAccessLevel, setInviteAccessLevel] = useState('viewer');
     const [isSendingInvite, setIsSendingInvite] = useState(false);
-    
+
     // Clipboard and formatting states
     const [clipboard, setClipboard] = useState(null);
     const [isBold, setIsBold] = useState(false);
@@ -113,7 +113,7 @@ const DocumentTemplateEditor = () => {
     const [textColor, setTextColor] = useState('#000000');
     const [textAlign, setTextAlign] = useState('left');
     const [pageLayout, setPageLayout] = useState('single');
-    
+
     // Document formatting states
     const [selectedText, setSelectedText] = useState('');
     const [textFormat, setTextFormat] = useState({
@@ -126,17 +126,17 @@ const DocumentTemplateEditor = () => {
         backgroundColor: 'transparent',
         align: 'left'
     });
-    
+
     // View states
     const [showGrid, setShowGrid] = useState(false);
     const [showRuler, setShowRuler] = useState(false);
     const [darkMode, setDarkMode] = useState(false);
     const [fullScreen, setFullScreen] = useState(false);
-    
+
     // Collaboration states
     const [collaborators, setCollaborators] = useState([]);
     const [comments, setComments] = useState([]);
-    
+
     // Letter of Recommendation fields
     const [lorData, setLorData] = useState({
         candidateName: '',
@@ -145,7 +145,7 @@ const DocumentTemplateEditor = () => {
         relationship: '',
         recommendation: ''
     });
-    
+
     // Additional formatting states
     const [highlightColor, setHighlightColor] = useState('#FFFF00');
     const [trackChanges, setTrackChanges] = useState(false);
@@ -162,25 +162,25 @@ const DocumentTemplateEditor = () => {
     const topFields = [
         { id: 'signature', name: 'Signature', icon: PenTool, color: '#f97316' },
         { id: 'initials', name: 'Initials', icon: Type, color: '#f97316' },
-        { id: 'textfield', name: 'Text field', icon: Type, color: '#f97316' },
+        { id: 'text', name: 'Text field', icon: Type, color: '#f97316' },
         { id: 'date', name: 'Date', icon: Calendar, color: '#f97316' }
     ];
-    
+
     const moreFields = [
-        { id: 'fileupload', name: 'File upload', icon: Upload, color: '#f97316' },
+        { id: 'file-upload', name: 'File upload', icon: Upload, color: '#f97316' },
         { id: 'radio', name: 'Radio buttons', icon: Circle, color: '#f97316' },
         { id: 'checkbox', name: 'Checkbox', icon: CheckSquare, color: '#f97316' },
         { id: 'dropdown', name: 'Dropdown', icon: ChevronDown, color: '#f97316' },
-        { id: 'card', name: 'Card details', icon: CreditCard, color: '#f97316' },
+        { id: 'card-details', name: 'Card details', icon: CreditCard, color: '#f97316' },
         { id: 'stamp', name: 'Stamp', icon: Stamp, color: '#f97316' }
     ];
-    
+
     const allFields = [...topFields, ...moreFields];
 
     // Load template
     useEffect(() => {
         loadTemplate();
-        
+
         // Cleanup on unmount
         return () => {
             document.removeEventListener('mousemove', handleResizeMove);
@@ -219,10 +219,10 @@ const DocumentTemplateEditor = () => {
             isRestoringFromHistory.current = false;
             return;
         }
-        
+
         const currentHistory = historyRef.current.history;
         const currentIndex = historyRef.current.index;
-        
+
         // Check if this is a duplicate of the last history entry
         if (currentHistory.length > 0 && currentIndex >= 0) {
             const lastEntry = currentHistory[currentIndex];
@@ -230,25 +230,25 @@ const DocumentTemplateEditor = () => {
                 return; // Skip duplicate
             }
         }
-        
+
         // Create a new history entry, discarding any "future" history after current index
         const newHistory = currentHistory.slice(0, currentIndex + 1);
         newHistory.push(JSON.parse(JSON.stringify(elements)));
-        
+
         // Limit history to 50 entries
         if (newHistory.length > 50) {
             newHistory.shift();
         }
-        
+
         const newIndex = newHistory.length - 1;
-        
+
         // Update ref (source of truth)
         historyRef.current = { history: newHistory, index: newIndex };
-        
+
         // Update state for UI (button disabled states)
         setHistory(newHistory);
         setHistoryIndex(newIndex);
-        
+
         console.log('History updated:', { length: newHistory.length, index: newIndex });
     }, [elements]);
 
@@ -256,15 +256,15 @@ const DocumentTemplateEditor = () => {
     const handleFieldDragStart = (field) => {
         setDraggedField(field);
     };
-    
+
     // Click handler for sidebar fields
     const handleFieldClick = (field) => {
         // For signature and initials, open modal first
         if (field.id === 'signature' || field.id === 'initials') {
-            setCurrentSignatureElement({ 
-                type: field.id, 
-                name: field.name, 
-                fromSidebar: true 
+            setCurrentSignatureElement({
+                type: field.id,
+                name: field.name,
+                fromSidebar: true
             });
             setShowSignatureModal(true);
         } else {
@@ -274,7 +274,7 @@ const DocumentTemplateEditor = () => {
                 const rect = canvas.getBoundingClientRect();
                 const x = rect.width / 2 - 100; // Center horizontally
                 const y = rect.height / 2 - 20; // Center vertically
-                
+
                 const newElement = {
                     id: Date.now(),
                     type: field.id,
@@ -289,7 +289,7 @@ const DocumentTemplateEditor = () => {
                     value: '',
                     completed: false
                 };
-                
+
                 setElements([...elements, newElement]);
                 setSelectedElement(newElement);
             }
@@ -332,7 +332,7 @@ const DocumentTemplateEditor = () => {
     const handleElementClick = (element, e) => {
         e.stopPropagation();
         setSelectedElement(element);
-        
+
         // Open signature modal for signature or initials fields
         if ((element.type === 'signature' || element.type === 'initials') && !element.completed) {
             setCurrentSignatureElement(element);
@@ -347,14 +347,14 @@ const DocumentTemplateEditor = () => {
             setSelectedElement(null);
         }
     };
-    
+
     // Update element value
     const handleElementValueChange = (elementId, value) => {
-        setElements(elements.map(el => 
+        setElements(elements.map(el =>
             el.id === elementId ? { ...el, value, completed: true } : el
         ));
     };
-    
+
     // Canvas initialization for signature modal
     useEffect(() => {
         if (showSignatureModal && signatureTab === 'draw' && signatureCanvasRef.current) {
@@ -364,32 +364,32 @@ const DocumentTemplateEditor = () => {
             ctx.fillRect(0, 0, canvas.width, canvas.height);
         }
     }, [showSignatureModal, signatureTab]);
-    
+
     // Signature Canvas Drawing Functions
     const startDrawing = (e) => {
         const canvas = signatureCanvasRef.current;
         const ctx = canvas.getContext('2d');
         const rect = canvas.getBoundingClientRect();
-        
+
         const x = e.clientX ? e.clientX - rect.left : e.touches[0].clientX - rect.left;
         const y = e.clientY ? e.clientY - rect.top : e.touches[0].clientY - rect.top;
-        
+
         ctx.beginPath();
         ctx.moveTo(x, y);
         setIsDrawing(true);
     };
-    
+
     const draw = (e) => {
         if (!isDrawing) return;
         e.preventDefault();
-        
+
         const canvas = signatureCanvasRef.current;
         const ctx = canvas.getContext('2d');
         const rect = canvas.getBoundingClientRect();
-        
+
         const x = e.clientX ? e.clientX - rect.left : e.touches[0].clientX - rect.left;
         const y = e.clientY ? e.clientY - rect.top : e.touches[0].clientY - rect.top;
-        
+
         ctx.strokeStyle = signatureColor;
         ctx.lineWidth = 2;
         ctx.lineCap = 'round';
@@ -397,18 +397,18 @@ const DocumentTemplateEditor = () => {
         ctx.lineTo(x, y);
         ctx.stroke();
     };
-    
+
     const stopDrawing = () => {
         setIsDrawing(false);
     };
-    
+
     const clearSignatureCanvas = () => {
         const canvas = signatureCanvasRef.current;
         const ctx = canvas.getContext('2d');
         ctx.fillStyle = 'white';
         ctx.fillRect(0, 0, canvas.width, canvas.height);
     };
-    
+
     const handleUploadSignature = (e) => {
         const file = e.target.files[0];
         if (file && file.type.startsWith('image/')) {
@@ -419,11 +419,11 @@ const DocumentTemplateEditor = () => {
             reader.readAsDataURL(file);
         }
     };
-    
+
     // Signature modal handlers
     const handleSignatureSave = () => {
         let signatureValue = null;
-        
+
         if (signatureTab === 'draw') {
             const canvas = signatureCanvasRef.current;
             signatureValue = canvas.toDataURL();
@@ -441,12 +441,12 @@ const DocumentTemplateEditor = () => {
         } else if (signatureTab === 'upload') {
             signatureValue = uploadedImage;
         }
-        
+
         if (!signatureValue) {
             alert('Please create a signature first');
             return;
         }
-        
+
         // If signature was added from sidebar, create new element on canvas
         if (currentSignatureElement.fromSidebar) {
             const canvas = canvasRef.current;
@@ -454,7 +454,7 @@ const DocumentTemplateEditor = () => {
                 const rect = canvas.getBoundingClientRect();
                 const x = rect.width / 2 - 100; // Center horizontally
                 const y = rect.height / 2 - 30; // Center vertically
-                
+
                 const newElement = {
                     id: Date.now(),
                     type: currentSignatureElement.type,
@@ -469,7 +469,7 @@ const DocumentTemplateEditor = () => {
                     value: signatureValue,
                     completed: true
                 };
-                
+
                 setElements([...elements, newElement]);
                 setSelectedElement(newElement);
             }
@@ -477,7 +477,7 @@ const DocumentTemplateEditor = () => {
             // Update existing element on canvas
             handleElementValueChange(currentSignatureElement.id, signatureValue);
         }
-        
+
         // Reset and close
         setShowSignatureModal(false);
         setTypedName('');
@@ -488,7 +488,7 @@ const DocumentTemplateEditor = () => {
             clearSignatureCanvas();
         }
     };
-    
+
     const handleSignatureCancel = () => {
         setShowSignatureModal(false);
         setTypedName('');
@@ -499,7 +499,7 @@ const DocumentTemplateEditor = () => {
             clearSignatureCanvas();
         }
     };
-    
+
     // Sidebar resize handlers
     const handleResizeStart = (e) => {
         e.preventDefault();
@@ -507,7 +507,7 @@ const DocumentTemplateEditor = () => {
         document.addEventListener('mousemove', handleResizeMove);
         document.addEventListener('mouseup', handleResizeEnd);
     };
-    
+
     const handleResizeMove = (e) => {
         if (isResizingSidebar) {
             const newWidth = window.innerWidth - e.clientX;
@@ -516,26 +516,26 @@ const DocumentTemplateEditor = () => {
             }
         }
     };
-    
+
     const handleResizeEnd = () => {
         setIsResizingSidebar(false);
         document.removeEventListener('mousemove', handleResizeMove);
         document.removeEventListener('mouseup', handleResizeEnd);
     };
-    
+
     // Element dragging on canvas
     const handleElementMouseDown = (e, element) => {
         if (e.button !== 0) return; // Only left click
         e.stopPropagation();
-        
+
         const canvas = e.currentTarget.parentElement;
         const rect = canvas.getBoundingClientRect();
         const scaleX = canvas.offsetWidth / rect.width;
         const scaleY = canvas.offsetHeight / rect.height;
-        
+
         const mouseX = (e.clientX - rect.left) * scaleX;
         const mouseY = (e.clientY - rect.top) * scaleY;
-        
+
         setSelectedElement(element);
         setDragOffset({
             x: mouseX - element.x,
@@ -546,20 +546,20 @@ const DocumentTemplateEditor = () => {
 
     const handleElementMouseMove = (e) => {
         if (!isDraggingElement || !selectedElement) return;
-        
+
         const canvas = document.querySelector('.document-page.active .page-content');
         if (!canvas) return;
-        
+
         const rect = canvas.getBoundingClientRect();
         const scaleX = canvas.offsetWidth / rect.width;
         const scaleY = canvas.offsetHeight / rect.height;
-        
+
         const mouseX = (e.clientX - rect.left) * scaleX;
         const mouseY = (e.clientY - rect.top) * scaleY;
-        
+
         const newX = Math.max(0, Math.min(canvas.offsetWidth - selectedElement.width, mouseX - dragOffset.x));
         const newY = Math.max(0, Math.min(canvas.offsetHeight - selectedElement.height, mouseY - dragOffset.y));
-        
+
         setElements(prevElements =>
             prevElements.map(el =>
                 el.id === selectedElement.id
@@ -567,7 +567,7 @@ const DocumentTemplateEditor = () => {
                     : el
             )
         );
-        
+
         setSelectedElement(prev => ({ ...prev, x: newX, y: newY }));
     };
 
@@ -581,15 +581,15 @@ const DocumentTemplateEditor = () => {
     const handleResizeElementMouseDown = (e, element, handle) => {
         e.stopPropagation();
         e.preventDefault();
-        
+
         const canvas = e.currentTarget.parentElement.parentElement;
         const rect = canvas.getBoundingClientRect();
         const scaleX = canvas.offsetWidth / rect.width;
         const scaleY = canvas.offsetHeight / rect.height;
-        
+
         const mouseX = (e.clientX - rect.left) * scaleX;
         const mouseY = (e.clientY - rect.top) * scaleY;
-        
+
         setIsResizingElement(true);
         setResizeHandle(handle);
         setResizeStart({
@@ -605,27 +605,27 @@ const DocumentTemplateEditor = () => {
 
     const handleResizeElementMouseMove = (e) => {
         if (!isResizingElement || !selectedElement || !resizeHandle) return;
-        
+
         const canvas = document.querySelector('.document-page.active .page-content');
         if (!canvas) return;
-        
+
         const rect = canvas.getBoundingClientRect();
         const scaleX = canvas.offsetWidth / rect.width;
         const scaleY = canvas.offsetHeight / rect.height;
-        
+
         const mouseX = (e.clientX - rect.left) * scaleX;
         const mouseY = (e.clientY - rect.top) * scaleY;
-        
+
         const deltaX = mouseX - resizeStart.x;
         const deltaY = mouseY - resizeStart.y;
-        
+
         let newWidth = resizeStart.width;
         let newHeight = resizeStart.height;
         let newX = resizeStart.elementX;
         let newY = resizeStart.elementY;
-        
+
         const minSize = 40;
-        
+
         switch (resizeHandle) {
             case 'se': // bottom-right
                 newWidth = Math.max(minSize, resizeStart.width + deltaX);
@@ -648,7 +648,7 @@ const DocumentTemplateEditor = () => {
                 newY = resizeStart.elementY + (resizeStart.height - newHeight);
                 break;
         }
-        
+
         // Ensure within canvas bounds
         if (newX < 0) {
             newWidth += newX;
@@ -664,7 +664,7 @@ const DocumentTemplateEditor = () => {
         if (newY + newHeight > canvas.offsetHeight) {
             newHeight = canvas.offsetHeight - newY;
         }
-        
+
         setElements(prevElements =>
             prevElements.map(el =>
                 el.id === selectedElement.id
@@ -672,7 +672,7 @@ const DocumentTemplateEditor = () => {
                     : el
             )
         );
-        
+
         setSelectedElement(prev => ({ ...prev, x: newX, y: newY, width: newWidth, height: newHeight }));
     };
 
@@ -727,21 +727,21 @@ const DocumentTemplateEditor = () => {
             // Don't delete element if user is typing in an input/textarea
             const activeElement = document.activeElement;
             const isTyping = activeElement && (
-                activeElement.tagName === 'INPUT' || 
+                activeElement.tagName === 'INPUT' ||
                 activeElement.tagName === 'TEXTAREA' ||
                 activeElement.isContentEditable
             );
-            
+
             if ((e.key === 'Delete' || e.key === 'Backspace') && selectedElement && !showSignatureModal && !isTyping) {
                 e.preventDefault();
                 handleDeleteElement();
             }
         };
-        
+
         window.addEventListener('keydown', handleKeyDown);
         return () => window.removeEventListener('keydown', handleKeyDown);
     }, [selectedElement, showSignatureModal]);
-    
+
     // Close dropdowns when clicking outside
     useEffect(() => {
         const handleClickOutside = (event) => {
@@ -754,18 +754,18 @@ const DocumentTemplateEditor = () => {
                 }
             }
         };
-        
+
         document.addEventListener('mousedown', handleClickOutside);
         return () => document.removeEventListener('mousedown', handleClickOutside);
     }, [showInviteDropdown, showReviewDropdown]);
-    
+
     // Toggle show more/less fields
     const toggleShowAllFields = () => {
         setShowAllFields(!showAllFields);
     };
-    
+
     // ==================== MENU HANDLERS ====================
-    
+
     // Close all menus
     const closeAllMenus = () => {
         setActiveMenu(null);
@@ -777,7 +777,7 @@ const DocumentTemplateEditor = () => {
         setShowInviteDropdown(false);
         setShowReviewDropdown(false);
     };
-    
+
     // Toggle menu
     const toggleMenu = (menuName) => {
         if (activeMenu === menuName) {
@@ -785,7 +785,7 @@ const DocumentTemplateEditor = () => {
         } else {
             closeAllMenus();
             setActiveMenu(menuName);
-            switch(menuName) {
+            switch (menuName) {
                 case 'file': setShowFileMenu(true); break;
                 case 'edit': setShowEditMenu(true); break;
                 case 'insert': setShowInsertMenu(true); break;
@@ -794,7 +794,7 @@ const DocumentTemplateEditor = () => {
             }
         }
     };
-    
+
     // Close menus when clicking outside
     useEffect(() => {
         const handleClickOutside = (e) => {
@@ -803,9 +803,9 @@ const DocumentTemplateEditor = () => {
             }
         };
         document.addEventListener('click', handleClickOutside);
-       return () => document.removeEventListener('click', handleClickOutside);
+        return () => document.removeEventListener('click', handleClickOutside);
     }, []);
-    
+
     // FILE MENU HANDLERS
     const handleNewDocument = () => {
         if (window.confirm('Create a new document? Unsaved changes will be lost.')) {
@@ -817,7 +817,7 @@ const DocumentTemplateEditor = () => {
             closeAllMenus();
         }
     };
-    
+
     const handleOpenDocument = () => {
         const input = document.createElement('input');
         input.type = 'file';
@@ -842,7 +842,7 @@ const DocumentTemplateEditor = () => {
         input.click();
         closeAllMenus();
     };
-    
+
     const handleSaveDocument = () => {
         const documentData = {
             name: documentName,
@@ -853,7 +853,7 @@ const DocumentTemplateEditor = () => {
         alert('Document saved successfully!');
         closeAllMenus();
     };
-    
+
     const handleSaveAs = () => {
         const newName = prompt('Enter document name:', documentName);
         if (newName) {
@@ -862,43 +862,43 @@ const DocumentTemplateEditor = () => {
         }
         closeAllMenus();
     };
-    
+
     const handleExport = (format) => {
         setShowExportModal(true);
         closeAllMenus();
     };
-    
+
     const handlePrint = () => {
         window.print();
         closeAllMenus();
     };
-    
+
     const handleCloseDocument = () => {
         if (window.confirm('Close document? Unsaved changes will be lost.')) {
             navigate('/dashboard/templates');
         }
         closeAllMenus();
     };
-    
+
     // EDIT MENU HANDLERS
     const handleUndo = () => {
         const currentIndex = historyRef.current.index;
         const currentHistory = historyRef.current.history;
-        
+
         console.log('Undo clicked:', { currentIndex, historyLength: currentHistory.length });
-        
+
         if (currentIndex > 0) {
             const newIndex = currentIndex - 1;
             const restoredElements = JSON.parse(JSON.stringify(currentHistory[newIndex]));
-            
+
             console.log('Undoing to index:', newIndex, 'Elements:', restoredElements.length);
-            
+
             // Update ref first
             historyRef.current.index = newIndex;
-            
+
             // Set flag to prevent useEffect from adding to history
             isRestoringFromHistory.current = true;
-            
+
             // Restore elements
             setElements(restoredElements);
             setHistoryIndex(newIndex);
@@ -907,25 +907,25 @@ const DocumentTemplateEditor = () => {
         }
         closeAllMenus();
     };
-    
+
     const handleRedo = () => {
         const currentIndex = historyRef.current.index;
         const currentHistory = historyRef.current.history;
-        
+
         console.log('Redo clicked:', { currentIndex, historyLength: currentHistory.length });
-        
+
         if (currentIndex < currentHistory.length - 1) {
             const newIndex = currentIndex + 1;
             const restoredElements = JSON.parse(JSON.stringify(currentHistory[newIndex]));
-            
+
             console.log('Redoing to index:', newIndex, 'Elements:', restoredElements.length);
-            
+
             // Update ref first
             historyRef.current.index = newIndex;
-            
+
             // Set flag to prevent useEffect from adding to history
             isRestoringFromHistory.current = true;
-            
+
             // Restore elements
             setElements(restoredElements);
             setHistoryIndex(newIndex);
@@ -942,14 +942,14 @@ const DocumentTemplateEditor = () => {
         }
         closeAllMenus();
     };
-    
+
     const handleCopy = () => {
         if (selectedElement) {
-            setClipboard({...selectedElement});
+            setClipboard({ ...selectedElement });
         }
         closeAllMenus();
     };
-    
+
     const handlePaste = () => {
         if (clipboard) {
             const newElement = {
@@ -962,41 +962,41 @@ const DocumentTemplateEditor = () => {
         }
         closeAllMenus();
     };
-    
+
     const handleDelete = () => {
         if (selectedElement) {
             handleDeleteElement();
         }
         closeAllMenus();
     };
-    
+
     const handleSelectAll = () => {
         // Select all elements on current page
         const pageElements = elements.filter(el => el.page === currentPage);
-        if (pageElements.length >  0) {
+        if (pageElements.length > 0) {
             setSelectedElement(pageElements[0]);
         }
         closeAllMenus();
     };
-    
+
     const handleFindReplace = () => {
         setShowFindReplaceModal(true);
         closeAllMenus();
     };
-    
+
     // INSERT MENU HANDLERS
     const handleInsertImage = () => {
         setShowInsertImageModal(true);
         closeAllMenus();
     };
-    
+
     const handleInsertTextBox = () => {
         const newElement = {
             id: Date.now(),
             type: 'textbox',
             name: 'Text Box',
             x: 100,
-            y:  100,
+            y: 100,
             width: 200,
             height: 100,
             page: currentPage,
@@ -1006,48 +1006,48 @@ const DocumentTemplateEditor = () => {
         setElements([...elements, newElement]);
         closeAllMenus();
     };
-    
+
     const handleInsertTable = () => {
         setShowInsertTableModal(true);
         closeAllMenus();
     };
-    
+
     const handleInsertLink = () => {
         setShowInsertLinkModal(true);
         closeAllMenus();
     };
-    
+
     const handleInsertSignature = () => {
-        setCurrentSignatureElement({ 
-            type: 'signature', 
-            name: 'Signature', 
-            fromSidebar: true 
+        setCurrentSignatureElement({
+            type: 'signature',
+            name: 'Signature',
+            fromSidebar: true
         });
         setShowSignatureModal(true);
         closeAllMenus();
     };
-    
+
     const handleInsertComment = () => {
         setShowCommentModal(true);
         closeAllMenus();
     };
-    
+
     // VIEW MENU HANDLERS
     const handleZoomIn = () => {
         setZoom(Math.min(zoom + 10, 200));
         closeAllMenus();
     };
-    
+
     const handleZoomOut = () => {
         setZoom(Math.max(zoom - 10, 50));
         closeAllMenus();
     };
-    
+
     const handleZoomReset = () => {
         setZoom(100);
         closeAllMenus();
     };
-    
+
     const handleToggleFullScreen = () => {
         if (!document.fullscreenElement) {
             document.documentElement.requestFullscreen();
@@ -1058,32 +1058,32 @@ const DocumentTemplateEditor = () => {
         }
         closeAllMenus();
     };
-    
+
     const handleToggleGrid = () => {
         setShowGrid(!showGrid);
         closeAllMenus();
     };
-    
+
     const handleToggleRuler = () => {
         setShowRuler(!showRuler);
         closeAllMenus();
     };
-    
+
     const handleToggleDarkMode = () => {
         setDarkMode(!darkMode);
         document.body.classList.toggle('dark-mode');
         closeAllMenus();
     };
-    
+
     const handleChangeLayout = (layout) => {
         setPageLayout(layout);
         closeAllMenus();
     };
-    
+
     // FORMAT MENU HANDLERS
     const applyFormat = (formatType, value) => {
         // This would apply formatting to selected text/element
-        switch(formatType) {
+        switch (formatType) {
             case 'bold':
                 setIsBold(!isBold);
                 break;
@@ -1108,13 +1108,13 @@ const DocumentTemplateEditor = () => {
         }
         closeAllMenus();
     };
-    
+
     // NEW HANDLERS FOR ENHANCED FILE MENU
     const handleRename = () => {
         setIsEditingName(true);
         closeAllMenus();
     };
-    
+
     const handleConvertToTemplate = async () => {
         try {
             const documentId = templateId; // Using templateId as documentId
@@ -1130,7 +1130,7 @@ const DocumentTemplateEditor = () => {
         }
         closeAllMenus();
     };
-    
+
     const handleMakeCopy = async () => {
         try {
             const documentId = templateId; // Using templateId as documentId
@@ -1146,32 +1146,32 @@ const DocumentTemplateEditor = () => {
         }
         closeAllMenus();
     };
-    
+
     const handleWorkflowSetup = () => {
         alert('Workflow setup - Premium feature!');
         closeAllMenus();
     };
-    
+
     const handleESignature = () => {
         alert('E-signature and verification');
         closeAllMenus();
     };
-    
+
     const handleRecipients = () => {
         alert('Manage recipients');
         closeAllMenus();
     };
-    
+
     const handleDocumentSettings = () => {
         alert('Document settings');
         closeAllMenus();
     };
-    
+
     const handleMove = () => {
         alert('Move document to folder');
         closeAllMenus();
     };
-    
+
     const handleArchive = async () => {
         if (window.confirm('Archive this document?')) {
             try {
@@ -1189,18 +1189,18 @@ const DocumentTemplateEditor = () => {
         }
         closeAllMenus();
     };
-    
+
     const handleDownload = (format) => {
         alert(`Downloading as ${format}...`);
         closeAllMenus();
     };
-    
+
     // NEW HANDLERS FOR ENHANCED INSERT MENU
     const handleInsertDocument = () => {
         alert('Insert document');
         closeAllMenus();
     };
-    
+
     const handleInsertCoverPage = () => {
         const newElement = {
             id: Date.now(),
@@ -1223,48 +1223,48 @@ const DocumentTemplateEditor = () => {
         alert('✅ Cover page added!');
         closeAllMenus();
     };
-    
+
     const handleInsertBlankPage = () => {
         setTotalPages(totalPages + 1);
         alert('Blank page added!');
         closeAllMenus();
     };
-    
+
     const handleInsertAttachment = () => {
         alert('Insert attachment - Premium feature!');
         closeAllMenus();
     };
-    
+
     const handleAddFrom = () => {
         alert('Add from library');
         closeAllMenus();
     };
-    
+
     const handleFillableFields = () => {
         alert('Fillable fields');
         closeAllMenus();
     };
-    
+
     const handleInsertVideo = () => {
         setShowInsertVideoModal(true);
         closeAllMenus();
     };
-    
+
     const handleInsertPricingTable = () => {
         setShowPricingTableModal(true);
         closeAllMenus();
     };
-    
+
     const handleInsertQuoteBuilder = () => {
         setShowQuoteBuilderModal(true);
         closeAllMenus();
     };
-    
+
     const handleInsertTOC = () => {
         setShowTOCModal(true);
         closeAllMenus();
     };
-    
+
     const handleInsertPageBreak = () => {
         const newElement = {
             id: Date.now(),
@@ -1283,88 +1283,88 @@ const DocumentTemplateEditor = () => {
         alert('✅ Page break inserted');
         closeAllMenus();
     };
-    
+
     // NEW HANDLERS FOR ENHANCED VIEW MENU
     const handleAllVariables = () => {
         alert('Show all variables');
         closeAllMenus();
     };
-    
+
     const handleContentLibrary = () => {
         alert('Content library - Premium feature!');
         closeAllMenus();
     };
-    
+
     const handlePagesPreview = () => {
         alert('Pages preview');
         closeAllMenus();
     };
-    
+
     const handleResolvedComments = () => {
         alert('Resolved comments/suggestions');
         closeAllMenus();
     };
-    
+
     const handleReviewData = () => {
         alert('Review data');
         closeAllMenus();
     };
-    
+
     const handleFullScreenPreview = () => {
         handleToggleFullScreen();
     };
-    
+
     // NEW HANDLERS FOR ENHANCED FORMAT MENU
     const handleStyleMenu = () => {
         alert('Style menu');
         closeAllMenus();
     };
-    
+
     const handleFontMenu = () => {
         alert('Font selection');
         closeAllMenus();
     };
-    
+
     const handleTextSizeMenu = () => {
         alert('Text size selection');
         closeAllMenus();
     };
-    
+
     const handleFormattingMenu = () => {
         alert('Formatting options');
         closeAllMenus();
     };
-    
+
     const handleAlignTextMenu = () => {
         alert('Align text options');
         closeAllMenus();
     };
-    
+
     const handleBulletsMenu = () => {
         alert('Bullets and numbering');
         closeAllMenus();
     };
-    
+
     const handleIndentMenu = () => {
         alert('Indent options');
         closeAllMenus();
     };
-    
+
     const handleLineSpacingMenu = () => {
         alert('Line spacing');
         closeAllMenus();
     };
-    
+
     const handleBorderStyles = () => {
         alert('Border styles');
         closeAllMenus();
     };
-    
+
     const handleInsertLinkFormat = () => {
         setShowInsertLinkModal(true);
         closeAllMenus();
     };
-    
+
     const handleClearFormatting = () => {
         setIsBold(false);
         setIsItalic(false);
@@ -1376,48 +1376,48 @@ const DocumentTemplateEditor = () => {
         alert('Formatting cleared!');
         closeAllMenus();
     };
-    
+
     const handleTheme = () => {
         alert('Theme options');
         closeAllMenus();
     };
-    
+
     const handleLayoutSetup = () => {
         alert('Layout setup');
         closeAllMenus();
     };
-    
+
     // COLLABORATION HANDLERS
     const handleInvite = () => {
         setShowInviteModal(true);
     };
-    
+
     const handleReview = () => {
         setShowReviewModal(true);
     };
-    
+
     const handleUpgrade = () => {
         setShowUpgradeModal(true);
     };
-    
+
     // LETTER OF RECOMMENDATION GENERATOR
     const handleGenerateLetterOfRec = () => {
         setShowLetterGenModal(true);
     };
-    
+
     // Keyboard shortcuts
     useEffect(() => {
         const handleKeyboardShortcuts = (e) => {
             if (showSignatureModal || showInviteModal || showReviewModal) return;
-            
+
             // Check if user is typing in an input/textarea
             const activeElement = document.activeElement;
             const isTyping = activeElement && (
-                activeElement.tagName === 'INPUT' || 
+                activeElement.tagName === 'INPUT' ||
                 activeElement.tagName === 'TEXTAREA' ||
                 activeElement.isContentEditable
             );
-            
+
             // Ctrl/Cmd + Z = Undo
             if ((e.ctrlKey || e.metaKey) && e.key === 'z' && !e.shiftKey && !isTyping) {
                 e.preventDefault();
@@ -1459,7 +1459,7 @@ const DocumentTemplateEditor = () => {
                 handleSelectAll();
             }
         };
-        
+
         window.addEventListener('keydown', handleKeyboardShortcuts);
         return () => window.removeEventListener('keydown', handleKeyboardShortcuts);
     }, [elements, selectedElement, clipboard, showSignatureModal, history, historyIndex]);
@@ -1478,74 +1478,211 @@ const DocumentTemplateEditor = () => {
     const handleNameBlur = () => {
         setIsEditingName(false);
     };
-    
+
     // Render interactive field content
     const renderFieldContent = (element) => {
         // Special handling for images - always show if they have a value
         if (element.type === 'image' && element.value) {
             return (
-                <img 
-                    src={element.value} 
+                <img
+                    src={element.value}
                     alt="Inserted image"
-                    style={{ 
-                        width: '100%', 
-                        height: '100%', 
+                    style={{
+                        width: '100%',
+                        height: '100%',
                         objectFit: 'contain',
                         pointerEvents: 'none'
                     }}
                 />
             );
         }
-        
+
+        // Render input for editable fields
+        if (element.type === 'text') {
+            return (
+                <input
+                    type="text"
+                    value={element.value || ''}
+                    onChange={(e) => handleElementValueChange(element.id, e.target.value)}
+                    className="field-input"
+                    onClick={(e) => e.stopPropagation()}
+                    onMouseDown={(e) => e.stopPropagation()}
+                    placeholder="Type here..."
+                />
+            );
+        }
+
+        if (element.type === 'date') {
+            return (
+                <input
+                    type="date"
+                    value={element.value || ''}
+                    onChange={(e) => handleElementValueChange(element.id, e.target.value)}
+                    className="field-input"
+                    onClick={(e) => e.stopPropagation()}
+                    onMouseDown={(e) => e.stopPropagation()}
+                />
+            );
+        }
+
+        if (element.type === 'textbox') {
+            return (
+                <textarea
+                    value={element.value || ''}
+                    onChange={(e) => handleElementValueChange(element.id, e.target.value)}
+                    className="field-input textbox-input"
+                    onClick={(e) => e.stopPropagation()}
+                    onMouseDown={(e) => e.stopPropagation()}
+                    style={{
+                        width: '100%',
+                        height: '100%',
+                        resize: 'none',
+                        border: 'none',
+                        padding: '8px',
+                        fontFamily: 'inherit',
+                        fontSize: '14px',
+                        outline: 'none'
+                    }}
+                    placeholder="Type multi-line text here..."
+                />
+            );
+        }
+
+        if (element.type === 'checkbox') {
+            return (
+                <div
+                    style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%' }}
+                    onMouseDown={(e) => e.stopPropagation()}
+                >
+                    <input
+                        type="checkbox"
+                        checked={element.value || false}
+                        onChange={(e) => handleElementValueChange(element.id, e.target.checked)}
+                        onClick={(e) => e.stopPropagation()}
+                        style={{ width: '18px', height: '18px', cursor: 'pointer' }}
+                    />
+                </div>
+            );
+        }
+
+        if (element.type === 'radio') {
+            return (
+                <div
+                    style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%' }}
+                    onMouseDown={(e) => e.stopPropagation()}
+                >
+                    <input
+                        type="radio"
+                        checked={element.value || false}
+                        onChange={(e) => handleElementValueChange(element.id, e.target.checked)}
+                        onClick={(e) => e.stopPropagation()}
+                        style={{ width: '18px', height: '18px', cursor: 'pointer' }}
+                    />
+                </div>
+            );
+        }
+
+        if (element.type === 'dropdown') {
+            return (
+                <div
+                    className="field-input"
+                    style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 8px' }}
+                    onMouseDown={(e) => e.stopPropagation()}
+                    onClick={(e) => {
+                        e.stopPropagation();
+                        // Optional: Trigger a selection dialog or dropdown menu
+                    }}
+                >
+                    <span style={{ fontSize: '13px', opacity: element.value ? 1 : 0.5 }}>
+                        {element.value || 'Select...'}
+                    </span>
+                    <ChevronDown size={14} />
+                </div>
+            );
+        }
+
+        if (element.type === 'file-upload') {
+            return (
+                <div
+                    className="field-input"
+                    style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '8px',
+                        padding: '0 8px',
+                        justifyContent: 'center',
+                        cursor: 'pointer',
+                        overflow: 'hidden'
+                    }}
+                    onMouseDown={(e) => e.stopPropagation()}
+                    onClick={(e) => {
+                        e.stopPropagation();
+                        const fileInput = document.createElement('input');
+                        fileInput.type = 'file';
+                        fileInput.onchange = (ev) => {
+                            const file = ev.target.files[0];
+                            if (file) {
+                                const reader = new FileReader();
+                                reader.onload = (event) => {
+                                    handleElementValueChange(element.id, event.target.result);
+                                };
+                                reader.readAsDataURL(file);
+                            }
+                        };
+                        fileInput.click();
+                    }}
+                >
+                    {element.value && typeof element.value === 'string' && element.value.startsWith('data:image') ? (
+                        <img
+                            src={element.value}
+                            alt="Upload preview"
+                            style={{ width: '100%', height: '100%', objectFit: 'contain' }}
+                        />
+                    ) : (
+                        <>
+                            <Upload size={14} />
+                            <span style={{ fontSize: '12px' }}>{element.value ? 'File Uploaded' : 'Upload File'}</span>
+                        </>
+                    )}
+                </div>
+            );
+        }
+
+        if (element.type === 'card-details') {
+            return (
+                <div
+                    className="field-input"
+                    style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '0 8px', justifyContent: 'center', cursor: 'pointer' }}
+                    onMouseDown={(e) => e.stopPropagation()}
+                    onClick={(e) => {
+                        e.stopPropagation();
+                        const val = prompt('Enter card details (last 4 digits):', element.value || '');
+                        if (val !== null) handleElementValueChange(element.id, val);
+                    }}
+                >
+                    <CreditCard size={14} />
+                    <span style={{ fontSize: '12px' }}>{element.value ? 'Card Added' : 'Card Details'}</span>
+                </div>
+            );
+        }
+
+        if (element.type === 'stamp') {
+            return (
+                <div
+                    className="field-input"
+                    style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '0 8px', justifyContent: 'center' }}
+                    onMouseDown={(e) => e.stopPropagation()}
+                >
+                    <Stamp size={14} />
+                    <span style={{ fontSize: '12px' }}>{element.value ? 'Stamped' : 'Stamp'}</span>
+                </div>
+            );
+        }
+
         if (element.completed && element.value) {
             switch (element.type) {
                 case 'signature':
                 case 'initials':
-                    // Check if value is an image (data URL) or text object
-                    if (typeof element.value === 'string' && element.value.startsWith('data:image')) {
-                        // It's a drawn or uploaded signature (image)
-                        return (
-                            <img 
-                                src={element.value} 
-                                alt={element.type}
-                                style={{ 
-                                    width: '100%', 
-                                    height: '100%', 
-                                    objectFit: 'contain',
-                                    pointerEvents: 'none'
-                                }}
-                            />
-                        );
-                    } else if (typeof element.value === 'object' && element.value.type === 'text') {
-                        // It's a typed signature
-                        return (
-                            <div className="field-completed" style={{ 
-                                fontFamily: element.value.font || 'Brush Script MT, cursive',
-                                fontSize: element.type === 'signature' ? '24px' : '18px',
-                                color: element.value.color || '#000000',
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                height: '100%',
-                                pointerEvents: 'none'
-                            }}>
-                                {element.value.text}
-                            </div>
-                        );
-                    } else {
-                        // Fallback for simple text
-                        return (
-                            <div className="field-completed" style={{ 
-                                fontFamily: 'Brush Script MT, cursive',
-                                fontSize: '18px',
-                                color: signatureColor
-                            }}>
-                                {element.value}
-                            </div>
-                        );
-                    }
-                case 'textfield':
-                    return <input type="text" value={element.value} onChange={(e) => handleElementValueChange(element.id, e.target.value)} className="field-input" onClick={(e) => e.stopPropagation()} />;
                 case 'date':
                     return <input type="date" value={element.value} onChange={(e) => handleElementValueChange(element.id, e.target.value)} className="field-input" onClick={(e) => e.stopPropagation()} />;
                 case 'checkbox':
@@ -1571,12 +1708,12 @@ const DocumentTemplateEditor = () => {
                     );
                 case 'image':
                     return (
-                        <img 
-                            src={element.value} 
+                        <img
+                            src={element.value}
                             alt="Inserted image"
-                            style={{ 
-                                width: '100%', 
-                                height: '100%', 
+                            style={{
+                                width: '100%',
+                                height: '100%',
                                 objectFit: 'contain',
                                 pointerEvents: 'none'
                             }}
@@ -1585,14 +1722,14 @@ const DocumentTemplateEditor = () => {
                 case 'table':
                     if (element.value && element.value.data) {
                         return (
-                            <div style={{ 
-                                width: '100%', 
-                                height: '100%', 
+                            <div style={{
+                                width: '100%',
+                                height: '100%',
                                 overflow: 'auto',
                                 pointerEvents: 'auto'
                             }}>
-                                <table style={{ 
-                                    width: '100%', 
+                                <table style={{
+                                    width: '100%',
                                     borderCollapse: 'collapse',
                                     fontSize: '12px'
                                 }}>
@@ -1600,7 +1737,7 @@ const DocumentTemplateEditor = () => {
                                         {element.value.data.map((row, rowIndex) => (
                                             <tr key={rowIndex}>
                                                 {row.map((cell, colIndex) => (
-                                                    <td 
+                                                    <td
                                                         key={colIndex}
                                                         style={{
                                                             border: '1px solid #cbd5e1',
@@ -1630,7 +1767,7 @@ const DocumentTemplateEditor = () => {
                                                                 const maxCol = element.value.data[0].length - 1;
                                                                 let targetRow = rowIndex;
                                                                 let targetCol = colIndex;
-                                                                
+
                                                                 if (e.key === 'ArrowRight' && colIndex < maxCol) {
                                                                     targetCol = colIndex + 1;
                                                                     e.preventDefault();
@@ -1663,7 +1800,7 @@ const DocumentTemplateEditor = () => {
                                                                         }
                                                                     }
                                                                 }
-                                                                
+
                                                                 if (targetRow !== rowIndex || targetCol !== colIndex) {
                                                                     const targetInput = document.querySelector(
                                                                         `input[data-element-id="${element.id}"][data-row="${targetRow}"][data-col="${targetCol}"]`
@@ -1701,7 +1838,7 @@ const DocumentTemplateEditor = () => {
                         if (element.value.includes('youtube.com/watch?v=')) {
                             const videoId = element.value.split('v=')[1]?.split('&')[0];
                             embedUrl = `https://www.youtube.com/embed/${videoId}`;
-                        }  else if (element.value.includes('youtu.be/')) {
+                        } else if (element.value.includes('youtu.be/')) {
                             const videoId = element.value.split('youtu.be/')[1]?.split('?')[0];
                             embedUrl = `https://www.youtube.com/embed/${videoId}`;
                         } else if (element.value.includes('vimeo.com/')) {
@@ -1726,10 +1863,10 @@ const DocumentTemplateEditor = () => {
                 case 'pricing-table':
                     if (element.value && element.value.plans) {
                         return (
-                            <div style={{ 
-                                width: '100%', 
-                                height: '100%', 
-                                display: 'flex', 
+                            <div style={{
+                                width: '100%',
+                                height: '100%',
+                                display: 'flex',
                                 gap: '10px',
                                 padding: '10px',
                                 overflow: 'auto'
@@ -1759,9 +1896,9 @@ const DocumentTemplateEditor = () => {
                 case 'quote-builder':
                     if (element.value && element.value.items) {
                         return (
-                            <div style={{ 
-                                width: '100%', 
-                                height: '100%', 
+                            <div style={{
+                                width: '100%',
+                                height: '100%',
                                 padding: '15px',
                                 overflow: 'auto',
                                 background: 'white'
@@ -1807,9 +1944,9 @@ const DocumentTemplateEditor = () => {
                 case 'toc':
                     if (element.value && element.value.sections) {
                         return (
-                            <div style={{ 
-                                width: '100%', 
-                                height: '100%', 
+                            <div style={{
+                                width: '100%',
+                                height: '100%',
                                 padding: '15px',
                                 overflow: 'auto',
                                 background: 'white'
@@ -1817,8 +1954,8 @@ const DocumentTemplateEditor = () => {
                                 <h2 style={{ fontSize: '18px', marginBottom: '15px', color: '#1e293b' }}>Table of Contents</h2>
                                 <ul style={{ listStyle: 'none', padding: 0 }}>
                                     {element.value.sections.map((section, index) => (
-                                        <li key={index} style={{ 
-                                            padding: '8px 0', 
+                                        <li key={index} style={{
+                                            padding: '8px 0',
                                             borderBottom: '1px dotted #e2e8f0',
                                             display: 'flex',
                                             justifyContent: 'space-between',
@@ -1836,9 +1973,9 @@ const DocumentTemplateEditor = () => {
                 case 'cover-page':
                     if (element.value) {
                         return (
-                            <div style={{ 
-                                width: '100%', 
-                                height: '100%', 
+                            <div style={{
+                                width: '100%',
+                                height: '100%',
                                 display: 'flex',
                                 flexDirection: 'column',
                                 alignItems: 'center',
@@ -1888,7 +2025,7 @@ const DocumentTemplateEditor = () => {
                     return <div className="element-content">{element.name}</div>;
             }
         }
-        
+
         // Handle textbox - always editable
         if (element.type === 'textbox') {
             return (
@@ -1911,18 +2048,18 @@ const DocumentTemplateEditor = () => {
                 />
             );
         }
-        
+
         // Handle table - always editable
         if (element.type === 'table' && element.value && element.value.data) {
             return (
-                <div style={{ 
-                    width: '100%', 
-                    height: '100%', 
+                <div style={{
+                    width: '100%',
+                    height: '100%',
                     overflow: 'auto',
                     pointerEvents: 'auto'
                 }}>
-                    <table style={{ 
-                        width: '100%', 
+                    <table style={{
+                        width: '100%',
                         borderCollapse: 'collapse',
                         fontSize: '12px'
                     }}>
@@ -1930,7 +2067,7 @@ const DocumentTemplateEditor = () => {
                             {element.value.data.map((row, rowIndex) => (
                                 <tr key={rowIndex}>
                                     {row.map((cell, colIndex) => (
-                                        <td 
+                                        <td
                                             key={colIndex}
                                             style={{
                                                 border: '1px solid #cbd5e1',
@@ -1960,7 +2097,7 @@ const DocumentTemplateEditor = () => {
                                                     const maxCol = element.value.data[0].length - 1;
                                                     let targetRow = rowIndex;
                                                     let targetCol = colIndex;
-                                                    
+
                                                     if (e.key === 'ArrowRight' && colIndex < maxCol) {
                                                         targetCol = colIndex + 1;
                                                         e.preventDefault();
@@ -1993,7 +2130,7 @@ const DocumentTemplateEditor = () => {
                                                             }
                                                         }
                                                     }
-                                                    
+
                                                     if (targetRow !== rowIndex || targetCol !== colIndex) {
                                                         const targetInput = document.querySelector(
                                                             `input[data-element-id="${element.id}"][data-row="${targetRow}"][data-col="${targetCol}"]`
@@ -2023,7 +2160,7 @@ const DocumentTemplateEditor = () => {
                 </div>
             );
         }
-        
+
         // Show placeholder for empty fields - clickable for signature
         if (element.type === 'signature' || element.type === 'initials') {
             return (
@@ -2033,7 +2170,7 @@ const DocumentTemplateEditor = () => {
                 </div>
             );
         }
-        
+
         return (
             <div className="element-content">{element.name}</div>
         );
@@ -2047,7 +2184,7 @@ const DocumentTemplateEditor = () => {
                     <button className="back-button" onClick={() => navigate('/dashboard/templates')}>
                         <FileText size={20} />
                     </button>
-                    
+
                     {isEditingName ? (
                         <input
                             type="text"
@@ -2062,7 +2199,7 @@ const DocumentTemplateEditor = () => {
                             {documentName}
                         </h1>
                     )}
-                    
+
                     <span className="document-status">Draft</span>
                 </div>
 
@@ -2393,23 +2530,23 @@ const DocumentTemplateEditor = () => {
                     <button className="action-btn trial" onClick={handleUpgrade}>
                         <span>Start free trial</span>
                     </button>
-                    
-                    <button 
-                        className="action-btn secondary" 
+
+                    <button
+                        className="action-btn secondary"
                         onClick={() => setShowInviteModal(true)}
                     >
                         <Users size={16} />
                         <span>Invite</span>
                     </button>
-                    
-                    <button 
-                        className="action-btn primary" 
+
+                    <button
+                        className="action-btn primary"
                         onClick={() => setShowReviewModal(true)}
                     >
                         <Send size={16} />
                         <span>Review and send</span>
                     </button>
-                    
+
                     <button className="action-btn icon-only" onClick={() => alert('Help center')}>
                         <HelpCircle size={20} />
                     </button>
@@ -2420,18 +2557,18 @@ const DocumentTemplateEditor = () => {
             <div className="editor-main">
                 {/* Left Toolbar */}
                 <aside className="left-toolbar">
-                    <button 
-                        className="toolbar-btn" 
-                        title="Undo" 
+                    <button
+                        className="toolbar-btn"
+                        title="Undo"
                         onClick={handleUndo}
                         disabled={historyIndex <= 0}
                         style={{ opacity: historyIndex <= 0 ? 0.5 : 1, cursor: historyIndex <= 0 ? 'not-allowed' : 'pointer' }}
                     >
                         <Undo size={20} />
                     </button>
-                    <button 
-                        className="toolbar-btn" 
-                        title="Redo" 
+                    <button
+                        className="toolbar-btn"
+                        title="Redo"
                         onClick={handleRedo}
                         disabled={historyIndex >= history.length - 1}
                         style={{ opacity: historyIndex >= history.length - 1 ? 0.5 : 1, cursor: historyIndex >= history.length - 1 ? 'not-allowed' : 'pointer' }}
@@ -2502,8 +2639,8 @@ const DocumentTemplateEditor = () => {
 
                                             <div className="document-body">
                                                 <p className="document-text">
-                                                    This Agreement is entered into on <span className="variable">[Date]</span> between 
-                                                    <span className="variable"> [Client.Company]</span> ("Client") and 
+                                                    This Agreement is entered into on <span className="variable">[Date]</span> between
+                                                    <span className="variable"> [Client.Company]</span> ("Client") and
                                                     <span className="variable"> [Sender.Company]</span> ("Agency").
                                                 </p>
 
@@ -2558,7 +2695,7 @@ const DocumentTemplateEditor = () => {
                                                 {selectedElement?.id === element.id && (
                                                     <>
                                                         <div className="element-controls">
-                                                            <button 
+                                                            <button
                                                                 className="delete-element-btn"
                                                                 onClick={handleElementDelete}
                                                                 title="Delete (Press Delete key)"
@@ -2567,19 +2704,19 @@ const DocumentTemplateEditor = () => {
                                                             </button>
                                                         </div>
                                                         {/* Resize handles */}
-                                                        <div 
+                                                        <div
                                                             className="resize-handle resize-handle-nw"
                                                             onMouseDown={(e) => handleResizeElementMouseDown(e, element, 'nw')}
                                                         />
-                                                        <div 
+                                                        <div
                                                             className="resize-handle resize-handle-ne"
                                                             onMouseDown={(e) => handleResizeElementMouseDown(e, element, 'ne')}
                                                         />
-                                                        <div 
+                                                        <div
                                                             className="resize-handle resize-handle-sw"
                                                             onMouseDown={(e) => handleResizeElementMouseDown(e, element, 'sw')}
                                                         />
-                                                        <div 
+                                                        <div
                                                             className="resize-handle resize-handle-se"
                                                             onMouseDown={(e) => handleResizeElementMouseDown(e, element, 'se')}
                                                         />
@@ -2596,11 +2733,11 @@ const DocumentTemplateEditor = () => {
                 {/* Right Sidebar - Fields Library */}
                 <aside className="fields-sidebar" style={{ width: `${sidebarWidth}px` }}>
                     {/* Resize Handle */}
-                    <div 
+                    <div
                         className="sidebar-resize-handle"
                         onMouseDown={handleResizeStart}
                     />
-                    
+
                     {/* User Profile Section */}
                     <div className="sidebar-user-profile">
                         <div className="user-avatar">{userInfo.initials}</div>
@@ -2612,7 +2749,7 @@ const DocumentTemplateEditor = () => {
                         </div>
                         <ChevronDown size={16} className="user-expand" />
                     </div>
-                    
+
                     <div className="sidebar-header">
                         <h3>Add Fillable Fields</h3>
                     </div>
@@ -2639,7 +2776,7 @@ const DocumentTemplateEditor = () => {
                                 </div>
                             );
                         })}
-                        
+
                         {/* Additional Fields - Show/Hide */}
                         {showAllFields && moreFields.map(field => {
                             const Icon = field.icon;
@@ -2662,16 +2799,16 @@ const DocumentTemplateEditor = () => {
                             );
                         })}
                     </div>
-                    
+
                     {/* Show More Button - Outside fields list */}
                     <div className="show-more-container">
                         <button className="show-more-btn" onClick={toggleShowAllFields}>
-                            <ChevronDown 
-                                size={14} 
-                                style={{ 
+                            <ChevronDown
+                                size={14}
+                                style={{
                                     transform: showAllFields ? 'rotate(180deg)' : 'rotate(0deg)',
                                     transition: 'transform 0.2s ease'
-                                }} 
+                                }}
                             />
                             {showAllFields ? 'Show less' : 'Show more'}
                         </button>
@@ -2704,52 +2841,53 @@ const DocumentTemplateEditor = () => {
                     </button>
                 </div>
             </footer>
-            
+
             {/* Signature Modal */}
             {showSignatureModal && (
                 <div className="modal-overlay" onClick={handleSignatureCancel}>
                     <div className="signature-modal" onClick={(e) => e.stopPropagation()}>
                         <div className="modal-header">
-                            <h2>Signature</h2>
+                            <h2>{currentSignatureElement?.type === 'initials' ? 'Initials' : 'Signature'}</h2>
                             <button className="modal-close" onClick={handleSignatureCancel}>
                                 <X size={20} />
                             </button>
                         </div>
-                        
+
                         <div className="modal-tabs">
-                            <button 
+                            <button
                                 className={`tab-btn ${signatureTab === 'draw' ? 'active' : ''}`}
                                 onClick={() => setSignatureTab('draw')}
                             >
                                 Draw
                             </button>
-                            <button 
+                            <button
                                 className={`tab-btn ${signatureTab === 'type' ? 'active' : ''}`}
                                 onClick={() => setSignatureTab('type')}
                             >
                                 Type
                             </button>
-                            <button 
+                            <button
                                 className={`tab-btn ${signatureTab === 'upload' ? 'active' : ''}`}
                                 onClick={() => setSignatureTab('upload')}
                             >
                                 Upload
                             </button>
                         </div>
-                        
+
                         <div className="modal-content">
                             {/* Draw Tab */}
                             {signatureTab === 'draw' && (
-                                <div className="signature-draw-tab">
-                                    <p className="tab-instruction">Draw your signature below using your mouse or touch device</p>
-                                    
-                                    <div className="signature-color-picker" style={{ marginBottom: '1rem' }}>
-                                        <label>Pen Color:</label>
-                                        <div className="color-options">
-                                            {['#000000', '#0000FF', '#1E40AF', '#7C3AED', '#DC2626'].map(color => (
+                                <div className="signature-tab-content">
+                                    <div className="signature-controls-top">
+                                        <button className="clear-link" onClick={clearSignatureCanvas}>
+                                            Clear
+                                        </button>
+
+                                        <div className="color-picker">
+                                            {['#000000', '#2563eb', '#dc2626'].map(color => (
                                                 <button
                                                     key={color}
-                                                    className={`color-btn ${signatureColor === color ? 'selected' : ''}`}
+                                                    className={`color-btn ${signatureColor === color ? 'active' : ''}`}
                                                     style={{ backgroundColor: color }}
                                                     onClick={() => setSignatureColor(color)}
                                                 >
@@ -2758,98 +2896,100 @@ const DocumentTemplateEditor = () => {
                                             ))}
                                         </div>
                                     </div>
-                                    
-                                    <canvas
-                                        ref={signatureCanvasRef}
-                                        width={600}
-                                        height={200}
-                                        className="signature-canvas"
-                                        onMouseDown={startDrawing}
-                                        onMouseMove={draw}
-                                        onMouseUp={stopDrawing}
-                                        onMouseLeave={stopDrawing}
-                                        onTouchStart={startDrawing}
-                                        onTouchMove={draw}
-                                        onTouchEnd={stopDrawing}
-                                    />
-                                    <button className="clear-canvas-btn" onClick={clearSignatureCanvas}>
-                                        <Trash2 size={16} />
-                                        Clear
-                                    </button>
+
+                                    <div className="signature-preview-container">
+                                        <canvas
+                                            ref={signatureCanvasRef}
+                                            width={600}
+                                            height={200}
+                                            className="signature-canvas"
+                                            onMouseDown={startDrawing}
+                                            onMouseMove={draw}
+                                            onMouseUp={stopDrawing}
+                                            onMouseLeave={stopDrawing}
+                                            onTouchStart={startDrawing}
+                                            onTouchMove={draw}
+                                            onTouchEnd={stopDrawing}
+                                        />
+                                        <div className="signature-baseline"></div>
+                                    </div>
                                 </div>
                             )}
-                            
+
                             {/* Type Tab */}
                             {signatureTab === 'type' && (
-                                <div className="signature-type-tab">
-                                    <p className="tab-instruction">Type your name and select a signature style</p>
-                                    
-                                    <input
-                                        type="text"
-                                        className="signature-name-input"
-                                        placeholder="Enter your full name"
-                                        value={typedName}
-                                        onChange={(e) => setTypedName(e.target.value)}
-                                    />
-                                    
-                                    {typedName && (
-                                        <>
-                                            <div className="signature-preview-label">Preview:</div>
-                                            <div className="signature-font-preview-container">
-                                                <div className="font-options">
-                                                    {[
-                                                        { name: 'Brush Script MT, cursive', label: 'Style 1' },
-                                                        { name: 'Lucida Handwriting, cursive', label: 'Style 2' },
-                                                        { name: 'Bradley Hand, cursive', label: 'Style 3' },
-                                                        { name: 'Courier New, monospace', label: 'Style 4' },
-                                                        { name: 'Georgia, serif', label: 'Style 5' }
-                                                    ].map(font => (
-                                                        <div
-                                                            key={font.name}
-                                                            className={`font-option ${selectedFont === font.name ? 'selected' : ''}`}
-                                                            onClick={() => setSelectedFont(font.name)}
-                                                        >
-                                                            <div 
-                                                                className="font-preview"
-                                                                style={{ 
-                                                                    fontFamily: font.name,
-                                                                    color: signatureColor,
-                                                                    fontSize: '32px',
-                                                                    fontStyle: 'italic'
-                                                                }}
-                                                            >
-                                                                {typedName}
-                                                            </div>
-                                                        </div>
-                                                    ))}
-                                                </div>
-                                            </div>
-                                            
-                                            <div className="signature-color-picker">
-                                                <label>Signature Color:</label>
-                                                <div className="color-options">
-                                                    {['#000000', '#0000FF', '#1E40AF', '#7C3AED', '#DC2626'].map(color => (
-                                                        <button
-                                                            key={color}
-                                                            className={`color-btn ${signatureColor === color ? 'selected' : ''}`}
-                                                            style={{ backgroundColor: color }}
-                                                            onClick={() => setSignatureColor(color)}
-                                                        >
-                                                            {signatureColor === color && <Check size={14} color="white" />}
-                                                        </button>
-                                                    ))}
-                                                </div>
-                                            </div>
-                                        </>
-                                    )}
+                                <div className="signature-tab-content">
+                                    <div className="signature-controls-top">
+                                        <button className="choose-font-dropdown">
+                                            Choose font <ChevronDown size={14} />
+                                        </button>
+
+                                        <div className="color-picker">
+                                            {['#000000', '#2563eb', '#dc2626'].map(color => (
+                                                <button
+                                                    key={color}
+                                                    className={`color-btn ${signatureColor === color ? 'active' : ''}`}
+                                                    style={{ backgroundColor: color }}
+                                                    onClick={() => setSignatureColor(color)}
+                                                >
+                                                    {signatureColor === color && <Check size={14} color="white" />}
+                                                </button>
+                                            ))}
+                                        </div>
+                                    </div>
+
+                                    <div className="signature-preview-container">
+                                        <input
+                                            type="text"
+                                            className="signature-input"
+                                            placeholder={currentSignatureElement?.type === 'initials' ? "Enter your initials" : "Enter your full name"}
+                                            value={typedName}
+                                            onChange={(e) => setTypedName(e.target.value)}
+                                            style={{
+                                                fontFamily: selectedFont,
+                                                color: signatureColor,
+                                                fontSize: '48px',
+                                                border: 'none',
+                                                background: 'transparent',
+                                                textAlign: 'center',
+                                                width: '100%',
+                                                outline: 'none'
+                                            }}
+                                        />
+                                        <div className="signature-baseline"></div>
+                                    </div>
+
+                                    {/* Style Selection - Show actual font preview */}
+                                    <div className="font-options" style={{ marginTop: '20px', display: 'flex', gap: '12px', flexWrap: 'wrap', justifyContent: 'center' }}>
+                                        {[
+                                            { name: 'Brush Script MT, cursive', label: 'Style 1' },
+                                            { name: 'Lucida Handwriting, cursive', label: 'Style 2' },
+                                            { name: 'Bradley Hand, cursive', label: 'Style 3' }
+                                        ].map(font => (
+                                            <button
+                                                key={font.name}
+                                                className={`tab-btn ${selectedFont === font.name ? 'active' : ''}`}
+                                                style={{
+                                                    borderBottom: selectedFont === font.name ? '3px solid #16a34a' : 'none',
+                                                    padding: '10px 20px',
+                                                    fontFamily: font.name,
+                                                    fontSize: '20px',
+                                                    color: selectedFont === font.name ? '#111827' : '#64748b'
+                                                }}
+                                                onClick={() => setSelectedFont(font.name)}
+                                            >
+                                                {typedName || (currentSignatureElement?.type === 'initials' ? 'JD' : 'John Doe')}
+                                            </button>
+                                        ))}
+                                    </div>
                                 </div>
                             )}
-                            
+
                             {/* Upload Tab */}
                             {signatureTab === 'upload' && (
                                 <div className="signature-upload-tab">
                                     <p className="tab-instruction">Upload an image of your signature (PNG, JPG)</p>
-                                    
+
                                     {!uploadedImage ? (
                                         <div className="upload-area">
                                             <input
@@ -2868,7 +3008,7 @@ const DocumentTemplateEditor = () => {
                                     ) : (
                                         <div className="uploaded-signature-preview">
                                             <img src={uploadedImage} alt="Uploaded signature" />
-                                            <button 
+                                            <button
                                                 className="remove-upload-btn"
                                                 onClick={() => setUploadedImage(null)}
                                             >
@@ -2880,27 +3020,33 @@ const DocumentTemplateEditor = () => {
                                 </div>
                             )}
                         </div>
-                        
+
+                        <div className="signature-tab-content" style={{ paddingTop: 0 }}>
+                            <p className="disclaimer-text">
+                                By electronically signing this document, I agree that my signature and initials are the equivalent of my handwritten signature and are considered originals on all documents, including legally binding contracts. I also agree to the <a href="#">Master Services Agreement</a> and <a href="#">Privacy Policy</a>.
+                            </p>
+                        </div>
+
                         <div className="modal-footer">
                             <button className="btn-cancel" onClick={handleSignatureCancel}>
                                 Cancel
                             </button>
-                            <button 
-                                className="btn-accept" 
+                            <button
+                                className="btn-accept"
                                 onClick={handleSignatureSave}
                                 disabled={
+                                    (signatureTab === 'draw' && !isDrawing && !signatureCanvasRef.current?.toDataURL().includes('base64')) ||
                                     (signatureTab === 'type' && !typedName) ||
                                     (signatureTab === 'upload' && !uploadedImage)
                                 }
                             >
-                                <Check size={16} />
-                                Apply Signature
+                                Accept and sign
                             </button>
                         </div>
                     </div>
                 </div>
             )}
-            
+
             {/* INVITE MODAL */}
             {showInviteModal && (
                 <div className="modal-overlay" onClick={() => setShowInviteModal(false)}>
@@ -2908,7 +3054,7 @@ const DocumentTemplateEditor = () => {
                         <button className="modal-close-btn" onClick={() => setShowInviteModal(false)}>
                             <X size={20} />
                         </button>
-                        
+
                         <div className="invite-modal-header">
                             <div className="invite-icon">
                                 <Users size={28} />
@@ -2922,22 +3068,22 @@ const DocumentTemplateEditor = () => {
                                 <label className="invite-label">Email addresses</label>
                                 <div className="invite-input-wrapper">
                                     <Mail size={18} />
-                                    <input 
-                                        type="email" 
+                                    <input
+                                        type="email"
                                         placeholder="colleague@company.com, team@company.com..."
                                         className="invite-email-input"
                                         value={inviteEmail}
                                         onChange={(e) => setInviteEmail(e.target.value)}
                                     />
                                 </div>
-                                
+
                                 <label className="invite-label">Access level</label>
                                 <div className="role-options">
                                     <div className="role-option">
-                                        <input 
-                                            type="radio" 
-                                            name="role" 
-                                            id="viewer" 
+                                        <input
+                                            type="radio"
+                                            name="role"
+                                            id="viewer"
                                             checked={inviteAccessLevel === 'viewer'}
                                             onChange={() => setInviteAccessLevel('viewer')}
                                         />
@@ -2950,9 +3096,9 @@ const DocumentTemplateEditor = () => {
                                         </label>
                                     </div>
                                     <div className="role-option">
-                                        <input 
-                                            type="radio" 
-                                            name="role" 
+                                        <input
+                                            type="radio"
+                                            name="role"
                                             id="commenter"
                                             checked={inviteAccessLevel === 'commenter'}
                                             onChange={() => setInviteAccessLevel('commenter')}
@@ -2966,9 +3112,9 @@ const DocumentTemplateEditor = () => {
                                         </label>
                                     </div>
                                     <div className="role-option">
-                                        <input 
-                                            type="radio" 
-                                            name="role" 
+                                        <input
+                                            type="radio"
+                                            name="role"
                                             id="editor"
                                             checked={inviteAccessLevel === 'editor'}
                                             onChange={() => setInviteAccessLevel('editor')}
@@ -2983,8 +3129,8 @@ const DocumentTemplateEditor = () => {
                                     </div>
                                 </div>
 
-                                <button 
-                                    className="invite-send-btn" 
+                                <button
+                                    className="invite-send-btn"
                                     onClick={async () => {
                                         if (!inviteEmail.trim()) {
                                             alert('Please enter at least one email address');
@@ -3023,8 +3169,8 @@ const DocumentTemplateEditor = () => {
                             <div className="share-link-container">
                                 <div className="share-link-box">
                                     <Link2 size={18} />
-                                    <input 
-                                        type="text" 
+                                    <input
+                                        type="text"
                                         value={`${window.location.origin}/doc/${templateId}`}
                                         readOnly
                                         className="share-link-field"
@@ -3046,7 +3192,7 @@ const DocumentTemplateEditor = () => {
                     </div>
                 </div>
             )}
-            
+
             {/* REVIEW MODAL */}
             {showReviewModal && (
                 <div className="modal-overlay" onClick={() => setShowReviewModal(false)}>
@@ -3054,7 +3200,7 @@ const DocumentTemplateEditor = () => {
                         <button className="modal-close-btn" onClick={() => setShowReviewModal(false)}>
                             <X size={20} />
                         </button>
-                        
+
                         <div className="review-modal-header">
                             <div className="review-icon">
                                 <FileCheck size={28} />
@@ -3071,18 +3217,18 @@ const DocumentTemplateEditor = () => {
                                     Send to
                                 </label>
                                 <div className="send-input-wrapper">
-                                    <input 
-                                        type="email" 
+                                    <input
+                                        type="email"
                                         placeholder="Enter recipient email addresses..."
                                         className="send-email-input"
                                     />
                                 </div>
-                                
+
                                 <label className="send-label" style={{ marginTop: '16px' }}>
                                     <MessageSquare size={16} />
                                     Message (optional)
                                 </label>
-                                <textarea 
+                                <textarea
                                     placeholder="Add a personal message..."
                                     className="send-message-textarea"
                                     rows="3"
@@ -3096,7 +3242,7 @@ const DocumentTemplateEditor = () => {
                                         <Download size={18} />
                                         Download PDF
                                     </button>
-                                    
+
                                     <button className="send-action-btn preview" onClick={() => {
                                         window.open(`/api/documents/${templateId}/preview`, '_blank');
                                     }}>
@@ -3164,7 +3310,7 @@ const DocumentTemplateEditor = () => {
                                     </h3>
                                     <span className="comments-count">{comments.length}</span>
                                 </div>
-                                
+
                                 <div className="comments-list-container">
                                     {comments.length === 0 ? (
                                         <div className="no-comments-state">
@@ -3194,7 +3340,7 @@ const DocumentTemplateEditor = () => {
                     </div>
                 </div>
             )}
-            
+
             {/* UPGRADE MODAL */}
             {showUpgradeModal && (
                 <div className="modal-overlay" onClick={() => setShowUpgradeModal(false)}>
@@ -3202,7 +3348,7 @@ const DocumentTemplateEditor = () => {
                         <button className="modal-close-btn" onClick={() => setShowUpgradeModal(false)}>
                             <X size={20} />
                         </button>
-                        
+
                         <div className="upgrade-modal-header">
                             <div className="upgrade-icon">
                                 <Crown size={32} />
@@ -3352,7 +3498,7 @@ const DocumentTemplateEditor = () => {
                     </div>
                 </div>
             )}
-            
+
             {/* LETTER OF RECOMMENDATION GENERATOR */}
             {showLetterGenModal && (
                 <div className="modal-overlay" onClick={() => setShowLetterGenModal(false)}>
@@ -3390,7 +3536,7 @@ const DocumentTemplateEditor = () => {
                                 const skills = document.getElementById('candidateSkills').value;
                                 const relationship = document.getElementById('relationship').value;
                                 const notes = document.getElementById('additionalNotes').value;
-                                
+
                                 const letterText = `
 
 LETTER OF RECOMMENDATION
@@ -3412,7 +3558,7 @@ Sincerely,
 [Your Title]
 [Contact Information]
                                 `.trim();
-                                
+
                                 // Insert letter into document
                                 const newElement = {
                                     id: Date.now(),
@@ -3437,7 +3583,7 @@ Sincerely,
                     </div>
                 </div>
             )}
-            
+
             {/* EXPORT MODAL */}
             {showExportModal && (
                 <div className="modal-overlay" onClick={() => setShowExportModal(false)}>
@@ -3489,7 +3635,7 @@ Sincerely,
                     </div>
                 </div>
             )}
-            
+
             {/* FIND AND REPLACE MODAL */}
             {showFindReplaceModal && (
                 <div className="modal-overlay" onClick={() => setShowFindReplaceModal(false)}>
@@ -3524,7 +3670,7 @@ Sincerely,
                     </div>
                 </div>
             )}
-            
+
             {/* INSERT IMAGE MODAL */}
             {showInsertImageModal && (
                 <div className="modal-overlay" onClick={() => setShowInsertImageModal(false)}>
@@ -3641,7 +3787,7 @@ Sincerely,
                                             value: {
                                                 rows: tableRows,
                                                 columns: tableColumns,
-                                                data: Array(tableRows).fill(null).map(() => 
+                                                data: Array(tableRows).fill(null).map(() =>
                                                     Array(tableColumns).fill('')
                                                 )
                                             },
