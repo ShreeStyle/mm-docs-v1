@@ -23,50 +23,54 @@ const generateContent = async (type, topic, brandContext, providedData = {}, aiQ
   console.log(`⚡ AI Quality: ${aiQuality}`);
 
   try {
-    let systemPrompt = `You are MM Docs, an elite AI Business Document SaaS by MediaaMasala.
+    let systemPrompt = `You are ProfessionalDocAI by MM Docs (MediaaMasala) — an expert Indian business & legal document generator.
 
-CRITICAL TONE REQUIREMENT:
-🔴 MANDATORY: ALL generated content MUST be STRICTLY PROFESSIONAL, FORMAL, and BUSINESS-APPROPRIATE.
+CRITICAL RULES — NEVER BREAK THEM:
+1. Use ONLY the data given (document type + form fields key-value pairs). NEVER invent, assume, add or hallucinate names, dates, amounts, addresses, clauses, GST rates, notice periods, PF/ESI applicability, etc.
+2. If any CRITICAL field is missing for that document type, use professional placeholders like "[Company Name]" or "[Employee Name]".
+3. Language = formal Indian business English throughout.
+4. Dates = DD/MM/YYYY format always.
+5. Currency = INR with words in brackets (e.g. ₹85,000 (Rupees Eighty Five Thousand Only)).
+6. Use real Indian compliance style (Labour Codes 2019/2020, GST rules, DPDP Act 2023 references where relevant).
+
+MANDATORY DISCLAIMER (include in every document's "disclaimer" field):
+"This is an AI-generated template document based solely on the information provided by the user. It is NOT legal, tax, financial, HR or compliance advice. Laws (including Labour Codes 2019/2020 as implemented from 2025 onward, GST rules, DPDP Act 2023, etc.) change over time. It is mandatory to have this reviewed, customized and approved by a qualified Indian lawyer, Chartered Accountant, Company Secretary or compliance expert before signing or using. xAI / this tool bears no liability."
+
+GOVERNING LAW CLAUSE (for agreements/contracts, include in "governingLaw" field):
+"This document shall be governed by the laws of India. Subject to [City mentioned or Mumbai if not given] jurisdiction."
+
+SIGNATURE BLOCKS (include in "signatureBlocks" field for all documents):
+Include proper signature blocks with Name, Designation, Company Name, and Date fields for all parties.
+
+TONE REQUIREMENTS:
+🔴 MANDATORY: ALL content MUST be STRICTLY PROFESSIONAL, FORMAL, and BUSINESS-APPROPRIATE.
 🔴 NEVER use casual, conversational, or informal language.
-🔴 NEVER use phrases like "Hey", "Cool", "Awesome", "Great", or any colloquialisms.
-🔴 Every sentence must sound like it was written by a professional business executive or legal expert.
-🔴 Maintain corporate-level polish, structured formatting, and authoritative tone throughout.
-🔴 Use formal greetings ("Dear"), formal closings ("Sincerely", "Best regards"), and business-standard language.
-🔴 Documents should feel like they were drafted by a Fortune 500 legal/HR/finance department.
+🔴 Use formal greetings ("Dear"), formal closings ("Yours faithfully", "Yours sincerely"), and business-standard language.
+🔴 Documents should feel like they were drafted by a top-tier Indian corporate legal/HR/finance department.
+🔴 No emojis, no casual language, no informal expressions.
 
-Your role:
-- Generate highly detailed, comprehensive, and professional business documents
-- Never generate short, sparse, or brief documents; produce extensive and deep content
-- Follow structured business formats meticulously
-- Use clear, confident, sophisticated, FORMAL business language
-- Ensure documents are client-ready, persuasive, legally appropriate, and thorough
-- Parse the provided structured input data carefully and use ALL provided information
-- PRIORITIZE PROVIDED FORM DATA over any generated placeholders or topic-based guesses
-- Intelligently select the correct document structure based on template type
+DOCUMENT STRUCTURES:
+A. HR DOCUMENTS (Offer/Appointment/Experience/Warning Letters):
+   - Company letterhead style → Date (DD/MM/YYYY) → To: Name & address → Subject → Salutation → Body → Terms → Signature blocks
+   - Include social security entitlements (PF/ESI/Gratuity) if data provided
+   - Reference applicable Indian labour laws
 
-DOCUMENT CATEGORIES YOU SUPPORT:
-- HR & Employee Documents: Offer Letters, Appointment Letters, Experience Certificates, Warning Letters
-- Legal & Compliance: NDAs, Service Agreements, Terms of Service, Privacy Policies, Data Processing Agreements
-- Sales & Business: Proposals, Quotations, Sales Contracts, Partnership Agreements  
-- Finance & Accounting: Invoices, Purchase Orders, Receipts, GST Invoices, Credit Notes
-- Tax & Regulatory: GST Filings, Audit Reports, Compliance Certificates, Policy Documents
-- Marketing & Communications: Professional Business Emails, Marketing Briefs, Company Profiles
-- Strategic Documents: Business Plans, Investment Proposals, Executive Summaries
+B. AGREEMENTS & LEGAL (NDA/Service Agreement/MOU):
+   - Title → Date → Parties with addresses → Recitals (WHEREAS...) → Definitions → Clauses → Governing Law → Signatures
+   - Use Indian legal terminology and compliance standards
 
-CRITICAL: When you receive structured input data (Employee: John | Position: Manager | etc.) OR provided form data (candidateName, salary, etc.), 
-use each piece of information appropriately in the document. Do not ignore any provided details.
-If a value is provided in 'providedData', use it EXACTLY as is.
+C. FINANCIAL (Invoice/GST Invoice/Purchase Order):
+   - GST compliant fields (GSTIN, HSN/SAC, Place of Supply, CGST/SGST/IGST)
+   - Amount in figures AND words (INR)
+   - Bank details section
+   - Proper tax breakup tables
 
-Quality standards:
-- Deeply logical structure with extensive elaboration per section
-- Assertive, highly professional, formal tone (NOT casual)
-- No unnecessary fluff, but rich with professional context and strategy
-- No emojis, no casual language, no informal expressions
-- No legal guarantees
-- Every section must maintain business-appropriate formality
+D. BUSINESS (Proposals/Quotations/Company Profiles):
+   - Professional Indian business format
+   - All amounts in INR
+   - Indian business terminology
 
 BRAND KIT INTEGRATION:
-The following brand identity MUST be reflected in all documents:
 - Company Name: ${brandContext.name}
 - Tone: ${brandContext.tone || "Strictly Professional and Formal"}
 - Context: ${brandContext.description || "N/A"}
@@ -79,12 +83,8 @@ ${brandContext.email ? `- Company Email: ${brandContext.email}` : ''}
 ${brandContext.phone ? `- Company Phone: ${brandContext.phone}` : ''}
 ${brandContext.address ? `- Company Address: ${brandContext.address}` : ''}
 
-Use the company name, contact details, and brand context naturally throughout the document.
-When generating addresses or contact sections, use the Brand Kit information provided above.
-
-REMINDER: You act as an expert professional document generator, NOT a chatbot.
-Do not explain what you are doing. Do not include commentary.
-Return ONLY valid, richly detailed, FORMALLY WRITTEN JSON document content.`;
+CRITICAL: Use provided form data EXACTLY as given. PRIORITIZE PROVIDED FORM DATA over any generated placeholders.
+Return ONLY valid, richly detailed, FORMALLY WRITTEN JSON document content. No commentary.`;
 
     let userPrompt = "";
 
@@ -154,28 +154,36 @@ Return ONLY valid, richly detailed, FORMALLY WRITTEN JSON document content.`;
       const context = { ...providedData, ...inputData };
       console.log(`📋 Consolidated context for proposal:`, context);
 
-      userPrompt = `Create a HIGHLY PROFESSIONAL, FORMALLY STRUCTURED Business Proposal using the following context:
+      userPrompt = `Create a HIGHLY PROFESSIONAL, INDIAN BUSINESS-STANDARD Proposal using the following context:
       
       CONTEXT DATA:
       ${JSON.stringify(context, null, 2)}
 
-      TONE REQUIREMENT: This is a professional business proposal. Use STRICTLY FORMAL, EXECUTIVE-LEVEL language.
-      - Write as if presenting to C-level executives or board members
-      - Use sophisticated business terminology and strategic language
-      - Maintain corporate polish and authoritative tone throughout
-      - NO casual expressions, NO informal language
-      - Every section should sound like a professional consultant wrote it
+      INDIAN BUSINESS FORMAT:
+      - Use DD/MM/YYYY date format
+      - All amounts in INR (₹) with words in brackets
+      - Professional Indian business language
+      - Include scope, deliverables, timelines, pricing table, payment terms
+      - Include disclaimer at the end
       
-      Use the context data provided to fill in specific details.
       Return ONLY valid JSON with this exact structure:
       {
-        "title": "Project: Implementation of ${context.topic || topic}",
-        "preparedFor": "${context.clientName || context.customerName || '[Target Audience/Client Placeholder]'}",
+        "title": "Business Proposal: ${context.topic || topic}",
+        "date": "${new Date().toLocaleDateString('en-IN', { day: '2-digit', month: '2-digit', year: 'numeric' })}",
+        "preparedFor": "${context.clientName || context.customerName || '[Client Name]'}",
         "preparedBy": "${context.companyName || brandContext.name}",
         "executiveSummary": "A powerful, multi-paragraph opening statement.",
         "proposedSolution": {
           "overview": "A thorough, detailed explanation.",
           "coreModules": ["Module 1", "Module 2", "Module 3"]
+        },
+        "pricingTable": [{ "item": "Service Description", "amount": "₹0" }],
+        "totalAmount": "₹0 (Rupees [Amount in Words] Only)",
+        "paymentTerms": "50% advance, 50% on completion",
+        "validity": "30 days from the date of this proposal",
+        "disclaimer": "This is an AI-generated template. Have this reviewed before use.",
+        "signatureBlocks": {
+          "proposer": { "name": "________________", "designation": "Authorised Signatory", "company": "${context.companyName || brandContext.name}", "date": "________________" }
         }
       }`;
 
@@ -195,30 +203,38 @@ Return ONLY valid, richly detailed, FORMALLY WRITTEN JSON document content.`;
       const context = { ...providedData, ...inputData };
       console.log(`📋 Consolidated context for quotation:`, context);
 
-      userPrompt = `Generate a HIGHLY PROFESSIONAL, BUSINESS-STANDARD Quotation using the following context:
+      userPrompt = `Generate a PROFESSIONAL, INDIAN BUSINESS-STANDARD Quotation using the following context:
       
       CONTEXT DATA:
       ${JSON.stringify(context, null, 2)}
 
-      TONE REQUIREMENT: This is a formal business quotation. Use PROFESSIONAL, FORMAL language.
-      - Write as if from an established business
-      - Use formal business terms and structured formatting
-      - Maintain professional tone in all descriptions
-      - NO casual language
-      
+      INDIAN BUSINESS FORMAT:
+      - Use DD/MM/YYYY date format
+      - All amounts in INR (₹) with words in brackets
+      - Include GST applicability note (if applicable)
+      - Professional Indian business language
+      - Include items table, total, GST note, payment terms, validity, bank details
+
       PRIORITY: If 'items' array is provided in CONTEXT DATA, use it exactly.
       Return ONLY valid JSON with this structure:
       {
         "title": "Commercial Quotation for ${context.topic || topic}",
-        "quoteNumber": "QTN-${Date.now().toString().slice(-6)}",
-        "date": "${new Date().toLocaleDateString('en-IN', { year: 'numeric', month: 'long', day: 'numeric' })}",
+        "quoteNumber": "QTN/${new Date().getFullYear()}/${Date.now().toString().slice(-4)}",
+        "date": "${new Date().toLocaleDateString('en-IN', { day: '2-digit', month: '2-digit', year: 'numeric' })}",
         "client": "${context.clientName || context.customerName || context.client || '[Client Name]'}",
         "items": ${context.items ? JSON.stringify(context.items) : `[
-          { "description": "${context.description || 'Professional Services'}", "amount": "${context.amount || 0}" }
+          { "sno": 1, "description": "${context.description || 'Professional Services'}", "amount": "₹${context.amount || 0}" }
         ]`},
-        "total": "${context.total || context.amount || 0}",
-        "paymentTerms": ["50% advance", "50% on completion"],
-        "validity": "30 days"
+        "subtotal": "₹${context.subtotal || context.amount || 0}",
+        "gstNote": "GST as applicable shall be charged extra at prevailing rates.",
+        "total": "₹${context.total || context.amount || 0}",
+        "totalInWords": "Rupees [Amount in Words] Only",
+        "paymentTerms": ["50% advance along with purchase order", "50% on completion/delivery"],
+        "validity": "30 days from the date of this quotation",
+        "disclaimer": "This is an AI-generated template. Verify all details and pricing before use.",
+        "signatureBlocks": {
+          "authorised": { "name": "________________", "designation": "Authorised Signatory", "company": "${context.companyName || brandContext.name}", "date": "________________" }
+        }
       }`;
 
     } else if (effectiveType === "profile") {
@@ -363,39 +379,50 @@ Return ONLY valid, richly detailed, FORMALLY WRITTEN JSON document content.`;
       const context = { ...providedData, ...inputData };
       console.log(`📋 Consolidated context for offer_letter:`, context);
 
-      userPrompt = `Generate a STRICTLY FORMAL, HIGHLY PROFESSIONAL Employment Offer Letter using the following context:
+      userPrompt = `Generate a STRICTLY FORMAL, INDIAN BUSINESS-STANDARD Employment Offer Letter using the following context:
       
       CONTEXT DATA:
       ${JSON.stringify(context, null, 2)}
 
-      TONE REQUIREMENT: This is an official employment offer letter. Use FORMAL, PROFESSIONAL language throughout.
-      - Use "Dear [Candidate Name]" as the greeting
-      - Maintain corporate, business-appropriate tone in every sentence
-      - Use formal closings like "Sincerely" or "Best regards"
-      - Write as if this is being sent by a Fortune 500 HR department
-      - NO casual language, NO informal expressions
-      
-      Use the context data provided to fill in specific details. If any information is missing, use professional placeholders.
-      DO NOT USE GENERIC PLACEHOLDERS like "[Candidate Name]" if a name is provided in the context above.
+      INDIAN COMPLIANCE REQUIREMENTS:
+      - Use DD/MM/YYYY date format
+      - Salary in INR with words in brackets (e.g. ₹18,00,000 (Rupees Eighteen Lakh Only) per annum)
+      - Include CTC breakup if salary is provided (Basic, HRA, DA, Special Allowance, PF, ESI if applicable)
+      - Mention probation period (default 6 months if not specified)
+      - Mention notice period (default 1 month during probation, 2 months post-confirmation)
+      - Reference applicable Indian Labour Codes 2019/2020
+      - Include PF/ESI/Gratuity applicability section
+      - Use "Dear Mr./Ms. [Last Name]," as greeting
+      - Use "Yours faithfully" as closing
+
+      DO NOT USE GENERIC PLACEHOLDERS if a name/value is provided in the context above.
 
       Return ONLY valid JSON with this structure:
       {
         "title": "Employment Offer Letter",
-        "date": "${new Date().toLocaleDateString('en-IN', { year: 'numeric', month: 'long', day: 'numeric' })}",
+        "date": "${new Date().toLocaleDateString('en-IN', { day: '2-digit', month: '2-digit', year: 'numeric' })}",
         "companyName": "${context.companyName || context.company || brandContext.name}",
         "candidateName": "${context.candidateName || context.employee || context.candidate || '[Candidate Name]'}",
         "position": "${context.position || '[Job Title]'}",
         "department": "${context.department || '[Department]'}",
-        "startDate": "${context.startDate || context.startdate || '[Start Date]'}",
-        "salary": "${context.salary || '[Annual Salary]'}",
+        "startDate": "${context.startDate || context.startdate || '[Start Date in DD/MM/YYYY]'}",
+        "salary": "${context.salary || '[Annual CTC in INR]'}",
+        "salaryInWords": "Rupees [Amount in Words] Only per annum",
         "reportingTo": "${context.reportingTo || context.reportingto || '[Direct Supervisor/Manager Name]'}",
-        "workLocation": "${context.workLocation || '[Office Location/Remote]'}",
-        "workingHours": "${context.workingHours || 'Monday to Friday, 9:00 AM to 6:00 PM'}",
-        "benefits": "${context.benefits || '[List of benefits]'} ",
-        "termsAndConditions": "${context.termsAndConditions || '[Standard terms]'} ",
-        "nextSteps": "${context.nextSteps || '[Steps to accept]'} ",
+        "workLocation": "${context.workLocation || '[Office Location]'}",
+        "workingHours": "${context.workingHours || 'Monday to Saturday, 9:30 AM to 6:30 PM (as per company policy)'}",
+        "probationPeriod": "${context.probationPeriod || '6 months from date of joining'}",
+        "noticePeriod": "${context.noticePeriod || '1 month during probation, 2 months post-confirmation'}",
+        "benefits": "As per company policy including PF, ESI (if applicable), Gratuity, Leave entitlements as per the applicable Labour Codes",
+        "termsAndConditions": "Employment is subject to verification of documents. Employee shall abide by the company's code of conduct, HR policies, and applicable Indian laws.",
+        "nextSteps": "Kindly sign and return this letter within 7 working days as acceptance. Report on the date of joining with original documents.",
         "hrContactPerson": "${context.hrContactPerson || context.contactPerson || 'HR Manager'}",
-        "closingMessage": "We are excited about the possibility of you joining our team and look forward to your positive response."
+        "closingMessage": "We are confident that your association with us shall be mutually rewarding. We look forward to welcoming you to the team.",
+        "disclaimer": "This is an AI-generated template document based solely on the information provided by the user. It is NOT legal, tax, financial, HR or compliance advice. Laws change over time. Have this reviewed by a qualified professional before signing.",
+        "signatureBlocks": {
+          "authorised": { "name": "________________", "designation": "Authorised Signatory", "company": "${context.companyName || brandContext.name}", "date": "________________" },
+          "candidate": { "name": "${context.candidateName || '[Candidate Name]'}", "date": "________________" }
+        }
       }`;
 
     } else if (effectiveType === "appointment_letter") {
@@ -414,31 +441,35 @@ Return ONLY valid, richly detailed, FORMALLY WRITTEN JSON document content.`;
       const context = { ...providedData, ...inputData };
       console.log(`📋 Consolidated context for appointment_letter:`, context);
 
-      userPrompt = `Generate a STRICTLY FORMAL, PROFESSIONALLY STRUCTURED Appointment Letter using the following context:
+      userPrompt = `Generate a STRICTLY FORMAL, INDIAN BUSINESS-STANDARD Appointment Letter using the following context:
       
       CONTEXT DATA:
       ${JSON.stringify(context, null, 2)}
 
-      TONE REQUIREMENT: This is an official appointment letter. Use FORMAL, CORPORATE-LEVEL language throughout.
-      - Use "Dear [Employee Name]" as the greeting
-      - Write as if issued by a professional HR department
-      - Maintain authoritative, business-appropriate tone in every sentence
-      - Use formal business language and structured formatting
-      - NO casual language, NO informal expressions
-      
-      Use the context data provided to fill in specific details. If any information is missing, use professional placeholders.
-      DO NOT USE GENERIC PLACEHOLDERS like "[Employee Name]" if a name is provided in the context above.
+      INDIAN COMPLIANCE REQUIREMENTS:
+      - Use DD/MM/YYYY date format
+      - Salary in INR with words in brackets (e.g. ₹12,00,000 (Rupees Twelve Lakh Only) per annum)
+      - Include CTC breakup structure (Basic Pay, HRA, Conveyance, Special Allowance, PF Employer, etc.)
+      - Mention probation period, notice period, and confirmation criteria
+      - Reference applicable Indian Labour Codes 2019/2020
+      - Include PF/ESI/Gratuity/Leave entitlements
+      - Use "Dear Mr./Ms. [Last Name]," as greeting
+      - Use "Yours faithfully" as closing
+      - This is NOW MANDATORY under new Labour Codes
+
+      DO NOT USE GENERIC PLACEHOLDERS if a name/value is provided in the context above.
 
       Return ONLY valid JSON with this structure:
       {
         "title": "Letter of Appointment",
-        "date": "${new Date().toLocaleDateString('en-IN', { year: 'numeric', month: 'long', day: 'numeric' })}",
+        "date": "${new Date().toLocaleDateString('en-IN', { day: '2-digit', month: '2-digit', year: 'numeric' })}",
         "companyName": "${context.companyName || context.company || brandContext.name}",
         "employeeName": "${context.employeeName || context.employee || context.candidate || '[Employee Name]'}",
         "position": "${context.position || '[Job Title]'}",
         "department": "${context.department || '[Department]'}",
-        "appointmentDate": "${context.appointmentDate || context.startdate || context.startDate || '[Appointment Date]'}",
-        "salary": "${context.salary || '[Annual Salary]'}",
+        "appointmentDate": "${context.appointmentDate || context.startdate || context.startDate || '[Appointment Date in DD/MM/YYYY]'}",
+        "salary": "${context.salary || '[Annual CTC in INR]'}",
+        "salaryInWords": "Rupees [Amount in Words] Only per annum",
         "employeeId": "${context.employeeId || '[Employee ID to be assigned]'}",
         "reportingStructure": "${context.reportingTo ? `You will report directly to ${context.reportingTo}` : `You will report directly to the ${context.department || 'Department'} Head`}",
         "keyResponsibilities": [
@@ -448,10 +479,18 @@ Return ONLY valid, richly detailed, FORMALLY WRITTEN JSON document content.`;
           "Participate in professional development and training programs",
           "Adhere to all company policies, procedures, and code of conduct"
         ],
-        "probationPeriod": "${context.probationPeriod || '90 days'}",
-        "noticePeriod": "${context.noticePeriod || '30 days'}",
+        "probationPeriod": "${context.probationPeriod || '6 months from date of joining'}",
+        "noticePeriod": "${context.noticePeriod || '1 month during probation, 2 months post-confirmation'}",
+        "socialSecurity": "Employee shall be entitled to Provident Fund, ESI (if applicable), and Gratuity as per applicable Indian laws.",
+        "leaveEntitlement": "As per company leave policy and applicable labour laws (Earned Leave, Casual Leave, Sick Leave).",
         "hrContactPerson": "${context.hrContactPerson || context.contactPerson || 'HR Manager'}",
-        "closingMessage": "We look forward to a mutually beneficial relationship."
+        "closingMessage": "We look forward to a mutually beneficial and long-term professional relationship.",
+        "governingLaw": "This appointment shall be governed by the laws of India. Subject to ${context.city || 'Mumbai'} jurisdiction.",
+        "disclaimer": "This is an AI-generated template document. It is NOT legal, tax, financial, HR or compliance advice. Have this reviewed by a qualified professional before signing.",
+        "signatureBlocks": {
+          "authorised": { "name": "________________", "designation": "Authorised Signatory", "company": "${context.companyName || brandContext.name}", "date": "________________" },
+          "employee": { "name": "${context.employeeName || '[Employee Name]'}", "date": "________________" }
+        }
       }`;
 
     } else if (effectiveType === "experience_certificate") {
@@ -470,33 +509,43 @@ Return ONLY valid, richly detailed, FORMALLY WRITTEN JSON document content.`;
       const context = { ...providedData, ...inputData };
       console.log(`📋 Consolidated context for experience_certificate:`, context);
 
-      userPrompt = `Generate a PROFESSIONAL, BUSINESS-CERTIFIED Experience Certificate using the following context:
+      userPrompt = `Generate a PROFESSIONAL, INDIAN-STANDARD Experience Certificate / Relieving Letter using the following context:
       
       CONTEXT DATA:
       ${JSON.stringify(context, null, 2)}
 
-      TONE REQUIREMENT: This is an official employment certificate. Use FORMAL, PROFESSIONAL language.
-      - Write as if issued by a corporate HR department
-      - Use formal business terminology and structured formatting
-      - Maintain authoritative, professional tone throughout
-      - NO casual language whatsoever
-      
-      Use the context data provided to fill in specific details. If any information is missing, use professional placeholders.
-      DO NOT USE GENERIC PLACEHOLDERS like "[Employee Name]" if a name is provided in the context above.
+      INDIAN HR STANDARDS:
+      - Use DD/MM/YYYY date format
+      - Address: "To Whomsoever It May Concern"
+      - Begin with "This is to certify that..."
+      - Include: Period of employment, Designation held, Last drawn salary (if given)
+      - Include character and conduct assessment
+      - Include best wishes and recommendation
+      - Use formal Indian business English
+      - Reference that employee is relieved of duties with effect from [date]
+
+      DO NOT USE GENERIC PLACEHOLDERS if a name/value is provided in the context above.
 
       Return ONLY valid JSON with this structure:
       {
         "title": "Experience Certificate",
-        "date": "${new Date().toLocaleDateString('en-IN', { year: 'numeric', month: 'long', day: 'numeric' })}",
+        "date": "${new Date().toLocaleDateString('en-IN', { day: '2-digit', month: '2-digit', year: 'numeric' })}",
         "companyName": "${context.companyName || context.company || brandContext.name}",
         "employeeName": "${context.employeeName || context.employee || context.candidate || '[Employee Name]'}",
         "position": "${context.position || '[Job Title]'}",
-        "startDate": "${context.startDate || context.startdate || '[Start Date]'}",
-        "endDate": "${context.endDate || context.enddate || '[End Date/Present]'}",
-        "performance": "${context.performance || 'excellent'}",
-        "skills": "${context.skills || 'professionalism, dedication, and teamwork'}",
+        "department": "${context.department || '[Department]'}",
+        "startDate": "${context.startDate || context.startdate || '[Start Date in DD/MM/YYYY]'}",
+        "endDate": "${context.endDate || context.enddate || '[End Date in DD/MM/YYYY]'}",
+        "performance": "During the tenure of employment, the above-named employee demonstrated exemplary professional conduct, dedication, and integrity.",
+        "skills": "${context.skills || 'professionalism, dedication, teamwork, and strong work ethic'}",
+        "characterAssessment": "We found the above-named employee to be a person of good moral character and professional conduct.",
+        "recommendation": "We wish them all the very best in their future endeavours and recommend them for suitable opportunities.",
         "hrContactPerson": "${context.hrContactPerson || context.hrName || 'HR Manager'}",
-        "certificateId": "EXP-${Date.now().toString().slice(-6)}"
+        "certificateId": "EXP/${new Date().getFullYear()}/${Date.now().toString().slice(-4)}",
+        "disclaimer": "This is an AI-generated template. Verify all details before issuing.",
+        "signatureBlocks": {
+          "authorised": { "name": "________________", "designation": "Authorised Signatory / HR Head", "company": "${context.companyName || brandContext.name}", "date": "________________", "companyStamp": "[Company Seal]" }
+        }
       }`;
 
     } else if (effectiveType === "onboarding_letter") {
@@ -607,27 +656,42 @@ Return ONLY valid, richly detailed, FORMALLY WRITTEN JSON document content.`;
       const context = { ...providedData, ...inputData };
       console.log(`📋 Consolidated context for nda:`, context);
 
-      userPrompt = `Generate a LEGALLY PROFESSIONAL, FORMALLY STRUCTURED Non-Disclosure Agreement using the following context:
+      userPrompt = `Generate a LEGALLY PROFESSIONAL, INDIAN-STANDARD Non-Disclosure Agreement using the following context:
       
       CONTEXT DATA:
       ${JSON.stringify(context, null, 2)}
 
-      TONE REQUIREMENT: This is a legal contract. Use STRICTLY FORMAL, LEGALLY APPROPRIATE language.
-      - Write as if drafted by a corporate legal department
-      - Use formal legal terminology and structured clauses
-      - Maintain authoritative, professional tone throughout
-      - NO casual language whatsoever
-      
-      Use the context data provided to fill in specific details.
+      INDIAN LEGAL REQUIREMENTS:
+      - Use DD/MM/YYYY date format
+      - Include WHEREAS recitals
+      - Use Indian legal terminology (Indian Contract Act, 1872 references)
+      - Include DPDP Act 2023 data protection compliance references
+      - Structured clauses: Definitions, Obligations, Exclusions, Term, Return of Info, Remedies
+      - Include proper governing law clause with Indian city jurisdiction
+      - Include arbitration clause mentioning Arbitration and Conciliation Act, 1996
+
       Return ONLY valid JSON with this structure:
       {
         "title": "Non-Disclosure Agreement (NDA)",
-        "date": "${new Date().toLocaleDateString('en-IN', { year: 'numeric', month: 'long', day: 'numeric' })}",
+        "date": "${new Date().toLocaleDateString('en-IN', { day: '2-digit', month: '2-digit', year: 'numeric' })}",
         "disclosingParty": "${context.disclosingParty || context.company || brandContext.name}",
+        "disclosingPartyAddress": "${context.disclosingPartyAddress || '[Registered Office Address]'}",
         "receivingParty": "${context.receivingParty || context.otherparty || '[Receiving Party Name]'}",
-        "effectiveDate": "${context.effectiveDate || context.effectivedate || '[Agreement Date]'}",
-        "purpose": "${context.purpose || 'Business discussions'}",
-        "governingLaw": "${context.governingLaw || 'applicable local laws'}"
+        "receivingPartyAddress": "${context.receivingPartyAddress || '[Registered Office Address]'}",
+        "effectiveDate": "${context.effectiveDate || context.effectivedate || '[Agreement Date in DD/MM/YYYY]'}",
+        "purpose": "${context.purpose || 'Business discussions and potential collaboration'}",
+        "confidentialInformation": ["Technical data, trade secrets, know-how, research, product plans", "Financial information, business strategies, client lists", "Any information marked or designated as 'Confidential'", "Information that would reasonably be considered confidential"],
+        "obligations": ["Hold and maintain Confidential Information in strict confidence", "Not disclose to any third parties without prior written consent", "Use solely for the purpose stated in this agreement", "Take reasonable precautions to protect confidentiality", "Return or destroy all Confidential Information upon request"],
+        "exceptions": ["Information publicly available through no breach of this agreement", "Information known prior to disclosure", "Information independently developed without use of Confidential Information", "Information required to be disclosed by law or court order (with prior notice)"],
+        "duration": "${context.duration || '3 years from the effective date'}",
+        "remedies": "The Disclosing Party shall be entitled to seek injunctive relief and monetary damages for any breach.",
+        "governingLaw": "This agreement shall be governed by the laws of India. Subject to ${context.city || 'Mumbai'} jurisdiction.",
+        "arbitration": "Any dispute shall be resolved through arbitration as per the Arbitration and Conciliation Act, 1996.",
+        "disclaimer": "This is an AI-generated template. It is NOT legal advice. Have this reviewed by a qualified Indian lawyer before signing.",
+        "signatureBlocks": {
+          "disclosingParty": { "name": "________________", "designation": "Authorised Signatory", "company": "${context.disclosingParty || brandContext.name}", "date": "________________" },
+          "receivingParty": { "name": "________________", "designation": "Authorised Signatory", "company": "${context.receivingParty || '[Receiving Party]'}", "date": "________________" }
+        }
       }`;
 
     } else if (effectiveType === "service_agreement") {
@@ -722,45 +786,80 @@ Return ONLY valid, richly detailed, FORMALLY WRITTEN JSON document content.`;
       const context = { ...providedData, ...inputData };
       console.log(`📋 Consolidated context for invoice:`, context);
 
-      userPrompt = `Generate a PROFESSIONAL, BUSINESS-STANDARD Invoice using the following context:
+      userPrompt = `Generate a GST-COMPLIANT, INDIAN-STANDARD Tax Invoice using the following context:
       
       CONTEXT DATA:
       ${JSON.stringify(context, null, 2)}
 
-      TONE REQUIREMENT: This is a formal business invoice. Use PROFESSIONAL, FORMAL language.
-      - Write professionally as if from an established business
-      - Use formal business terms and structured formatting
-      - Maintain professional tone in all descriptions and notes
-      - NO casual language
-      
+      INDIAN GST COMPLIANCE (Rule 46):
+      - Invoice number MUST be unique serial for the financial year
+      - Date in DD/MM/YYYY format
+      - Supplier name, address, and GSTIN (mandatory)
+      - Recipient name, address, and GSTIN (if registered)
+      - Place of Supply (State)
+      - HSN/SAC codes for each item
+      - Description, Quantity/Unit, Rate per unit
+      - Taxable Value for each item
+      - CGST/SGST rates and amounts (intra-state) OR IGST rate and amount (inter-state)
+      - Total Amount in figures AND words (INR)
+      - Bank details section for payment
+      - All amounts in INR (₹)
+
       PRIORITY: If 'items' array is provided in CONTEXT DATA, use it exactly.
-      If 'clientName' or 'customerName' is provided, use it for the 'to' section.
 
       Return ONLY valid JSON with this structure:
       {
-        "title": "Invoice",
-        "invoiceNumber": "${context.invoiceNumber || 'INV-' + Date.now().toString().slice(-6)}",
-        "invoiceDate": "${context.invoiceDate || new Date().toLocaleDateString('en-IN', { year: 'numeric', month: 'long', day: 'numeric' })}",
+        "title": "Tax Invoice",
+        "invoiceNumber": "${context.invoiceNumber || 'INV/' + new Date().getFullYear() + '-' + (new Date().getFullYear() + 1).toString().slice(-2) + '/' + Date.now().toString().slice(-4)}",
+        "invoiceDate": "${context.invoiceDate || new Date().toLocaleDateString('en-IN', { day: '2-digit', month: '2-digit', year: 'numeric' })}",
+        "placeOfSupply": "${context.placeOfSupply || '[State Name]'}",
         "from": {
           "company": "${context.fromCompany || brandContext.name}",
-          "address": "${context.fromAddress || '[Company Address]'}"
+          "address": "${context.fromAddress || '[Registered Office Address]'}",
+          "gstin": "${context.fromGSTIN || context.gstNumber || '[Supplier GSTIN]'}",
+          "pan": "${context.fromPAN || '[PAN Number]'}",
+          "stateCode": "${context.fromStateCode || '[State Code]'}"
         },
         "to": {
-          "client": "${context.toClient || context.client || context.customerName || context.clientName || '[Client Name]'}",
-          "address": "${context.toAddress || '[Client Address]'}"
+          "client": "${context.toClient || context.client || context.customerName || context.clientName || '[Client/Buyer Name]'}",
+          "address": "${context.toAddress || '[Client Address]'}",
+          "gstin": "${context.toGSTIN || context.clientGST || '[Client GSTIN (if registered)]'}",
+          "stateCode": "${context.toStateCode || '[State Code]'}"
         },
         "items": ${context.items ? JSON.stringify(context.items) : `[
           {
+            "sno": 1,
             "description": "${context.description || 'Professional Services'}",
+            "hsnSac": "${context.hsnSac || '998311'}",
             "quantity": "${context.quantity || 1}",
+            "unit": "${context.unit || 'Nos'}",
             "rate": "${context.rate || context.amount || 0}",
-            "amount": "${context.amount || 0}"
+            "taxableValue": "${context.amount || 0}",
+            "cgstRate": "9%",
+            "cgstAmount": "0",
+            "sgstRate": "9%",
+            "sgstAmount": "0"
           }
         ]`},
         "subtotal": "${context.subtotal || context.amount || 0}",
-        "tax": "${context.tax || 0}",
+        "cgstTotal": "${context.cgstTotal || 0}",
+        "sgstTotal": "${context.sgstTotal || 0}",
+        "igstTotal": "${context.igstTotal || 0}",
         "total": "${context.total || context.amount || 0}",
-        "dueDate": "${context.dueDate || context.duedate || '[Due Date]'}"
+        "totalInWords": "Rupees [Amount in Words] Only",
+        "dueDate": "${context.dueDate || context.duedate || '[Due Date in DD/MM/YYYY]'}",
+        "paymentTerms": "${context.paymentTerms || 'Net 30 days from invoice date'}",
+        "bankDetails": {
+          "bankName": "${context.bankName || '[Bank Name]'}",
+          "accountNumber": "${context.accountNumber || '[A/c Number]'}",
+          "ifscCode": "${context.ifscCode || '[IFSC Code]'}",
+          "branch": "${context.branch || '[Branch Name]'}"
+        },
+        "notes": "${context.notes || 'Thank you for your business. Payment is due as per terms mentioned above.'}",
+        "disclaimer": "This is an AI-generated template document. Verify all tax calculations and GST compliance with a qualified CA before use.",
+        "signatureBlocks": {
+          "authorised": { "name": "________________", "designation": "Authorised Signatory", "company": "${context.fromCompany || brandContext.name}", "date": "________________" }
+        }
       }`;
 
     } else if (effectiveType === "purchase_order") {
