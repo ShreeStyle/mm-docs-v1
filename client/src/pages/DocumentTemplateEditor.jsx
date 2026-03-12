@@ -76,6 +76,8 @@ const DocumentTemplateEditor = () => {
     const [showFormatMenu, setShowFormatMenu] = useState(false);
     const [showInviteDropdown, setShowInviteDropdown] = useState(false);
     const [showReviewDropdown, setShowReviewDropdown] = useState(false);
+    const [openDropdownId, setOpenDropdownId] = useState(null);
+    const [openStampId, setOpenStampId] = useState(null);
 
     // Feature modals
     const [showInviteModal, setShowInviteModal] = useState(false);
@@ -322,7 +324,8 @@ const DocumentTemplateEditor = () => {
                     page: currentPage,
                     recipient: null,
                     required: false,
-                    value: '',
+                    value: field.id === 'dropdown' ? 'Option 1' : '',
+                    options: field.id === 'dropdown' ? ['Option 1', 'Option 2', 'Option 3'] : [],
                     completed: false
                 };
 
@@ -352,7 +355,8 @@ const DocumentTemplateEditor = () => {
             page: currentPage,
             recipient: null,
             required: false,
-            value: '', // Store field value
+            value: draggedField.id === 'dropdown' ? 'Option 1' : '', // Store field value
+            options: draggedField.id === 'dropdown' ? ['Option 1', 'Option 2', 'Option 3'] : [],
             completed: false
         };
 
@@ -373,6 +377,21 @@ const DocumentTemplateEditor = () => {
         if ((element.type === 'signature' || element.type === 'initials') && !element.completed) {
             setCurrentSignatureElement(element);
             setShowSignatureModal(true);
+        }
+    };
+
+    const handleEditOptions = (element) => {
+        const currentOptions = element.options || ['Option 1', 'Option 2', 'Option 3'];
+        const val = prompt('Enter options separated by commas:', currentOptions.join(', '));
+        if (val !== null) {
+            const newOptions = val.split(',').map(o => o.trim()).filter(o => o !== '');
+            if (newOptions.length > 0) {
+                const updatedElements = elements.map(el =>
+                    el.id === element.id ? { ...el, options: newOptions, value: newOptions[0] } : el
+                );
+                setElements(updatedElements);
+                addToHistory(updatedElements);
+            }
         }
     };
 
@@ -1619,20 +1638,81 @@ const DocumentTemplateEditor = () => {
         }
 
         if (element.type === 'dropdown') {
+            const isOpen = openDropdownId === element.id;
             return (
                 <div
-                    className="field-input"
-                    style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 8px' }}
-                    onMouseDown={(e) => e.stopPropagation()}
+                    className="field-input dropdown-field-wrapper"
+                    style={{ 
+                        display: 'flex', 
+                        alignItems: 'center', 
+                        justifyContent: 'space-between', 
+                        padding: '0 8px',
+                        position: 'relative',
+                        height: '100%',
+                        background: 'white',
+                        border: '1px solid #e2e8f0',
+                        borderRadius: '4px',
+                        cursor: 'pointer'
+                    }}
                     onClick={(e) => {
                         e.stopPropagation();
-                        // Optional: Trigger a selection dialog or dropdown menu
+                        setOpenDropdownId(isOpen ? null : element.id);
                     }}
                 >
-                    <span style={{ fontSize: '13px', opacity: element.value ? 1 : 0.5 }}>
+                    <span style={{ fontSize: '13px', opacity: element.value ? 1 : 0.5, userSelect: 'none' }}>
                         {element.value || 'Select...'}
                     </span>
-                    <ChevronDown size={14} />
+                    <ChevronDown 
+                        size={14} 
+                        style={{ 
+                            transition: 'transform 0.2s ease', 
+                            transform: isOpen ? 'rotate(180deg)' : 'rotate(0)' 
+                        }} 
+                    />
+
+                    {isOpen && (
+                        <div 
+                            className="custom-dropdown-menu"
+                            style={{
+                                position: 'absolute',
+                                top: '100%',
+                                left: 0,
+                                width: '100%',
+                                marginTop: '4px',
+                                background: 'white',
+                                border: '1px solid #e2e8f0',
+                                borderRadius: '6px',
+                                boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)',
+                                zIndex: 1000,
+                                maxHeight: '200px',
+                                overflowY: 'auto'
+                            }}
+                        >
+                            {(element.options || ['Option 1', 'Option 2', 'Option 3']).map((option, idx) => (
+                                <div
+                                    key={idx}
+                                    className="dropdown-option-item"
+                                    style={{
+                                        padding: '8px 12px',
+                                        fontSize: '13px',
+                                        color: '#1e293b',
+                                        cursor: 'pointer',
+                                        transition: 'background 0.2s',
+                                        borderBottom: idx < (element.options?.length || 3) - 1 ? '1px solid #f1f5f9' : 'none'
+                                    }}
+                                    onMouseOver={(e) => e.target.style.background = '#f8fafc'}
+                                    onMouseOut={(e) => e.target.style.background = 'transparent'}
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        handleElementValueChange(element.id, option);
+                                        setOpenDropdownId(null);
+                                    }}
+                                >
+                                    {option}
+                                </div>
+                            ))}
+                        </div>
+                    )}
                 </div>
             );
         }
@@ -1689,28 +1769,123 @@ const DocumentTemplateEditor = () => {
                 <div
                     className="field-input"
                     style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '0 8px', justifyContent: 'center', cursor: 'pointer' }}
-                    onMouseDown={(e) => e.stopPropagation()}
                     onClick={(e) => {
                         e.stopPropagation();
+                        // Close dropdowns if open
+                        setOpenDropdownId(null);
+                        setOpenStampId(null);
+                        
                         const val = prompt('Enter card details (last 4 digits):', element.value || '');
                         if (val !== null) handleElementValueChange(element.id, val);
                     }}
                 >
                     <CreditCard size={14} />
-                    <span style={{ fontSize: '12px' }}>{element.value ? 'Card Added' : 'Card Details'}</span>
+                    <span style={{ fontSize: '12px' }}>
+                        {element.value ? `Card: **** ${element.value}` : 'Card Details'}
+                    </span>
                 </div>
             );
         }
 
         if (element.type === 'stamp') {
+            const isStampOpen = openStampId === element.id;
+            const stampOptions = [
+                { label: 'APPROVED', color: '#16a34a', borderColor: '#bbf7d0', bgColor: '#f0fdf4' },
+                { label: 'PAID', color: '#2563eb', borderColor: '#bfdbfe', bgColor: '#eff6ff' },
+                { label: 'DRAFT', color: '#64748b', borderColor: '#e2e8f0', bgColor: '#f8fafc' },
+                { label: 'SIGN HERE', color: '#ea580c', borderColor: '#fed7aa', bgColor: '#fff7ed' },
+                { label: 'URGENT', color: '#dc2626', borderColor: '#fecaca', bgColor: '#fef2f2' }
+            ];
+
+            const currentStamp = element.value 
+                ? stampOptions.find(opt => opt.label === element.value) || stampOptions[0]
+                : null;
+
             return (
                 <div
-                    className="field-input"
-                    style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '0 8px', justifyContent: 'center' }}
-                    onMouseDown={(e) => e.stopPropagation()}
+                    className="field-input dropdown-field-wrapper"
+                    style={{ 
+                        display: 'flex', 
+                        alignItems: 'center', 
+                        justifyContent: 'center', 
+                        padding: currentStamp ? '4px' : '0 8px',
+                        cursor: 'pointer',
+                        position: 'relative',
+                        border: currentStamp ? 'none' : undefined,
+                        background: currentStamp ? 'transparent' : undefined
+                    }}
+                    onClick={(e) => {
+                        e.stopPropagation();
+                        // Close other open menus
+                        setOpenDropdownId(null);
+                        setOpenStampId(isStampOpen ? null : element.id);
+                    }}
                 >
-                    <Stamp size={14} />
-                    <span style={{ fontSize: '12px' }}>{element.value ? 'Stamped' : 'Stamp'}</span>
+                    {currentStamp ? (
+                        <div style={{
+                            border: `3px solid ${currentStamp.borderColor}`,
+                            color: currentStamp.color,
+                            backgroundColor: currentStamp.bgColor,
+                            padding: '4px 12px',
+                            borderRadius: '4px',
+                            fontWeight: 'bold',
+                            fontSize: '14px',
+                            letterSpacing: '1px',
+                            textTransform: 'uppercase',
+                            transform: 'rotate(-5deg)',
+                            fontFamily: 'Impact, Arial Black, sans-serif',
+                            boxShadow: '0 2px 4px rgba(0,0,0,0.05)'
+                        }}>
+                            {currentStamp.label}
+                        </div>
+                    ) : (
+                        <>
+                            <Stamp size={14} />
+                            <span style={{ fontSize: '12px' }}>Stamp</span>
+                        </>
+                    )}
+
+                    {isStampOpen && (
+                        <div className="custom-dropdown-menu" style={{ 
+                            left: '50%', 
+                            transform: 'translateX(-50%)',
+                            width: '160px',
+                            padding: '8px'
+                        }}>
+                            {stampOptions.map((option, idx) => (
+                                <div 
+                                    key={idx}
+                                    className="custom-dropdown-item"
+                                    style={{
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                        padding: '8px',
+                                        borderBottom: idx < stampOptions.length - 1 ? '1px solid #f1f5f9' : 'none'
+                                    }}
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        handleElementValueChange(element.id, option.label);
+                                        setOpenStampId(null);
+                                    }}
+                                >
+                                    <div style={{
+                                        border: `2px solid ${option.borderColor}`,
+                                        color: option.color,
+                                        backgroundColor: option.bgColor,
+                                        padding: '2px 8px',
+                                        borderRadius: '4px',
+                                        fontWeight: 'bold',
+                                        fontSize: '12px',
+                                        letterSpacing: '0.5px',
+                                        fontFamily: 'Impact, Arial Black, sans-serif'
+                                    }}>
+                                        {option.label}
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    )}
                 </div>
             );
         }
@@ -2731,6 +2906,29 @@ const DocumentTemplateEditor = () => {
                                                 {selectedElement?.id === element.id && (
                                                     <>
                                                         <div className="element-controls">
+                                                            {element.type === 'dropdown' && (
+                                                                <button
+                                                                    className="edit-element-btn"
+                                                                    onClick={() => handleEditOptions(element)}
+                                                                    title="Edit Options"
+                                                                    style={{
+                                                                        display: 'flex',
+                                                                        alignItems: 'center',
+                                                                        justifyContent: 'center',
+                                                                        width: '28px',
+                                                                        height: '28px',
+                                                                        borderRadius: '4px',
+                                                                        border: 'none',
+                                                                        background: '#f8fafc',
+                                                                        color: '#64748b',
+                                                                        cursor: 'pointer',
+                                                                        marginRight: '8px',
+                                                                        transition: 'all 0.2s'
+                                                                    }}
+                                                                >
+                                                                    <Settings size={14} />
+                                                                </button>
+                                                            )}
                                                             <button
                                                                 className="delete-element-btn"
                                                                 onClick={handleElementDelete}
