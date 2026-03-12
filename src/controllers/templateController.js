@@ -269,6 +269,29 @@ exports.initializeTemplates = async (req, res) => {
                     { placeholder: '{{totalAmount}}', description: 'Total invoice amount', fieldMapping: 'totalAmount' }
                 ],
                 metadata: { tags: ['invoice', 'billing', 'finance'], version: '1.0.0' }
+            },
+            {
+                templateId: 'letter-of-recommendation-001',
+                name: 'Letter of Recommendation',
+                category: 'hr',
+                description: 'Professional recommendation letter for students or employees',
+                icon: '🎓',
+                requiredFields: [
+                    { fieldName: 'candidateName', fieldType: 'text', label: 'Candidate Name', placeholder: 'e.g. John Doe', required: true },
+                    { fieldName: 'position', fieldType: 'text', label: 'Position/Course Applied For', placeholder: 'e.g. Master of Science in CS', required: true },
+                    { fieldName: 'recommenderName', fieldType: 'text', label: 'Recommender Name', placeholder: 'e.g. Prof. Alan Turing', required: true },
+                    { fieldName: 'recommenderTitle', fieldType: 'text', label: 'Recommender Title', placeholder: 'e.g. Head of Engineering', required: true },
+                    { fieldName: 'relationship', fieldType: 'text', label: 'Relationship', placeholder: 'e.g. Professor / Supervisor', required: true },
+                    { fieldName: 'companyName', fieldType: 'text', label: 'Company/University Name', placeholder: 'e.g. Tech University', required: true },
+                    { fieldName: 'companyAddress', fieldType: 'textarea', label: 'Company Address', placeholder: 'Complete address', required: true }
+                ],
+                content: await fs.promises.readFile(path.join(__dirname, '../templates/recommendation_letter.hbs'), 'utf8'),
+                placeholders: [
+                    { placeholder: '{{candidateName}}', description: 'Name of the candidate', fieldMapping: 'candidateName' },
+                    { placeholder: '{{position}}', description: 'Position or course', fieldMapping: 'position' },
+                    { placeholder: '{{recommenderName}}', description: 'Name of the recommender', fieldMapping: 'recommenderName' }
+                ],
+                metadata: { tags: ['recommendation', 'hr', 'academic'], version: '1.0.0' }
             }
         ];
 

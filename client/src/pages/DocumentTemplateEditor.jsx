@@ -267,6 +267,42 @@ const DocumentTemplateEditor = () => {
                 fromSidebar: true
             });
             setShowSignatureModal(true);
+        } else if (field.id === 'file-upload') {
+            const fileInput = document.createElement('input');
+            fileInput.type = 'file';
+            fileInput.accept = 'image/*';
+            fileInput.onchange = (ev) => {
+                const file = ev.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = (event) => {
+                        const canvas = canvasRef.current;
+                        if (canvas) {
+                            const rect = canvas.getBoundingClientRect();
+                            const x = rect.width / 2 - 100;
+                            const y = rect.height / 2 - 100;
+
+                            const newElement = {
+                                id: Date.now(),
+                                type: 'image', // Use image type since we are reading it as data URL
+                                name: 'Uploaded File',
+                                x: x,
+                                y: y,
+                                width: 200,
+                                height: 200,
+                                page: currentPage,
+                                value: event.target.result,
+                                completed: true
+                            };
+
+                            setElements(prev => [...prev, newElement]);
+                            setSelectedElement(newElement);
+                        }
+                    };
+                    reader.readAsDataURL(file);
+                }
+            };
+            fileInput.click();
         } else {
             // For other fields, place directly on canvas at center
             const canvas = canvasRef.current;
