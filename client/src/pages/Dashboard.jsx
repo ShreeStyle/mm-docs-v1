@@ -1664,8 +1664,10 @@ export default function Dashboard() {
                 appointment_letter: [
                     ...commonFields,
                     { id: 'employeeName', label: 'Employee Name', type: 'text', placeholder: 'e.g. Priya Sharma', required: true },
+                    { id: 'employeeAddress', label: 'Employee Address', type: 'textarea', placeholder: 'Complete address of the employee', required: true },
                     { id: 'position', label: 'Position', type: 'text', placeholder: 'e.g. Senior Software Engineer', required: true },
                     { id: 'department', label: 'Department', type: 'text', placeholder: 'e.g. Engineering', required: true },
+                    { id: 'salary', label: 'Annual Salary (₹)', type: 'number', placeholder: 'e.g. 1500000', required: true },
                     { id: 'appointmentDate', label: 'Appointment Date', type: 'date', required: true },
                     { id: 'reportingTo', label: 'Reporting Manager', type: 'text', placeholder: 'e.g. Director of Engineering', required: true }
                 ],
@@ -1956,14 +1958,13 @@ Subject: Appointment as ${formData.position || '[Position]'}
 
 Dear ${formData.employeeName || '[Employee Name]'},
 
-We are pleased to inform you that you have been appointed as ${formData.position || '[Position]'} in the ${formData.department || '[Department]'} department of ${formData.companyName || '[Company Name]'}, effective from ${formData.startDate || '[Start Date]'}.
+We are pleased to inform you that you have been appointed as ${formData.position || '[Position]'} in the ${formData.department || '[Department]'} department of ${formData.companyName || '[Company Name]'}, effective from ${formData.appointmentDate || '[Appointment Date]'}.
 
 Employment Details:
 • Position: ${formData.position || '[Position]'}
 • Department: ${formData.department || '[Department]'}
 • Reporting To: ${formData.reportingTo || '[Reporting Manager]'}
-• Work Location: ${formData.workLocation || '[Work Location]'}
-• Probation Period: ${formData.probationPeriod || '90 days'}
+• Annual Salary: ₹${formData.salary ? Number(formData.salary).toLocaleString() : '[Salary]'}
 
 Terms and Conditions:
 • You will be governed by the rules and regulations of the company

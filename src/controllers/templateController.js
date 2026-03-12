@@ -161,6 +161,7 @@ exports.initializeTemplates = async (req, res) => {
                     { fieldName: 'position', fieldType: 'text', label: 'Position', placeholder: 'e.g. Marketing Manager', required: true },
                     { fieldName: 'department', fieldType: 'text', label: 'Department', placeholder: 'e.g. Marketing', required: true },
                     { fieldName: 'appointmentDate', fieldType: 'date', label: 'Appointment Date', required: true },
+                    { fieldName: 'salary', fieldType: 'number', label: 'Annual Salary (₹)', placeholder: 'e.g. 1800000', required: true },
                     { fieldName: 'reportingTo', fieldType: 'text', label: 'Reporting Manager', placeholder: 'e.g. Head of Marketing', required: true },
                     { fieldName: 'workLocation', fieldType: 'text', label: 'Work Location', placeholder: 'e.g. Mumbai Office', required: true },
                     { fieldName: 'companyName', fieldType: 'text', label: 'Company Name', placeholder: 'e.g. Business Corp Ltd', required: true },

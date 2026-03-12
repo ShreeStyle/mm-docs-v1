@@ -1,325 +1,444 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Appointment Letter</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <title>Appointment Letter - {{companyName}}</title>
+    <!-- Use similar fonts to the reference (Helvetica/Arial sans-serif stack, or Inter) -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Montserrat:wght@700;800&display=swap" rel="stylesheet">
     <style>
+        @page {
+            size: A4;
+            margin: 0;
+        }
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
         }
-
         body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            line-height: 1.6;
-            color: #1f2937;
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 48px 40px;
+            font-family: 'Inter', -apple-system, sans-serif;
+            background: #ffffff;
+            color: #2c323f;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+            font-size: 11px;
+            line-height: 1.5;
+        }
+        
+        .a4-container {
+            width: 210mm;
+            min-height: 297mm;
+            position: relative;
             background: white;
-            font-size: 14px;
+            overflow: hidden;
+            margin: 0 auto;
         }
 
-        .letterhead {
+        /* Top Banner Vector Graphics */
+        .top-banner {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 210mm;
+            height: 45mm;
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        /* Bottom Banner Vector Graphics */
+        .bottom-banner {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 210mm;
+            height: 25mm;
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        .header-content {
+            position: relative;
+            z-index: 2;
+            width: 100%;
+            height: 45mm;
             display: flex;
             justify-content: space-between;
-            align-items: flex-start;
-            padding-bottom: 28px;
-            margin-bottom: 36px;
-            border-bottom: 1px solid #e5e7eb;
+            align-items: center;
         }
 
-        .company-name {
-            font-size: 22px;
-            font-weight: 700;
-            color: #111827;
-            margin-bottom: 8px;
-            letter-spacing: -0.02em;
-        }
-
-        .company-address {
-            font-size: 13px;
-            color: #4b5563;
-            line-height: 1.6;
-            max-width: 280px;
-        }
-
-        .doc-badge {
-            text-align: right;
-        }
-
-        .doc-title {
-            font-size: 30px;
+        .header-title {
+            color: white;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 24px;
             font-weight: 800;
-            color: #e5e7eb;
-            text-transform: uppercase;
-            letter-spacing: 0.06em;
-            margin-bottom: 8px;
+            letter-spacing: 1px;
+            margin-left: 20mm;
+            margin-top: 5mm;
         }
 
-        .doc-date {
-            font-size: 13px;
-            color: #6b7280;
+        .header-logo {
+            margin-right: 15mm;
+            margin-top: 5mm;
+            text-align: right;
+            color: #0c2049;
+            font-family: 'Montserrat', sans-serif;
+        }
+        .header-logo-icon {
+            font-size: 32px;
+            font-weight: 800;
+            color: #008f87;
+            line-height: 1;
+        }
+        .header-logo-text {
+            font-size: 14px;
+            font-weight: 800;
+            letter-spacing: 1px;
+            margin-top: 2px;
         }
 
-        .doc-date strong {
-            color: #111827;
+        /* Main Body Layer */
+        .content-layer {
+            position: relative;
+            z-index: 2;
+            padding: 10mm 20mm 25mm 20mm;
         }
 
-        .section-label {
-            font-size: 11px;
-            text-transform: uppercase;
-            letter-spacing: 0.06em;
-            color: #6b7280;
-            font-weight: 600;
-            margin-bottom: 12px;
+        /* Meta Section (To & Date) */
+        .meta-section {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 25px;
+            color: #2c323f;
         }
 
-        .recipient {
-            margin-bottom: 32px;
+        .recipient-info {
+            line-height: 1.5;
+        }
+        
+        .recipient-label {
+            font-weight: 700;
+            font-size: 12px;
         }
 
         .recipient-name {
-            font-size: 16px;
-            font-weight: 600;
-            color: #111827;
-            margin-bottom: 4px;
+            font-size: 12px;
+            color: #2c323f;
+        }
+        
+        .recipient-address {
+            color: #4a5568;
         }
 
-        .recipient-addr {
-            font-size: 13px;
-            color: #4b5563;
+        .date-text {
+            font-size: 12px;
+            color: #2c323f;
         }
 
-        .subject {
-            background: #f9fafb;
-            border-radius: 8px;
-            padding: 16px 20px;
-            margin-bottom: 28px;
-            font-weight: 600;
-            color: #111827;
-            font-size: 14px;
+        /* Intro Paragraph */
+        .intro-text {
+            margin-bottom: 20px;
+            text-align: justify;
+        }
+        .intro-text p {
+            margin-bottom: 8px;
         }
 
-        .content {
-            font-size: 14px;
-            color: #374151;
-            line-height: 1.7;
+        /* Two Column Layout */
+        .columns-container {
+            display: flex;
+            justify-content: space-between;
+            gap: 20px;
+            margin-bottom: 25px;
         }
 
-        .content p {
-            margin-bottom: 16px;
+        .col-left {
+            width: 48%;
         }
 
+        .col-right {
+            width: 48%;
+        }
+
+        .section-title {
+            font-size: 11px;
+            font-weight: 700;
+            color: #2c323f;
+            margin-bottom: 12px;
+        }
+
+        /* Position Details Table */
         .details-table {
             width: 100%;
             border-collapse: collapse;
-            margin: 24px 0;
         }
-
-        .details-table th {
-            background: #f9fafb;
-            text-align: left;
-            padding: 12px 16px;
-            font-size: 13px;
-            font-weight: 600;
-            color: #6b7280;
-            border-bottom: 1px solid #e5e7eb;
-            text-transform: uppercase;
-            letter-spacing: 0.04em;
-            width: 35%;
+        .details-table tr {
+            border-bottom: 1px solid #7cb3c8;
         }
-
+        .details-table tr:last-child {
+            border-bottom: 1px solid #7cb3c8;
+        }
         .details-table td {
-            padding: 12px 16px;
-            font-size: 14px;
-            color: #111827;
-            font-weight: 500;
-            border-bottom: 1px solid #f3f4f6;
+            padding: 8px 0;
+            font-size: 10px;
+            vertical-align: top;
+        }
+        .details-table td.label-cell {
+            font-weight: 700;
+            color: #1a2a40;
+            width: 45%;
+        }
+        .details-table td.value-cell {
+            color: #3a4a5f;
+            text-align: right;
         }
 
-        .terms-section {
-            background: #f9fafb;
-            border-radius: 8px;
-            padding: 24px;
-            margin: 28px 0;
+        /* Key Responsibilities List */
+        .responsibilities-intro {
+            font-size: 10px;
+            margin-bottom: 6px;
+            color: #333;
+        }
+        .responsibilities-list {
+            padding-left: 15px;
+            font-size: 10px;
+            color: #333;
+            margin-bottom: 8px;
+        }
+        .responsibilities-list li {
+            margin-bottom: 4px;
+        }
+        .responsibilities-outro {
+            font-size: 10px;
+            color: #333;
         }
 
-        .terms-title {
-            font-size: 13px;
-            font-weight: 600;
-            color: #111827;
-            margin-bottom: 16px;
-            text-transform: uppercase;
-            letter-spacing: 0.04em;
+        /* Additional Sections */
+        .extra-section {
+            margin-bottom: 20px;
+        }
+        .extra-section p {
+            margin-bottom: 4px;
+            color: #333;
+            text-align: justify;
         }
 
-        .terms-list {
-            padding-left: 20px;
+        /* Divider */
+        .divider {
+            height: 1px;
+            background-color: #7cb3c8;
+            margin: 25px 0 20px 0;
         }
 
-        .terms-list li {
-            margin-bottom: 10px;
-            font-size: 13px;
-            color: #4b5563;
-            line-height: 1.6;
-        }
-
-        .signature-section {
-            margin-top: 48px;
+        /* Signature and Footer Area */
+        .bottom-area {
             display: flex;
             justify-content: space-between;
+            align-items: flex-end;
+            margin-top: 10px;
         }
 
         .signature-block {
-            width: 44%;
+            width: 50%;
+        }
+        
+        .closure-text {
+            margin-bottom: 40px;
+            color: #333;
         }
 
-        .sig-label {
-            font-size: 12px;
-            font-weight: 600;
-            color: #6b7280;
-            text-transform: uppercase;
-            letter-spacing: 0.04em;
-            margin-bottom: 48px;
+        .sender-name {
+            font-size: 11px;
+            font-weight: 700;
+            color: #2c323f;
         }
 
-        .sig-line {
-            border-top: 1px solid #d1d5db;
-            padding-top: 8px;
+        .sender-title {
+            font-size: 10px;
+            color: #4a5568;
         }
 
-        .sig-name {
-            font-size: 14px;
-            font-weight: 600;
-            color: #111827;
+        .contact-info {
+            width: 45%;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            align-items: flex-end;
         }
 
-        .sig-role {
-            font-size: 12px;
-            color: #6b7280;
+        .contact-item {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 8px;
+            font-size: 10px;
+            color: #4a5568;
         }
 
-        .footer {
-            margin-top: 48px;
-            text-align: center;
-            padding-top: 24px;
-            border-top: 1px solid #e5e7eb;
-            color: #9ca3af;
-            font-size: 12px;
+        .contact-icon {
+            width: 16px;
+            height: 16px;
+            background: #008f87;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 8px;
         }
     </style>
 </head>
-
 <body>
-    <div class="letterhead">
-        <div>
-            <div class="company-name">{{companyName}}</div>
-            <div class="company-address">
-                {{{companyAddress}}}
-                {{#if companyPhone}}<br>{{companyPhone}}{{/if}}
-                {{#if companyEmail}}<br>{{companyEmail}}{{/if}}
+    <div class="a4-container">
+        
+        <!-- Top SVG Banner -->
+        <svg class="top-banner" viewBox="0 0 800 170" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+            <!-- Light Blue Abstract Angle -->
+            <polygon points="0,0 800,0 800,105 0,170" fill="#ccdae6" />
+            <!-- Teal Middle Angle -->
+            <polygon points="0,0 580,0 480,140 0,150" fill="#008f87" />
+            <!-- Dark Navy Main Shape -->
+            <polygon points="0,0 520,0 350,140 0,140" fill="#0c2049" />
+            <!-- Decorative Light Blue Stripes -->
+            <polygon points="150,140 200,140 240,165 190,165" fill="#68c0b5" />
+            <polygon points="210,140 260,140 300,165 250,165" fill="#008f87" />
+            
+            <!-- Abstract circle hash pattern on top right inside navy -->
+            <g transform="translate(540, 20) rotate(45)" opacity="0.8">
+                <line x1="0" y1="0" x2="0" y2="40" stroke="white" stroke-width="2" />
+                <line x1="8" y1="-5" x2="8" y2="45" stroke="white" stroke-width="2" />
+                <line x1="16" y1="-10" x2="16" y2="50" stroke="white" stroke-width="2" />
+                <line x1="24" y1="-5" x2="24" y2="45" stroke="white" stroke-width="2" />
+                <line x1="32" y1="0" x2="32" y2="40" stroke="white" stroke-width="2" />
+            </g>
+        </svg>
+
+        <div class="header-content">
+            <div class="header-title">APPOINTMENT LETTER</div>
+            <div class="header-logo">
+                <div class="header-logo-icon">§</div>
+                <div class="header-logo-text">{{#if companyName}}{{companyName}}{{else}}COMPANY{{/if}}</div>
             </div>
         </div>
-        <div class="doc-badge">
-            <div class="doc-title">APPOINTMENT</div>
-            <div class="doc-date"><strong>Date:</strong> {{appointmentDate}}</div>
-            {{#if refNumber}}<div class="doc-date"><strong>Ref:</strong> {{refNumber}}</div>{{/if}}
-        </div>
-    </div>
 
-    <div class="recipient">
-        <div class="section-label">To</div>
-        <div class="recipient-name">{{employeeName}}</div>
-        {{#if employeeAddress}}<div class="recipient-addr">{{{employeeAddress}}}</div>{{/if}}
-    </div>
-
-    <div class="subject">Subject: Appointment as {{position}}</div>
-
-    <div class="content">
-        <p>Dear {{employeeName}},</p>
-        <p>We are pleased to inform you that you have been appointed as <strong>{{position}}</strong> in the
-            <strong>{{department}}</strong> department of {{companyName}}, effective from
-            <strong>{{startDate}}</strong>.</p>
-        <p>Your appointment is subject to the terms and conditions mentioned below and as per the company policies:</p>
-
-        <table class="details-table">
-            <tr>
-                <th>Employee Name</th>
-                <td>{{employeeName}}</td>
-            </tr>
-            <tr>
-                <th>Position</th>
-                <td>{{position}}</td>
-            </tr>
-            <tr>
-                <th>Department</th>
-                <td>{{department}}</td>
-            </tr>
-            <tr>
-                <th>Date of Appointment</th>
-                <td>{{appointmentDate}}</td>
-            </tr>
-            <tr>
-                <th>Reporting Manager</th>
-                <td>{{reportingTo}}</td>
-            </tr>
-            <tr>
-                <th>Work Location</th>
-                <td>{{workLocation}}</td>
-            </tr>
-            {{#if probationPeriod}}<tr>
-                <th>Probation Period</th>
-                <td>{{probationPeriod}}</td>
-            </tr>{{/if}}
-        </table>
-
-        <div class="terms-section">
-            <div class="terms-title">Terms & Conditions</div>
-            <ol class="terms-list">
-                <li>You will be governed by the rules, regulations, and policies of the company as amended from time to
-                    time.</li>
-                <li>You are required to maintain confidentiality of all company information and data.</li>
-                <li>Your employment is subject to satisfactory completion of probation period{{#if probationPeriod}} of
-                    {{probationPeriod}}{{/if}}.</li>
-                <li>You will be required to give {{#if noticePeriod}}{{noticePeriod}}{{else}}30 days{{/if}} notice in
-                    writing before leaving the organization.</li>
-                <li>The company reserves the right to terminate your services with appropriate notice as per company
-                    policy.</li>
-                <li>You will be entitled to benefits as per company policy including health insurance and paid leave.
-                </li>
-            </ol>
-        </div>
-
-        <p>We welcome you to our organization and look forward to a long and mutually beneficial association.</p>
-        <p>Please confirm your acceptance by signing and returning a copy of this letter.</p>
-        <p>Congratulations and welcome to <strong>{{companyName}}</strong>!</p>
-    </div>
-
-    <div class="signature-section">
-        <div class="signature-block">
-            <div class="sig-label">For {{companyName}}</div>
-            <div class="sig-line">
-                <div class="sig-name">{{#if hrContactPerson}}{{hrContactPerson}}{{else}}HR Manager{{/if}}</div>
-                <div class="sig-role">Human Resources</div>
+        <div class="content-layer">
+            
+            <div class="meta-section">
+                <div class="recipient-info">
+                    <div class="recipient-label">To:</div>
+                    <div class="recipient-name">{{employeeName}}</div>
+                    {{#if employeeAddress}}
+                    <div class="recipient-address">{{{employeeAddress}}}</div>
+                    {{/if}}
+                </div>
+                <div class="date-text">{{#if appointmentDate}}{{appointmentDate}}{{else}}{{date}}{{/if}}</div>
             </div>
-        </div>
-        <div class="signature-block">
-            <div class="sig-label">Employee Acceptance</div>
-            <div class="sig-line">
-                <div class="sig-name">{{employeeName}}</div>
-                <div class="sig-role">Date: ___________</div>
-            </div>
-        </div>
-    </div>
 
-    <div class="footer">
-        <p>This is a system-generated document. {{companyName}}</p>
+            <div class="intro-text">
+                <p>Dear {{#if employeeName}}{{employeeName}}{{else}}Candidate{{/if}},</p>
+                <p>We are pleased to inform you that you have been officially appointed to the position of <strong>{{position}}</strong>, effective <strong>{{#if startDate}}{{startDate}}{{else}}{{appointmentDate}}{{/if}}</strong>, within the <strong>{{department}}</strong> Department of {{companyName}}.</p>
+                <p>Your appointment reflects the company's confidence in your capabilities, work ethic, and consistent contributions to operational excellence and your ongoing commitment to improving team performance.</p>
+            </div>
+
+            <div class="columns-container">
+                <!-- Left Column -->
+                <div class="col-left">
+                    <div class="section-title">1. Position Details</div>
+                    <table class="details-table">
+                        <tr>
+                            <td class="label-cell">Position Title</td>
+                            <td class="value-cell">{{position}}</td>
+                        </tr>
+                        <tr>
+                            <td class="label-cell">Department</td>
+                            <td class="value-cell">{{department}}</td>
+                        </tr>
+                        <tr>
+                            <td class="label-cell">Reporting To</td>
+                            <td class="value-cell">{{#if reportingTo}}{{reportingTo}}{{else}}Department Head{{/if}}</td>
+                        </tr>
+                        <tr>
+                            <td class="label-cell">Employment Type</td>
+                            <td class="value-cell">Full-Time</td>
+                        </tr>
+                        <tr>
+                            <td class="label-cell">Start Date</td>
+                            <td class="value-cell">{{#if startDate}}{{startDate}}{{else}}{{appointmentDate}}{{/if}}</td>
+                        </tr>
+                    </table>
+                </div>
+
+                <!-- Right Column -->
+                <div class="col-right">
+                    <div class="section-title">2. Key Responsibilities</div>
+                    <div class="responsibilities-intro">You will be responsible for:</div>
+                    <ul class="responsibilities-list">
+                        {{#if keyResponsibilities}}
+                            {{#each keyResponsibilities}}
+                                <li>{{this}}</li>
+                            {{/each}}
+                        {{else}}
+                            <li>Leading daily workflow within your designated department.</li>
+                            <li>Overseeing report accuracy, analysis quality, and operational improvements.</li>
+                            <li>Supporting audit cycles and cross-functional initiatives.</li>
+                            <li>Ensuring all processes comply with standard internal SOPs and Indian Labour Codes.</li>
+                        {{/if}}
+                    </ul>
+                    <div class="responsibilities-outro">Additional responsibilities may be assigned as needed to support strategic goals.</div>
+                </div>
+            </div>
+
+            <div class="extra-section">
+                <div class="section-title">3. Compensation &amp; Benefits</div>
+                <p>Your compensation package including Fixed Pay and performance-linked benefits sums to <strong>{{#if salaryInWords}}₹{{salary}} ({{salaryInWords}}){{else}}₹{{salary}} per annum{{/if}}</strong>. Applicable deductions like PF, ESI, and taxes will be processed as per prevailing Indian laws. Detailed structure will be communicated separately by the Human Resources Department.</p>
+            </div>
+
+            <div class="extra-section">
+                <div class="section-title">4. Confirmation of Appointment</div>
+                <p>Please sign and return the acknowledgment section below within 5 working days to confirm your acceptance of this appointment.</p>
+                <p>We look forward to your continued leadership and meaningful contributions to the company's future growth. Congratulations on your new role.</p>
+            </div>
+
+            <div class="divider"></div>
+
+            <div class="bottom-area">
+                <div class="signature-block">
+                    <div class="closure-text">Sincerely,</div>
+                    <div class="sender-name">{{#if hrContactPerson}}{{hrContactPerson}}{{else}}HR Director{{/if}}</div>
+                    <div class="sender-title">Human Resources Department</div>
+                </div>
+
+                <div class="contact-info">
+                    {{#if companyPhone}}
+                    <div class="contact-item">
+                        <div class="contact-icon">✆</div>
+                        <div>{{companyPhone}}</div>
+                    </div>
+                    {{/if}}
+                    <div class="contact-item">
+                        <div class="contact-icon">📍</div>
+                        <div>{{#if companyAddress}}{{{companyAddress}}}{{else}}Corporate Headquarters{{/if}}</div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Bottom SVG Banner -->
+        <svg class="bottom-banner" viewBox="0 0 800 95" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+            <!-- Light Blue Abstract Angle -->
+            <polygon points="400,95 800,95 800,20 600,95" fill="#ccdae6" />
+            <!-- Teal Angles -->
+            <polygon points="500,95 650,95 800,40 800,70" fill="#008f87" />
+            <polygon points="680,95 760,95 800,80 800,95" fill="#68c0b5" />
+            <!-- Dark Navy Main Shape -->
+            <polygon points="0,95 600,95 500,60 0,60" fill="#0c2049" />
+            
+            <!-- Diagonal stripes on the teal part -->
+            <polygon points="550,95 580,95 640,75 610,75" fill="#ffffff" />
+            <polygon points="610,95 640,95 700,70 670,70" fill="#ffffff" />
+        </svg>
+
     </div>
 </body>
-
 </html>
