@@ -7,6 +7,11 @@
     <title>Privacy Policy</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
+        @page {
+            size: A4;
+            margin: 0;
+        }
+
         * {
             box-sizing: border-box;
             margin: 0;
@@ -15,359 +20,184 @@
 
         body {
             font-family: 'Inter', -apple-system, sans-serif;
+            background: #ffffff;
+            color: #333333;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+            font-size: 11px;
             line-height: 1.6;
-            color: #1f2937;
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 48px 40px;
+        }
+
+        .a4-container {
+            width: 210mm;
+            min-height: 297mm;
+            position: relative;
             background: white;
-            font-size: 14px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
         }
 
-        .header {
-            text-align: center;
-            padding-bottom: 28px;
-            margin-bottom: 36px;
-            border-bottom: 1px solid #e5e7eb;
+        /* Top Wave Banner */
+        .top-banner {
+            position: relative;
+            width: 100%;
+            height: 60mm;
+            background-color: #ffffff;
         }
 
-        .company-name {
-            font-size: 22px;
-            font-weight: 700;
-            color: #111827;
-            margin-bottom: 4px;
+        .wave-svg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+        }
+
+        .header-content {
+            position: absolute;
+            top: 25mm;
+            left: 20mm;
+            z-index: 10;
         }
 
         .doc-title {
+            color: #f37021;
             font-size: 32px;
             font-weight: 800;
-            color: #e5e7eb;
+            line-height: 1;
             text-transform: uppercase;
-            letter-spacing: 0.06em;
-            margin: 8px 0;
+            letter-spacing: -0.5px;
         }
 
-        .doc-meta {
-            font-size: 13px;
-            color: #6b7280;
+        .doc-subtitle {
+            color: #f37021;
+            font-size: 28px;
+            font-weight: 400;
+            font-style: italic;
+            margin-top: 4px;
         }
 
-        .doc-meta strong {
-            color: #111827;
+        /* Content Layer */
+        .content-layer {
+            flex-grow: 1;
+            padding: 10mm 20mm 20mm 20mm;
         }
 
-        .intro {
-            font-size: 14px;
-            color: #374151;
-            line-height: 1.7;
-            margin-bottom: 28px;
+        .section {
+            margin-bottom: 25px;
         }
 
-        .intro p {
-            margin-bottom: 12px;
-        }
-
-        .clause {
-            margin: 24px 0;
-        }
-
-        .clause-header {
-            font-size: 16px;
+        .section-header {
+            color: #f37021;
+            font-size: 12px;
             font-weight: 700;
-            color: #111827;
+            margin-bottom: 8px;
+            text-transform: capitalize;
+        }
+
+        .section-text {
+            color: #555555;
+            text-align: justify;
+        }
+
+        .section-text p {
             margin-bottom: 12px;
-            padding-bottom: 8px;
-            border-bottom: 1px solid #e5e7eb;
         }
 
-        .clause p {
-            font-size: 13px;
-            color: #4b5563;
-            line-height: 1.7;
-            margin-bottom: 10px;
+        .section-list {
+            list-style: none;
+            padding-left: 0;
         }
 
-        .clause ul,
-        .clause ol {
-            padding-left: 20px;
-            margin: 8px 0;
-        }
-
-        .clause li {
-            font-size: 13px;
-            color: #4b5563;
-            line-height: 1.6;
+        .section-list li {
+            position: relative;
+            padding-left: 15px;
             margin-bottom: 6px;
+            color: #555555;
         }
 
-        .highlight-box {
-            background: #eff6ff;
-            border: 1px solid #bfdbfe;
-            border-radius: 8px;
-            padding: 16px 20px;
-            margin: 16px 0;
+        .section-list li::before {
+            content: "•";
+            position: absolute;
+            left: 0;
+            color: #f37021;
         }
 
-        .highlight-box p {
-            font-size: 13px;
-            color: #1e40af;
-        }
-
-        .data-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin: 16px 0;
-        }
-
-        .data-table th {
-            background: #f9fafb;
-            text-align: left;
-            padding: 10px 14px;
-            font-size: 12px;
-            font-weight: 600;
-            color: #6b7280;
-            border-bottom: 1px solid #e5e7eb;
-            text-transform: uppercase;
-            letter-spacing: 0.04em;
-        }
-
-        .data-table td {
-            padding: 10px 14px;
-            font-size: 13px;
-            color: #374151;
-            border-bottom: 1px solid #f3f4f6;
-        }
-
-        .rights-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 12px;
-            margin: 16px 0;
-        }
-
-        .right-card {
-            background: #f9fafb;
-            border-radius: 8px;
-            padding: 16px;
-        }
-
-        .right-title {
-            font-size: 13px;
-            font-weight: 600;
-            color: #111827;
-            margin-bottom: 4px;
-        }
-
-        .right-desc {
-            font-size: 12px;
-            color: #4b5563;
-        }
-
-        .contact-section {
-            background: #f9fafb;
-            border-radius: 8px;
-            padding: 24px;
-            margin: 28px 0;
-        }
-
-        .contact-title {
-            font-size: 13px;
-            font-weight: 600;
-            color: #111827;
-            margin-bottom: 12px;
-            text-transform: uppercase;
-            letter-spacing: 0.04em;
-        }
-
-        .contact-detail {
-            font-size: 13px;
-            color: #4b5563;
-            line-height: 1.6;
-        }
-
-        .contact-detail strong {
-            color: #111827;
-        }
-
-        .footer {
-            margin-top: 48px;
-            text-align: center;
-            padding-top: 24px;
-            border-top: 1px solid #e5e7eb;
-            color: #9ca3af;
-            font-size: 12px;
-        }
     </style>
 </head>
 
 <body>
-    <div class="header">
-        <div class="company-name">{{companyName}}</div>
-        <div class="doc-title">Privacy Policy</div>
-        <div class="doc-meta"><strong>Effective Date:</strong> {{effectiveDate}} &nbsp;|&nbsp; <strong>Last
-                Updated:</strong> {{#if lastUpdated}}{{lastUpdated}}{{else}}{{effectiveDate}}{{/if}}</div>
-    </div>
-
-    <div class="intro">
-        <p>At <strong>{{companyName}}</strong>, we are committed to protecting your privacy and ensuring the security of
-            your personal information. This Privacy Policy explains how we collect, use, disclose, and safeguard your
-            information in compliance with the Information Technology Act, 2000 and the Digital Personal Data Protection
-            Act, 2023.</p>
-    </div>
-
-    <div class="clause">
-        <div class="clause-header">1. Information We Collect</div>
-        <p>We may collect the following types of information:</p>
-        <table class="data-table">
-            <tr>
-                <th>Category</th>
-                <th>Examples</th>
-            </tr>
-            <tr>
-                <td>Personal Identifiers</td>
-                <td>Name, email address, phone number, postal address</td>
-            </tr>
-            <tr>
-                <td>Account Information</td>
-                <td>Username, password (encrypted), account preferences</td>
-            </tr>
-            <tr>
-                <td>Financial Information</td>
-                <td>Billing address, payment method details (processed securely)</td>
-            </tr>
-            <tr>
-                <td>Usage Data</td>
-                <td>IP address, browser type, pages visited, time spent on pages</td>
-            </tr>
-            <tr>
-                <td>Device Information</td>
-                <td>Device type, operating system, unique device identifiers</td>
-            </tr>
-        </table>
-    </div>
-
-    <div class="clause">
-        <div class="clause-header">2. How We Use Your Information</div>
-        <ul>
-            <li>To provide, maintain, and improve our services and user experience.</li>
-            <li>To process transactions and send related information including confirmations and invoices.</li>
-            <li>To send administrative information, updates, security alerts, and support messages.</li>
-            <li>To personalize your experience and deliver targeted content relevant to your interests.</li>
-            <li>To comply with legal obligations and enforce our terms of service.</li>
-            <li>To detect, prevent, and address technical issues, fraud, and security threats.</li>
-        </ul>
-    </div>
-
-    <div class="clause">
-        <div class="clause-header">3. Legal Basis for Processing</div>
-        <p>We process personal data on the following legal bases under applicable Indian law:</p>
-        <ul>
-            <li><strong>Consent:</strong> Where you have given explicit consent for processing.</li>
-            <li><strong>Contractual Necessity:</strong> To perform our obligations under a contract with you.</li>
-            <li><strong>Legal Obligation:</strong> To comply with applicable laws and regulations.</li>
-            <li><strong>Legitimate Interest:</strong> Where processing is necessary for our legitimate business
-                interests, provided your rights are not overridden.</li>
-        </ul>
-    </div>
-
-    <div class="clause">
-        <div class="clause-header">4. Data Sharing & Disclosure</div>
-        <p>We do not sell your personal information. We may share your information with:</p>
-        <ul>
-            <li><strong>Service Providers:</strong> Third-party vendors who perform services on our behalf (hosting,
-                analytics, payment processing).</li>
-            <li><strong>Legal Requirements:</strong> When required by law, regulation, legal process, or governmental
-                request.</li>
-            <li><strong>Business Transfers:</strong> In connection with a merger, acquisition, or sale of assets.</li>
-            <li><strong>With Consent:</strong> When you provide explicit consent for specific sharing.</li>
-        </ul>
-    </div>
-
-    <div class="clause">
-        <div class="clause-header">5. Data Security</div>
-        <p>We implement appropriate technical and organizational measures to protect your personal data against
-            unauthorized access, alteration, disclosure, or destruction. These measures include:</p>
-        <ul>
-            <li>Encryption of data in transit and at rest using industry-standard protocols (TLS/SSL, AES-256).</li>
-            <li>Regular security assessments and vulnerability testing.</li>
-            <li>Access controls and authentication mechanisms for authorized personnel only.</li>
-            <li>Employee training on data protection and privacy best practices.</li>
-        </ul>
-    </div>
-
-    <div class="clause">
-        <div class="clause-header">6. Data Retention</div>
-        <p>We retain personal data only for as long as necessary to fulfill the purposes described in this policy, or as
-            required by law. When data is no longer needed, it is securely deleted or anonymized. Typical retention
-            periods are:</p>
-        <ul>
-            <li>Account data: Duration of account activity plus {{#if retentionPeriod}}{{retentionPeriod}}{{else}}2
-                years{{/if}} after account closure.</li>
-            <li>Transaction records: As required by applicable tax and financial regulations.</li>
-            <li>Usage data: Up to 12 months from the date of collection.</li>
-        </ul>
-    </div>
-
-    <div class="clause">
-        <div class="clause-header">7. Your Rights</div>
-        <p>Under applicable data protection laws, you have the following rights:</p>
-        <div class="rights-grid">
-            <div class="right-card">
-                <div class="right-title">Right to Access</div>
-                <div class="right-desc">Request a copy of your personal data we hold.</div>
-            </div>
-            <div class="right-card">
-                <div class="right-title">Right to Correction</div>
-                <div class="right-desc">Request correction of inaccurate or incomplete data.</div>
-            </div>
-            <div class="right-card">
-                <div class="right-title">Right to Erasure</div>
-                <div class="right-desc">Request deletion of your personal data in certain circumstances.</div>
-            </div>
-            <div class="right-card">
-                <div class="right-title">Right to Withdraw Consent</div>
-                <div class="right-desc">Withdraw previously given consent at any time.</div>
-            </div>
-            <div class="right-card">
-                <div class="right-title">Right to Data Portability</div>
-                <div class="right-desc">Receive your data in a structured, machine-readable format.</div>
-            </div>
-            <div class="right-card">
-                <div class="right-title">Right to Grievance Redressal</div>
-                <div class="right-desc">File a complaint with the Data Protection Board of India.</div>
+    <div class="a4-container">
+        <!-- Top Wave Banner -->
+        <div class="top-banner">
+            <svg class="wave-svg" viewBox="0 0 800 250" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M0,0 C200,10 400,150 800,40 L800,0 L0,0 Z" fill="#fff4e6" />
+                <path d="M0,0 C300,50 500,180 800,70 L800,0 L0,0 Z" fill="#ffb380" />
+                <path d="M0,0 C350,80 600,160 800,100 L800,0 L0,0 Z" fill="#f37021" />
+            </svg>
+            <div class="header-content">
+                <div class="doc-title">Privacy</div>
+                <div class="doc-subtitle">Policy</div>
             </div>
         </div>
-    </div>
 
-    <div class="clause">
-        <div class="clause-header">8. Cookies & Tracking</div>
-        <p>We use cookies and similar tracking technologies to enhance your experience. You can manage cookie
-            preferences through your browser settings. Types of cookies we use include essential cookies, performance
-            cookies, and marketing cookies.</p>
-    </div>
+        <!-- Main Content -->
+        <div class="content-layer">
+            <div class="section">
+                <div class="section-header">1. Introduction</div>
+                <div class="section-text">
+                    <p>Welcome to <strong>{{companyName}}</strong>. We respect your privacy and are committed to protecting your personal data. This privacy policy will inform you as to how we look after your personal data when you visit our website and tell you about your privacy rights.</p>
+                </div>
+            </div>
 
-    <div class="clause">
-        <div class="clause-header">9. Changes to This Policy</div>
-        <p>We may update this Privacy Policy from time to time. We will notify you of any material changes by posting
-            the updated policy on our website and updating the "Last Updated" date. Your continued use of the Services
-            after changes constitutes acceptance of the revised policy.</p>
-    </div>
+            <div class="section">
+                <div class="section-header">2. Data We Collect</div>
+                <div class="section-text">
+                    <p>We may collect, use, store and transfer different kinds of personal data about you which we have grouped together as follows:</p>
+                    <ul class="section-list">
+                        <li>Identity Data includes first name, last name, username or similar identifier.</li>
+                        <li>Contact Data includes email address and telephone numbers.</li>
+                        <li>Technical Data includes internet protocol (IP) address, browser type and version.</li>
+                    </ul>
+                </div>
+            </div>
 
-    <div class="contact-section">
-        <div class="contact-title">Contact Us</div>
-        <div class="contact-detail">
-            <strong>{{companyName}}</strong><br>
-            {{{companyAddress}}}<br>
-            {{#if companyEmail}}Email: {{companyEmail}}<br>{{/if}}
-            {{#if companyPhone}}Phone: {{companyPhone}}<br>{{/if}}
-            {{#if dpoEmail}}<br><strong>Data Protection Officer:</strong> {{dpoEmail}}{{/if}}
+            <div class="section">
+                <div class="section-header">3. How We Use Your Data</div>
+                <div class="section-text">
+                    <p>We will only use your personal data when the law allows us to. Most commonly, we will use your personal data in the following circumstances:</p>
+                    <ul class="section-list">
+                        <li>Where we need to perform the contract we are about to enter into or have entered into with you.</li>
+                        <li>Where it is necessary for our legitimate interests.</li>
+                        <li>Where we need to comply with a legal or regulatory obligation.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="section">
+                <div class="section-header">4. Data Security</div>
+                <div class="section-text">
+                    <p>We have put in place appropriate security measures to prevent your personal data from being accidentally lost, used or accessed in an unauthorized way, altered or disclosed.</p>
+                </div>
+            </div>
+
+            <div class="section">
+                <div class="section-header">5. Your Legal Rights</div>
+                <div class="section-text">
+                    <p>Under certain circumstances, you have rights under data protection laws in relation to your personal data, including the right to request access, correction, erasure, restriction, transfer, to object to processing, to withdraw consent.</p>
+                </div>
+            </div>
+
+            <div class="section">
+                <div class="section-header">6. Contact Us</div>
+                <div class="section-text">
+                    <p>If you have any questions about this privacy policy or our privacy practices, please contact our Data Protection Officer at: <strong>{{#if dpoEmail}}{{dpoEmail}}{{else}}privacy@company.com{{/if}}</strong></p>
+                </div>
+            </div>
         </div>
-    </div>
-
-    <div class="footer">
-        <p>© {{#if currentYear}}{{currentYear}}{{else}}2024{{/if}} {{companyName}}. All Rights Reserved.</p>
-        <p>This Privacy Policy was last updated on {{#if lastUpdated}}{{lastUpdated}}{{else}}{{effectiveDate}}{{/if}}.
-        </p>
     </div>
 </body>
 

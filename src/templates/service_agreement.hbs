@@ -7,6 +7,11 @@
     <title>Service Agreement</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
+        @page {
+            size: A4;
+            margin: 0;
+        }
+
         * {
             box-sizing: border-box;
             margin: 0;
@@ -15,390 +20,293 @@
 
         body {
             font-family: 'Inter', -apple-system, sans-serif;
+            background: #ffffff;
+            color: #333333;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+            font-size: 11px;
             line-height: 1.6;
-            color: #1f2937;
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 48px 40px;
-            background: white;
-            font-size: 14px;
         }
 
-        .header {
-            text-align: center;
-            padding-bottom: 28px;
-            margin-bottom: 36px;
-            border-bottom: 1px solid #e5e7eb;
+        .a4-container {
+            width: 210mm;
+            min-height: 297mm;
+            position: relative;
+            background: white;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* Top Wave Banner */
+        .top-banner {
+            position: relative;
+            width: 100%;
+            height: 60mm;
+            background-color: #ffffff;
+        }
+
+        .wave-svg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+        }
+
+        .header-content {
+            position: absolute;
+            top: 25mm;
+            left: 20mm;
+            z-index: 10;
         }
 
         .doc-title {
-            font-size: 28px;
+            color: #f37021;
+            font-size: 32px;
             font-weight: 800;
-            color: #111827;
+            line-height: 1;
             text-transform: uppercase;
-            letter-spacing: 0.04em;
-            margin-bottom: 4px;
+            letter-spacing: -0.5px;
         }
 
         .doc-subtitle {
-            font-size: 13px;
-            color: #6b7280;
+            color: #f37021;
+            font-size: 28px;
+            font-weight: 400;
+            font-style: italic;
+            margin-top: 4px;
         }
 
-        .doc-subtitle strong {
-            color: #111827;
+        /* Content Layer */
+        .content-layer {
+            flex-grow: 1;
+            padding: 10mm 20mm 20mm 20mm;
         }
 
-        .parties-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 24px;
-            margin: 28px 0;
+        .section {
+            margin-bottom: 25px;
         }
 
-        .party-card {
-            background: #f9fafb;
-            border-radius: 8px;
-            padding: 20px;
+        .section-header {
+            color: #f37021;
+            font-size: 12px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            text-transform: capitalize;
         }
 
-        .party-label {
-            font-size: 11px;
-            text-transform: uppercase;
-            letter-spacing: 0.06em;
-            color: #6b7280;
-            font-weight: 600;
+        .section-text {
+            color: #555555;
+            text-align: justify;
+        }
+
+        .section-text p {
             margin-bottom: 12px;
         }
 
-        .party-name {
-            font-size: 16px;
-            font-weight: 600;
-            color: #111827;
-            margin-bottom: 8px;
+        .section-list {
+            list-style: none;
+            padding-left: 0;
         }
 
-        .party-details {
-            font-size: 13px;
-            color: #4b5563;
-            line-height: 1.6;
-        }
-
-        .content {
-            font-size: 14px;
-            color: #374151;
-            line-height: 1.7;
-        }
-
-        .content p {
-            margin-bottom: 16px;
-        }
-
-        .clause {
-            margin: 20px 0;
-            padding: 20px;
-            background: #f9fafb;
-            border-radius: 8px;
-        }
-
-        .clause h4 {
-            font-size: 14px;
-            font-weight: 600;
-            color: #111827;
-            margin-bottom: 10px;
-        }
-
-        .clause p,
-        .clause li {
-            font-size: 13px;
-            color: #4b5563;
-            line-height: 1.6;
-            margin-bottom: 8px;
-        }
-
-        .clause ul,
-        .clause ol {
-            padding-left: 20px;
-        }
-
-        .clause li {
+        .section-list li {
+            position: relative;
+            padding-left: 15px;
             margin-bottom: 6px;
+            color: #555555;
         }
 
-        .scope-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin: 24px 0;
+        .section-list li::before {
+            content: "•";
+            position: absolute;
+            left: 0;
+            color: #f37021;
         }
 
-        .scope-table th {
-            background: #f9fafb;
-            text-align: left;
-            padding: 12px 16px;
-            font-size: 13px;
-            font-weight: 600;
-            color: #6b7280;
-            border-bottom: 1px solid #e5e7eb;
-            text-transform: uppercase;
-            letter-spacing: 0.04em;
-            width: 35%;
+        /* Parties Info */
+        .parties-grid {
+            display: flex;
+            justify-content: space-between;
+            gap: 20px;
+            margin-bottom: 20px;
         }
 
-        .scope-table td {
-            padding: 12px 16px;
-            font-size: 14px;
-            color: #111827;
-            font-weight: 500;
-            border-bottom: 1px solid #f3f4f6;
+        .party-info {
+            flex: 1;
         }
 
-        .important-box {
-            background: #fef2f2;
-            border: 1px solid #fecaca;
-            border-radius: 8px;
-            padding: 20px;
-            margin: 24px 0;
+        .underline-field {
+            display: inline-block;
+            border-bottom: 1px solid #999;
+            min-width: 150px;
+            margin-left: 5px;
+            padding-bottom: 1px;
         }
 
-        .important-box h4 {
-            font-size: 13px;
-            font-weight: 600;
-            color: #991b1b;
-            margin-bottom: 8px;
-            text-transform: uppercase;
-            letter-spacing: 0.04em;
-        }
-
-        .important-box p {
-            font-size: 13px;
-            color: #7f1d1d;
-            line-height: 1.6;
-        }
-
+        /* Signature Area */
         .signature-section {
             margin-top: 40px;
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 32px;
+            page-break-inside: avoid;
         }
 
-        .signature-card {
-            background: #f9fafb;
-            border-radius: 8px;
-            padding: 24px;
+        .sig-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 30px;
         }
 
-        .sig-title {
-            font-size: 13px;
-            font-weight: 600;
-            color: #111827;
-            margin-bottom: 16px;
-            text-transform: uppercase;
-            letter-spacing: 0.04em;
+        .sig-block {
+            width: 45%;
+            display: flex;
+            align-items: flex-end;
+            gap: 10px;
         }
 
-        .sig-name {
-            font-size: 14px;
-            font-weight: 600;
-            color: #111827;
-            margin-bottom: 16px;
+        .sig-label {
+            white-space: nowrap;
+            color: #333;
+            font-weight: 500;
         }
 
-        .sig-field {
-            margin-bottom: 16px;
+        .sig-line {
+            flex-grow: 1;
+            border-bottom: 1px solid #999;
+            height: 20px;
         }
 
-        .sig-field-label {
-            font-size: 12px;
-            color: #6b7280;
-            margin-bottom: 4px;
+        .date-block {
+            width: 35%;
+            display: flex;
+            align-items: flex-end;
+            gap: 10px;
         }
 
-        .sig-field-line {
-            border-bottom: 1px solid #d1d5db;
-            min-width: 200px;
-            height: 24px;
-        }
-
-        .footer {
-            margin-top: 48px;
-            text-align: center;
-            padding-top: 24px;
-            border-top: 1px solid #e5e7eb;
-            color: #9ca3af;
-            font-size: 12px;
-        }
     </style>
 </head>
 
 <body>
-    <div class="header">
-        <div class="doc-title">Service Agreement</div>
-        <div class="doc-subtitle"><strong>Agreement Date:</strong> {{effectiveDate}} &nbsp;|&nbsp; <strong>Agreement
-                No:</strong> {{#if agreementNumber}}{{agreementNumber}}{{else}}SA-2024-001{{/if}}</div>
-    </div>
-
-    <div class="parties-grid">
-        <div class="party-card">
-            <div class="party-label">Service Provider (First Party)</div>
-            <div class="party-name">{{companyName}}</div>
-            <div class="party-details">{{{companyAddress}}}{{#if companyEmail}}<br>{{companyEmail}}{{/if}}{{#if
-                companyPhone}}<br>{{companyPhone}}{{/if}}</div>
-        </div>
-        <div class="party-card">
-            <div class="party-label">Client (Second Party)</div>
-            <div class="party-name">{{clientName}}</div>
-            <div class="party-details">{{{clientAddress}}}{{#if clientEmail}}<br>{{clientEmail}}{{/if}}{{#if
-                clientPhone}}<br>{{clientPhone}}{{/if}}</div>
-        </div>
-    </div>
-
-    <div class="content">
-        <p>This Service Agreement ("Agreement") is entered into as of <strong>{{effectiveDate}}</strong> by and between
-            the parties identified above. Both parties agree to the following terms and conditions governing the
-            provision of services.</p>
-
-        <div class="clause">
-            <h4>1. Scope of Services</h4>
-            <p>The Service Provider agrees to provide the following services to the Client:</p>
-            <table class="scope-table">
-                <tr>
-                    <th>Service Description</th>
-                    <td>{{{serviceDescription}}}</td>
-                </tr>
-                <tr>
-                    <th>Duration</th>
-                    <td>{{#if duration}}{{duration}}{{else}}12 months{{/if}} from the effective date</td>
-                </tr>
-                <tr>
-                    <th>Service Fee</th>
-                    <td>₹{{totalAmount}}</td>
-                </tr>
-                <tr>
-                    <th>Payment Terms</th>
-                    <td>{{#if paymentTerms}}{{paymentTerms}}{{else}}Net 30 days from invoice date{{/if}}</td>
-                </tr>
-            </table>
-        </div>
-
-        <div class="clause">
-            <h4>2. Obligations of Service Provider</h4>
-            <ul>
-                <li>Perform all services with due diligence, skill, and in a professional manner consistent with
-                    industry standards.</li>
-                <li>Assign qualified personnel to perform the services as described herein.</li>
-                <li>Provide regular progress reports and updates to the Client as reasonably requested.</li>
-                <li>Maintain confidentiality of all Client information and proprietary data.</li>
-                <li>Comply with all applicable laws, regulations, and industry standards in performing the services.
-                </li>
-            </ul>
-        </div>
-
-        <div class="clause">
-            <h4>3. Obligations of Client</h4>
-            <ul>
-                <li>Provide timely access to necessary information, systems, and personnel required for the performance
-                    of services.</li>
-                <li>Make all payments due under this Agreement within the agreed payment terms.</li>
-                <li>Designate a single point of contact for communication regarding the services.</li>
-                <li>Provide written feedback and approvals in a timely manner to avoid project delays.</li>
-            </ul>
-        </div>
-
-        <div class="clause">
-            <h4>4. Payment Terms</h4>
-            <p>The Client shall pay the Service Provider the agreed fee of <strong>₹{{totalAmount}}</strong> in
-                accordance with the payment schedule agreed upon. Late payments shall attract an interest of 1.5% per
-                month on the outstanding amount. All taxes, including GST, shall be borne by the Client as applicable.
-            </p>
-        </div>
-
-        <div class="clause">
-            <h4>5. Intellectual Property</h4>
-            <p>All intellectual property rights in the deliverables created under this Agreement shall vest with the
-                Client upon full payment. The Service Provider retains the right to use general knowledge, skills, and
-                experience acquired during the performance of services.</p>
-        </div>
-
-        <div class="clause">
-            <h4>6. Confidentiality</h4>
-            <p>Both parties agree to maintain the confidentiality of all proprietary and confidential information
-                disclosed during the course of this Agreement. This obligation shall survive the termination of this
-                Agreement for a period of {{#if confidentialityPeriod}}{{confidentialityPeriod}}{{else}}3 years{{/if}}.
-            </p>
-        </div>
-
-        <div class="clause">
-            <h4>7. Term and Termination</h4>
-            <p>This Agreement shall remain in effect for a period of {{#if duration}}{{duration}}{{else}}12
-                months{{/if}} from the effective date. Either party may terminate this Agreement with {{#if
-                noticePeriod}}{{noticePeriod}}{{else}}30 days{{/if}} prior written notice. Upon termination, the Client
-                shall pay for all services rendered up to the date of termination.</p>
-        </div>
-
-        <div class="clause">
-            <h4>8. Limitation of Liability</h4>
-            <p>Neither party shall be liable for any indirect, incidental, special, consequential, or punitive damages
-                arising out of or related to this Agreement. The Service Provider's total liability under this Agreement
-                shall not exceed the total fees paid or payable by the Client under this Agreement.</p>
-        </div>
-
-        <div class="important-box">
-            <h4>Dispute Resolution</h4>
-            <p>Any disputes arising out of this Agreement shall be resolved through mutual negotiation. If unresolved
-                within 30 days, the dispute shall be referred to arbitration under the Arbitration and Conciliation Act,
-                1996, with the seat of arbitration in {{#if jurisdiction}}{{jurisdiction}}{{else}}Bangalore,
-                India{{/if}}.</p>
-        </div>
-
-        <div class="clause">
-            <h4>9. Governing Law</h4>
-            <p>This Agreement shall be governed by and construed in accordance with the laws of India. The courts of
-                {{#if jurisdiction}}{{jurisdiction}}{{else}}Bangalore{{/if}} shall have exclusive jurisdiction over any
-                legal proceedings arising from this Agreement.</p>
-        </div>
-
-        <p>IN WITNESS WHEREOF, the parties have executed this Service Agreement as of the date first written above.</p>
-    </div>
-
-    <div class="signature-section">
-        <div class="signature-card">
-            <div class="sig-title">Service Provider</div>
-            <div class="sig-name">{{companyName}}</div>
-            <div class="sig-field">
-                <div class="sig-field-label">Authorized Signature</div>
-                <div class="sig-field-line"></div>
-            </div>
-            <div class="sig-field">
-                <div class="sig-field-label">Name & Title</div>
-                <div class="sig-field-line"></div>
-            </div>
-            <div class="sig-field">
-                <div class="sig-field-label">Date</div>
-                <div class="sig-field-line"></div>
+    <div class="a4-container">
+        <!-- Top Wave Banner -->
+        <div class="top-banner">
+            <svg class="wave-svg" viewBox="0 0 800 250" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M0,0 C200,10 400,150 800,40 L800,0 L0,0 Z" fill="#fff4e6" />
+                <path d="M0,0 C300,50 500,180 800,70 L800,0 L0,0 Z" fill="#ffb380" />
+                <path d="M0,0 C350,80 600,160 800,100 L800,0 L0,0 Z" fill="#f37021" />
+            </svg>
+            <div class="header-content">
+                <div class="doc-title">Service</div>
+                <div class="doc-subtitle">Agreement</div>
             </div>
         </div>
-        <div class="signature-card">
-            <div class="sig-title">Client</div>
-            <div class="sig-name">{{clientName}}</div>
-            <div class="sig-field">
-                <div class="sig-field-label">Authorized Signature</div>
-                <div class="sig-field-line"></div>
+        <!-- Main Content -->
+        <div class="content-layer">
+            <div class="section">
+                <div class="section-text">
+                    <p>This Service Agreement (hereinafter referred to as “Agreement”) lays down the terms of engagement, agreed upon by the Company and the Consultant.</p>
+                    <p>This Service Agreement is executed on <span class="underline-field">{{executionDay}}</span> day of <span class="underline-field">{{executionMonth}}</span>, <span class="underline-field">{{executionYear}}</span> (“Execution Date”)</p>
+                </div>
             </div>
-            <div class="sig-field">
-                <div class="sig-field-label">Name & Title</div>
-                <div class="sig-field-line"></div>
+
+            <div class="section" style="text-align: center; font-weight: 700; border-bottom: 1px solid #eee; padding-bottom: 5px;">
+                BY AND BETWEEN
             </div>
-            <div class="sig-field">
-                <div class="sig-field-label">Date</div>
-                <div class="sig-field-line"></div>
+
+            <div class="section">
+                <div class="section-text">
+                    <p><span class="underline-field"><strong>{{companyName}}</strong></span>, (CIN: <span class="underline-field">{{companyCIN}}</span>) a private limited/public limited company incorporated and validly existing under the Companies Act, 1956/2013, and having its registered office at <span class="underline-field">{{companyAddress}}</span>, (hereinafter referred to as the “Company” which expression shall unless it be repugnant to the context or meaning thereof, be deemed to mean and include its successors and permitted assigns) of the FIRST PART;</p>
+                    <p style="text-align: center; font-weight: 700;">AND</p>
+                    <p><span class="underline-field"><strong>{{partyName}}</strong></span> son of <span class="underline-field">{{fatherName}}</span>, UID/PAN: <span class="underline-field">{{uidPan}}</span>, an individual, residing at <span class="underline-field">{{partyAddress}}</span> (hereinafter referred to as the “Consultant”, which expression shall, unless repugnant to the meaning or context hereof, be deemed to include all heirs, executors and administrators) of the SECOND PART.</p>
+                </div>
+            </div>
+
+            <div class="section">
+                <div class="section-text">
+                    <p>The Company and the Consultant are hereinafter individually referred to as the “Party” and collectively as the “Parties”.</p>
+                    <p><strong>WHEREAS</strong> the parties hereto desire to enter into this Agreement to define and set forth the terms and conditions of the engagement of the Consultant by the Company;</p>
+                    <p><strong>NOW, THEREFORE</strong>, IN CONSIDERATION OF THE MUTUAL PROMISES AND COVENANTS HEREIN CONTAINED, THE PARTIES HERETO AGREES AS FOLLOWS:</p>
+                </div>
+            </div>
+
+            <div class="section">
+                <div class="section-header">1. Terms and conditions of Engagement</div>
+                <div class="section-text">
+                    <p>1.1. The Consultant has been engaged from <span class="underline-field">{{startDate}}</span> which shall also be deemed as date of the acceptance of these terms to provide the Company with the services described in Schedule A (the “Scope of Services”), together with such other services as may be reasonably requested in connection with this Agreement.</p>
+                    <p>1.2. The Consultant agrees to perform the Services in a timely manner, and to exercise all reasonable skill and care in the performance of the Services.</p>
+                    <p>1.3. He shall provide the Company promptly with any information, data or documents which may be reasonably required in connection with the Services under this Agreement.</p>
+                </div>
+            </div>
+
+            <div class="section">
+                <div class="section-header">2. Tenure</div>
+                <div class="section-text">
+                    <p>The initial tenure of this Agreement will be for <span class="underline-field">{{tenureYears}}</span> years i.e. from <span class="underline-field">{{startDate}}</span> till <span class="underline-field">{{endDate}}</span> (“Initial Term”).</p>
+                </div>
+            </div>
+
+            <div class="section">
+                <div class="section-header">3. Fees and Expenses</div>
+                <div class="section-text">
+                    <p>3.1. Subject to any special terms agreed in writing by the parties, the Company shall pay the consultancy fees and charges from time to time for the provision of the Services as set out in the Schedule B (the “Fees”).</p>
+                    <p>3.2. The tax will be deducted as per the applicable laws.</p>
+                    <p>3.3. The Company shall reimburse the Consultant for all the out of pocket expenses incurred by him in connection with the Services, provided the Consultant shall issue proper receipts of such expenditure.</p>
+                </div>
+            </div>
+
+            <div class="section">
+                <div class="section-header">4. Duties and Obligations</div>
+                <div class="section-text">
+                    <p>4.1. The Consultant shall diligently provide his Services and shall execute all the assignments and projects on timely manner with the highest professional standards and ethical business practices.</p>
+                </div>
+            </div>
+
+            <div class="section">
+                <div class="section-header">5. Confidentiality</div>
+                <div class="section-text">
+                    <p>Both parties agree to maintain confidentiality of all proprietary and sensitive information exchanged during the term of this Agreement. All information relating to the Company or given by Company to the Consultant shall be deemed to be confidential.</p>
+                </div>
+            </div>
+
+            <div class="section">
+                <div class="section-header">6. Termination</div>
+                <div class="section-text">
+                    <p>Either Party may terminate this Agreement by giving <span class="underline-field">{{noticePeriod}}</span> days notice. The Company may terminate immediately for breach of terms.</p>
+                </div>
+            </div>
+
+            {{#if sections}}
+                {{#each sections}}
+                    <div class="section">
+                        <div class="section-header">{{#if @index}}{{add @index 7}}{{else}}7{{/if}}. {{this.heading}}</div>
+                        <div class="section-text">
+                            <p>{{this.content}}</p>
+                        </div>
+                    </div>
+                {{/each}}
+            {{/if}}
+
+            <div class="section">
+                <div class="section-header">Acceptance and Signatures</div>
+                <div class="signature-section">
+                    <div class="sig-row">
+                        <div class="sig-block" style="flex-direction: column; align-items: flex-start;">
+                            <span class="sig-label">For and on behalf of <strong>{{companyName}}</strong></span>
+                            <div class="sig-line" style="width: 100%; margin: 10px 0;"></div>
+                            <span class="sig-label">Authorised Signatory</span>
+                            <span class="sig-label">Name: <span class="underline-field">{{signatoryName}}</span></span>
+                        </div>
+                        <div class="sig-block" style="flex-direction: column; align-items: flex-start;">
+                            <span class="sig-label">For and on behalf of <strong>{{partyName}}</strong></span>
+                            <div class="sig-line" style="width: 100%; margin: 10px 0;"></div>
+                            <span class="sig-label">Consultant</span>
+                            <span class="sig-label">Name: <span class="underline-field">{{partyName}}</span></span>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
-    </div>
-
-    <div class="footer">
-        <p>This Agreement is executed in duplicate, with each party retaining one original copy.</p>
-        <p>{{companyName}} — Legal Document System</p>
     </div>
 </body>
 

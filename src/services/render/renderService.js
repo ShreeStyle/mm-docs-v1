@@ -2,6 +2,15 @@ const handlebars = require("handlebars");
 const fs = require("fs");
 const path = require("path");
 
+// Register Handlebars helpers
+handlebars.registerHelper("add", function(value, addition) {
+    return parseInt(value) + parseInt(addition);
+});
+
+handlebars.registerHelper("length", function(array) {
+    return Array.isArray(array) ? array.length : 0;
+});
+
 // Load template function
 const loadTemplate = (templateName) => {
   const templatePath = path.join(__dirname, "../../templates", `${templateName}.hbs`);
@@ -164,10 +173,11 @@ const getTemplateForDocumentType = (documentType) => {
   if (templateMap[documentType]) return templateMap[documentType];
 
   // Handle new template IDs (e.g., service-agreement-001 -> service_agreement)
-  // Strip version/suffixes and convert hyphens to underscores
+  // Strip version/suffixes and convert hyphens/spaces to underscores
   let sanitizedType = documentType
+    .toLowerCase()
     .replace(/-[0-9]+$/, '') // Remove -001, -002 etc
-    .replace(/-/g, '_');      // Convert hyphens to underscores
+    .replace(/[-\s]/g, '_');  // Convert hyphens and spaces to underscores
 
   return sanitizedType;
 };
@@ -225,12 +235,14 @@ exports.renderDocument = async (document, brandKit) => {
   try {
     const templateName = getTemplateForDocumentType(document.type);
 
-    // Ensure template exists, fallback to generic if specific type missing
     let template;
     try {
+      console.log(`🔍 Attempting to load template: ${templateName}`);
       template = loadTemplate(templateName);
+      console.log(`✅ Successfully loaded: ${templateName}`);
     } catch (e) {
-      console.log(`Template ${templateName} not found, falling back to generic`);
+      console.error(`❌ Template ${templateName} not found or error loading:`, e.message);
+      console.log(`⚠️ Falling back to generic template`);
       template = loadTemplate("generic");
     }
 
@@ -256,6 +268,25 @@ exports.renderDocument = async (document, brandKit) => {
       fontFamily: brandKit?.fontFamily || 'Inter',
       generatedDate: new Date().toLocaleDateString()
     };
+
+    // Ensure sections are objects if they came in as strings (common AI/formatting issue)
+    if (Array.isArray(data.sections)) {
+      data.sections = data.sections.map(section => {
+        if (typeof section === 'string') {
+          try {
+            // Attempt to parse if it's a JSON string
+            if (section.trim().startsWith('{')) {
+              return JSON.parse(section);
+            }
+            // Otherwise wrap it
+            return { heading: "Section", content: section };
+          } catch (e) {
+            return { heading: "Section", content: section };
+          }
+        }
+        return section;
+      });
+    }
 
     // Debug logging to verify array structures
     if (document.type === 'audit_report' && data.auditFindings) {

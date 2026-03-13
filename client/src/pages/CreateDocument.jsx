@@ -188,62 +188,21 @@ const CreateDocument = () => {
 
         // Replace placeholders with form data or professional sample data
         const previewData = {
-            // Use form data if available, otherwise use professional sample data
-            clientName: formData.clientName || 'ABC Corporation Pvt Ltd',
-            clientAddress: new Handlebars.SafeString(formData.clientAddress ? formData.clientAddress.replace(/\n/g, '<br>') : '123 Business Street<br>Mumbai, Maharashtra - 400001<br>India'),
+            ...formData,
+            // Fallbacks for better preview experience
+            clientName: formData.clientName || formData.partyName || 'ABC Corporation Pvt Ltd',
+            partyName: formData.partyName || formData.clientName || 'Business Partner Corp',
+            companyName: formData.companyName || 'Your Company Ltd',
+            effectiveDate: formData.effectiveDate || new Date().toLocaleDateString('en-IN'),
+            services: formData.services || formData.serviceDescription || 'Professional Services',
+            // Handle safe strings for addresses
+            clientAddress: new Handlebars.SafeString(formData.clientAddress ? formData.clientAddress.replace(/\n/g, '<br>') : formData.partyAddress ? formData.partyAddress.replace(/\n/g, '<br>') : '123 Business Street<br>Mumbai, Maharashtra'),
+            companyAddress: new Handlebars.SafeString(formData.companyAddress ? formData.companyAddress.replace(/\n/g, '<br>') : 'Tech Park, Sector 5<br>Bangalore, Karnataka'),
+            // Other fields...
             invoiceNumber: formData.invoiceNumber || 'INV-2024-001',
             invoiceDate: formData.invoiceDate || new Date().toLocaleDateString('en-IN'),
-            dueDate: formData.dueDate || new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toLocaleDateString('en-IN'),
             totalAmount: formData.totalAmount || '1,18,000',
-            serviceDescription: new Handlebars.SafeString(formData.serviceDescription ? formData.serviceDescription.replace(/\n/g, '<br>') : 'Professional Software Development Services'),
-            companyName: formData.companyName || 'Your Company Ltd',
-            companyAddress: new Handlebars.SafeString(formData.companyAddress ? formData.companyAddress.replace(/\n/g, '<br>') : 'Tech Park, Sector 5<br>Bangalore, Karnataka - 560001<br>India'),
-            companyPhone: '+91-9876543210',
-            companyEmail: 'billing@yourcompany.com',
-            gstNumber: '29ABCDE1234F1Z5',
-            clientPhone: '+91-9876543211',
-            clientEmail: 'contact@abccorp.com',
-            clientGST: '27ABCDE5678G1Z2',
-            baseAmount: formData.totalAmount ? (parseFloat(formData.totalAmount.replace(/,/g, '')) * 0.85).toLocaleString('en-IN') : '1,00,000',
-            taxAmount: formData.totalAmount ? (parseFloat(formData.totalAmount.replace(/,/g, '')) * 0.15).toLocaleString('en-IN') : '18,000',
-            subtotal: formData.totalAmount ? (parseFloat(formData.totalAmount.replace(/,/g, '')) * 0.85).toLocaleString('en-IN') : '1,00,000',
-            taxRate: '18',
             currentDate: new Date().toLocaleDateString('en-IN'),
-            paymentTerms: 'Net 30 days from invoice date',
-            bankDetails: 'HDFC Bank - A/c: 1234567890, IFSC: HDFC0001234',
-            upiId: 'yourcompany@paytm',
-            notes: 'Thank you for choosing our services. We look forward to continued business.',
-            quantity: '1',
-            rate: formData.totalAmount || '1,18,000',
-            // Additional fields for other templates
-            candidateName: formData.candidateName || 'John Doe',
-            employeeName: formData.employeeName || 'Jane Smith',
-            position: formData.position || 'Senior Software Engineer',
-            department: formData.department || 'Engineering',
-            salary: formData.salary || '18,00,000',
-            startDate: formData.startDate || '2024-04-01',
-            appointmentDate: formData.appointmentDate || '2024-04-01',
-            reportingTo: formData.reportingTo || 'Engineering Manager',
-            workLocation: formData.workLocation || 'Bangalore Office',
-            partyName: formData.partyName || 'Business Partner Corp',
-            effectiveDate: formData.effectiveDate || '2024-03-01',
-            duration: formData.duration || '2',
-
-            // Adding a default items array to make the invoice look good
-            items: [
-                {
-                    description: formData.serviceDescription || 'Professional Software Development Services - Core Product',
-                    quantity: 1,
-                    rate: formData.totalAmount ? (parseFloat(formData.totalAmount.replace(/,/g, '')) * 0.85 * 0.6).toLocaleString('en-IN') : '60,000',
-                    amount: formData.totalAmount ? (parseFloat(formData.totalAmount.replace(/,/g, '')) * 0.85 * 0.6).toLocaleString('en-IN') : '60,000'
-                },
-                {
-                    description: 'UI/UX Design Services - Consultation',
-                    quantity: 1,
-                    rate: formData.totalAmount ? (parseFloat(formData.totalAmount.replace(/,/g, '')) * 0.85 * 0.4).toLocaleString('en-IN') : '40,000',
-                    amount: formData.totalAmount ? (parseFloat(formData.totalAmount.replace(/,/g, '')) * 0.85 * 0.4).toLocaleString('en-IN') : '40,000'
-                }
-            ]
         };
 
         try {

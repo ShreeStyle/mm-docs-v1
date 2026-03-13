@@ -313,12 +313,12 @@
 
             <div class="recipient-info">
                 <div class="recipient-label">To:</div>
-                <div>{{#if employeeName}}Mr./Ms. {{employeeName}}{{else}}Mr. Matt Zhang{{/if}}</div>
-                <div>{{#if department}}{{department}} Department{{else}}Marketing Department{{/if}}</div>
+                <div>{{#if employeeName}}Mr./Ms. {{employeeName}}{{else}}{{/if}}</div>
+                <div>{{#if department}}{{department}} Department{{else}}{{/if}}</div>
             </div>
 
             <div class="salutation">
-                Dear {{#if employeeName}}Mr./Ms. {{employeeName}}{{else}}Mr. Zhang{{/if}},
+                Dear {{#if employeeName}}Mr./Ms. {{employeeName}}{{else}}{{/if}},
             </div>
 
             <div class="body-paragraphs">
@@ -332,7 +332,7 @@
             <div class="signature-area">
                 <div style="margin-bottom: 50px;">Sincerely,</div>
                 
-                <div class="signature-name">{{#if managerName}}{{managerName}}{{else}}{{#if hrContactPerson}}{{hrContactPerson}}{{else}}Teddy Yu{{/if}}{{/if}}</div>
+                <div class="signature-name">{{#if managerName}}{{managerName}}{{else}}{{#if hrContactPerson}}{{hrContactPerson}}{{else}}{{/if}}{{/if}}</div>
                 <div class="signature-title">{{#if managerTitle}}{{managerTitle}}{{else}}HR Manager{{/if}}</div>
             </div>
         </div>

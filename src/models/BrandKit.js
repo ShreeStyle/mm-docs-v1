@@ -87,14 +87,14 @@ const brandKitSchema = new mongoose.Schema({
 });
 
 // Pre-save hook to sync colors array with individual color fields
-brandKitSchema.pre('save', function(next) {
+brandKitSchema.pre('save', async function() {
     // Sync colors array for backward compatibility
     this.colors = [this.primaryColor, this.secondaryColor, this.accentColor].filter(Boolean);
     
     // Sync fonts for backward compatibility
-    this.fonts.primary = this.fontFamily;
-    
-    next();
+    if (this.fonts) {
+        this.fonts.primary = this.fontFamily;
+    }
 });
 
 module.exports = mongoose.model("BrandKit", brandKitSchema);

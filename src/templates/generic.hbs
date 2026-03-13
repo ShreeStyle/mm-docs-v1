@@ -23,9 +23,25 @@
   <p class="highlight"><strong>Date:</strong> {{generatedDate}}</p>
   
   <div class="content">
-    <h3>Summary</h3>
-    <p>{{content.summary}}</p>
-    <p>{{content.details}}</p>
+    {{#if content.summary}}
+      <h3>Overview</h3>
+      <p>{{content.summary}}</p>
+    {{/if}}
+
+    {{#if sections}}
+      <div class="dynamic-sections">
+        {{#each sections}}
+          <div class="section-item">
+            <h3>{{this.heading}}</h3>
+            <p>{{this.content}}</p>
+          </div>
+        {{/each}}
+      </div>
+    {{/if}}
+
+    {{#if content.details}}
+      <p>{{content.details}}</p>
+    {{/if}}
   </div>
 
   {{{footerHTML}}}

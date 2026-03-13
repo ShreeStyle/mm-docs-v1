@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Non-Disclosure Agreement</title>
+    <title>Memorandum of Understanding</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         @page {
@@ -192,13 +192,16 @@
         <!-- Top Wave Banner -->
         <div class="top-banner">
             <svg class="wave-svg" viewBox="0 0 800 250" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+                <!-- Bottom wave (lighter) -->
                 <path d="M0,0 C200,10 400,150 800,40 L800,0 L0,0 Z" fill="#fff4e6" />
+                <!-- Middle wave -->
                 <path d="M0,0 C300,50 500,180 800,70 L800,0 L0,0 Z" fill="#ffb380" />
+                <!-- Top wave (actual orange) -->
                 <path d="M0,0 C350,80 600,160 800,100 L800,0 L0,0 Z" fill="#f37021" />
             </svg>
             <div class="header-content">
-                <div class="doc-title">Non-Disclosure</div>
-                <div class="doc-subtitle">Agreement</div>
+                <div class="doc-title">Memorandum of</div>
+                <div class="doc-subtitle">Understanding</div>
             </div>
         </div>
 
@@ -207,49 +210,55 @@
             <div class="section">
                 <div class="section-header">1. Agreement Overview</div>
                 <div class="section-text">
-                    <p>This Non-Disclosure Agreement is entered into by:</p>
+                    <p>This Memorandum of Understanding is entered into by:</p>
                     <div class="parties-grid">
-                        <div class="party-info"><strong>Disclosing Party</strong> : <span class="underline-field">{{companyName}}</span></div>
-                        <div class="party-info"><strong>Receiving Party</strong> : <span class="underline-field">{{partyName}}</span></div>
+                        <div class="party-info"><strong>First Party</strong> : <span class="underline-field">{{partyName}}</span></div>
+                        <div class="party-info"><strong>Second Party</strong> : <span class="underline-field">{{companyName}}</span></div>
                     </div>
-                    <p><strong>Effective Date:</strong> <span class="underline-field">{{effectiveDate}}</span></p>
                 </div>
             </div>
 
             <div class="section">
-                <div class="section-header">2. Definition of Confidential Information</div>
+                <div class="section-header">2. Background and Purpose</div>
                 <div class="section-text">
-                    <p>For purposes of this Agreement, "Confidential Information" shall include all information disclosed by the Disclosing Party, including but not limited to technical data, trade secrets, research, product plans, marketing, and financial information.</p>
+                    <p>{{#if background}}{{background}}{{else}}The parties wish to enter into this MOU to explore and establish a framework for collaboration in their respective fields of expertise and mutual business objectives.{{/if}}</p>
                 </div>
             </div>
 
             <div class="section">
-                <div class="section-header">3. Obligations of Receiving Party</div>
+                <div class="section-header">3. Areas of Collaboration</div>
                 <ul class="section-list">
-                    <li>Hold and maintain the Confidential Information in strict confidence.</li>
-                    <li>Not disclose the Confidential Information to any third parties without prior written consent.</li>
-                    <li>Use the Confidential Information solely for the purposes of evaluating potential business collaboration.</li>
+                    {{#if collaborationAreas}}
+                        {{#each collaborationAreas}}
+                            <li>{{this}}</li>
+                        {{/each}}
+                    {{else}}
+                        <li>Joint research and development initiatives.</li>
+                        <li>Marketing and promotional activities.</li>
+                        <li>Sharing of technical expertise and resources.</li>
+                    {{/if}}
                 </ul>
             </div>
 
             <div class="section">
-                <div class="section-header">4. Exceptions</div>
+                <div class="section-header">4. Roles and Responsibilities</div>
                 <div class="section-text">
-                    <p>The obligations of confidentiality shall not apply to information that is publicly available through no breach of this Agreement, independently developed, or required to be disclosed by law.</p>
+                    <p><strong>Party A</strong> shall be responsible for: {{#if partyARoles}}{{partyARoles}}{{else}}Allocating necessary personnel and providing technical documentation.{{/if}}</p>
+                    <p><strong>Party B</strong> shall be responsible for: {{#if partyBRoles}}{{partyBRoles}}{{else}}Providing market insights and facilitating stakeholder engagement.{{/if}}</p>
                 </div>
             </div>
 
             <div class="section">
                 <div class="section-header">5. Term and Termination</div>
                 <div class="section-text">
-                    <p>This Agreement shall remain in effect for a period of {{#if duration}}{{duration}} years{{else}}3 years{{/if}} from the Effective Date. The obligations of confidentiality shall survive termination.</p>
+                    <p>This MOU shall remain in effect until modified or terminated by mutual consent. Either party may terminate this agreement with written notice if objectives are not met.</p>
                 </div>
             </div>
 
             <div class="section">
-                <div class="section-header">6. Governing Law</div>
+                <div class="section-header">6. Confidentiality</div>
                 <div class="section-text">
-                    <p>This Agreement shall be governed by the laws of {{#if jurisdiction}}{{jurisdiction}}{{else}}India{{/if}}.</p>
+                    <p>Both parties agree to maintain confidentiality of all proprietary and sensitive information exchanged during the term of this Agreement.</p>
                 </div>
             </div>
 
@@ -267,13 +276,13 @@
             <div class="section">
                 <div class="section-header">{{#if sections}}{{add (length sections) 7}}{{else}}7{{/if}}. Acceptance and Signatures</div>
                 <div class="section-text">
-                    <p>By signing below, both parties acknowledge and agree to the terms outlined in this Non-Disclosure Agreement.</p>
+                    <p>By signing below, both parties agree to the terms outlined in this Memorandum of Understanding.</p>
                 </div>
 
                 <div class="signature-section">
                     <div class="sig-row">
                         <div class="sig-block">
-                            <span class="sig-label">Disclosing Party Signature</span>
+                            <span class="sig-label">Party A Signature</span>
                             <div class="sig-line"></div>
                         </div>
                         <div class="date-block">
@@ -283,7 +292,7 @@
                     </div>
                     <div class="sig-row">
                         <div class="sig-block">
-                            <span class="sig-label">Receiving Party Signature</span>
+                            <span class="sig-label">Party B Signature</span>
                             <div class="sig-line"></div>
                         </div>
                         <div class="date-block">

@@ -1724,8 +1724,12 @@ export default function Dashboard() {
                 ],
                 service_agreement: [
                     ...commonFields,
-                    { id: 'clientName', label: 'Client Name', type: 'text', placeholder: 'e.g. XYZ Corporation', required: true },
-                    { id: 'clientAddress', label: 'Client Address', type: 'textarea', placeholder: 'Complete client address', required: true },
+                    { id: 'companyCIN', label: 'Company CIN', type: 'text', placeholder: 'Enter Company Identification Number', required: true },
+                    { id: 'consultantName', label: 'Consultant Name', type: 'text', placeholder: 'e.g. Rajesh Kumar', required: true },
+                    { id: 'consultantAddress', label: 'Consultant Address', type: 'textarea', placeholder: 'Complete address of the consultant', required: true },
+                    { id: 'fatherName', label: "Father's Name", type: 'text', placeholder: "Consultant's Father's Name", required: true },
+                    { id: 'uidPan', label: 'UID / PAN', type: 'text', placeholder: 'Enter Aadhaar or PAN number', required: true },
+                    { id: 'executionDate', label: 'Execution Date', type: 'date', required: true },
                     { id: 'serviceType', label: 'Service Type', type: 'text', placeholder: 'e.g. Software Development / Consulting', required: true },
                     { id: 'serviceDescription', label: 'Service Description', type: 'textarea', placeholder: 'Detailed description of services to be provided', required: true },
                     { id: 'contractValue', label: 'Contract Value (₹)', type: 'number', placeholder: 'e.g. 500000', required: true },
@@ -2300,6 +2304,112 @@ Best regards,
 ${formData.companyName}
 HR Department
                     `
+                },
+                terms_of_service: {
+                    title: 'Terms of Service',
+                    content: `
+TERMS OF SERVICE
+
+These Terms of Service (the “Terms”) govern your access to and use of ${formData.serviceName || '[Service Name]'}, provided by ${formData.companyName || '[Company Name]'} (“Company”, “we”, “us”, or “our”).
+
+Effective Date: ${formData.effectiveDate || '[Effective Date]'}
+
+1. ACCEPTANCE OF TERMS:
+By accessing or using our services, you agree to be bound by these Terms and our Privacy Policy.
+
+2. SERVICE DESCRIPTION:
+${formData.serviceDescription || '[Describe your service or product here]'}
+
+3. USER OBLIGATIONS:
+As a user of our service, you agree to:
+${formData.userObligations || '[Key user obligations and responsibilities]'}
+
+4. PROHIBITED ACTIVITIES:
+You shall not:
+${formData.restrictions || '[Prohibited activities and restrictions]'}
+
+5. INTELLECTUAL PROPERTY:
+All content, features, and functionality are and will remain the exclusive property of ${formData.companyName || '[Company Name]'} and its licensors.
+
+6. LIMITATION OF LIABILITY:
+In no event shall ${formData.companyName || '[Company Name]'} be liable for any indirect, incidental, special, consequential or punitive damages.
+
+7. GOVERNING LAW:
+These Terms shall be governed and construed in accordance with the laws of India.
+
+8. CONTACT US:
+If you have any questions about these Terms, please contact us.
+                    `
+                },
+                privacy_policy: {
+                    title: 'Privacy Policy',
+                    content: `
+PRIVACY POLICY
+
+This Privacy Policy describes how ${formData.companyName || '[Company Name]'} (“Company”, “we”, “us”, or “our”) collects, uses, and shares your personal information when you use ${formData.serviceName || '[Service Name]'}.
+
+Effective Date: ${formData.effectiveDate || '[Effective Date]'}
+
+1. DATA WE COLLECT:
+${formData.dataCollected || '[Describe types of personal data collected]'}
+
+2. HOW WE USE YOUR DATA:
+We use your data for the following purposes:
+${formData.dataUsage || '[Describe how data is used to provide and improve services]'}
+
+3. DATA SECURITY:
+We implement professional security measures to protect your data, including:
+${formData.dataSecurity || '[Describe key security measures]'}
+
+4. YOUR DATA RIGHTS:
+In accordance with the Digital Personal Data Protection Act 2023, you have the right to access, update, and request deletion of your data.
+
+5. THIRD-PARTY SHARING:
+We do not sell your personal data. We only share data with trusted partners necessary for service delivery.
+
+6. CONTACT US:
+If you have any questions about this Privacy Policy or our data practices, please contact us at: ${formData.contactEmail || '[Privacy Contact Email]'}
+                    `
+                },
+                service_agreement: {
+                    title: 'Service Agreement',
+                    content: `
+SERVICE AGREEMENT
+
+This SERVICE AGREEMENT (the “Agreement”) is made and executed on this ${formData.executionDate ? new Date(formData.executionDate).getDate() : '[Day]'} day of ${formData.executionDate ? new Date(formData.executionDate).toLocaleString('default', { month: 'long' }) : '[Month]'} ${formData.executionDate ? new Date(formData.executionDate).getFullYear() : '[Year]'} by and between:
+
+${formData.companyName || '[Company Name]'}, a company incorporated under the Companies Act, 2013, having CIN: ${formData.companyCIN || '[Company CIN]'}, and having its registered office at ${formData.companyAddress || '[Company Address]'}, represented by its Authorized Signatory, (hereinafter referred to as the “COMPANY”).
+
+AND
+
+${formData.consultantName || '[Consultant Name]'} S/o ${formData.fatherName || "[Father's Name]"}, R/o ${formData.consultantAddress || '[Consultant Address]'} (hereinafter referred to as the “CONSULTANT”). UID/PAN No: ${formData.uidPan || '[UID/PAN]'}.
+
+1. ENGAGEMENT AND SCOPE OF SERVICES:
+The COMPANY hereby engages the CONSULTANT to provide ${formData.serviceType || '[Service Type]'} services as described below:
+${formData.serviceDescription || '[Detailed Service Description]'}
+
+2. TENURE:
+This Agreement shall be effective from ${formData.startDate || '[Start Date]'} and shall remain valid until ${formData.endDate || '[End Date]'}, unless terminated earlier.
+
+3. PROFESSIONAL FEES AND PAYMENT TERMS:
+In consideration for the services, the COMPANY shall pay a total contract value of ₹${formData.contractValue ? Number(formData.contractValue).toLocaleString() : '[Contract Value]'}.
+Payment Terms: ${formData.paymentTerms || '[Payment Terms]'}
+
+4. CONFIDENTIALITY:
+The CONSULTANT shall maintain strict confidentiality regarding all COMPANY information and shall not disclose it to any third party.
+
+5. TERMINATION:
+Either party may terminate this agreement with 30 days written notice.
+
+6. GOVERNING LAW:
+This Agreement shall be governed by the laws of India.
+
+SIGNATURES:
+
+For ${formData.companyName || '[Company Name]'}         CONSULTANT
+_________________________         _________________________
+Authorized Signatory              ${formData.consultantName || '[Name]'}
+                    `
                 }
             };
 
@@ -2337,6 +2447,7 @@ HR Department
                     if (formData.candidateName) context.push(`candidate: ${formData.candidateName}`);
                     if (formData.employeeName) context.push(`employee: ${formData.employeeName}`);
                     if (formData.clientName) context.push(`client: ${formData.clientName}`);
+                    if (formData.consultantName) context.push(`consultant: ${formData.consultantName}`);
                     if (formData.partyName) context.push(`party: ${formData.partyName}`);
                     if (formData.position) context.push(`position: ${formData.position}`);
                     if (formData.salary) context.push(`salary: ₹${Number(formData.salary).toLocaleString()}`);
@@ -3011,25 +3122,48 @@ HR Department
                                                             padding: 0,
                                                             margin: 0
                                                         }}>
-                                                            {value.map((item, index) => (
-                                                                <li key={index} style={{
-                                                                    display: 'flex',
-                                                                    alignItems: 'flex-start',
-                                                                    marginBottom: '6px',
-                                                                    fontSize: '12px',
-                                                                    lineHeight: '1.4'
-                                                                }}>
-                                                                    <span style={{
-                                                                        color: '#F97316',
-                                                                        marginRight: '8px',
+                                                            {value.map((item, index) => {
+                                                                // Special handling for section objects {heading, content}
+                                                                if (typeof item === 'object' && item !== null && item.heading && item.content) {
+                                                                    return (
+                                                                        <div key={index} style={{ marginBottom: '16px' }}>
+                                                                            <h4 style={{
+                                                                                fontSize: '13px',
+                                                                                fontWeight: '700',
+                                                                                color: '#111827',
+                                                                                marginBottom: '4px'
+                                                                            }}>{item.heading}</h4>
+                                                                            <p style={{
+                                                                                fontSize: '12px',
+                                                                                color: '#374151',
+                                                                                lineHeight: '1.5',
+                                                                                margin: 0,
+                                                                                whiteSpace: 'pre-wrap'
+                                                                            }}>{item.content}</p>
+                                                                        </div>
+                                                                    );
+                                                                }
+
+                                                                return (
+                                                                    <li key={index} style={{
+                                                                        display: 'flex',
+                                                                        alignItems: 'flex-start',
+                                                                        marginBottom: '6px',
                                                                         fontSize: '12px',
-                                                                        fontWeight: '600'
-                                                                    }}>•</span>
-                                                                    <span style={{ color: '#374151' }}>
-                                                                        {typeof item === 'object' ? JSON.stringify(item, null, 2) : item}
-                                                                    </span>
-                                                                </li>
-                                                            ))}
+                                                                        lineHeight: '1.4'
+                                                                    }}>
+                                                                        <span style={{
+                                                                            color: '#F97316',
+                                                                            marginRight: '8px',
+                                                                            fontSize: '12px',
+                                                                            fontWeight: '600'
+                                                                        }}>•</span>
+                                                                        <span style={{ color: '#374151' }}>
+                                                                            {typeof item === 'object' ? JSON.stringify(item, null, 2) : item}
+                                                                        </span>
+                                                                    </li>
+                                                                );
+                                                            })}
                                                         </ul>
                                                     ) : typeof value === 'object' && value !== null ? (
                                                         // Handle nested objects

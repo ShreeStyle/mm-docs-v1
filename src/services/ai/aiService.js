@@ -674,11 +674,9 @@ Return ONLY valid, richly detailed, FORMALLY WRITTEN JSON document content. No c
       {
         "title": "Non-Disclosure Agreement (NDA)",
         "date": "${new Date().toLocaleDateString('en-IN', { day: '2-digit', month: '2-digit', year: 'numeric' })}",
-        "disclosingParty": "${context.disclosingParty || context.company || brandContext.name}",
-        "disclosingPartyAddress": "${context.disclosingPartyAddress || '[Registered Office Address]'}",
-        "receivingParty": "${context.receivingParty || context.otherparty || '[Receiving Party Name]'}",
-        "receivingPartyAddress": "${context.receivingPartyAddress || '[Registered Office Address]'}",
-        "effectiveDate": "${context.effectiveDate || context.effectivedate || '[Agreement Date in DD/MM/YYYY]'}",
+        "companyName": "${context.companyName || context.company || brandContext.name}",
+        "partyName": "${context.partyName || context.otherparty || '[Receiving Party Name]'}",
+        "effectiveDate": "${context.effectiveDate || new Date().toLocaleDateString()}",
         "purpose": "${context.purpose || 'Business discussions and potential collaboration'}",
         "confidentialInformation": ["Technical data, trade secrets, know-how, research, product plans", "Financial information, business strategies, client lists", "Any information marked or designated as 'Confidential'", "Information that would reasonably be considered confidential"],
         "obligations": ["Hold and maintain Confidential Information in strict confidence", "Not disclose to any third parties without prior written consent", "Use solely for the purpose stated in this agreement", "Take reasonable precautions to protect confidentiality", "Return or destroy all Confidential Information upon request"],
@@ -689,9 +687,13 @@ Return ONLY valid, richly detailed, FORMALLY WRITTEN JSON document content. No c
         "arbitration": "Any dispute shall be resolved through arbitration as per the Arbitration and Conciliation Act, 1996.",
         "disclaimer": "This is an AI-generated template. It is NOT legal advice. Have this reviewed by a qualified Indian lawyer before signing.",
         "signatureBlocks": {
-          "disclosingParty": { "name": "________________", "designation": "Authorised Signatory", "company": "${context.disclosingParty || brandContext.name}", "date": "________________" },
-          "receivingParty": { "name": "________________", "designation": "Authorised Signatory", "company": "${context.receivingParty || '[Receiving Party]'}", "date": "________________" }
-        }
+          "disclosingParty": { "name": "________________", "designation": "Authorised Signatory", "company": "${context.companyName || brandContext.name}", "date": "________________" },
+          "receivingParty": { "name": "________________", "designation": "Authorised Signatory", "company": "${context.partyName || '[Receiving Party]'}", "date": "________________" }
+        },
+        "sections": [
+          { "heading": "I. Scope of Confidentiality", "content": "..." },
+          { "heading": "II. Intellectual Property Rights", "content": "..." }
+        ]
       }`;
 
     } else if (effectiveType === "service_agreement") {
@@ -708,29 +710,53 @@ Return ONLY valid, richly detailed, FORMALLY WRITTEN JSON document content. No c
 
       // Merge with providedData from frontend form
       const context = { ...providedData, ...inputData };
+      
+      // Extract date components if provided
+      const execDate = context.executionDate ? new Date(context.executionDate) : new Date();
+      const executionDay = execDate.getDate();
+      const executionMonth = execDate.toLocaleString('default', { month: 'long' });
+      const executionYear = execDate.getFullYear();
+
       console.log(`📋 Consolidated context for service_agreement:`, context);
 
       userPrompt = `Generate a LEGALLY PROFESSIONAL, FORMALLY STRUCTURED Service Agreement using the following context:
       
       CONTEXT DATA:
-      ${JSON.stringify(context, null, 2)}
+      ${JSON.stringify({ ...context, executionDay, executionMonth, executionYear }, null, 2)}
 
       TONE REQUIREMENT: This is a legal service contract. Use STRICTLY FORMAL, LEGALLY APPROPRIATE language.
       - Write as if drafted by a corporate legal team
       - Use formal contract terminology and structured clauses
       - Maintain authoritative, professional tone throughout
       - NO casual language whatsoever
+      - Use DD/MM/YYYY for other dates
       
-      Use the context data provided to fill in specific details.
       Return ONLY valid JSON with this structure:
       {
         "title": "Service Agreement",
-        "date": "${new Date().toLocaleDateString('en-IN', { year: 'numeric', month: 'long', day: 'numeric' })}",
-        "serviceProvider": "${context.serviceProvider || context.company || brandContext.name}",
-        "client": "${context.client || context.otherparty || '[Client Name]'}",
-        "effectiveDate": "${context.effectiveDate || context.effectivedate || '[Agreement Date]'}",
-        "serviceDescription": "${context.purpose || context.serviceDescription || 'Professional services'}",
-        "paymentTerms": "${context.paymentTerms || 'As per invoice'}"
+        "companyName": "${context.companyName || brandContext.name}",
+        "companyAddress": "${context.companyAddress || brandContext.address || '[Company Address]'}",
+        "companyCIN": "${context.companyCIN || '[Company CIN]'}",
+        "consultantName": "${context.consultantName || '[Consultant Name]'}",
+        "consultantAddress": "${context.consultantAddress || '[Consultant Address]'}",
+        "fatherName": "${context.fatherName || "[Consultant's Father's Name]"}",
+        "uidPan": "${context.uidPan || '[UID/PAN No]'}",
+        "executionDay": "${executionDay}",
+        "executionMonth": "${executionMonth}",
+        "executionYear": "${executionYear}",
+        "serviceType": "${context.serviceType || 'Professional Services'}",
+        "serviceDescription": "${context.serviceDescription || 'Detailed scope of services...'}",
+        "startDate": "${context.startDate || '[Start Date]'}",
+        "endDate": "${context.endDate || '[End Date]'}",
+        "contractValue": "${context.contractValue || '[Contract Value]'}",
+        "paymentTerms": "${context.paymentTerms || 'As per invoice'}",
+        "sections": [
+          { "heading": "I. Detailed Scope of Work", "content": "..." },
+          { "heading": "II. Service Level Standards", "content": "..." },
+          { "heading": "III. Intellectual Property", "content": "..." },
+          { "heading": "IV. Confidentiality", "content": "..." },
+          { "heading": "V. Termination", "content": "..." }
+        ]
       }`;
 
     } else if (effectiveType === "mou") {
@@ -767,7 +793,11 @@ Return ONLY valid, richly detailed, FORMALLY WRITTEN JSON document content. No c
         "party1": "${context.party1 || context.company || brandContext.name}",
         "party2": "${context.party2 || context.otherparty || '[Second Party Name]'}",
         "effectiveDate": "${context.effectiveDate || context.effectivedate || '[Agreement Date]'}",
-        "purpose": "${context.purpose || 'Mutual cooperation'}"
+        "purpose": "${context.purpose || 'Mutual cooperation'}",
+        "sections": [
+          { "heading": "I. Strategic Alignment", "content": "..." },
+          { "heading": "II. Areas of Cooperation", "content": "..." }
+        ]
       }`;
 
     } else if (effectiveType === "invoice") {
@@ -1049,6 +1079,49 @@ Return ONLY valid, richly detailed, FORMALLY WRITTEN JSON document content. No c
         ]
       }`;
 
+    } else if (effectiveType === "terms_of_service" || effectiveType === "privacy_policy") {
+      // Parse structured input data
+      const inputData = {};
+      if (topic.includes('|')) {
+        topic.split('|').forEach(pair => {
+          const [key, value] = pair.split(':').map(s => s.trim());
+          if (key && value) {
+            inputData[key.toLowerCase().replace(/\s+/g, '')] = value;
+          }
+        });
+      }
+
+      // Merge with providedData from frontend form
+      const context = { ...providedData, ...inputData };
+      console.log(`📋 Consolidated context for ${effectiveType}:`, context);
+
+      const isTOS = effectiveType === "terms_of_service";
+      const docTitle = isTOS ? "Terms of Service" : "Privacy Policy";
+
+      userPrompt = `DRAFT a HIGHLY PROFESSIONAL, LEGALLY ROBUST ${docTitle} for:
+      
+      CONTEXT DATA:
+      ${JSON.stringify(context, null, 2)}
+
+      IMPORTANT INSTRUCTIONS:
+      1. DO NOT repeat these instructions or the input data in the output.
+      2. DRAFT ACTUAL, LEGALLY-SOUND CLAUSES that a real company would use.
+      3. Focus on ${isTOS ? "User Obligations, Liabilities, Intellectual Property, and Dispute Resolution" : "Data Collection, Usage, Storage, User Rights, and Compliance with DPDP Act 2023"}.
+      4. The response MUST be in JSON format with a "sections" array containing "heading" and "content" fields.
+      
+      Return ONLY valid JSON with this structure:
+      {
+        "title": "${docTitle}",
+        "companyName": "${context.companyName || brandContext.name}",
+        "effectiveDate": "${context.effectiveDate || new Date().toLocaleDateString('en-IN')}",
+        "sections": [
+          { "heading": "1. Introduction", "content": "Draft a formal introduction for ${context.companyName}'s ${isTOS ? 'services' : 'data practices'}." },
+          { "heading": "${isTOS ? '2. User Obligations' : '2. Data Collection'}", "content": "Professional drafting of ${isTOS ? 'what users must do and agree to' : 'what data is collected and why'}." },
+          { "heading": "${isTOS ? '3. Acceptable Use' : '3. Data Usage'}", "content": "Detailed legal drafting of ${isTOS ? 'restrictions and prohibited activities' : 'how the data is used to improve services'}." },
+          { "heading": "${isTOS ? '4. Limitation of Liability' : '4. Data Protection'}", "content": "Formal legal language for ${isTOS ? 'protecting the company from legal claims' : 'how data is secured and protected' }." },
+          { "heading": "${isTOS ? '5. Governing Law' : '5. User Rights'}", "content": "Drafting of ${isTOS ? 'Indian legal jurisdiction and arbitration' : 'rights of users to access and delete data as per DPDP Act 2023'}." }
+        ]
+      }`;
     } else {
       userPrompt = `Create a HIGHLY DETAILED, EXECUTIVE-LEVEL Strategic Document or Pitch Deck for: "${topic}".
       
@@ -1202,8 +1275,24 @@ const generateProfessionalAppreciation = (rawInput, employeeName, position) => {
 // Fallback mock generation (in case API fails)
 const generateMockContent = (type, topic, providedData = {}, brandContext = {}) => {
   console.log('🔄 Generating fallback content with provided data:', providedData);
-  const topicTitle = topic.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
-  const effectiveType = type.toLowerCase();
+  
+  // Sanitize topic to create a concise title if it's too long
+  let topicTitle = topic.split('|')[0].trim(); // Take part before pipe if exists
+  if (topicTitle.length > 50) {
+    topicTitle = topicTitle.substring(0, 47) + "...";
+  }
+  topicTitle = topicTitle.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+  
+  // SANITIZE TYPE FOR CONSISTENT MAPPING
+  const effectiveType = type.toLowerCase().replace(/[-\s]/g, '_');
+
+  // Try to extract sections from the topic if they are provided as JSON-like structures
+  const extractedSections = [];
+  const sectionRegex = /\{\s*"heading"\s*:\s*"([^"]+)"\s*,\s*"content"\s*:\s*"([^"]+)"\s*\}/g;
+  let match;
+  while ((match = sectionRegex.exec(topic)) !== null) {
+    extractedSections.push({ heading: match[1], content: match[2] });
+  }
 
   if (effectiveType === "proposal") {
     return {
@@ -1353,7 +1442,29 @@ const generateMockContent = (type, topic, providedData = {}, brandContext = {}) 
         "All previous employment contracts and agreements stand terminated"
       ],
       hrContactPerson: providedData.hrContactPerson || "HR Manager",
-      closingMessage: "We look forward to a mutually beneficial and productive association."
+      closingMessage: "We look forward to a mutually beneficial and productive association.",
+      sections: extractedSections.length > 0 ? extractedSections : [
+        { "heading": "I. Orientation and Induction", "content": "The employee shall undergo a comprehensive orientation program on the first day of joining to familiarize themselves with company culture and processes." },
+        { "heading": "II. Performance Standards", "content": "High standards of performance and professional conduct are expected and will be reviewed periodically." }
+      ]
+    };
+  } else if (effectiveType === "nda" || effectiveType === "service_agreement" || effectiveType === "mou" || effectiveType === "terms_of_service" || effectiveType === "privacy_policy") {
+    // Try to extract company/party names from topic string if providedData is sparse
+    const coMatch = topic.match(/Company:\s*([^,]+)/i);
+    const clientMatch = topic.match(/Client:\s*([^,]+)/i);
+    
+    return {
+      title: topicTitle,
+      date: new Date().toLocaleDateString('en-IN', { year: 'numeric', month: 'long', day: 'numeric' }),
+      companyName: providedData.companyName || (coMatch ? coMatch[1].trim() : brandContext.name || "Provider"),
+      partyName: providedData.partyName || (clientMatch ? clientMatch[1].trim() : "Client"),
+      effectiveDate: providedData.effectiveDate || new Date().toLocaleDateString(),
+      services: providedData.serviceType || "Professional Services",
+      sections: extractedSections.length > 0 ? extractedSections : [
+        { "heading": "I. Scope and Purpose", "content": "This section outlines the primary objectives and scope of the agreement as discussed between the parties." },
+        { "heading": "II. Detailed Terms", "content": "Comprehensive terms and conditions governing the relationship, including obligations and performance metrics." },
+        { "heading": "III. Governing Law", "content": "This agreement shall be governed by and construed in accordance with the laws of India." }
+      ]
     };
   } else if (effectiveType === "experience_certificate") {
     console.log('📝 Building experience certificate fallback with data:', providedData);
