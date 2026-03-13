@@ -566,7 +566,7 @@ const DocumentTemplateEditor = () => {
     const handleResizeMove = (e) => {
         if (isResizingSidebar) {
             const newWidth = window.innerWidth - e.clientX;
-            if (newWidth >= 260 && newWidth <= 480) {
+            if (newWidth >= 260 && newWidth <= 600) {
                 setSidebarWidth(newWidth);
             }
         }
@@ -1534,6 +1534,12 @@ const DocumentTemplateEditor = () => {
         setIsEditingName(false);
     };
 
+    const handleNameKeyDown = (e) => {
+        if (e.key === 'Enter') {
+            setIsEditingName(false);
+        }
+    };
+
     // Render interactive field content
     const renderFieldContent = (element) => {
         // Special handling for images - always show if they have a value
@@ -2402,6 +2408,7 @@ const DocumentTemplateEditor = () => {
                             value={documentName}
                             onChange={handleNameChange}
                             onBlur={handleNameBlur}
+                            onKeyDown={handleNameKeyDown}
                             autoFocus
                             className="document-name-input"
                         />
@@ -2984,68 +2991,70 @@ const DocumentTemplateEditor = () => {
                         <ChevronDown size={16} className="user-expand" />
                     </div>
 
-                    <div className="sidebar-header">
-                        <h3>Add Fillable Fields</h3>
-                    </div>
+                    <div className="sidebar-scrollable-content">
+                        <div className="sidebar-header">
+                            <h3>Add Fillable Fields</h3>
+                        </div>
 
-                    <div className="fields-list">
-                        {/* Top 4 Fields - Always Visible */}
-                        {topFields.map(field => {
-                            const Icon = field.icon;
-                            return (
-                                <div
-                                    key={field.id}
-                                    className="field-item"
-                                    draggable
-                                    onDragStart={() => handleFieldDragStart(field)}
-                                    onClick={() => handleFieldClick(field)}
-                                >
-                                    <div className="field-icon" style={{ backgroundColor: `${field.color}20`, color: field.color }}>
-                                        <Icon size={16} />
+                        <div className="fields-list">
+                            {/* Top 4 Fields - Always Visible */}
+                            {topFields.map(field => {
+                                const Icon = field.icon;
+                                return (
+                                    <div
+                                        key={field.id}
+                                        className="field-item"
+                                        draggable
+                                        onDragStart={() => handleFieldDragStart(field)}
+                                        onClick={() => handleFieldClick(field)}
+                                    >
+                                        <div className="field-icon" style={{ backgroundColor: `${field.color}20`, color: field.color }}>
+                                            <Icon size={16} />
+                                        </div>
+                                        <span className="field-name">{field.name}</span>
+                                        <div className="field-drag-handle">
+                                            <div className="drag-dots">⋮⋮</div>
+                                        </div>
                                     </div>
-                                    <span className="field-name">{field.name}</span>
-                                    <div className="field-drag-handle">
-                                        <div className="drag-dots">⋮⋮</div>
-                                    </div>
-                                </div>
-                            );
-                        })}
+                                );
+                            })}
 
-                        {/* Additional Fields - Show/Hide */}
-                        {showAllFields && moreFields.map(field => {
-                            const Icon = field.icon;
-                            return (
-                                <div
-                                    key={field.id}
-                                    className="field-item"
-                                    draggable
-                                    onDragStart={() => handleFieldDragStart(field)}
-                                    onClick={() => handleFieldClick(field)}
-                                >
-                                    <div className="field-icon" style={{ backgroundColor: `${field.color}20`, color: field.color }}>
-                                        <Icon size={16} />
+                            {/* Additional Fields - Show/Hide */}
+                            {showAllFields && moreFields.map(field => {
+                                const Icon = field.icon;
+                                return (
+                                    <div
+                                        key={field.id}
+                                        className="field-item"
+                                        draggable
+                                        onDragStart={() => handleFieldDragStart(field)}
+                                        onClick={() => handleFieldClick(field)}
+                                    >
+                                        <div className="field-icon" style={{ backgroundColor: `${field.color}20`, color: field.color }}>
+                                            <Icon size={16} />
+                                        </div>
+                                        <span className="field-name">{field.name}</span>
+                                        <div className="field-drag-handle">
+                                            <div className="drag-dots">⋮⋮</div>
+                                        </div>
                                     </div>
-                                    <span className="field-name">{field.name}</span>
-                                    <div className="field-drag-handle">
-                                        <div className="drag-dots">⋮⋮</div>
-                                    </div>
-                                </div>
-                            );
-                        })}
-                    </div>
+                                );
+                            })}
+                        </div>
 
-                    {/* Show More Button - Outside fields list */}
-                    <div className="show-more-container">
-                        <button className="show-more-btn" onClick={toggleShowAllFields}>
-                            <ChevronDown
-                                size={14}
-                                style={{
-                                    transform: showAllFields ? 'rotate(180deg)' : 'rotate(0deg)',
-                                    transition: 'transform 0.2s ease'
-                                }}
-                            />
-                            {showAllFields ? 'Show less' : 'Show more'}
-                        </button>
+                        {/* Show More Button - Outside fields list */}
+                        <div className="show-more-container">
+                            <button className="show-more-btn" onClick={toggleShowAllFields}>
+                                <ChevronDown
+                                    size={14}
+                                    style={{
+                                        transform: showAllFields ? 'rotate(180deg)' : 'rotate(0deg)',
+                                        transition: 'transform 0.2s ease'
+                                    }}
+                                />
+                                {showAllFields ? 'Show less' : 'Show more'}
+                            </button>
+                        </div>
                     </div>
 
                     <div className="sidebar-divider"></div>

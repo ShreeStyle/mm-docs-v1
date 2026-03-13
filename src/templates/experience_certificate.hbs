@@ -1,332 +1,382 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Experience Certificate</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <title>Employment Certificate - {{companyName}}</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Montserrat:wght@700;800&display=swap" rel="stylesheet">
     <style>
+        @page {
+            size: A4;
+            margin: 0;
+        }
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
         }
-
         body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            line-height: 1.6;
-            color: #1f2937;
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 48px 40px;
-            background: white;
-            font-size: 14px;
-        }
-
-        .letterhead {
-            text-align: center;
-            padding-bottom: 28px;
-            margin-bottom: 36px;
-            border-bottom: 1px solid #e5e7eb;
-        }
-
-        .company-name {
-            font-size: 22px;
-            font-weight: 700;
-            color: #111827;
-            margin-bottom: 8px;
-            letter-spacing: -0.02em;
-        }
-
-        .company-address {
-            font-size: 13px;
-            color: #4b5563;
-            line-height: 1.6;
-        }
-
-        .doc-title-wrap {
-            text-align: center;
-            margin: 32px 0;
-        }
-
-        .doc-title {
-            font-size: 36px;
-            font-weight: 800;
-            color: #e5e7eb;
-            text-transform: uppercase;
-            letter-spacing: 0.08em;
-        }
-
-        .cert-meta {
-            text-align: right;
-            margin-bottom: 24px;
-            font-size: 13px;
-            color: #6b7280;
-        }
-
-        .cert-meta strong {
-            color: #111827;
-        }
-
-        .section-label {
+            font-family: 'Inter', -apple-system, sans-serif;
+            background: #ffffff;
+            color: #333333;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
             font-size: 11px;
-            text-transform: uppercase;
-            letter-spacing: 0.06em;
-            color: #6b7280;
-            font-weight: 600;
-            margin-bottom: 12px;
+            line-height: 1.6;
         }
-
-        .content {
-            font-size: 14px;
-            color: #374151;
-            line-height: 1.7;
-        }
-
-        .content p {
-            margin-bottom: 16px;
-        }
-
-        .details-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin: 24px 0;
-        }
-
-        .details-table th {
-            background: #f9fafb;
-            text-align: left;
-            padding: 12px 16px;
-            font-size: 13px;
-            font-weight: 600;
-            color: #6b7280;
-            border-bottom: 1px solid #e5e7eb;
-            text-transform: uppercase;
-            letter-spacing: 0.04em;
-            width: 35%;
-        }
-
-        .details-table td {
-            padding: 12px 16px;
-            font-size: 14px;
-            color: #111827;
-            font-weight: 500;
-            border-bottom: 1px solid #f3f4f6;
-        }
-
-        .performance-section {
-            background: #f9fafb;
-            border-radius: 8px;
-            padding: 24px;
-            margin: 28px 0;
-        }
-
-        .perf-title {
-            font-size: 13px;
-            font-weight: 600;
-            color: #111827;
-            margin-bottom: 12px;
-            text-transform: uppercase;
-            letter-spacing: 0.04em;
-        }
-
-        .perf-list {
-            padding-left: 20px;
-            margin-top: 12px;
-        }
-
-        .perf-list li {
-            margin-bottom: 8px;
-            font-size: 13px;
-            color: #4b5563;
-            line-height: 1.5;
-        }
-
-        .verify-note {
-            background: #fefce8;
-            border: 1px solid #fde68a;
-            border-radius: 8px;
-            padding: 16px 20px;
-            margin: 24px 0;
-            font-size: 13px;
-            color: #92400e;
-        }
-
-        .verify-note strong {
-            color: #78350f;
-        }
-
-        .signature-section {
-            margin-top: 48px;
+        
+        .a4-container {
+            width: 210mm;
+            min-height: 297mm;
+            position: relative;
+            background: white;
+            margin: 0 auto;
             display: flex;
-            justify-content: space-between;
-            align-items: flex-end;
+            flex-direction: column;
+            border: 1px solid #e0e0e0;
         }
 
-        .seal-block {
-            width: 40%;
-        }
-
-        .seal-box {
-            border: 1px solid #d1d5db;
-            border-radius: 8px;
-            height: 72px;
+        /* Top Banner Section */
+        .top-banner {
+            width: 100%;
+            height: 60mm;
+            background: linear-gradient(135deg, #021bc7 0%, #0047ff 100%);
+            position: relative;
+            overflow: hidden;
             display: flex;
             align-items: center;
-            justify-content: center;
+            padding-left: 30mm;
+        }
+        
+        .banner-shape-1 {
+            position: absolute;
+            right: 0;
+            top: 0;
+            width: 60mm;
+            height: 45mm;
+            background: rgba(255, 255, 255, 0.05);
+        }
+        
+        .banner-shape-2 {
+            position: absolute;
+            right: 20mm;
+            bottom: 0;
+            width: 40mm;
+            height: 30mm;
+            background: rgba(0, 0, 0, 0.1);
+        }
+
+        .header-content {
+            display: flex;
+            align-items: center;
+            gap: 15mm;
+            z-index: 2;
+            width: 100%;
+        }
+
+        .abstract-logo {
+            width: 32px;
+            height: 32px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            grid-template-rows: 1fr 1fr;
+            gap: 2px;
+            transform: rotate(45deg);
+        }
+        
+        .abstract-logo div {
+            background-color: white;
+            box-shadow: inset 0 0 5px rgba(0,0,0,0.1);
+        }
+        .abstract-logo .tl { background-color: #f0f0f0; }
+        .abstract-logo .br { background-color: #e0e0e0; }
+
+        .header-text {
+            color: white;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header-title {
+            font-family: 'Inter', sans-serif;
+            font-size: 32px;
+            font-weight: 800;
+            line-height: 1.1;
+            letter-spacing: -0.5px;
+            margin-bottom: 8px;
+        }
+
+        .ref-number {
             font-size: 11px;
-            color: #9ca3af;
-            margin-top: 8px;
+            font-weight: 400;
+            opacity: 0.9;
+            margin-top: 10px;
         }
 
-        .signature-block {
-            width: 40%;
+        /* Content Layer */
+        .content-layer {
+            flex-grow: 1;
+            padding: 20mm 35mm 20mm 35mm;
         }
 
-        .sig-label {
+        /* Employee Info Grid */
+        .certify-intro {
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 12px;
+            font-size: 11px;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: 120px 1fr;
+            row-gap: 6px;
+            margin-bottom: 30px;
+            font-size: 11px;
+        }
+
+        .info-label {
+            color: #555;
+            font-weight: 500;
+        }
+
+        .info-value {
+            color: #333;
+            font-weight: 500;
+        }
+        
+        .colon-separator {
+            display: inline-block;
+            width: 15px;
+            color: #333;
+        }
+
+        /* Narrative Body */
+        .narrative-body {
+            font-size: 11px;
+            color: #333;
+            text-align: justify;
+        }
+
+        .narrative-body p {
+            margin-bottom: 20px;
+            line-height: 1.6;
+        }
+
+        /* Date Section */
+        .date-section {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 35px;
+            font-size: 11px;
+            width: 100%;
+            padding-right: 50px;
+        }
+        
+        .date-item {
+            display: flex;
+            align-items: center;
+        }
+        
+        .date-label {
+            font-weight: 700;
+            margin-right: 15px;
+        }
+
+        /* Signature Area */
+        .signature-area {
+            margin-top: 50px;
+        }
+        
+        .closure {
+            margin-bottom: 30px;
+        }
+        
+        .signature-placeholder {
+            width: 150px;
+            height: 50px;
+            margin-bottom: 5px;
+        }
+        
+        .signature-image {
+            max-height: 50px;
+            max-width: 150px;
+        }
+
+        .signature-name {
+            font-weight: 700;
             font-size: 12px;
+            color: #333;
+        }
+
+        /* Footer Bar */
+        .footer-banner {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding-bottom: 15mm;
+        }
+        
+        .footer-thin-bar {
+            width: 90%;
+            height: 4px;
+            background-color: #0047ff;
+            align-self: flex-start;
+            margin-bottom: 5px;
+        }
+
+        .footer-main-bar {
+            width: 100%;
+            height: 20mm;
+            background: linear-gradient(90deg, #021bc7 0%, #0047ff 100%);
+            display: flex;
+            align-items: center;
+            padding: 0 35mm;
+            color: white;
+            justify-content: space-between;
+        }
+        
+        .footer-left-accents {
+            position: absolute;
+            left: 0;
+            height: 20mm;
+            display: flex;
+        }
+        .footer-accent-1 { width: 10mm; background-color: #0115a6; }
+        .footer-accent-2 { width: 20mm; background-color: #021bc7; }
+
+        .footer-contact-block {
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+            position: relative;
+            padding-left: 12px;
+            z-index: 2;
+        }
+        
+        .footer-contact-block::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 2px;
+            bottom: 2px;
+            width: 2px;
+            background-color: rgba(255,255,255,0.8);
+        }
+
+        .footer-text {
+            font-size: 10px;
+            font-weight: 400;
+        }
+        
+        .footer-text-bold {
             font-weight: 600;
-            color: #6b7280;
-            text-transform: uppercase;
-            letter-spacing: 0.04em;
-            margin-bottom: 48px;
-        }
-
-        .sig-line {
-            border-top: 1px solid #d1d5db;
-            padding-top: 8px;
-        }
-
-        .sig-name {
-            font-size: 14px;
-            font-weight: 600;
-            color: #111827;
-        }
-
-        .sig-role {
-            font-size: 12px;
-            color: #6b7280;
-        }
-
-        .footer {
-            margin-top: 48px;
-            text-align: center;
-            padding-top: 24px;
-            border-top: 1px solid #e5e7eb;
-            color: #9ca3af;
-            font-size: 12px;
         }
     </style>
 </head>
-
 <body>
-    <div class="letterhead">
-        <div class="company-name">{{companyName}}</div>
-        <div class="company-address">
-            {{{companyAddress}}}
-            {{#if companyPhone}}<br>{{companyPhone}}{{/if}}
-            {{#if companyEmail}} | {{companyEmail}}{{/if}}
-        </div>
-    </div>
-
-    <div class="doc-title-wrap">
-        <div class="doc-title">EXPERIENCE CERTIFICATE</div>
-    </div>
-
-    <div class="cert-meta">
-        <strong>Certificate No:</strong> {{#if
-        certificateNumber}}{{certificateNumber}}{{else}}EXP/{{currentYear}}/{{employeeId}}{{/if}}<br>
-        <strong>Date:</strong> {{currentDate}}
-    </div>
-
-    <div class="content">
-        <p class="section-label">To Whom It May Concern</p>
-
-        <p>This is to certify that <strong>{{employeeName}}</strong> was employed with {{companyName}} in the following
-            capacity:</p>
-
-        <table class="details-table">
-            <tr>
-                <th>Employee Name</th>
-                <td>{{employeeName}}</td>
-            </tr>
-            <tr>
-                <th>Position Held</th>
-                <td>{{position}}</td>
-            </tr>
-            <tr>
-                <th>Department</th>
-                <td>{{department}}</td>
-            </tr>
-            {{#if employeeId}}<tr>
-                <th>Employee ID</th>
-                <td>{{employeeId}}</td>
-            </tr>{{/if}}
-            <tr>
-                <th>Date of Joining</th>
-                <td>{{joiningDate}}</td>
-            </tr>
-            <tr>
-                <th>Date of Relieving</th>
-                <td>{{relievingDate}}</td>
-            </tr>
-            <tr>
-                <th>Total Experience</th>
-                <td>{{#if totalExperience}}{{totalExperience}}{{else}}As per employment period{{/if}}</td>
-            </tr>
-        </table>
-
-        <div class="performance-section">
-            <div class="perf-title">Work Performance & Conduct</div>
-            <p>During the tenure of employment, {{employeeName}} demonstrated exceptional professionalism, dedication,
-                and competence. {{#if workDescription}}{{workDescription}}{{else}}The employee consistently met
-                performance objectives and maintained high standards of work quality.{{/if}}</p>
-            <ul class="perf-list">
-                <li>Consistently exceeded performance targets and objectives</li>
-                <li>Demonstrated strong leadership and collaborative skills</li>
-                <li>Contributed significantly to departmental and organizational goals</li>
-                <li>Maintained excellent professional conduct and work ethics</li>
-                {{#if achievements}}<li>{{achievements}}</li>{{/if}}
-            </ul>
+    <div class="a4-container">
+        <!-- Top Banner -->
+        <div class="top-banner">
+            <div class="banner-shape-1"></div>
+            <div class="banner-shape-2"></div>
+            
+            <div class="header-content">
+                <div class="abstract-logo">
+                    <div class="tl"></div><div></div>
+                    <div></div><div class="br"></div>
+                </div>
+                <div class="header-text">
+                    <div class="header-title">Employment<br>Certificate</div>
+                    <div class="ref-number">Ref. No.: {{#if refNumber}}{{refNumber}}{{else}}045/HRD/LIC/X/2025{{/if}}</div>
+                </div>
+            </div>
         </div>
 
-        <p>We found {{employeeName}} to be honest, hardworking, reliable, and a person of good character. The employee
-            maintained excellent relationships with colleagues, clients, and management throughout the employment
-            period.</p>
+        <!-- Main Content -->
+        <div class="content-layer">
+            <div class="certify-intro">This is to certify that:</div>
+            
+            <div class="info-grid">
+                <div class="info-label">Name</div>
+                <div class="info-value"><span class="colon-separator">:</span>{{employeeName}}</div>
+                
+                {{#if employeeId}}
+                <div class="info-label">Employee ID</div>
+                <div class="info-value"><span class="colon-separator">:</span>{{employeeId}}</div>
+                {{else}}
+                <div class="info-label">Employee ID</div>
+                <div class="info-value"><span class="colon-separator">:</span>204589</div>
+                {{/if}}
+                
+                <div class="info-label">Position</div>
+                <div class="info-value"><span class="colon-separator">:</span>{{position}}</div>
+                
+                <div class="info-label">Department</div>
+                <div class="info-value"><span class="colon-separator">:</span>{{department}}</div>
+                
+                <div class="info-label">Period of Employment</div>
+                <div class="info-value"><span class="colon-separator">:</span>{{#if joiningDate}}{{joiningDate}}{{else}}{{startDate}}{{/if}} &#8211; {{#if relievingDate}}{{relievingDate}}{{else}}{{#if endDate}}{{endDate}}{{else}}Present{{/if}}{{/if}}</div>
+            </div>
 
-        {{#if reasonForLeaving}}
-        <p><strong>Reason for Leaving:</strong> {{reasonForLeaving}}</p>
-        {{/if}}
+            <div class="narrative-body">
+                <p>Mr./Ms. {{employeeName}} was employed full-time at {{companyName}}, located at {{companyAddress}}. During their tenure, they were responsible for {{#if projects}}{{projects}}{{else}}handling key departmental functions, managing specific projects, maintaining high standards of work, and supporting the team to ensure consistent performance.{{/if}}</p>
+                
+                <p>They consistently demonstrated professionalism, patience, and effective communication skills. Their contribution greatly enhanced our operations, and they maintained a strong track record. {{#if performanceSummary}}{{performanceSummary}}{{/if}}</p>
+                
+                <p>This certificate is issued upon their request for any official or administrative purposes it may serve.</p>
+            </div>
 
-        <p>We have no hesitation in recommending {{employeeName}} for future employment opportunities and wish them
-            success in all future endeavors.</p>
+            <div class="date-section">
+                <div class="date-item">
+                    <span class="date-label">Issued in</span>
+                    <span>: {{#if companyCity}}{{companyCity}}{{else}}Headquarters{{/if}}</span>
+                </div>
+                <div class="date-item">
+                    <span class="date-label">Date</span>
+                    <span>: {{#if date}}{{date}}{{else}}Today{{/if}}</span>
+                </div>
+            </div>
 
-        <div class="verify-note">
-            <strong>For Verification:</strong> This certificate can be verified by contacting our HR department at {{#if
-            hrEmail}}{{hrEmail}}{{else}}hr@company.com{{/if}} or {{#if hrPhone}}{{hrPhone}}{{else}}+91-XXXXXXXXXX{{/if}}
+            <div class="signature-area">
+                <div class="closure">
+                    Sincerely,<br>
+                    {{#if managerTitle}}{{managerTitle}}{{else}}Human Resources Manager{{/if}}
+                </div>
+                <div class="signature-placeholder">
+                    <svg class="signature-image" viewBox="0 0 150 50" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M 20 40 Q 30 10, 40 40 T 45 40 Q 50 30, 52 35 T 60 40 Q 65 30, 70 35 T 85 41 Q 90 35, 95 38 Q 110 30, 140 42" fill="none" stroke="#222" stroke-width="1.5" stroke-linecap="round"/>
+                        <path d="M 40 40 Q 35 30, 30 40" fill="none" stroke="#222" stroke-width="1.5"/>
+                        <circle cx="85" cy="30" r="1.5" fill="#222"/>
+                    </svg>
+                </div>
+                <div class="signature-name">{{#if hrContactPerson}}{{hrContactPerson}}{{else}}Avery Davis{{/if}}</div>
+            </div>
+            
         </div>
-    </div>
 
-    <div class="signature-section">
-        <div class="seal-block">
-            <div class="section-label">Company Seal</div>
-            <div class="seal-box">COMPANY SEAL</div>
-        </div>
-        <div class="signature-block">
-            <div class="sig-label">Authorized Signatory</div>
-            <div class="sig-line">
-                <div class="sig-name">{{#if hrContactPerson}}{{hrContactPerson}}{{else}}HR Manager{{/if}}</div>
-                <div class="sig-role">{{#if managerTitle}}{{managerTitle}}{{else}}Human Resources
-                    Manager{{/if}}<br>{{companyName}}</div>
+        <!-- Footer -->
+        <div class="footer-banner">
+            <div class="footer-thin-bar"></div>
+            <div style="position: relative; width: 100%;">
+                <div class="footer-left-accents">
+                    <div class="footer-accent-1"></div>
+                    <div class="footer-accent-2"></div>
+                </div>
+                <div class="footer-main-bar">
+                    <div class="footer-contact-block" style="margin-left: 25mm;">
+                        <span class="footer-text footer-text-bold">{{#if companyName}}{{companyName}}{{else}}Larana, Inc.{{/if}}</span>
+                        <span class="footer-text">{{#if companyEmail}}{{companyEmail}}{{else}}www.reallygreatsite.com{{/if}}</span>
+                    </div>
+                    
+                    <div class="footer-contact-block">
+                        <span class="footer-text">{{#if hrEmail}}{{hrEmail}}{{else}}hello@reallygreatsite.com{{/if}}</span>
+                        <span class="footer-text">{{#if companyPhone}}{{companyPhone}}{{else}}+123-456-7890{{/if}}</span>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
-
-    <div class="footer">
-        <p>This is a system-generated certificate. Valid without signature. {{companyName}}</p>
-        {{#if currentDate}}<p>Generated on {{currentDate}}</p>{{/if}}
-    </div>
 </body>
-
 </html>

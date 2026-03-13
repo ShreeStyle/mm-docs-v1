@@ -1,341 +1,366 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Warning Letter</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <title>Warning Letter - {{companyName}}</title>
+    <!-- Using Montserrat for headers and a clean sans-serif for body -->
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
+        @page {
+            size: A4;
+            margin: 0;
+        }
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
         }
-
         body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            font-family: 'Montserrat', sans-serif;
+            background: #ffffff;
+            color: #555555;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+            font-size: 11px;
             line-height: 1.6;
-            color: #1f2937;
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 48px 40px;
+            font-weight: 500;
+        }
+        
+        .a4-container {
+            width: 210mm;
+            min-height: 297mm;
+            position: relative;
             background: white;
-            font-size: 14px;
+            margin: 0 auto;
+            overflow: hidden;
         }
 
-        .letterhead {
+        /* Geometric Corner SVG - Top Left */
+        .corner-top-left {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 90mm;
+            height: 90mm;
+            z-index: 1;
+        }
+
+        /* Geometric Corner SVG - Bottom Right */
+        .corner-bottom-right {
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            width: 100mm;
+            height: 100mm;
+            z-index: 1;
+        }
+
+        /* Header Layout */
+        .header-container {
+            position: relative;
+            z-index: 2;
+            padding: 25mm 20mm 15mm 65mm; /* Indent body from the left geometry */
             display: flex;
             justify-content: space-between;
             align-items: flex-start;
-            padding-bottom: 28px;
-            margin-bottom: 36px;
-            border-bottom: 1px solid #e5e7eb;
+        }
+        
+        /* Thin formatting lines in header */
+        .header-line-top {
+            position: absolute;
+            top: 25mm;
+            left: 65mm;
+            right: 20mm;
+            height: 1px;
+            background-color: #d0d0d0;
+        }
+        .header-line-bottom {
+            position: absolute;
+            bottom: 10mm;
+            left: 35mm;
+            right: 20mm;
+            height: 1px;
+            background-color: #d0d0d0;
         }
 
-        .company-name {
-            font-size: 22px;
+        .header-text {
+            padding-top: 15px;
+        }
+
+        .header-title {
+            font-size: 24px;
             font-weight: 700;
-            color: #111827;
-            margin-bottom: 8px;
-            letter-spacing: -0.02em;
-        }
-
-        .company-address {
-            font-size: 13px;
-            color: #4b5563;
-            line-height: 1.6;
-            max-width: 280px;
-        }
-
-        .doc-badge {
-            text-align: right;
-        }
-
-        .doc-title {
-            font-size: 32px;
-            font-weight: 800;
-            color: #fecaca;
+            color: #555555;
+            letter-spacing: 0.5px;
             text-transform: uppercase;
-            letter-spacing: 0.06em;
-            margin-bottom: 8px;
         }
 
-        .doc-date {
-            font-size: 13px;
-            color: #6b7280;
-        }
-
-        .doc-date strong {
-            color: #111827;
-        }
-
-        .confidential-badge {
-            display: inline-block;
-            padding: 4px 12px;
-            border-radius: 9999px;
-            font-size: 11px;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            background: #fef2f2;
-            color: #dc2626;
-            margin-top: 8px;
-        }
-
-        .section-label {
-            font-size: 11px;
-            text-transform: uppercase;
-            letter-spacing: 0.06em;
-            color: #6b7280;
-            font-weight: 600;
-            margin-bottom: 12px;
-        }
-
-        .recipient {
-            margin-bottom: 32px;
-        }
-
-        .recipient-name {
-            font-size: 16px;
-            font-weight: 600;
-            color: #111827;
-            margin-bottom: 4px;
-        }
-
-        .recipient-detail {
-            font-size: 13px;
-            color: #4b5563;
-        }
-
-        .subject {
-            background: #fef2f2;
-            border-radius: 8px;
-            padding: 16px 20px;
-            border-left: 4px solid #ef4444;
-            margin-bottom: 28px;
-            font-weight: 600;
-            color: #991b1b;
+        .header-subtitle {
             font-size: 14px;
+            color: #888888;
+            font-weight: 500;
+            margin-top: 5px;
         }
 
-        .content {
-            font-size: 14px;
-            color: #374151;
-            line-height: 1.7;
-        }
-
-        .content p {
-            margin-bottom: 16px;
-        }
-
-        .incident-box {
-            background: #f9fafb;
-            border-radius: 8px;
-            padding: 24px;
-            margin: 24px 0;
-            border-left: 4px solid #6b7280;
-        }
-
-        .incident-title {
-            font-size: 13px;
-            font-weight: 600;
-            color: #111827;
-            margin-bottom: 12px;
-            text-transform: uppercase;
-            letter-spacing: 0.04em;
-        }
-
-        .incident-text {
-            font-size: 14px;
-            color: #374151;
-            line-height: 1.7;
-        }
-
-        .action-section {
-            background: #fffbeb;
-            border-radius: 8px;
-            padding: 24px;
-            margin: 24px 0;
-            border-left: 4px solid #f59e0b;
-        }
-
-        .action-title {
-            font-size: 13px;
-            font-weight: 600;
-            color: #92400e;
-            margin-bottom: 12px;
-            text-transform: uppercase;
-            letter-spacing: 0.04em;
-        }
-
-        .action-list {
-            padding-left: 20px;
-        }
-
-        .action-list li {
-            margin-bottom: 8px;
-            font-size: 13px;
-            color: #78350f;
-            line-height: 1.5;
-        }
-
-        .closing {
-            margin-top: 24px;
-        }
-
-        .signature-section {
-            margin-top: 48px;
-        }
-
-        .sig-label {
-            font-size: 12px;
-            font-weight: 600;
-            color: #6b7280;
-            text-transform: uppercase;
-            letter-spacing: 0.04em;
-            margin-bottom: 48px;
-        }
-
-        .sig-line {
-            border-top: 1px solid #d1d5db;
-            padding-top: 8px;
-            width: 250px;
-        }
-
-        .sig-name {
-            font-size: 14px;
-            font-weight: 600;
-            color: #111827;
-        }
-
-        .sig-role {
-            font-size: 12px;
-            color: #6b7280;
-        }
-
-        .ack-section {
-            margin-top: 48px;
-            background: #f9fafb;
-            border-radius: 8px;
-            padding: 24px;
-        }
-
-        .ack-title {
-            font-size: 13px;
-            font-weight: 600;
-            color: #111827;
-            margin-bottom: 16px;
-            text-transform: uppercase;
-            letter-spacing: 0.04em;
-        }
-
-        .ack-fields {
-            display: flex;
-            gap: 40px;
-            font-size: 13px;
-            color: #6b7280;
-        }
-
-        .ack-field {
-            flex: 1;
-        }
-
-        .ack-line {
-            border-bottom: 1px solid #d1d5db;
-            margin-top: 32px;
-        }
-
-        .footer {
-            margin-top: 48px;
+        .logo-container {
             text-align: center;
-            padding-top: 24px;
-            border-top: 1px solid #e5e7eb;
-            color: #9ca3af;
-            font-size: 12px;
         }
+        .abstract-arrow-logo {
+            width: 40px;
+            height: 40px;
+            margin-bottom: 5px;
+        }
+        .logo-text {
+            font-size: 12px;
+            font-weight: 800;
+            color: #444;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        /* Content Area */
+        .content-area {
+            position: relative;
+            z-index: 2;
+            padding: 10mm 20mm 10mm 35mm;
+        }
+
+        .date-right {
+            text-align: right;
+            font-size: 11px;
+            color: #666;
+            margin-bottom: 25px;
+        }
+
+        .recipient-info {
+            margin-bottom: 45px;
+            color: #555;
+        }
+        
+        .recipient-label {
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .salutation {
+            margin-bottom: 20px;
+            color: #555;
+        }
+
+        .body-paragraphs p {
+            margin-bottom: 25px;
+            text-align: justify;
+            color: #666;
+        }
+
+        /* Explicit highlighting matching the screenshot */
+        .italic-highlight {
+            font-style: italic;
+            font-weight: 600;
+            color: #444;
+        }
+
+        /* Signature */
+        .signature-area {
+            margin-top: 50px;
+        }
+        .signature-name {
+            font-weight: 700;
+            color: #444;
+            margin-top: 40px; /* Space for signature */
+        }
+        .signature-title {
+            color: #888;
+        }
+
+        /* Footer */
+        .footer-area {
+            position: absolute;
+            bottom: 15mm;
+            left: 35mm;
+            z-index: 2;
+        }
+
+        .footer-divider {
+            width: 120mm;
+            height: 1px;
+            background-color: #d0d0d0;
+            margin-bottom: 15px;
+        }
+
+        .contact-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 8px;
+            font-size: 10px;
+            color: #666;
+        }
+        
+        .icon-circle {
+            width: 14px;
+            height: 14px;
+            background-color: #f3ca2f; /* Gold yellow */
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .icon-inner {
+            fill: white;
+            width: 8px;
+            height: 8px;
+        }
+
     </style>
 </head>
-
 <body>
-    <div class="letterhead">
-        <div>
-            <div class="company-name">{{companyName}}</div>
-            <div class="company-address">{{{companyAddress}}}</div>
-        </div>
-        <div class="doc-badge">
-            <div class="doc-title">WARNING</div>
-            <div class="doc-date"><strong>Date:</strong> {{issueDate}}</div>
-            <div class="confidential-badge">Confidential</div>
-        </div>
-    </div>
+    <div class="a4-container">
+        <!-- Top Left Geometric Design -->
+        <svg class="corner-top-left" viewBox="0 0 250 250" xmlns="http://www.w3.org/2000/svg">
+            <!-- Base red triangle -->
+            <polygon points="0,0 200,0 0,200" fill="#e03e36" />
+            <!-- Inner dark gray/brown pattern -->
+            <polygon points="0,0 120,0 0,120" fill="#4a3e3d" />
+            <polygon points="0,40 80,0 0,0" fill="#e03e36" />
+            
+            <!-- Gold intersecting lines -->
+            <polygon points="20,180 50,150 180,20 150,50" fill="#f3ca2f" />
+            <polygon points="0,110 30,80 160,0 100,0 0,70" fill="#f3ca2f" />
+            <polygon points="0,0 120,120 150,90 0,0" fill="#e03e36" opacity="0.9" />
 
-    <div class="recipient">
-        <div class="section-label">To</div>
-        <div class="recipient-name">{{employeeName}}</div>
-        <div class="recipient-detail">{{position}}, {{department}}</div>
-    </div>
+            <!-- Red intersecting block -->
+            <polygon points="40,200 90,150 200,40 150,90" fill="#cc2f28" />
 
-    <div class="subject">Subject: Warning — {{violationType}}</div>
+            <!-- Decorative 6 gold dots -->
+            <g fill="#f3ca2f">
+                <circle cx="15" cy="80" r="2.5" />
+                <circle cx="25" cy="80" r="2.5" />
+                <circle cx="35" cy="80" r="2.5" />
+                <circle cx="15" cy="90" r="2.5" />
+                <circle cx="25" cy="90" r="2.5" />
+                <circle cx="35" cy="90" r="2.5" />
+            </g>
+        </svg>
 
-    <div class="content">
-        <p>Dear {{#if employeeName}}{{employeeName}}{{else}}Employee{{/if}},</p>
+        <!-- Bottom Right Geometric Design -->
+        <svg class="corner-bottom-right" viewBox="0 0 300 300" xmlns="http://www.w3.org/2000/svg">
+            <!-- Thin outline frame pointing towards content -->
+            <polyline points="280,150 200,230 150,180 230,100" fill="none" stroke="#a0a0a0" stroke-width="2" />
+            
+            <!-- Base red triangle -->
+            <polygon points="300,300 300,100 100,300" fill="#e03e36" />
+            
+            <!-- Red overlapping blocks -->
+            <polygon points="300,150 220,230 160,300 300,300" fill="#cc2f28" />
+            <polygon points="300,200 240,260 200,300 300,300" fill="#e03e36" />
+            
+            <!-- Dark gray block -->
+            <polygon points="250,300 300,250 300,300" fill="#4a3e3d" />
 
-        <p>This letter is being issued to bring to your attention a serious concern regarding your conduct/performance
-            at {{companyName}}.</p>
+            <!-- Gold intersecting lines -->
+            <polygon points="180,280 150,250 280,120 250,150" fill="#f3ca2f" />
+            <polygon points="110,300 80,270 240,110 270,140" fill="#f3ca2f" />
+            
+            <!-- Decorative 6 gold dots in dark block -->
+            <g fill="#f3ca2f">
+                <circle cx="270" cy="270" r="2.5" />
+                <circle cx="280" cy="270" r="2.5" />
+                <circle cx="290" cy="270" r="2.5" />
+                <circle cx="280" cy="280" r="2.5" />
+                <circle cx="270" cy="280" r="2.5" />
+                <circle cx="290" cy="280" r="2.5" />
+            </g>
 
-        <div class="incident-box">
-            <div class="incident-title">Incident Details</div>
-            <div class="incident-text">{{{incidentDescription}}}</div>
-        </div>
+            <!-- Sparkle Stars -->
+            <path d="M 235 150 Q 240 150 240 145 Q 240 150 245 150 Q 240 150 240 155 Q 240 150 235 150" fill="#a0a0a0" />
+            <path d="M 220 160 Q 228 160 228 152 Q 228 160 236 160 Q 228 160 228 168 Q 228 160 220 160" fill="#a0a0a0" />
+        </svg>
 
-        <p>This behavior is in violation of company policies and is not acceptable. As per our company guidelines, such
-            actions can have serious consequences including but not limited to suspension or termination of employment.
-        </p>
-
-        <div class="action-section">
-            <div class="action-title">Expected Corrective Actions</div>
-            <ul class="action-list">
-                <li>Immediate improvement in the area of concern is expected.</li>
-                <li>You must adhere to all company policies and guidelines going forward.</li>
-                <li>Any repeat occurrence will lead to further disciplinary action.</li>
-                <li>You are expected to maintain cordial relations with colleagues and superiors.</li>
-            </ul>
-        </div>
-
-        <p>We hope that you will take this warning seriously and make the necessary improvements. The management is
-            willing to support you in making these improvements, but continued violations will not be tolerated.</p>
-
-        <p>This letter will be placed in your personnel file for record.</p>
-    </div>
-
-    <div class="signature-section">
-        <div class="sig-label">Issued By</div>
-        <div class="sig-line">
-            <div class="sig-name">{{#if hrContactPerson}}{{hrContactPerson}}{{else}}HR Manager{{/if}}</div>
-            <div class="sig-role">{{#if managerTitle}}{{managerTitle}}{{else}}Head, HR Department{{/if}}</div>
-        </div>
-    </div>
-
-    <div class="ack-section">
-        <div class="ack-title">Employee Acknowledgment</div>
-        <p style="font-size: 13px; color: #4b5563; margin-bottom: 16px;">I acknowledge receipt of this warning letter
-            and understand its contents.</p>
-        <div class="ack-fields">
-            <div class="ack-field">
-                <div>Employee Signature</div>
-                <div class="ack-line"></div>
+        <div class="header-container">
+            <div class="header-line-top"></div>
+            
+            <div class="header-text">
+                <div class="header-title">WARNING LETTER</div>
+                <div class="header-subtitle">Employee Warning Letter</div>
             </div>
-            <div class="ack-field">
-                <div>Date</div>
-                <div class="ack-line"></div>
+            
+            <div class="logo-container">
+                <!-- Abstract 3-arrow logo -->
+                <svg class="abstract-arrow-logo" viewBox="0 0 50 60" xmlns="http://www.w3.org/2000/svg">
+                    <!-- Left dark gray arrow -->
+                    <polygon points="10,50 15,15 20,50" fill="#4a3e3d" />
+                    <polygon points="5,50 15,10 25,50" fill="#5a4e4d" />
+                    <!-- Right dark gray arrow -->
+                    <polygon points="30,50 35,15 40,50" fill="#4a3e3d" />
+                    <polygon points="25,50 35,10 45,50" fill="#5a4e4d" />
+                    <!-- Middle Gold Arrow (Taller) -->
+                    <polygon points="20,50 25,0 30,50" fill="#f3ca2f" />
+                    <polygon points="15,50 25,0 35,50" fill="#e3ba1f" />
+                </svg>
+                <div class="logo-text">{{#if companyName}}{{companyName}}{{else}}FAUGET{{/if}}</div>
+            </div>
+            
+            <div class="header-line-bottom"></div>
+        </div>
+
+        <div class="content-area">
+            <div class="date-right">
+                {{#if date}}{{date}}{{else}}16 October 2025{{/if}}
+            </div>
+
+            <div class="recipient-info">
+                <div class="recipient-label">To:</div>
+                <div>{{#if employeeName}}Mr./Ms. {{employeeName}}{{else}}Mr. Matt Zhang{{/if}}</div>
+                <div>{{#if department}}{{department}} Department{{else}}Marketing Department{{/if}}</div>
+            </div>
+
+            <div class="salutation">
+                Dear {{#if employeeName}}Mr./Ms. {{employeeName}}{{else}}Mr. Zhang{{/if}},
+            </div>
+
+            <div class="body-paragraphs">
+                <p>This letter serves as a <span class="italic-highlight">formal warning</span> regarding your {{#if incidentDescription}}{{incidentDescription}}{{else}}repeated absence from work without prior notice on the following dates: 5 October 2025, 9 October 2025, and 12 October 2025. Such behavior violates our company's attendance policy and disrupts team productivity.{{/if}}</p>
+                
+                <p>Please be advised that this is your first official warning. Any further violation may lead to stricter disciplinary actions, including suspension or termination of employment.</p>
+                
+                <p>We expect you to demonstrate immediate improvement and comply with company policies.</p>
+            </div>
+
+            <div class="signature-area">
+                <div style="margin-bottom: 50px;">Sincerely,</div>
+                
+                <div class="signature-name">{{#if managerName}}{{managerName}}{{else}}{{#if hrContactPerson}}{{hrContactPerson}}{{else}}Teddy Yu{{/if}}{{/if}}</div>
+                <div class="signature-title">{{#if managerTitle}}{{managerTitle}}{{else}}HR Manager{{/if}}</div>
             </div>
         </div>
-    </div>
 
-    <div class="footer">
-        <p>This is a confidential HR document. {{companyName}}</p>
+        <div class="footer-area">
+            <div class="footer-divider"></div>
+            
+            <div class="contact-row">
+                <div class="icon-circle">
+                    <!-- Phone Icon SVG -->
+                    <svg class="icon-inner" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M20.01 15.38c-1.23 0-2.42-.2-3.53-.56M15.78 14.36a1 1 0 0 0-.25 1l2.09 5.23c.12.31.06.67-.18.91l-1.99 1.99c-.31.31-.77.38-1.16.2-7.58-3.5-13.6-9.52-17.1-17.1-.18-.39-.11-.85.2-1.16l1.99-1.99c.24-.24.6-.3.91-.18l5.23 2.09a1 1 0 0 0 1-.25l2.42-3.39c.2-.28.56-.37.89-.25 1.11.36 2.3.56 3.53.56h4.59c.55 0 1 .45 1 1v4.59c0 .55-.45 1-1 1h-4.6z"/>
+                    </svg>
+                </div>
+                <div>{{#if companyPhone}}{{companyPhone}}{{else}}+123-456-7890{{/if}}</div>
+            </div>
+            
+            <div class="contact-row">
+                <div class="icon-circle">
+                    <!-- Location Pin Icon SVG -->
+                    <svg class="icon-inner" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
+                    </svg>
+                </div>
+                <div>{{#if companyAddress}}{{companyAddress}}{{else}}123 Anywhere St., Any City{{/if}}</div>
+            </div>
+        </div>
+
     </div>
 </body>
-
 </html>

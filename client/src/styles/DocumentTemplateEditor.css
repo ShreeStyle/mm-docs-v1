@@ -764,10 +764,17 @@
     border-left: 1px solid #e5e7eb;
     display: flex;
     flex-direction: column;
-    overflow-y: auto;
     position: relative;
     min-width: 260px;
-    max-width: 480px;
+    max-width: 600px; /* Increased from 480px to allow more space for names */
+    height: calc(100vh - 56px - 44px); /* Subtracting navbar and footer height */
+}
+
+.sidebar-scrollable-content {
+    flex: 1;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
 }
 
 /* Resize Handle */
@@ -827,13 +834,12 @@
 }
 
 .user-name {
-    font-size: 12px;
+    font-size: 13px; /* Slightly larger */
     font-weight: 600;
     color: #111827;
     margin-bottom: 3px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    white-space: normal; /* Allow wrapping if needed */
+    word-break: break-word;
 }
 
 .user-role {
@@ -978,7 +984,7 @@
 .sidebar-divider {
     height: 1px;
     background: #e5e7eb;
-    margin: 12px 14px;
+    margin: 4px 14px;
 }
 
 .sidebar-section {

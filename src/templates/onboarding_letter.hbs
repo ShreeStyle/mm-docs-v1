@@ -3,272 +3,407 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Onboarding Letter</title>
+    <title>Onboarding Letter - {{companyName}}</title>
+    <!-- Use a sophisticated serif font to match the reference document -->
+    <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&display=swap" rel="stylesheet">
     <style>
-        body {
-            font-family: 'Arial', sans-serif;
-            line-height: 1.6;
-            color: #333;
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 40px;
-            background: white;
+        @page {
+            size: A4;
+            margin: 0;
         }
-        .header {
-            text-align: center;
-            margin-bottom: 40px;
-            border-bottom: 3px solid #1e40af;
-            padding-bottom: 20px;
-        }
-        .company-name {
-            font-size: 28px;
-            font-weight: bold;
-            color: #1e40af;
-            margin-bottom: 5px;
-        }
-        .company-address {
-            font-size: 14px;
-            color: #666;
-            margin-bottom: 10px;
-        }
-        .document-title {
-            font-size: 24px;
-            font-weight: bold;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            margin: 30px 0;
-            text-align: center;
-            color: #333;
-        }
-        .welcome-section {
-            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
-            border: 2px solid #1e40af;
-            border-radius: 12px;
-            padding: 30px;
-            margin: 30px 0;
-            text-align: center;
-        }
-        .welcome-title {
-            font-size: 20px;
-            font-weight: bold;
-            color: #1e40af;
-            margin-bottom: 15px;
-        }
-        .content {
-            margin-bottom: 30px;
-            text-align: justify;
-        }
-        .content p {
-            margin-bottom: 15px;
-        }
-        .info-section {
-            margin: 25px 0;
-            border-left: 4px solid #1e40af;
-            padding-left: 20px;
-            background: #f8fafc;
-            padding: 20px;
-            border-radius: 8px;
-        }
-        .section-title {
-            font-size: 16px;
-            font-weight: bold;
-            color: #1e40af;
-            margin-bottom: 15px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        .checklist {
-            list-style: none;
+        * {
+            box-sizing: border-box;
+            margin: 0;
             padding: 0;
         }
-        .checklist li {
-            margin-bottom: 10px;
-            padding-left: 25px;
+        body {
+            font-family: 'Lora', Georgia, serif;
+            background: #ffffff;
+            color: #1a1a1a;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+            font-size: 11px;
+            line-height: 1.6;
+        }
+        
+        .a4-container {
+            width: 210mm;
+            min-height: 297mm;
             position: relative;
+            background: white;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Top Banner Section */
+        .top-banner {
+            width: 100%;
+            padding-top: 25mm;
+            padding-bottom: 5mm;
+            padding-left: 20mm;
+            padding-right: 20mm;
+            display: flex;
+            justify-content: center;
+        }
+
+        .banner-content {
+            width: 100%;
+            height: 45mm;
+            background-color: #1b263b; /* Dark Blue */
+            display: flex;
+            justify-content: space-between;
+            align-items: stretch;
+        }
+
+        .banner-text-wrapper {
+            padding: 10mm 15mm;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .banner-title {
+            color: #e5e1d8; /* Cream color for text */
+            font-size: 42px;
+            font-weight: 400;
+            margin: 0;
+            line-height: 1.1;
+            letter-spacing: -0.5px;
+        }
+
+        .banner-title-italic {
+            font-style: italic;
+        }
+
+        .logo-box {
+            background-color: #2d5a27; /* Dark Green */
+            width: 45mm;
+            padding: 8mm 5mm;
+            display: flex;
+            flex-direction: row;
+            align-items: flex-start;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .company-name-vertical {
+            color: #e5e1d8;
+            font-size: 15px;
+            text-align: right;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            line-height: 1.2;
+            white-space: pre-line;
+        }
+
+        .logo-icon {
+            width: 24px;
+            height: 24px;
+        }
+
+        /* Main Body Layer */
+        .content-layer {
+            flex-grow: 1;
+            padding: 10mm 25mm 20mm 25mm;
+        }
+
+        /* Salutation */
+        .salutation {
+            font-size: 18px;
+            font-style: italic;
+            color: #1b263b;
+            margin-bottom: 25px;
+        }
+
+        /* Intro text */
+        .body-text {
+            font-size: 11px;
+            color: #1a1a1a;
+            margin-bottom: 20px;
+            text-align: left;
+        }
+        .body-text p {
+            margin-bottom: 12px;
+        }
+
+        /* Info Sections (restyled for this template) */
+        .info-block {
+            margin-bottom: 20px;
+        }
+        
+        .section-title {
+            font-size: 11px;
+            font-weight: 700;
+            color: #1b263b;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-bottom: 1px solid #e5e1d8;
+            padding-bottom: 4px;
+        }
+
+        .details-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px 40px;
+            margin-bottom: 5px;
+        }
+        
+        .detail-item {
+            width: calc(50% - 20px);
+            display: flex;
+            justify-content: flex-start;
+        }
+
+        .detail-label {
+            font-weight: 600;
+            width: 100px;
+            color: #1b263b;
+        }
+        
+        .detail-value {
+            color: #333;
+        }
+
+        /* Checklists */
+        .checklist {
+            list-style: none;
+            padding-left: 0;
+            margin-bottom: 10px;
+            columns: 2;
+        }
+        .checklist li {
+            position: relative;
+            padding-left: 15px;
+            margin-bottom: 5px;
+            break-inside: avoid-column;
         }
         .checklist li:before {
-            content: "✓";
+            content: "•";
             position: absolute;
             left: 0;
-            color: #10b981;
+            color: #2d5a27;
             font-weight: bold;
-            font-size: 16px;
         }
+
+        /* Schedule Table */
         .schedule-table {
             width: 100%;
             border-collapse: collapse;
-            margin: 20px 0;
-            background: white;
-            border-radius: 8px;
-            overflow: hidden;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-        }
-        .schedule-table th,
-        .schedule-table td {
-            border: 1px solid #e5e7eb;
-            padding: 12px;
-            text-align: left;
+            margin-bottom: 15px;
         }
         .schedule-table th {
-            background-color: #1e40af;
-            color: white;
-            font-weight: bold;
+            text-align: left;
+            padding: 6px 0;
+            border-bottom: 1px solid #1b263b;
+            font-weight: 600;
+            color: #1b263b;
         }
-        .schedule-table tr:nth-child(even) {
-            background-color: #f9fafb;
+        .schedule-table td {
+            padding: 6px 0;
+            border-bottom: 1px solid #e5e1d8;
+            color: #333;
         }
-        .contact-info {
-            background: #fef3e2;
-            border: 1px solid #f59e0b;
-            border-radius: 8px;
-            padding: 20px;
-            margin: 25px 0;
+
+        /* Signature Area */
+        .signature-block {
+            margin-top: 30px;
+            margin-bottom: 15mm;
         }
-        .signature-section {
-            margin-top: 50px;
-            text-align: center;
+        .closure-text {
+            margin-bottom: 40px;
+            color: #1a1a1a;
         }
-        .footer {
-            margin-top: 40px;
-            text-align: center;
+        .sender-name {
             font-size: 12px;
-            color: #666;
-            border-top: 1px solid #eee;
-            padding-top: 20px;
+            font-weight: 700;
+            color: #1b263b;
         }
+        .sender-title {
+            font-size: 11px;
+            color: #4a5568;
+            font-style: italic;
+        }
+
+        /* Footer Bar */
+        .footer-bar-container {
+            width: 100%;
+            padding: 0 15mm 15mm 15mm;
+            display: flex;
+        }
+
+        .footer-bar-content {
+            width: 100%;
+            height: 25mm;
+            display: flex;
+            align-items: stretch;
+        }
+
+        .footer-segment-blue {
+            background-color: #1b263b; /* Dark Blue */
+            flex-grow: 2.5;
+            display: flex;
+            align-items: center;
+            padding: 0 15mm;
+        }
+
+        .footer-segment-green {
+            background-color: #2d5a27; /* Dark Green */
+            flex-grow: 1;
+        }
+
+        .footer-segment-cream {
+            background-color: #e5e1d8; /* Cream */
+            width: 20mm;
+        }
+
+        .footer-meta {
+            display: flex;
+            gap: 40px;
+            color: white;
+            font-family: 'Inter', sans-serif; /* Keep meta info sans-serif for readability */
+            font-size: 9px;
+            font-weight: 300;
+        }
+
+        .footer-meta-block {
+            display: flex;
+            border-left: 1px solid rgba(255,255,255,0.3);
+            padding-left: 10px;
+            flex-direction: column;
+            justify-content: center;
+        }
+        
     </style>
 </head>
 <body>
-    <div class="header">
-        <div class="company-name">{{companyName}}</div>
-        <div class="company-address">{{companyAddress}}</div>
-        {{#if companyPhone}}<div>Phone: {{companyPhone}} | Email: {{companyEmail}}</div>{{/if}}
-    </div>
-
-    <div class="document-title">Welcome & Onboarding Letter</div>
-
-    <div class="welcome-section">
-        <div class="welcome-title">🎉 Welcome to {{companyName}}! 🎉</div>
-        <p style="font-size: 16px; color: #374151; margin: 0;">
-            We're excited to have you join our team as <strong>{{position}}</strong>
-        </p>
-    </div>
-
-    <div class="content">
-        <p>Dear {{employeeName}},</p>
-
-        <p>Congratulations and welcome to {{companyName}}! We are thrilled to have you join our team as <strong>{{position}}</strong> in the <strong>{{department}}</strong> department, starting from <strong>{{startDate}}</strong>.</p>
-
-        <p>This letter contains important information about your first day and the onboarding process to help you settle in smoothly and successfully.</p>
-
-        <div class="info-section">
-            <div class="section-title">
-                <span>📋</span> First Day Information
+    <div class="a4-container">
+        <!-- Top Banner -->
+        <div class="top-banner">
+            <div class="banner-content">
+                <div class="banner-text-wrapper">
+                    <h1 class="banner-title"><span class="banner-title-italic">Welcome</span> to<br>the team</h1>
+                </div>
+                <div class="logo-box">
+                    <div class="company-name-vertical">{{#if companyName}}{{companyName}}{{else}}SITWELL<br>FINANCIAL{{/if}}</div>
+                    <!-- Diamond SVG Logo -->
+                    <svg class="logo-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12 2L2 12L12 22L22 12L12 2Z" stroke="#e5e1d8" stroke-width="1.5"/>
+                        <path d="M12 5.5L5.5 12L12 18.5L18.5 12L12 5.5Z" stroke="#e5e1d8" stroke-width="1.5"/>
+                        <path d="M2 12H22" stroke="#e5e1d8" stroke-width="1.5"/>
+                        <path d="M12 2V22" stroke="#e5e1d8" stroke-width="1.5"/>
+                    </svg>
+                </div>
             </div>
-            <ul class="checklist">
-                <li><strong>Date:</strong> {{startDate}}</li>
-                <li><strong>Time:</strong> {{#if startTime}}{{startTime}}{{else}}9:00 AM{{/if}}</li>
-                <li><strong>Location:</strong> {{#if workLocation}}{{workLocation}}{{else}}Main Office Reception{{/if}}</li>
-                <li><strong>Contact Person:</strong> {{#if hrContactPerson}}{{hrContactPerson}}{{else}}HR Team{{/if}}</li>
-                <li><strong>Dress Code:</strong> {{#if dressCode}}{{dressCode}}{{else}}Business Casual{{/if}}</li>
-            </ul>
         </div>
 
-        <div class="info-section">
-            <div class="section-title">
-                <span>📄</span> Documents to Bring
+        <!-- Main Content -->
+        <div class="content-layer">
+            <div class="salutation">
+                Dear {{employeeName}},
             </div>
-            <ul class="checklist">
-                <li>Original and photocopies of educational certificates</li>
-                <li>Previous employment certificates and experience letters</li>
-                <li>PAN Card, Aadhaar Card, and Passport (original + photocopy)</li>
-                <li>Bank account details and cancelled cheque</li>
-                <li>Passport-size photographs (4 copies)</li>
-                <li>Medical fitness certificate (if applicable)</li>
-                <li>Signed offer letter and appointment letter</li>
-            </ul>
+
+            <div class="body-text">
+                <p>Welcome to <strong>{{companyName}}</strong>! We are excited to have you on board and look forward to the contributions you will make as <strong>{{position}}</strong> in our <strong>{{department}}</strong> department.</p>
+                <p>As a new member of our team, you will be joining a group of talented and dedicated individuals who are committed to excellence. We believe in fostering a positive and collaborative work environment where everyone can grow and succeed together.</p>
+                <p>We understand that starting a new job can be overwhelming, so please know that we are here to support you every step of the way. Your official start date is <strong>{{startDate}}</strong>.</p>
+            </div>
+
+            <div class="info-block">
+                <div class="section-title">First Day Details</div>
+                <div class="details-grid">
+                    <div class="detail-item">
+                        <span class="detail-label">Reporting Time:</span>
+                        <span class="detail-value">{{#if startTime}}{{startTime}}{{else}}9:00 AM{{/if}}</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Location:</span>
+                        <span class="detail-value">{{#if workLocation}}{{workLocation}}{{else}}Main Office{{/if}}</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Contact Person:</span>
+                        <span class="detail-value">{{#if hrContactPerson}}{{hrContactPerson}}{{else}}HR Desk{{/if}}</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Dress Code:</span>
+                        <span class="detail-value">{{#if dressCode}}{{dressCode}}{{else}}Business Casual{{/if}}</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="info-block">
+                <div class="section-title">What to Bring</div>
+                <ul class="checklist">
+                    <li>Valid Photo ID</li>
+                    <li>Bank Account Details</li>
+                    <li>Educational Certificates</li>
+                    <li>Previous Relieving Letter</li>
+                    <li>Passport Photos (4)</li>
+                    <li>Signed Offer Letter</li>
+                </ul>
+            </div>
+
+            <div class="info-block">
+                <div class="section-title">First Week Schedule</div>
+                <table class="schedule-table">
+                    <thead>
+                        <tr>
+                            <th style="width: 25%;">Day</th>
+                            <th style="width: 75%;">Activity</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Day 1</strong></td>
+                            <td>Welcome session, IT setup, and HR documentation.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Day 2</strong></td>
+                            <td>Company orientation and departmental introductions.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Day 3-5</strong></td>
+                            <td>Role-specific training and initial project syncs.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="body-text" style="margin-top: 15px;">
+                <p>If you have any questions or concerns before your start date, please don't hesitate to reach out to your colleagues or me.</p>
+                <p>Once again, welcome to the team! We are thrilled to have you with us and can't wait to see what we will achieve together.</p>
+            </div>
+
+            <div class="signature-block">
+                <div class="closure-text">Best regards,</div>
+                <div class="sender-name">{{#if hrContactPerson}}{{hrContactPerson}}{{else}}Human Resources Manager{{/if}}</div>
+                <div class="sender-title">{{#if hrPhone}}Contact: {{hrPhone}}{{/if}}</div>
+            </div>
         </div>
 
-        <div class="info-section">
-            <div class="section-title">
-                <span>📅</span> First Week Schedule
+        <!-- Footer Bar -->
+        <div class="footer-bar-container">
+            <div class="footer-bar-content">
+                <div class="footer-segment-blue">
+                    <div class="footer-meta">
+                        <div class="footer-meta-block">
+                            <span>{{companyName}}</span>
+                            <span>{{companyAddress}}</span>
+                        </div>
+                        <div class="footer-meta-block">
+                            <span>{{#if hrEmail}}{{hrEmail}}{{else}}{{companyEmail}}{{/if}}</span>
+                            <span>{{#if hrPhone}}{{hrPhone}}{{else}}{{companyPhone}}{{/if}}</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="footer-segment-green"></div>
+                <div class="footer-segment-cream"></div>
             </div>
-            <table class="schedule-table">
-                <thead>
-                    <tr>
-                        <th>Day</th>
-                        <th>Activity</th>
-                        <th>Duration</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td><strong>Day 1</strong></td>
-                        <td>Welcome session, documentation, IT setup</td>
-                        <td>Full Day</td>
-                    </tr>
-                    <tr>
-                        <td><strong>Day 2</strong></td>
-                        <td>Company orientation and policy briefing</td>
-                        <td>Half Day</td>
-                    </tr>
-                    <tr>
-                        <td><strong>Day 3</strong></td>
-                        <td>Department introduction and team meetings</td>
-                        <td>Full Day</td>
-                    </tr>
-                    <tr>
-                        <td><strong>Day 4-5</strong></td>
-                        <td>Role-specific training and mentorship</td>
-                        <td>Full Days</td>
-                    </tr>
-                </tbody>
-            </table>
         </div>
-
-        <div class="info-section">
-            <div class="section-title">
-                <span>🎯</span> What to Expect
-            </div>
-            <ul class="checklist">
-                <li><strong>Workspace Setup:</strong> Your desk, computer, and necessary equipment will be ready</li>
-                <li><strong>IT Access:</strong> Email account, system logins, and software access will be provided</li>
-                <li><strong>Buddy System:</strong> You'll be assigned a buddy to help you navigate your first few weeks</li>
-                <li><strong>Training Program:</strong> Comprehensive training on company processes and your role</li>
-                <li><strong>Team Introduction:</strong> Meet your colleagues and understand team dynamics</li>
-                <li><strong>Goal Setting:</strong> Discuss expectations and set initial performance goals</li>
-            </ul>
-        </div>
-
-        <div class="contact-info">
-            <div class="section-title">
-                <span>📞</span> Important Contacts
-            </div>
-            <p><strong>HR Department:</strong> {{#if hrEmail}}{{hrEmail}}{{else}}hr@{{companyName}}.com{{/if}} | {{#if hrPhone}}{{hrPhone}}{{else}}+91-XXXXXXXXXX{{/if}}</p>
-            <p><strong>IT Support:</strong> {{#if itEmail}}{{itEmail}}{{else}}it@{{companyName}}.com{{/if}} | {{#if itPhone}}{{itPhone}}{{else}}+91-XXXXXXXXXX{{/if}}</p>
-            <p><strong>Your Manager:</strong> {{reportingTo}} | {{#if managerEmail}}{{managerEmail}}{{else}}manager@{{companyName}}.com{{/if}}</p>
-        </div>
-
-        <p>We have planned an exciting onboarding journey for you that will help you understand our company culture, values, and your role in our success story. Our team is committed to supporting you every step of the way.</p>
-
-        <p>If you have any questions or concerns before your start date, please don't hesitate to reach out to our HR team.</p>
-
-        <p><strong>Once again, welcome to the {{companyName}} family! We look forward to working with you and achieving great things together.</strong></p>
     </div>
-
-    <div class="signature-section">
-        <p><strong>Best regards,</strong></p>
-        <p style="margin-top: 40px;">
-            <strong>{{#if hrContactPerson}}{{hrContactPerson}}{{else}}HR Manager{{/if}}</strong><br>
-            Human Resources Department<br>
-            {{companyName}}
-        </p>
-    </div>
-
-    <div class="footer">
-        <p>This is a computer-generated document. For any queries, please contact HR.</p>
-        <p>Generated on {{currentDate}} | {{companyName}} - Professional Onboarding System</p>
-    </div>
+</body>
+</html>
+ </div>
 </body>
 </html>

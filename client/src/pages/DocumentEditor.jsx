@@ -31,6 +31,10 @@ const DocumentEditor = () => {
     const [selectedFieldId, setSelectedFieldId] = useState(null);
     const [signatureColor, setSignatureColor] = useState('#000000');
 
+    // Sidebar Resizing State
+    const [sidebarWidth, setSidebarWidth] = useState(320);
+    const [isResizingSidebar, setIsResizingSidebar] = useState(false);
+
     // Upload Tab State
     const [uploadedImage, setUploadedImage] = useState(null);
 
@@ -251,6 +255,28 @@ const DocumentEditor = () => {
         resetSignatureModal();
     };
 
+    // Sidebar resize handlers
+    const handleResizeStart = (e) => {
+        e.preventDefault();
+        setIsResizingSidebar(true);
+        document.addEventListener('mousemove', handleResizeMove);
+        document.addEventListener('mouseup', handleResizeEnd);
+    };
+
+    const handleResizeMove = (e) => {
+        // Since it's a right sidebar, width = screen - mouseX
+        const newWidth = window.innerWidth - e.clientX;
+        if (newWidth >= 280 && newWidth <= 480) {
+            setSidebarWidth(newWidth);
+        }
+    };
+
+    const handleResizeEnd = () => {
+        setIsResizingSidebar(false);
+        document.removeEventListener('mousemove', handleResizeMove);
+        document.removeEventListener('mouseup', handleResizeEnd);
+    };
+
     const saveTimeoutRef = useRef(null);
 
     const autoSave = useCallback((updatedFields) => {
@@ -365,7 +391,11 @@ const DocumentEditor = () => {
                 />
 
                 {/* Fields Panel (Right) */}
-                <div className="right-sidebar">
+                <div 
+                    className={`right-sidebar ${isResizingSidebar ? 'resizing' : ''}`}
+                    style={{ width: `${sidebarWidth}px` }}
+                >
+                    <div className="sidebar-resize-handle" onMouseDown={handleResizeStart} />
                     <FieldsPanel
                         onFieldDragStart={(field) => console.log('Dragging field:', field)}
                         onFieldClick={(field) => {
