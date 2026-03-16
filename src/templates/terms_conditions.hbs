@@ -147,6 +147,24 @@
         <!-- Main Content -->
         <div class="content-layer">
             <div class="section">
+                <div class="section-header">Company</div>
+                <div class="section-text">
+                    <p><strong>{{companyName}}</strong>{{#if serviceName}} — <em>{{serviceName}}</em>{{/if}}</p>
+                    {{#if effectiveDate}}<p><strong>Effective Date:</strong> {{effectiveDate}}</p>{{/if}}
+                </div>
+            </div>
+
+            {{#if sections}}
+                {{#each sections}}
+                    <div class="section">
+                        <div class="section-header">{{this.heading}}</div>
+                        <div class="section-text">
+                            <p>{{this.content}}</p>
+                        </div>
+                    </div>
+                {{/each}}
+            {{else}}
+            <div class="section">
                 <div class="section-header">1. Acceptance of Terms</div>
                 <div class="section-text">
                     <p>By accessing and using this website, you accept and agree to be bound by the terms and provision of this agreement. In addition, when using these particular services, you shall be subject to any posted guidelines or rules applicable to such services.</p>
@@ -180,6 +198,7 @@
                     <p>These terms and conditions are governed by and construed in accordance with the laws of <strong>{{#if jurisdiction}}{{jurisdiction}}{{else}}India{{/if}}</strong> and you irrevocably submit to the exclusive jurisdiction of the courts in that State or location.</p>
                 </div>
             </div>
+            {{/if}}
         </div>
     </div>
 </body>

@@ -1720,7 +1720,8 @@ export default function Dashboard() {
                     { id: 'partyAddress', label: 'Other Party Address', type: 'textarea', placeholder: 'Complete address of the other party', required: true },
                     { id: 'effectiveDate', label: 'Effective Date', type: 'date', required: true },
                     { id: 'duration', label: 'Duration (Years)', type: 'number', placeholder: 'e.g. 2', required: true },
-                    { id: 'purpose', label: 'Purpose/Project', type: 'textarea', placeholder: 'Brief description of the purpose or project', required: true }
+                    { id: 'purpose', label: 'Purpose/Project', type: 'textarea', placeholder: 'Brief description of the purpose or project', required: true },
+                    { id: 'jurisdiction', label: 'Governing Jurisdiction (City)', type: 'text', placeholder: 'e.g. Mumbai, Bangalore, New Delhi', required: false }
                 ],
                 service_agreement: [
                     ...commonFields,
@@ -1743,23 +1744,28 @@ export default function Dashboard() {
                     { id: 'effectiveDate', label: 'Effective Date', type: 'date', required: true },
                     { id: 'serviceDescription', label: 'Service Description', type: 'textarea', placeholder: 'Brief description of the service or product', required: true },
                     { id: 'userObligations', label: 'User Obligations', type: 'textarea', placeholder: 'Key obligations and responsibilities of users', required: true },
-                    { id: 'restrictions', label: 'Restrictions', type: 'textarea', placeholder: 'Prohibited activities and restrictions', required: true }
+                    { id: 'restrictions', label: 'Restrictions/Prohibited Activities', type: 'textarea', placeholder: 'Prohibited activities and restrictions', required: true },
+                    { id: 'jurisdiction', label: 'Governing Jurisdiction (City)', type: 'text', placeholder: 'e.g. Mumbai, Bangalore, New Delhi', required: false }
                 ],
                 privacy_policy: [
                     ...commonFields,
                     { id: 'serviceName', label: 'Service/Product Name', type: 'text', placeholder: 'e.g. MyApp Platform', required: true },
                     { id: 'effectiveDate', label: 'Effective Date', type: 'date', required: true },
-                    { id: 'dataCollected', label: 'Data Collected', type: 'textarea', placeholder: 'Types of data collected from users', required: true },
-                    { id: 'dataUsage', label: 'Data Usage', type: 'textarea', placeholder: 'How user data will be used', required: true },
-                    { id: 'dataSecurity', label: 'Security Measures', type: 'textarea', placeholder: 'Security measures to protect user data', required: true },
-                    { id: 'contactEmail', label: 'Privacy Contact Email', type: 'email', placeholder: 'e.g. privacy@company.com', required: true }
+                    { id: 'dataCollected', label: 'Data Collected', type: 'textarea', placeholder: 'Types of data collected from users (e.g. name, email, IP address)', required: true },
+                    { id: 'dataUsage', label: 'Data Usage', type: 'textarea', placeholder: 'How user data will be used (e.g. service improvement, analytics)', required: true },
+                    { id: 'dataSecurity', label: 'Security Measures', type: 'textarea', placeholder: 'Security measures to protect user data (e.g. encryption, access controls)', required: true },
+                    { id: 'dpoEmail', label: 'Data Protection Officer (DPO) Email', type: 'email', placeholder: 'e.g. privacy@company.com', required: true }
                 ],
                 mou: [
                     ...commonFields,
-                    { id: 'partyName', label: 'Other Party Name', type: 'text', placeholder: 'e.g. Partner Company Name', required: true },
+                    { id: 'partyName', label: 'Other Party / First Party Name', type: 'text', placeholder: 'e.g. Partner Company Name', required: true },
                     { id: 'partyAddress', label: 'Other Party Address', type: 'textarea', placeholder: 'Complete address of the other party', required: true },
                     { id: 'effectiveDate', label: 'Effective Date', type: 'date', required: true },
-                    { id: 'purpose', label: 'Purpose of MOU', type: 'textarea', placeholder: 'Detailed purpose and scope of understanding', required: true },
+                    { id: 'purpose', label: 'Purpose/Objective of MOU', type: 'textarea', placeholder: 'Detailed purpose and scope of this understanding', required: true },
+                    { id: 'background', label: 'Background / Context', type: 'textarea', placeholder: 'Why are the parties entering into this MOU? Describe business context.', required: false },
+                    { id: 'collaborationAreas', label: 'Areas of Collaboration', type: 'textarea', placeholder: 'e.g. Joint R&D, Marketing activities, Technology sharing (one per line)', required: false },
+                    { id: 'partyARoles', label: 'Party A (Other Party) Responsibilities', type: 'textarea', placeholder: 'Key responsibilities of the first/other party', required: false },
+                    { id: 'partyBRoles', label: 'Party B (Your Company) Responsibilities', type: 'textarea', placeholder: 'Key responsibilities of your company', required: false },
                     { id: 'duration', label: 'Duration (Years)', type: 'number', placeholder: 'e.g. 3', required: true }
                 ],
 

@@ -151,6 +151,10 @@ const getTemplateForDocumentType = (documentType) => {
     'warning_letter': 'warning_letter',
     'nda': 'nda',
     'service_agreement': 'service_agreement',
+    'mou': 'mou',
+    'privacy_policy': 'privacy_policy',
+    'terms_of_service': 'terms_conditions',  // file is terms_conditions.hbs
+    'terms_conditions': 'terms_conditions',
     'business_proposal': 'proposal',
     'quotation': 'quotation',
     'invoice': 'invoice',

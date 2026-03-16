@@ -681,9 +681,10 @@ Return ONLY valid, richly detailed, FORMALLY WRITTEN JSON document content. No c
         "confidentialInformation": ["Technical data, trade secrets, know-how, research, product plans", "Financial information, business strategies, client lists", "Any information marked or designated as 'Confidential'", "Information that would reasonably be considered confidential"],
         "obligations": ["Hold and maintain Confidential Information in strict confidence", "Not disclose to any third parties without prior written consent", "Use solely for the purpose stated in this agreement", "Take reasonable precautions to protect confidentiality", "Return or destroy all Confidential Information upon request"],
         "exceptions": ["Information publicly available through no breach of this agreement", "Information known prior to disclosure", "Information independently developed without use of Confidential Information", "Information required to be disclosed by law or court order (with prior notice)"],
-        "duration": "${context.duration || '3 years from the effective date'}",
+        "duration": "${context.duration || '3'} years from the effective date",
+        "jurisdiction": "${context.jurisdiction || 'Mumbai'}",
         "remedies": "The Disclosing Party shall be entitled to seek injunctive relief and monetary damages for any breach.",
-        "governingLaw": "This agreement shall be governed by the laws of India. Subject to ${context.city || 'Mumbai'} jurisdiction.",
+        "governingLaw": "This agreement shall be governed by the laws of India. Subject to ${context.jurisdiction || 'Mumbai'} jurisdiction.",
         "arbitration": "Any dispute shall be resolved through arbitration as per the Arbitration and Conciliation Act, 1996.",
         "disclaimer": "This is an AI-generated template. It is NOT legal advice. Have this reviewed by a qualified Indian lawyer before signing.",
         "signatureBlocks": {
@@ -785,18 +786,24 @@ Return ONLY valid, richly detailed, FORMALLY WRITTEN JSON document content. No c
       - Use formal legal terminology and structured format
       - Maintain authoritative, professional tone throughout
       - NO casual language whatsoever
+      - If collaborationAreas string is provided, convert it to a proper array of items (split by newline or comma)
       
       Return ONLY valid JSON with this structure:
       {
         "title": "Memorandum of Understanding (MOU)",
         "date": "${new Date().toLocaleDateString('en-IN', { year: 'numeric', month: 'long', day: 'numeric' })}",
-        "party1": "${context.party1 || context.company || brandContext.name}",
-        "party2": "${context.party2 || context.otherparty || '[Second Party Name]'}",
+        "companyName": "${context.companyName || context.company || brandContext.name}",
+        "partyName": "${context.partyName || context.otherparty || '[First Party Name]'}",
         "effectiveDate": "${context.effectiveDate || context.effectivedate || '[Agreement Date]'}",
-        "purpose": "${context.purpose || 'Mutual cooperation'}",
+        "purpose": "${context.purpose || 'Mutual cooperation and collaboration'}",
+        "background": "${context.background || 'The parties wish to enter into this MOU to explore and establish a framework for collaboration in their respective fields of expertise.'}",
+        "collaborationAreas": ${context.collaborationAreas ? `"${context.collaborationAreas}".split('\\n').filter(s => s.trim()).map(s => s.trim())` : '["Joint research and development initiatives.", "Marketing and promotional activities.", "Sharing of technical expertise and resources."]'},
+        "partyARoles": "${context.partyARoles || 'Allocating necessary personnel and providing technical documentation.'}",
+        "partyBRoles": "${context.partyBRoles || 'Providing market insights and facilitating stakeholder engagement.'}",
+        "duration": "${context.duration || '3'} years",
         "sections": [
-          { "heading": "I. Strategic Alignment", "content": "..." },
-          { "heading": "II. Areas of Cooperation", "content": "..." }
+          { "heading": "I. Strategic Alignment", "content": "Generate professional content describing strategic alignment between both parties." },
+          { "heading": "II. Intellectual Property", "content": "Generate professional content on IP rights and ownership relevant to this collaboration." }
         ]
       }`;
 
@@ -1108,18 +1115,22 @@ Return ONLY valid, richly detailed, FORMALLY WRITTEN JSON document content. No c
       2. DRAFT ACTUAL, LEGALLY-SOUND CLAUSES that a real company would use.
       3. Focus on ${isTOS ? "User Obligations, Liabilities, Intellectual Property, and Dispute Resolution" : "Data Collection, Usage, Storage, User Rights, and Compliance with DPDP Act 2023"}.
       4. The response MUST be in JSON format with a "sections" array containing "heading" and "content" fields.
+      5. Use specific data provided in context (e.g. dataCollected, dataUsage, dataSecurity, userObligations, restrictions, jurisdiction, dpoEmail).
       
       Return ONLY valid JSON with this structure:
       {
         "title": "${docTitle}",
         "companyName": "${context.companyName || brandContext.name}",
+        "serviceName": "${context.serviceName || context.companyName || brandContext.name}",
         "effectiveDate": "${context.effectiveDate || new Date().toLocaleDateString('en-IN')}",
+        "dpoEmail": "${context.dpoEmail || context.contactEmail || context.privacyEmail || 'privacy@company.com'}",
+        "jurisdiction": "${context.jurisdiction || 'India'}",
         "sections": [
-          { "heading": "1. Introduction", "content": "Draft a formal introduction for ${context.companyName}'s ${isTOS ? 'services' : 'data practices'}." },
-          { "heading": "${isTOS ? '2. User Obligations' : '2. Data Collection'}", "content": "Professional drafting of ${isTOS ? 'what users must do and agree to' : 'what data is collected and why'}." },
-          { "heading": "${isTOS ? '3. Acceptable Use' : '3. Data Usage'}", "content": "Detailed legal drafting of ${isTOS ? 'restrictions and prohibited activities' : 'how the data is used to improve services'}." },
-          { "heading": "${isTOS ? '4. Limitation of Liability' : '4. Data Protection'}", "content": "Formal legal language for ${isTOS ? 'protecting the company from legal claims' : 'how data is secured and protected' }." },
-          { "heading": "${isTOS ? '5. Governing Law' : '5. User Rights'}", "content": "Drafting of ${isTOS ? 'Indian legal jurisdiction and arbitration' : 'rights of users to access and delete data as per DPDP Act 2023'}." }
+          { "heading": "1. Introduction", "content": "Draft a formal introduction for ${context.companyName}'s ${isTOS ? 'service terms' : 'data privacy practices'}." },
+          { "heading": "${isTOS ? '2. User Obligations' : '2. Data Collection'}", "content": "${isTOS ? `Professional legal drafting on user obligations: ${context.userObligations || 'See standard terms'}` : `What data we collect: ${context.dataCollected || 'name, email, IP address, usage data'}`}." },
+          { "heading": "${isTOS ? '3. Acceptable Use & Restrictions' : '3. Data Usage'}", "content": "${isTOS ? `Restrictions and prohibited activities: ${context.restrictions || 'Commercial misuse, reverse engineering, illegal activity'}` : `How data is used: ${context.dataUsage || 'service improvement, analytics, customer support'}`}." },
+          { "heading": "${isTOS ? '4. Limitation of Liability' : '4. Data Security'}", "content": "${isTOS ? 'Formal legal language for protecting the company from legal claims.' : `Security measures: ${context.dataSecurity || 'encryption, access controls, audit logging'}`}." },
+          { "heading": "${isTOS ? '5. Governing Law & Disputes' : '5. Your Rights & Contact'}", "content": "${isTOS ? `Governing law: India. Jurisdiction: ${context.jurisdiction || 'Mumbai'}. Disputes through arbitration under the Arbitration and Conciliation Act, 1996.` : `User rights under DPDP Act 2023. Contact DPO at: ${context.dpoEmail || context.contactEmail || 'privacy@company.com'}`}." }
         ]
       }`;
     } else {
