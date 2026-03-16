@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { ArrowLeft, FileText, Download, Eye, Loader2 } from 'lucide-react';
@@ -10,6 +10,7 @@ const CreateDocument = () => {
     const navigate = useNavigate();
 
     const [template, setTemplate] = useState(null);
+    const iframeRef = useRef(null);
     const [formData, setFormData] = useState({});
     const [loading, setLoading] = useState(true);
     const [generating, setGenerating] = useState(false);
@@ -26,6 +27,14 @@ const CreateDocument = () => {
             setLoading(false);
         }
     }, [templateId]);
+
+    // Update iframe preview directly via DOM ref whenever formData or template changes
+    useEffect(() => {
+        if (iframeRef.current && template) {
+            const html = getPreviewContent();
+            iframeRef.current.srcdoc = html;
+        }
+    }, [formData, template]);
 
     const fetchTemplate = async () => {
         try {
@@ -207,9 +216,9 @@ const CreateDocument = () => {
             teamMembers: formData.teamMembers || 'Key stakeholders and team roles.',
             deliverables: formData.deliverables || 'List the deliverables.',
             services: formData.services || formData.serviceDescription || 'Professional Services',
-            // Handle safe strings for addresses
-            clientAddress: new Handlebars.SafeString(formData.clientAddress ? formData.clientAddress.replace(/\n/g, '<br>') : formData.partyAddress ? formData.partyAddress.replace(/\n/g, '<br>') : '123 Business Street<br>Mumbai, Maharashtra'),
-            companyAddress: new Handlebars.SafeString(formData.companyAddress ? formData.companyAddress.replace(/\n/g, '<br>') : 'Tech Park, Sector 5<br>Bangalore, Karnataka'),
+            // Plain strings — the template uses white-space: pre-line so newlines render correctly
+            clientAddress: formData.clientAddress || formData.partyAddress || '123 Business Street\nMumbai, Maharashtra',
+            companyAddress: formData.companyAddress || 'Tech Park, Sector 5\nBangalore, Karnataka',
             // Other fields...
             invoiceNumber: formData.invoiceNumber || 'INV-2024-001',
             invoiceDate: formData.invoiceDate || new Date().toLocaleDateString('en-IN'),
@@ -462,7 +471,7 @@ const CreateDocument = () => {
                                 zIndex: 1
                             }}>
                                 <iframe
-                                    srcDoc={getPreviewContent()}
+                                    ref={iframeRef}
                                     style={{
                                         width: '100%',
                                         height: '1123px',

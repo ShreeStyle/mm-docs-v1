@@ -2091,26 +2091,33 @@ Thank you for your business!
 ${formData.companyName || '[Company Name]'}
                     `
                 },
-                proposal: {
+                business_proposal: {
                     title: 'Business Proposal',
                     content: `
 BUSINESS PROPOSAL
 
-To: ${formData.clientName || '[Client Name]'}
-From: ${formData.companyName || '[Company Name]'}
+Prepared For: ${formData.clientName || '[Client Name]'}
+${formData.clientAddress || ''}
+
+Prepared By: ${formData.companyName || '[Company Name]'}
+${formData.companyAddress || ''}
 Date: ${currentDate}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 PROJECT: ${formData.projectTitle || '[Project Title]'}
 
 EXECUTIVE SUMMARY:
-We are pleased to present this proposal for ${formData.projectTitle || '[Project Title]'}. Our team at ${formData.companyName || '[Company Name]'} is committed to delivering exceptional results within the proposed timeline.
+We are pleased to present this proposal for ${formData.projectTitle || '[Project Title]'}. Our team at ${formData.companyName || '[Company Name]'} is committed to delivering exceptional results within the proposed timeline and budget.
 
-PROJECT DETAILS:
+PROJECT DESCRIPTION:
 ${formData.projectDescription || '[Detailed project scope, deliverables, and methodology will be outlined here]'}
 
-INVESTMENT:
-Total Project Value: ₹${formData.projectValue ? Number(formData.projectValue).toLocaleString() : '[Project Value]'}
-Timeline: ${formData.timeline || '[Timeline]'}
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+INVESTMENT & TIMELINE:
+• Total Project Value: ₹${formData.projectValue ? Number(formData.projectValue).toLocaleString() : '[Project Value]'}
+• Timeline: ${formData.timeline || '[Timeline]'}
 
 WHY CHOOSE US:
 • Proven track record in similar projects
