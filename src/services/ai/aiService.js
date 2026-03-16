@@ -107,7 +107,7 @@ Return ONLY valid, richly detailed, FORMALLY WRITTEN JSON document content. No c
       else if (topicLower.includes("privacy policy")) effectiveType = "privacy_policy";
       else if (topicLower.includes("mou") || topicLower.includes("memorandum")) effectiveType = "mou";
       // Sales & Business Documents
-      else if (topicLower.includes("business proposal") || topicLower.includes("proposal")) effectiveType = "proposal";
+      else if (topicLower.includes("business proposal") || topicLower.includes("proposal") || topicLower.includes("business-proposal-001")) effectiveType = "proposal";
       else if (topicLower.includes("quotation") || topicLower.includes("estimate") || topicLower.includes("quote")) effectiveType = "quotation";
       else if (topicLower.includes("sales contract")) effectiveType = "sales_contract";
       else if (topicLower.includes("partnership agreement")) effectiveType = "partnership_agreement";
@@ -138,7 +138,7 @@ Return ONLY valid, richly detailed, FORMALLY WRITTEN JSON document content. No c
       return generateMockContent(effectiveType, topic, providedData, brandContext);
     }
 
-    if (effectiveType === "proposal") {
+    if (effectiveType === "proposal" || effectiveType === "business-proposal-001") {
       // Parse structured input data
       const inputData = {};
       if (topic.includes('|')) {
@@ -158,33 +158,34 @@ Return ONLY valid, richly detailed, FORMALLY WRITTEN JSON document content. No c
       
       CONTEXT DATA:
       ${JSON.stringify(context, null, 2)}
-
+      
       INDIAN BUSINESS FORMAT:
       - Use DD/MM/YYYY date format
       - All amounts in INR (₹) with words in brackets
       - Professional Indian business language
-      - Include scope, deliverables, timelines, pricing table, payment terms
-      - Include disclaimer at the end
       
-      Return ONLY valid JSON with this exact structure:
+      Return ONLY valid JSON with this exact structure (ALL FIELDS ARE REQUIRED):
       {
-        "title": "Business Proposal: ${context.topic || topic}",
-        "date": "${new Date().toLocaleDateString('en-IN', { day: '2-digit', month: '2-digit', year: 'numeric' })}",
-        "preparedFor": "${context.clientName || context.customerName || '[Client Name]'}",
-        "preparedBy": "${context.companyName || brandContext.name}",
-        "executiveSummary": "A powerful, multi-paragraph opening statement.",
-        "proposedSolution": {
-          "overview": "A thorough, detailed explanation.",
-          "coreModules": ["Module 1", "Module 2", "Module 3"]
-        },
-        "pricingTable": [{ "item": "Service Description", "amount": "₹0" }],
-        "totalAmount": "₹0 (Rupees [Amount in Words] Only)",
-        "paymentTerms": "50% advance, 50% on completion",
-        "validity": "30 days from the date of this proposal",
-        "disclaimer": "This is an AI-generated template. Have this reviewed before use.",
-        "signatureBlocks": {
-          "proposer": { "name": "________________", "designation": "Authorised Signatory", "company": "${context.companyName || brandContext.name}", "date": "________________" }
-        }
+        "companyName": "${brandContext.name}",
+        "proposalDate": "${new Date().toLocaleDateString('en-IN', { day: '2-digit', month: '2-digit', year: 'numeric' })}",
+        "projectTitle": "${context.projectTitle || context.topic || topic}",
+        "companyAddress": "${brandContext.address || '[Company Address]'}",
+        "companyEmail": "${brandContext.email || '[Company Email]'}",
+        "companyPhone": "${brandContext.phone || '[Company Phone]'}",
+        "companyWebsite": "${brandContext.website || ''}",
+        "clientName": "${context.clientName || context.customerName || '[Client Name]'}",
+        "clientCompany": "${context.clientCompany || '[Client Company Name]'}",
+        "projectDescription": "A powerful, multi-paragraph opening statement covering the vision and strategic approach.",
+        "problemStatement": "Specific goals and objectives of the project (use bullet points if applicable).",
+        "proposedSolution": "A thorough, detailed explanation of the methodology and approach.",
+        "targetAudience": "Detailed scope of inclusions for this project.",
+        "keyFeatures": "Scope limitations and exclusions.",
+        "deliverables": "Detailed list of expected outcomes and final deliverables.",
+        "projectTimeline": "Detailed implementation roadmap with phases.",
+        "projectBudget": "${context.projectBudget || context.amount || '0.00'}",
+        "teamMembers": "Key stakeholders and team roles dedicated to this project.",
+        "specialNotes": "Risk assessment and any additional strategic notes.",
+        "disclaimer": "This is an AI-generated template document. It is NOT legal, tax, financial, or compliance advice. Have it reviewed by a qualified professional."
       }`;
 
     } else if (effectiveType === "quotation") {
@@ -1305,29 +1306,31 @@ const generateMockContent = (type, topic, providedData = {}, brandContext = {}) 
     extractedSections.push({ heading: match[1], content: match[2] });
   }
 
-  if (effectiveType === "proposal") {
+  console.log(`🧪 Mock Generator -> Raw Type: "${type}", Effective Type: "${effectiveType}"`);
+
+  if (effectiveType.includes("proposal")) {
+    const currentDate = new Date().toLocaleDateString('en-IN', { day: '2-digit', month: '2-digit', year: 'numeric' });
     return {
-      title: `Strategic Proposal: ${topicTitle}`,
-      executiveSummary: `This comprehensive proposal outlines a strategic framework for ${topic}, designed to maximize operational efficiency, drive measurable long-term value, and strengthen your market position. We have conducted a preliminary analysis of your current digital infrastructure and identified key opportunities for high-impact growth. Our approach prioritizes scalable architecture, user-centric design, and data-driven decision making to ensure that every investment translates into tangible business outcomes. By partnering with us, you gain access to a dedicated team of experts committed to delivering excellence and pushing the boundaries of what is possible for your brand.`,
-      objectives: ["Establish operational excellence", "Optimize resource allocation", "Achieve measurable ROI"],
-      scope: {
-        included: ["Comprehensive Audit & Strategy", "Full-scale Implementation", "Quality Assurance & Testing", "User Training Session"],
-        excluded: ["Third-party software licenses", "Ongoing maintenance (unless signed)", "Content creation beyond scope"]
-      },
-      methodology: [
-        { phase: "Ph I: Discovery", details: "Deep research into the current state and requirements." },
-        { phase: "Ph II: Strategy", details: "Designing the core framework and alignment." },
-        { phase: "Ph III: Delivery", details: "Full implementation and quality assurance." },
-        { phase: "Ph IV: Review", details: "Final handover and performance optimization." }
-      ],
-      deliverables: ["Strategy Document", "Implementation Roadmap", "Final Executable Assets", "Training Manual"],
-      timeline: "Estimated Duration: 6-8 Weeks",
-      investment: [
-        { service: "Consultation & Strategy", amount: "₹50,000", justification: "Expert oversight and planning." },
-        { service: "Implementation", amount: "₹1,50,000", justification: "Core execution and delivery." }
-      ],
-      assumptions: ["Timely access to stakeholders", "Availability of necessary data"],
-      conclusion: "We are confident that this initiative will lead to significant strategic advantages and look forward to a successful partnership."
+      companyName: brandContext.name || providedData.companyName || "MM Docs",
+      proposalDate: currentDate,
+      projectTitle: providedData.projectTitle || topicTitle,
+      companyAddress: brandContext.address || providedData.companyAddress || "India",
+      companyEmail: brandContext.email || providedData.companyEmail || "hello@mmdocs.com",
+      companyPhone: brandContext.phone || providedData.companyPhone || "+91-1234567890",
+      companyWebsite: brandContext.website || providedData.companyWebsite || "www.mmdocs.com",
+      clientName: providedData.clientName || "[Client Contact Name]",
+      clientCompany: providedData.clientCompany || "[Client Company Name]",
+      projectDescription: providedData.projectDescription || `This comprehensive proposal outlines a strategic framework for ${topicTitle}, designed to maximize operational efficiency and drive measurable long-term value.`,
+      problemStatement: providedData.problemStatement || "1. Establish operational excellence\n2. Optimize resource allocation\n3. Achieve measurable ROI",
+      proposedSolution: providedData.proposedSolution || "Our approach prioritizes scalable architecture, user-centric design, and data-driven decision making to ensure high-impact results.",
+      targetAudience: providedData.targetAudience || "Full-scale implementation, Quality assurance, User training sessions",
+      keyFeatures: providedData.keyFeatures || "Third-party license fees, Ongoing maintenance costs",
+      deliverables: providedData.deliverables || "1. Strategy Document\n2. Implementation Roadmap\n3. Final Executable Assets",
+      projectTimeline: providedData.projectTimeline || "Total Duration: 8-12 Weeks\nPhase 1: Discovery (2 weeks)\nPhase 2: Implementation (6 weeks)",
+      projectBudget: providedData.projectBudget || providedData.amount || "0.00",
+      teamMembers: providedData.teamMembers || "Project Lead, Senior Solutions Architect, Support Staff",
+      specialNotes: providedData.specialNotes || "This proposal is valid for 30 days.",
+      disclaimer: "This is an AI-generated template document. It is NOT legal, tax, financial, or compliance advice. Have it reviewed by a qualified professional."
     };
   } else if (effectiveType === "resume") {
     return {

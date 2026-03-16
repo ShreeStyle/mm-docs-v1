@@ -83,6 +83,7 @@ const CreateDocument = () => {
 
             const documentData = {
                 type: template.templateId,
+                topic: `Generate a professional business proposal document for company: ${formData.companyName || 'our company'}, client: ${formData.clientName || 'our client'}, project: ${formData.projectTitle || 'our project'}, amount: ₹${formData.projectBudget || '0'}. Additional details: ${Object.entries(formData).map(([k, v]) => `${k}: ${v}`).join(', ')}`,
                 title: `${template.name} - ${formData.candidateName || formData.employeeName || formData.clientName || 'Document'}`,
                 content: formData,
                 templateId: template.templateId
@@ -194,6 +195,17 @@ const CreateDocument = () => {
             partyName: formData.partyName || formData.clientName || 'Business Partner Corp',
             companyName: formData.companyName || 'Your Company Ltd',
             effectiveDate: formData.effectiveDate || new Date().toLocaleDateString('en-IN'),
+            proposalDate: formData.proposalDate || new Date().toLocaleDateString('en-IN'),
+            projectTitle: formData.projectTitle || 'Digital Marketing Transformation Initiative',
+            projectDescription: formData.projectDescription || 'Provide a comprehensive summary of the project goals, vision, and strategic approach.',
+            problemStatement: formData.problemStatement || 'Define specific goals and objectives.',
+            proposedSolution: formData.proposedSolution || 'Detailed methodology.',
+            targetAudience: formData.targetAudience || 'List project inclusions.',
+            keyFeatures: formData.keyFeatures || 'List project exclusions.',
+            projectTimeline: formData.projectTimeline || 'Detailed timeline.',
+            projectBudget: formData.projectBudget || '0.00',
+            teamMembers: formData.teamMembers || 'Key stakeholders and team roles.',
+            deliverables: formData.deliverables || 'List the deliverables.',
             services: formData.services || formData.serviceDescription || 'Professional Services',
             // Handle safe strings for addresses
             clientAddress: new Handlebars.SafeString(formData.clientAddress ? formData.clientAddress.replace(/\n/g, '<br>') : formData.partyAddress ? formData.partyAddress.replace(/\n/g, '<br>') : '123 Business Street<br>Mumbai, Maharashtra'),

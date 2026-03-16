@@ -156,6 +156,8 @@ const getTemplateForDocumentType = (documentType) => {
     'terms_of_service': 'terms_conditions',  // file is terms_conditions.hbs
     'terms_conditions': 'terms_conditions',
     'business_proposal': 'proposal',
+    'business-proposal': 'proposal',
+    'business-proposal-001': 'proposal',
     'quotation': 'quotation',
     'invoice': 'invoice',
     'gst_invoice': 'gst_invoice',

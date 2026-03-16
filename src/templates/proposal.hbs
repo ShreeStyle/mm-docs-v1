@@ -15,509 +15,501 @@
 
         body {
             font-family: 'Inter', -apple-system, sans-serif;
-            line-height: 1.6;
             color: #1f2937;
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 48px 40px;
             background: white;
             font-size: 14px;
+            line-height: 1.6;
         }
 
-        .cover {
-            text-align: center;
-            padding: 60px 0;
-            margin-bottom: 40px;
-            border-bottom: 1px solid #e5e7eb;
+        /* Colors & Theme */
+        :root {
+            --brand-green: #059669;
+            --brand-dark: #111827;
+            --brand-gray: #f3f4f6;
+            --text-main: #374151;
+            --text-light: #6b7280;
         }
 
-        .cover .company-name {
-            font-size: 14px;
-            font-weight: 600;
-            color: #6b7280;
-            text-transform: uppercase;
-            letter-spacing: 0.08em;
-            margin-bottom: 16px;
+        h1, h2, h3, h4, h5, h6 {
+            color: var(--brand-dark);
+            font-weight: 700;
         }
 
-        .cover .doc-title {
-            font-size: 40px;
+        .page {
+            width: 794px; /* A4 width approx at 96dpi */
+            min-height: 1123px;
+            padding: 60px;
+            margin: 0 auto;
+            background: white;
+            position: relative;
+            page-break-after: always;
+            box-sizing: border-box;
+        }
+
+        /* Left Green Bar Accent for Pages */
+        .page-accent {
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 15px;
+            background-color: var(--brand-green);
+        }
+
+        /* Cover Page */
+        .cover-page {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            height: 1000px;
+        }
+
+        .cover-header {
+            margin-bottom: auto;
+        }
+
+        .cover-title {
+            font-size: 56px;
             font-weight: 800;
-            color: #111827;
-            letter-spacing: -0.02em;
-            margin-bottom: 8px;
+            line-height: 1.1;
+            margin-bottom: 20px;
+            color: var(--brand-dark);
+        }
+        
+        .cover-subtitle {
+            font-size: 24px;
+            color: var(--brand-green);
+            font-weight: 600;
+            margin-bottom: 40px;
         }
 
-        .cover .doc-subtitle {
-            font-size: 18px;
-            color: #6b7280;
-            font-weight: 400;
-            margin-bottom: 24px;
+        .cover-brand {
+            font-size: 16px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: var(--brand-dark);
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+        
+        .cover-date {
+            font-size: 16px;
+            color: var(--text-light);
+            margin-bottom: 100px;
         }
 
-        .cover .meta {
-            font-size: 13px;
-            color: #9ca3af;
+        .prepared-section {
+            display: flex;
+            justify-content: space-between;
+            margin-top: auto;
+            border-top: 2px solid var(--brand-dark);
+            padding-top: 30px;
         }
 
-        .cover .meta strong {
-            color: #6b7280;
-        }
-
-        .prepared-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 24px;
-            margin-bottom: 36px;
-        }
-
-        .prepared-card {
-            background: #f9fafb;
-            border-radius: 8px;
-            padding: 20px;
+        .prepared-block {
+            width: 45%;
         }
 
         .prepared-label {
-            font-size: 11px;
+            font-size: 12px;
             text-transform: uppercase;
-            letter-spacing: 0.06em;
-            color: #6b7280;
-            font-weight: 600;
+            letter-spacing: 1px;
+            color: var(--brand-green);
+            font-weight: 700;
             margin-bottom: 10px;
         }
 
         .prepared-name {
-            font-size: 16px;
-            font-weight: 600;
-            color: #111827;
-            margin-bottom: 4px;
-        }
-
-        .prepared-detail {
-            font-size: 13px;
-            color: #4b5563;
-            line-height: 1.5;
-        }
-
-        .section {
-            margin: 32px 0;
-        }
-
-        .section-title {
             font-size: 18px;
             font-weight: 700;
-            color: #111827;
-            margin-bottom: 16px;
-            padding-bottom: 8px;
-            border-bottom: 2px solid #e5e7eb;
+            margin-bottom: 5px;
         }
 
-        .content {
+        .prepared-details {
             font-size: 14px;
-            color: #374151;
-            line-height: 1.7;
+            color: var(--text-light);
+            white-space: pre-line;
         }
 
-        .content p {
-            margin-bottom: 16px;
-        }
-
-        .highlight-box {
-            background: #eff6ff;
-            border-radius: 8px;
-            padding: 20px;
-            margin: 20px 0;
-        }
-
-        .highlight-box p {
-            font-size: 14px;
-            color: #1e40af;
-            line-height: 1.6;
-        }
-
-        .deliverables-list {
-            padding-left: 0;
-            list-style: none;
-            margin: 16px 0;
-        }
-
-        .deliverables-list li {
-            padding: 12px 16px;
-            margin-bottom: 8px;
-            background: #f9fafb;
-            border-radius: 8px;
-            font-size: 14px;
-            color: #111827;
+        /* Inner Pages */
+        .page-header {
             display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .deliverables-list li::before {
-            content: "✓";
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            width: 24px;
-            height: 24px;
-            background: #ecfdf5;
-            border-radius: 50%;
-            font-size: 12px;
-            color: #059669;
-            font-weight: 700;
-            flex-shrink: 0;
-        }
-
-        .pricing-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin: 20px 0;
-        }
-
-        .pricing-table thead th {
-            background: #f9fafb;
-            text-align: left;
-            padding: 12px 16px;
-            font-size: 12px;
-            font-weight: 600;
-            color: #6b7280;
+            justify-content: space-between;
+            align-items: flex-end;
+            margin-bottom: 40px;
+            padding-bottom: 20px;
             border-bottom: 1px solid #e5e7eb;
-            text-transform: uppercase;
-            letter-spacing: 0.04em;
         }
 
-        .pricing-table thead th:last-child {
-            text-align: right;
-        }
-
-        .pricing-table tbody td {
-            padding: 12px 16px;
+        .page-brand {
             font-size: 14px;
-            color: #111827;
-            border-bottom: 1px solid #f3f4f6;
+            font-weight: 700;
+            line-height: 1.2;
+        }
+        
+        .page-brand span {
+            display: block;
+            color: var(--brand-green);
         }
 
-        .pricing-table tbody td:last-child {
-            text-align: right;
-            font-weight: 600;
-        }
-
-        .total-box {
-            display: flex;
-            justify-content: flex-end;
-            margin: 16px 0;
-        }
-
-        .total-display {
-            background: #111827;
-            color: white;
-            border-radius: 8px;
-            padding: 16px 24px;
-            text-align: right;
-        }
-
-        .total-label {
-            font-size: 12px;
-            color: #9ca3af;
-            text-transform: uppercase;
-            letter-spacing: 0.04em;
-        }
-
-        .total-value {
-            font-size: 28px;
+        .page-title {
+            font-size: 32px;
             font-weight: 800;
+            color: var(--brand-dark);
+            position: relative;
+        }
+        
+        .section-number {
+            font-size: 60px;
+            font-weight: 800;
+            color: rgba(5, 150, 105, 0.1);
+            position: absolute;
+            right: 0;
+            top: -20px;
+            line-height: 1;
         }
 
-        .timeline-section {
-            background: #f9fafb;
-            border-radius: 8px;
-            padding: 24px;
-            margin: 24px 0;
+        /* Content Formatting */
+        .content-text {
+            font-size: 16px;
+            color: var(--text-main);
+            line-height: 1.8;
+            margin-bottom: 20px;
         }
 
-        .timeline-title {
-            font-size: 13px;
+        .content-highlight {
+            font-size: 20px;
             font-weight: 600;
-            color: #111827;
-            margin-bottom: 16px;
-            text-transform: uppercase;
-            letter-spacing: 0.04em;
+            color: var(--brand-green);
+            line-height: 1.5;
+            margin: 40px 0;
+            padding-left: 20px;
+            border-left: 4px solid var(--brand-dark);
         }
 
-        .timeline-grid {
+        /* Grid Layouts */
+        .grid-2 {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 16px;
+            gap: 40px;
+            margin-top: 30px;
+        }
+
+        .card {
+            background: var(--brand-gray);
+            padding: 30px;
+            border-radius: 8px;
+        }
+
+        .card-number {
+            font-size: 30px;
+            font-weight: 800;
+            color: var(--brand-green);
+            margin-bottom: 15px;
+        }
+
+        .card-title {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 15px;
+        }
+
+        /* Timeline */
+        .timeline {
+            margin-top: 40px;
         }
 
         .timeline-item {
-            padding: 12px;
-            background: white;
-            border-radius: 6px;
+            display: flex;
+            margin-bottom: 30px;
+            position: relative;
+        }
+
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: 25px;
+            top: 50px;
+            bottom: -30px;
+            width: 2px;
+            background: #e5e7eb;
+        }
+
+        .timeline-item:last-child::before {
+            display: none;
+        }
+
+        .timeline-dot {
+            width: 50px;
+            height: 50px;
+            background: var(--brand-dark);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 20px;
+            margin-right: 30px;
+            flex-shrink: 0;
+            z-index: 1;
+        }
+
+        .timeline-content {
+            padding-top: 10px;
         }
 
         .timeline-phase {
-            font-size: 12px;
-            color: #6b7280;
-            font-weight: 600;
+            font-size: 14px;
+            color: var(--brand-green);
+            font-weight: 700;
             text-transform: uppercase;
-            letter-spacing: 0.04em;
-            margin-bottom: 4px;
+            letter-spacing: 1px;
+            margin-bottom: 5px;
         }
 
         .timeline-desc {
-            font-size: 14px;
-            color: #111827;
-            font-weight: 500;
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--brand-dark);
         }
 
-        .timeline-duration {
-            font-size: 12px;
-            color: #6b7280;
-            margin-top: 2px;
+        /* Budget Table */
+        .budget-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 30px;
         }
 
-        .cta-section {
-            background: #111827;
-            border-radius: 12px;
-            padding: 32px;
-            margin: 32px 0;
-            text-align: center;
+        .budget-table th {
+            text-align: left;
+            padding: 15px 20px;
+            background: var(--brand-dark);
             color: white;
+            font-weight: 600;
         }
 
-        .cta-text {
+        .budget-table td {
+            padding: 15px 20px;
+            border-bottom: 1px solid #e5e7eb;
+            font-size: 16px;
+        }
+
+        .budget-table tr:last-child {
+            font-weight: 700;
+            font-size: 20px;
+            background: var(--brand-gray);
+        }
+
+        .budget-table td:last-child,
+        .budget-table th:last-child {
+            text-align: right;
+        }
+
+        /* Footer */
+        .contact-footer {
+            margin-top: 80px;
+            padding-top: 40px;
+            border-top: 2px solid var(--brand-dark);
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .contact-title {
+            font-size: 32px;
+            font-weight: 800;
+            color: var(--brand-dark);
+        }
+
+        .contact-info {
+            text-align: right;
+        }
+
+        .contact-info p {
+            font-size: 16px;
+            font-weight: 500;
+            margin-bottom: 5px;
+            color: var(--text-main);
+        }
+
+        .contact-info p.phone {
             font-size: 20px;
             font-weight: 700;
-            margin-bottom: 8px;
+            color: var(--brand-green);
+            margin-bottom: 10px;
         }
 
-        .cta-sub {
-            font-size: 14px;
-            color: #9ca3af;
-        }
-
-        .terms-section {
-            margin: 24px 0;
-        }
-
-        .terms-list {
+        /* Helper classes */
+        .bullet-list {
             padding-left: 20px;
+            margin-top: 20px;
         }
 
-        .terms-list li {
-            margin-bottom: 8px;
-            font-size: 13px;
-            color: #4b5563;
+        .bullet-list li {
+            font-size: 16px;
+            margin-bottom: 10px;
             line-height: 1.6;
+            color: var(--text-main);
+        }
+        
+        .white-space-pre {
+            white-space: pre-wrap;
         }
 
-        .signature-section {
-            margin-top: 40px;
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 32px;
-        }
-
-        .sig-card {
-            background: #f9fafb;
-            border-radius: 8px;
-            padding: 24px;
-        }
-
-        .sig-title {
-            font-size: 13px;
-            font-weight: 600;
-            color: #111827;
-            margin-bottom: 16px;
-            text-transform: uppercase;
-        }
-
-        .sig-field {
-            margin-bottom: 16px;
-        }
-
-        .sig-field-label {
-            font-size: 12px;
-            color: #6b7280;
-            margin-bottom: 4px;
-        }
-
-        .sig-field-line {
-            border-bottom: 1px solid #d1d5db;
-            height: 24px;
-        }
-
-        .footer {
-            margin-top: 48px;
-            text-align: center;
-            padding-top: 24px;
-            border-top: 1px solid #e5e7eb;
-            color: #9ca3af;
-            font-size: 12px;
-        }
     </style>
 </head>
 
 <body>
-    <div class="cover">
-        <div class="company-name">{{companyName}}</div>
-        <div class="doc-title">{{#if proposalTitle}}{{proposalTitle}}{{else}}Business Proposal{{/if}}</div>
-        <div class="doc-subtitle">{{#if proposalSubtitle}}{{proposalSubtitle}}{{else}}A comprehensive proposal for your
-            consideration{{/if}}</div>
-        <div class="meta"><strong>Date:</strong> {{proposalDate}} &nbsp;|&nbsp; <strong>Proposal No:</strong> {{#if
-            proposalNumber}}{{proposalNumber}}{{else}}BP-2024-001{{/if}}</div>
-    </div>
 
-    <div class="prepared-grid">
-        <div class="prepared-card">
-            <div class="prepared-label">Prepared By</div>
-            <div class="prepared-name">{{companyName}}</div>
-            <div class="prepared-detail">{{{companyAddress}}}</div>
-            {{#if companyEmail}}<div class="prepared-detail">{{companyEmail}}</div>{{/if}}
-        </div>
-        <div class="prepared-card">
-            <div class="prepared-label">Prepared For</div>
-            <div class="prepared-name">{{clientName}}</div>
-            <div class="prepared-detail">{{{clientAddress}}}</div>
-            {{#if clientEmail}}<div class="prepared-detail">{{clientEmail}}</div>{{/if}}
-        </div>
-    </div>
-
-    <div class="section">
-        <div class="section-title">Executive Summary</div>
-        <div class="content">
-            <div class="highlight-box">
-                <p>{{{executiveSummary}}}</p>
+    <!-- Cover Page -->
+    <div class="page">
+        <div class="page-accent"></div>
+        <div class="cover-page">
+            <div class="cover-header">
+                <div class="cover-brand">
+                    {{#if companyName}}{{companyName}}{{else}}Company Name{{/if}}
+                </div>
+                <div class="cover-date">
+                    {{#if proposalDate}}{{proposalDate}}{{else}}Date{{/if}}
+                </div>
+                
+                <h1 class="cover-title">Project<br>Proposal</h1>
+                <div class="cover-subtitle">
+                    {{#if projectTitle}}{{projectTitle}}{{else}}Project Title{{/if}}
+                </div>
             </div>
-        </div>
-    </div>
 
-    <div class="section">
-        <div class="section-title">Scope of Work</div>
-        <div class="content">
-            <p>{{{scopeOfWork}}}</p>
-        </div>
-    </div>
-
-    <div class="section">
-        <div class="section-title">Deliverables</div>
-        <ul class="deliverables-list">
-            {{#each deliverables}}
-            <li>{{this}}</li>
-            {{/each}}
-        </ul>
-    </div>
-
-    <div class="section">
-        <div class="section-title">Investment</div>
-        <table class="pricing-table">
-            <thead>
-                <tr>
-                    <th>Service / Item</th>
-                    <th>Amount</th>
-                </tr>
-            </thead>
-            <tbody>
-                {{#each items}}
-                <tr>
-                    <td>{{this.description}}</td>
-                    <td>₹{{this.amount}}</td>
-                </tr>
-                {{/each}}
-            </tbody>
-        </table>
-        <div class="total-box">
-            <div class="total-display">
-                <div class="total-label">Total Investment</div>
-                <div class="total-value">₹{{totalAmount}}</div>
-            </div>
-        </div>
-    </div>
-
-    <div class="section">
-        <div class="section-title">Timeline</div>
-        <div class="timeline-section">
-            <div class="timeline-grid">
-                <div class="timeline-item">
-                    <div class="timeline-phase">Phase 1</div>
-                    <div class="timeline-desc">Discovery & Planning</div>
-                    <div class="timeline-duration">{{#if phase1Duration}}{{phase1Duration}}{{else}}Week 1-2{{/if}}</div>
+            <div class="prepared-section">
+                <div class="prepared-block">
+                    <div class="prepared-label">Prepared By :</div>
+                    <div class="prepared-name">{{#if companyName}}{{companyName}}{{else}}Company Name{{/if}}</div>
+                    <div class="prepared-details">
+                        {{#if companyAddress}}{{companyAddress}}{{/if}}
+                        {{#if companyEmail}}<br>{{companyEmail}}{{/if}}
+                        {{#if companyPhone}}<br>{{companyPhone}}{{/if}}
+                    </div>
                 </div>
-                <div class="timeline-item">
-                    <div class="timeline-phase">Phase 2</div>
-                    <div class="timeline-desc">Development & Execution</div>
-                    <div class="timeline-duration">{{#if phase2Duration}}{{phase2Duration}}{{else}}Week 3-6{{/if}}</div>
-                </div>
-                <div class="timeline-item">
-                    <div class="timeline-phase">Phase 3</div>
-                    <div class="timeline-desc">Testing & Review</div>
-                    <div class="timeline-duration">{{#if phase3Duration}}{{phase3Duration}}{{else}}Week 7-8{{/if}}</div>
-                </div>
-                <div class="timeline-item">
-                    <div class="timeline-phase">Phase 4</div>
-                    <div class="timeline-desc">Launch & Handover</div>
-                    <div class="timeline-duration">{{#if phase4Duration}}{{phase4Duration}}{{else}}Week 9-10{{/if}}
+                <div class="prepared-block">
+                    <div class="prepared-label">Prepared For :</div>
+                    <div class="prepared-name">{{#if clientName}}{{clientName}}{{else}}Client Name{{/if}}</div>
+                    <div class="prepared-details">
+                        {{#if clientCompany}}<br>{{clientCompany}}{{/if}}
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <div class="section">
-        <div class="section-title">Terms & Conditions</div>
-        <ol class="terms-list">
-            <li>This proposal is valid for {{#if validityDays}}{{validityDays}}{{else}}30{{/if}} days from the date of
-                issue.</li>
-            <li>Payment terms: {{#if paymentTerms}}{{paymentTerms}}{{else}}50% on acceptance, 50% on project
-                completion{{/if}}.</li>
-            <li>The project scope is as defined in this proposal. Any changes will be handled through a formal change
-                request process.</li>
-            <li>All prices are exclusive of applicable taxes unless otherwise stated.</li>
-            <li>Both parties agree to maintain confidentiality of all shared information.</li>
-        </ol>
-    </div>
-
-    <div class="cta-section">
-        <div class="cta-text">Ready to get started?</div>
-        <div class="cta-sub">Sign below to accept this proposal and begin the engagement</div>
-    </div>
-
-    <div class="signature-section">
-        <div class="sig-card">
-            <div class="sig-title">{{companyName}}</div>
-            <div class="sig-field">
-                <div class="sig-field-label">Authorized Signature</div>
-                <div class="sig-field-line"></div>
+    <!-- Executive Summary Page -->
+    <div class="page">
+        <div class="page-header">
+            <div class="page-brand">
+                {{#if companyName}}{{companyName}}{{else}}Company Name{{/if}}
+                <span>{{#if proposalDate}}{{proposalDate}}{{else}}Date{{/if}}</span>
             </div>
-            <div class="sig-field">
-                <div class="sig-field-label">Name & Title</div>
-                <div class="sig-field-line"></div>
-            </div>
-            <div class="sig-field">
-                <div class="sig-field-label">Date</div>
-                <div class="sig-field-line"></div>
+            <div class="page-title">
+                Summary
+                <div class="section-number">01</div>
             </div>
         </div>
-        <div class="sig-card">
-            <div class="sig-title">Client Acceptance</div>
-            <div class="sig-field">
-                <div class="sig-field-label">Authorized Signature</div>
-                <div class="sig-field-line"></div>
+
+        <div class="content-highlight white-space-pre">
+            {{#if projectDescription}}{{projectDescription}}{{else}}Provide a comprehensive summary of the project goals, vision, and strategic approach.{{/if}}
+        </div>
+
+        <h3 style="margin-top: 40px; margin-bottom: 20px; font-size: 24px;">Project Objectives</h3>
+        <div class="content-text white-space-pre">{{#if problemStatement}}{{problemStatement}}{{else}}Define specific goals and objectives.{{/if}}</div>
+    </div>
+
+    <!-- Methodology & Scope Page -->
+    <div class="page">
+        <div class="page-header">
+            <div class="page-brand">
+                {{#if companyName}}{{companyName}}{{else}}Company Name{{/if}}
+                <span>{{#if proposalDate}}{{proposalDate}}{{else}}Date{{/if}}</span>
             </div>
-            <div class="sig-field">
-                <div class="sig-field-label">Name: {{clientName}}</div>
+            <div class="page-title">
+                Methodology & Scope
+                <div class="section-number">02</div>
             </div>
-            <div class="sig-field">
-                <div class="sig-field-label">Date</div>
-                <div class="sig-field-line"></div>
+        </div>
+
+        <div class="grid-2">
+            <div class="card">
+                <div class="card-title">Proposed Solution / Methodology</div>
+                <div class="content-text white-space-pre">{{#if proposedSolution}}{{proposedSolution}}{{else}}Detailed methodology.{{/if}}</div>
+            </div>
+            <div class="card" style="background: var(--brand-dark); color: white;">
+                <div class="card-title" style="color: white;">Scope (Inclusions)</div>
+                <div class="content-text white-space-pre" style="color: #e5e7eb;">{{#if targetAudience}}{{targetAudience}}{{else}}List project inclusions.{{/if}}</div>
+            </div>
+        </div>
+
+        {{#if keyFeatures}}
+        <h3 style="margin-top: 40px; margin-bottom: 20px; font-size: 20px;">Scope Limitations & Exclusions</h3>
+        <div class="content-text white-space-pre">{{keyFeatures}}</div>
+        {{/if}}
+        
+        {{#if deliverables}}
+        <h3 style="margin-top: 40px; margin-bottom: 20px; font-size: 20px;">Expected Outcomes / Deliverables</h3>
+        <div class="content-text white-space-pre">{{deliverables}}</div>
+        {{/if}}
+    </div>
+
+    <!-- Timeline & Logistics Page -->
+    <div class="page">
+        <div class="page-header">
+            <div class="page-brand">
+                {{#if companyName}}{{companyName}}{{else}}Company Name{{/if}}
+                <span>{{#if proposalDate}}{{proposalDate}}{{else}}Date{{/if}}</span>
+            </div>
+            <div class="page-title">
+                Timeline & Budget
+                <div class="section-number">03</div>
+            </div>
+        </div>
+
+        <h3 style="margin-bottom: 20px; font-size: 24px;">Project Timeline</h3>
+        <div class="content-text white-space-pre">{{#if projectTimeline}}{{projectTimeline}}{{else}}Detailed timeline.{{/if}}</div>
+
+        <h3 style="margin-top: 50px; margin-bottom: 20px; font-size: 24px;">Estimated Budget</h3>
+        <table class="budget-table">
+            <thead>
+                <tr>
+                    <th>Description</th>
+                    <th>Estimated Cost</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Project Budget Estimate (Total)</td>
+                    <td>₹{{#if projectBudget}}{{projectBudget}}{{else}}0.00{{/if}}</td>
+                </tr>
+            </tbody>
+        </table>
+
+        {{#if teamMembers}}
+        <h3 style="margin-top: 50px; margin-bottom: 20px; font-size: 24px;">Key Stakeholders & Team</h3>
+        <div class="content-text white-space-pre">{{teamMembers}}</div>
+        {{/if}}
+
+        {{#if specialNotes}}
+        <h3 style="margin-top: 40px; margin-bottom: 20px; font-size: 20px;">Risk Assessment & Notes</h3>
+        <div class="content-text white-space-pre">{{specialNotes}}</div>
+        {{/if}}
+
+        <div class="contact-footer">
+            <div class="contact-title">
+                Let's Work<br>Together
+            </div>
+            <div class="contact-info">
+                {{#if companyPhone}}<p class="phone">{{companyPhone}}</p>{{/if}}
+                <p>Contact Us</p>
+                {{#if companyEmail}}<p>{{companyEmail}}</p>{{/if}}
+                {{#if companyWebsite}}<p>{{companyWebsite}}</p>{{/if}}
             </div>
         </div>
     </div>
 
-    <div class="footer">
-        <p>{{companyName}} — Business Proposal</p>
-    </div>
 </body>
-
 </html>

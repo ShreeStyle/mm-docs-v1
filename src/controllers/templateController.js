@@ -293,6 +293,42 @@ exports.initializeTemplates = async (req, res) => {
                     { placeholder: '{{recommenderName}}', description: 'Name of the recommender', fieldMapping: 'recommenderName' }
                 ],
                 metadata: { tags: ['recommendation', 'hr', 'academic'], version: '1.0.0' }
+            },
+            {
+                templateId: 'business-proposal-001',
+                name: 'Business Proposal',
+                category: 'sales',
+                description: 'Professional business proposal template with executive summary, methodology, and budget',
+                icon: '💼',
+                requiredFields: [
+                    { fieldName: 'companyName', fieldType: 'text', label: 'Company Name', placeholder: 'e.g. Green Simple Company', required: true },
+                    { fieldName: 'companyAddress', fieldType: 'textarea', label: 'Company Address', placeholder: 'Complete company address', required: true },
+                    { fieldName: 'companyEmail', fieldType: 'email', label: 'Company Email', placeholder: 'e.g. hello@company.com', required: true },
+                    { fieldName: 'companyPhone', fieldType: 'text', label: 'Company Phone', placeholder: 'e.g. +123-456-7890', required: true },
+                    { fieldName: 'companyWebsite', fieldType: 'text', label: 'Company Website', placeholder: 'e.g. www.company.com', required: false },
+                    { fieldName: 'projectTitle', fieldType: 'text', label: 'Project Title', placeholder: 'e.g. Digital Marketing Transformation Initiative', required: true },
+                    { fieldName: 'projectType', fieldType: 'text', label: 'Project Type', placeholder: 'e.g. Marketing, Software Development', required: false },
+                    { fieldName: 'projectDescription', fieldType: 'textarea', label: 'Executive Summary', placeholder: 'High-level project summary', required: true },
+                    { fieldName: 'problemStatement', fieldType: 'textarea', label: 'Objectives', placeholder: 'Enter objectives as bullet points', required: true },
+                    { fieldName: 'proposedSolution', fieldType: 'textarea', label: 'Methodology / Solution', placeholder: 'Brief explanation of the methodology', required: true },
+                    { fieldName: 'targetAudience', fieldType: 'textarea', label: 'Scope (Inclusions)', placeholder: 'Inclusions or Target Audience', required: true },
+                    { fieldName: 'keyFeatures', fieldType: 'textarea', label: 'Scope (Exclusions)', placeholder: 'Exclusions or Limitations', required: false },
+                    { fieldName: 'projectTimeline', fieldType: 'textarea', label: 'Project Timeline', placeholder: 'Timeline descriptions', required: true },
+                    { fieldName: 'projectBudget', fieldType: 'number', label: 'Estimated Budget (₹)', placeholder: 'e.g. 500000', required: true },
+                    { fieldName: 'teamMembers', fieldType: 'textarea', label: 'Key Stakeholders', placeholder: 'List key stakeholders and roles', required: true },
+                    { fieldName: 'deliverables', fieldType: 'textarea', label: 'Expected Outcomes / Deliverables', placeholder: 'List the deliverables', required: true },
+                    { fieldName: 'clientName', fieldType: 'text', label: 'Client Contact Name', placeholder: 'e.g. Avery Davis', required: true },
+                    { fieldName: 'clientCompany', fieldType: 'text', label: 'Client Company Name', placeholder: 'e.g. Wardiere Inc.', required: true },
+                    { fieldName: 'proposalDate', fieldType: 'date', label: 'Proposal Date', required: true },
+                    { fieldName: 'specialNotes', fieldType: 'textarea', label: 'Risk Assessment', placeholder: 'List risks and mitigation plans', required: false }
+                ],
+                content: await fs.promises.readFile(path.join(__dirname, '../templates/proposal.hbs'), 'utf8'),
+                placeholders: [
+                    { placeholder: '{{companyName}}', description: 'Your company name', fieldMapping: 'companyName' },
+                    { placeholder: '{{projectTitle}}', description: 'Title of the project', fieldMapping: 'projectTitle' },
+                    { placeholder: '{{clientCompany}}', description: 'Client company name', fieldMapping: 'clientCompany' }
+                ],
+                metadata: { tags: ['proposal', 'sales', 'business'], version: '1.0.0' }
             }
         ];
 
