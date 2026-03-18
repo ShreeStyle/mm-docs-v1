@@ -1202,6 +1202,30 @@ const TEMPLATE_LIBRARY = {
                 },
                 date: "[Current Date]"
             }
+        },
+        {
+            id: "partnership_agreement",
+            title: "General Partnership Agreement",
+            category: "legal_documents",
+            description: "Formal partnership agreement with numbered clauses and professional layout",
+            tags: ["legal", "partnership", "agreement", "business"],
+            templateFile: "partnership_agreement.hbs",
+            content: {
+                commencementDate: "[Date]",
+                partner1Name: "[Partner 1 Name]",
+                partner1Address: "[Partner 1 Address]",
+                partner2Name: "[Partner 2 Name]",
+                partner2Address: "[Partner 2 Address]",
+                businessName: "[Partnership Business Name]",
+                businessPurpose: "The purpose of this partnership is to conduct professional business activities as agreed upon by the partners.",
+                partner1Contribution: "$30,000 in capital",
+                partner2Contribution: "Design expertise and market contacts",
+                partner1ProfitShare: "60%",
+                partner2ProfitShare: "40%",
+                partner1Responsibilities: "Finance, client acquisition, and operations management",
+                partner2Responsibilities: "Design work, project delivery, and client communication",
+                bankName: "Borcelle Bank"
+            }
         }
     ],
 

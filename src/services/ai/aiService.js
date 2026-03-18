@@ -283,6 +283,57 @@ Return ONLY valid, richly detailed, FORMALLY WRITTEN JSON document content. No c
         ]
       }`;
 
+    } else if (effectiveType === "partnership_agreement") {
+      // Parse structured input data
+      const inputData = {};
+      if (topic.includes('|')) {
+        topic.split('|').forEach(pair => {
+          const [key, value] = pair.split(':').map(s => s.trim());
+          if (key && value) {
+            inputData[key.toLowerCase().replace(/\s+/g, '')] = value;
+          }
+        });
+      }
+
+      // Merge with providedData from frontend form
+      const context = { ...providedData, ...inputData };
+      console.log(`📋 Consolidated context for partnership_agreement:`, context);
+
+      userPrompt = `Generate an ELITE, FORMALLY BINDING Partnership Agreement using the following context:
+      
+      CONTEXT DATA:
+      ${JSON.stringify(context, null, 2)}
+
+      EXTREME PROFESSIONALISM & LEGAL TONE:
+      - This must read like it was drafted by a top-tier international corporate law firm.
+      - Use sophisticated legal vocabulary (e.g., "The Partners shall...", "Notwithstanding any provision...", "Subject to the terms herein...").
+      - NO conversational filler, NO introductory fluff, NO casual language.
+      - Strictly follow the formal 9-section structure.
+      - **IMPORTANT**: Prioritize provided data for Dispute Resolution, Governing Law, and Entire Agreement. If provided, use that text exactly or professionally refine it; if not provided, draft from scratch.
+      - Ensure the wording is "perfect professional" as per elite corporate standards.
+
+      Return ONLY valid JSON with this structure (merge with context data):
+      {
+        "commencementDate": "${context.commencementDate || '[Date]'}",
+        "partner1Name": "${context.partner1Name || '[Partner 1 Name]'}",
+        "partner1Address": "${context.partner1Address || '[Partner 1 Address]'}",
+        "partner1Title": "${context.partner1Title || '[Title]'}",
+        "partner2Name": "${context.partner2Name || '[Partner 2 Name]'}",
+        "partner2Address": "${context.partner2Address || '[Partner 2 Address]'}",
+        "partner2Title": "${context.partner2Title || '[Title]'}",
+        "businessName": "${context.businessName || '[Business Name]'}",
+        "businessPurpose": "Draft an elite, formal purpose clause: ${context.businessPurpose || '[Purpose]'}",
+        "partner1Contribution": "Draft an elite, formal capital/expertise contribution for Partner 1: ${context.partner1Contribution || '[Contribution]'}",
+        "partner2Contribution": "Draft an elite, formal capital/expertise contribution for Partner 2: ${context.partner2Contribution || '[Contribution]'}",
+        "partner1ProfitShare": "${context.partner1ProfitShare || '50%'}",
+        "partner2ProfitShare": "${context.partner2ProfitShare || '50%'}",
+        "partner1Responsibilities": "Draft elite, exhaustive responsibilities for Partner 1: ${context.partner1Responsibilities || '[Responsibilities]'}",
+        "partner2Responsibilities": "Draft elite, exhaustive responsibilities for Partner 2: ${context.partner2Responsibilities || '[Responsibilities]'}",
+        "bankName": "${context.bankName || '[Bank Name]'}",
+        "disputeResolution": "Draft formal mediation/arbitration clause",
+        "governingLaw": "Draft formal governing law clause",
+        "entireAgreement": "Draft formal merger/integration clause"
+      }`;
     } else if (effectiveType === "profile") {
       // Parse structured input data
       const inputData = {};
@@ -2348,6 +2399,27 @@ We appreciate the cooperation and assistance provided by management and staff th
         { heading: "INDEMNIFICATION", content: "Each Party shall indemnify, defend, and hold harmless the other Party from and against any and all claims, damages, liabilities, and expenses arising out of or related to a breach of this Agreement by the indemnifying Party." },
         { heading: "LIMITATION OF LIABILITY", content: "To the maximum extent permitted by applicable law, neither Party shall be liable for any indirect, incidental, special, or consequential damages arising out of or in connection with this Agreement, regardless of the cause of action." }
       ]
+    };
+  } else if (effectiveType === "partnership_agreement") {
+    console.log('📝 Building partnership agreement fallback with data:', providedData);
+    return {
+      commencementDate: providedData.commencementDate || new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }),
+      partner1Name: providedData.partner1Name || "[Partner 1 Name]",
+      partner1Address: providedData.partner1Address || "[Partner 1 Address]",
+      partner2Name: providedData.partner2Name || "[Partner 2 Name]",
+      partner2Address: providedData.partner2Address || "[Partner 2 Address]",
+      businessName: providedData.businessName || "[Partnership Business Name]",
+      businessPurpose: providedData.businessPurpose || "The purpose of this partnership is to conduct business activities as agreed upon by the partners.",
+      partner1Contribution: providedData.partner1Contribution || "[Contribution Details]",
+      partner2Contribution: providedData.partner2Contribution || "[Contribution Details]",
+      partner1ProfitShare: providedData.partner1ProfitShare || "50%",
+      partner2ProfitShare: providedData.partner2ProfitShare || "50%",
+      partner1Responsibilities: providedData.partner1Responsibilities || "[Responsibility Details]",
+      partner2Responsibilities: providedData.partner2Responsibilities || "[Responsibility Details]",
+      bankName: providedData.bankName || "[Bank Name]",
+      disputeResolution: providedData.disputeResolution || "In the event of a dispute, the partners agree to first attempt mediation through a professional mediator.",
+      governingLaw: providedData.governingLaw || "This Agreement shall be governed by the laws of the State of [State].",
+      entireAgreement: providedData.entireAgreement || "This Agreement constitutes the full agreement between the partners, overriding any prior agreements."
     };
   } else {
     return {

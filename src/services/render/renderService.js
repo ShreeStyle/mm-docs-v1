@@ -167,6 +167,7 @@ const getTemplateForDocumentType = (documentType) => {
     'gst_filing': 'gst_filing_summary',
     'policy_document': 'policy_document',
     'regulatory_filing': 'regulatory_filing',
+    'partnership_agreement': 'partnership_agreement',
     'proposal': 'proposal',
     'resume': 'resume',
     'marketing_brief': 'marketing_brief',

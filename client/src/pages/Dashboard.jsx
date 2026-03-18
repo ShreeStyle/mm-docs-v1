@@ -1797,13 +1797,25 @@ export default function Dashboard() {
 
                 partnership_agreement: [
                     ...commonFields,
-                    { id: 'partnerName', label: 'Partner Name', type: 'text', placeholder: 'e.g. John Doe / XYZ Corp', required: true },
-                    { id: 'partnerAddress', label: 'Partner Address', type: 'textarea', placeholder: 'Complete partner address', required: true },
-                    { id: 'businessName', label: 'Partnership Business Name', type: 'text', placeholder: 'e.g. ABC & XYZ Partners', required: true },
-                    { id: 'businessType', label: 'Business Type', type: 'text', placeholder: 'e.g. Consulting Services', required: true },
-                    { id: 'capitalContribution', label: 'Capital Contribution (₹)', type: 'number', placeholder: 'e.g. 1000000', required: true },
-                    { id: 'profitSharingRatio', label: 'Profit Sharing Ratio', type: 'text', placeholder: 'e.g. 50:50 or 60:40', required: true },
-                    { id: 'effectiveDate', label: 'Effective Date', type: 'date', required: true }
+                    { id: 'partner1Name', label: 'Partner 1 Name', type: 'text', placeholder: 'e.g. Matt Zhang', required: true },
+                    { id: 'partner1Address', label: 'Partner 1 Address', type: 'textarea', placeholder: '123 Anywhere ST., Any City 12345', required: true },
+                    { id: 'partner1Title', label: 'Partner 1 Title', type: 'text', placeholder: 'e.g. Co-Founder', required: true },
+                    { id: 'partner2Name', label: 'Partner 2 Name', type: 'text', placeholder: 'e.g. Anna Katrina Marchesi', required: true },
+                    { id: 'partner2Address', label: 'Partner 2 Address', type: 'textarea', placeholder: '123 Anywhere ST., Any City 12345', required: true },
+                    { id: 'partner2Title', label: 'Partner 2 Title', type: 'text', placeholder: 'e.g. Co-Founder', required: true },
+                    { id: 'businessName', label: 'Partnership Business Name', type: 'text', placeholder: 'e.g. Fauget Studio', required: true },
+                    { id: 'businessPurpose', label: 'Business Purpose', type: 'textarea', placeholder: 'e.g. Provide graphic design services for small businesses.', required: true },
+                    { id: 'partner1Contribution', label: 'Partner 1 Contribution', type: 'textarea', placeholder: 'e.g. $30,000 in capital', required: true },
+                    { id: 'partner2Contribution', label: 'Partner 2 Contribution', type: 'textarea', placeholder: 'e.g. Design expertise, portfolio, and client contacts.', required: true },
+                    { id: 'partner1ProfitShare', label: 'Partner 1 Profit/Loss %', type: 'text', placeholder: 'e.g. 60%', required: true },
+                    { id: 'partner2ProfitShare', label: 'Partner 2 Profit/Loss %', type: 'text', placeholder: 'e.g. 40%', required: true },
+                    { id: 'partner1Responsibilities', label: 'Partner 1 Responsibilities', type: 'textarea', placeholder: 'e.g. Finance, client acquisition, and managing the studio.', required: true },
+                    { id: 'partner2Responsibilities', label: 'Partner 2 Responsibilities', type: 'textarea', placeholder: 'e.g. Design work, client communication, and project delivery.', required: true },
+                    { id: 'bankName', label: 'Bank Name', type: 'text', placeholder: 'e.g. Borcelle Bank', required: true },
+                    { id: 'commencementDate', label: 'Commencement Date', type: 'date', required: true },
+                    { id: 'disputeResolution', label: 'Dispute Resolution', type: 'textarea', placeholder: 'e.g. In the event of a dispute, the partners agree to...', required: true },
+                    { id: 'governingLaw', label: 'Governing Law', type: 'text', placeholder: 'e.g. This Agreement shall be governed by the laws of the State of [State].', required: true },
+                    { id: 'entireAgreement', label: 'Entire Agreement', type: 'textarea', placeholder: 'e.g. This Agreement constitutes the full agreement...', required: true }
                 ],
                 quotation: [
                     ...commonFields,
@@ -2239,6 +2251,63 @@ Authorized Signatory
 For ${formData.partyName || '[Other Party Name]'}:
 _________________________
 Authorized Signatory
+                    `
+                },
+                partnership_agreement: {
+                    title: 'Partnership Agreement',
+                    content: `
+PARTNERSHIP AGREEMENT
+
+This Partnership Agreement ("Agreement") is made and entered into on ${formData.commencementDate || '[Date]'}, by and between:
+
+Partner 1:
+${formData.partner1Name || '[Partner 1 Name]'}
+${formData.partner1Address || '[Partner 1 Address]'}
+
+Partner 2:
+${formData.partner2Name || '[Partner 2 Name]'}
+${formData.partner2Address || '[Partner 2 Address]'}
+
+The partners wish to form a business partnership on the terms set out below:
+
+1. Name and Business Purpose
+The partnership will conduct its business under the name "${formData.businessName || '[Business Name]'}". The purpose of the partnership is to ${formData.businessPurpose || '[Business Purpose]'}.
+
+2. Contributions
+• ${formData.partner1Name || 'Partner 1'} agrees to contribute: ${formData.partner1Contribution || '[Contribution]'}
+• ${formData.partner2Name || 'Partner 2'} agrees to contribute: ${formData.partner2Contribution || '[Contribution]'}
+
+3. Profit and Loss Sharing
+The partners agree to share profits and losses as follows:
+• ${formData.partner1Name || 'Partner 1'}: ${formData.partner1ProfitShare || '[%]'}
+• ${formData.partner2Name || 'Partner 2'}: ${formData.partner2ProfitShare || '[%]'}
+
+4. Management and Responsibilities
+• ${formData.partner1Name || 'Partner 1'} will be responsible for: ${formData.partner1Responsibilities || '[Responsibilities]'}
+• ${formData.partner2Name || 'Partner 2'} will be responsible for: ${formData.partner2Responsibilities || '[Responsibilities]'}
+• Major decisions, such as taking on new partners, will require the consent of both parties.
+
+5. Banking and Financial Records
+The partnership's finances will be maintained in a joint bank account at ${formData.bankName || '[Bank Name]'}, and each partner will have access to all financial records upon request.
+
+6. Term and Termination
+This partnership will commence on ${formData.commencementDate || '[Date]'}, and will continue until terminated by mutual agreement or upon the incapacity of one of the partners.
+
+7. Dispute Resolution
+${formData.disputeResolution || 'In the event of a dispute, the partners agree to first attempt mediation through a professional mediator.'}
+
+8. Governing Law
+${formData.governingLaw || 'This Agreement shall be governed by the laws of the State of [State].'}
+
+9. Entire Agreement
+${formData.entireAgreement || 'This Agreement constitutes the full agreement between the partners, overriding any prior agreements.'}
+
+IN WITNESS WHEREOF, the partners have executed this Partnership Agreement as of the date first above written.
+
+_________________________    _________________________
+${formData.partner1Name || '[Partner 1 Name]'}          ${formData.partner2Name || '[Partner 2 Name]'}
+${formData.partner1Title || '[Title]'}                 ${formData.partner2Title || '[Title]'}
+Date: ${currentDate}           Date: ${currentDate}
                     `
                 },
                 warning_letter: {

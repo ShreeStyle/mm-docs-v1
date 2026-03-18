@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Partnership Agreement</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap');
+        
+        :root {
+            --primary-color: {{brandColor}};
+            --text-color: #1a1a1a;
+            --border-color: #000000;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            color: var(--text-color);
+            line-height: 1.5;
+            margin: 0;
+            padding: 20px;
+            background: #fff;
+        }
+
+        .document-container {
+            border: 1px solid var(--border-color);
+            padding: 2px;
+            min-height: 1050px;
+        }
+
+        .inner-border {
+            border: 3px solid var(--border-color);
+            padding: 40px;
+            min-height: 1000px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .header h1 {
+            font-size: 28px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin: 0;
+            font-weight: 700;
+        }
+
+        .intro {
+            margin-bottom: 25px;
+            font-size: 14px;
+        }
+
+        .partners-section {
+            margin-bottom: 25px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .partner {
+            font-size: 14px;
+        }
+
+        .partner-label {
+            font-weight: bold;
+            display: block;
+        }
+
+        .partner-name {
+            font-weight: bold;
+            font-size: 16px;
+            margin: 2px 0;
+        }
+
+        .partner-address {
+            margin: 0;
+            font-size: 13px;
+            color: #333;
+        }
+
+        .section {
+            margin-bottom: 20px;
+        }
+
+        .section-title {
+            font-weight: bold;
+            font-size: 15px;
+            margin-bottom: 5px;
+            display: block;
+        }
+
+        .section-content {
+            font-size: 13.5px;
+            color: #333;
+        }
+
+        .bullet-list {
+            list-style-type: disc;
+            margin-left: 20px;
+            padding: 0;
+        }
+
+        .bullet-item {
+            margin-bottom: 4px;
+        }
+
+        .signature-section {
+            margin-top: 50px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .signature-block {
+            width: 45%;
+        }
+
+        .signature-info {
+            margin-top: 10px;
+            font-size: 13px;
+        }
+
+        .signature-line {
+            border-top: 1px solid #000;
+            margin-bottom: 8px;
+            width: 100%;
+        }
+
+        .footer {
+            margin-top: 50px;
+            font-size: 10px;
+            text-align: center;
+            color: #999;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        @media print {
+            .document-container {
+                border: none;
+            }
+            .inner-border {
+                border: 3px solid #000;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="document-container">
+        <div class="inner-border">
+            <div class="header">
+                <h1>Partnership Agreement</h1>
+            </div>
+
+            <div class="intro">
+                <p>This Partnership Agreement ("Agreement") is made and entered into on <strong>{{commencementDate}}</strong>, by and between:</p>
+            </div>
+
+            <div class="partners-section">
+                <div class="partner">
+                    <span class="partner-label">Partner 1:</span>
+                    <p class="partner-name">{{partner1Name}}</p>
+                    <p class="partner-address">{{partner1Address}}</p>
+                </div>
+
+                <div class="partner">
+                    <span class="partner-label">Partner 2:</span>
+                    <p class="partner-name">{{partner2Name}}</p>
+                    <p class="partner-address">{{partner2Address}}</p>
+                </div>
+            </div>
+
+            <p class="section-content" style="margin-bottom: 20px;">The partners wish to form a business partnership on the terms set out below:</p>
+
+            <div class="section">
+                <span class="section-title">1. Name and Business Purpose</span>
+                <div class="section-content">
+                    <p>The partnership will conduct its business under the name "<strong>{{businessName}}</strong>". {{businessPurpose}}</p>
+                </div>
+            </div>
+
+            <div class="section">
+                <span class="section-title">2. Contributions</span>
+                <div class="section-content">
+                    <ul class="bullet-list">
+                        <li class="bullet-item"><strong>{{partner1Name}}</strong>: {{partner1Contribution}}</li>
+                        <li class="bullet-item"><strong>{{partner2Name}}</strong>: {{partner2Contribution}}</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="section">
+                <span class="section-title">3. Profit and Loss Sharing</span>
+                <div class="section-content">
+                    <ul class="bullet-list">
+                        <li class="bullet-item"><strong>{{partner1Name}}</strong>: {{partner1ProfitShare}}</li>
+                        <li class="bullet-item"><strong>{{partner2Name}}</strong>: {{partner2ProfitShare}}</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="section">
+                <span class="section-title">4. Management and Responsibilities</span>
+                <div class="section-content">
+                    <ul class="bullet-list">
+                        <li class="bullet-item"><strong>{{partner1Name}}</strong>: {{partner1Responsibilities}}</li>
+                        <li class="bullet-item"><strong>{{partner2Name}}</strong>: {{partner2Responsibilities}}</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="section">
+                <span class="section-title">5. Banking and Financial Records</span>
+                <div class="section-content">
+                    <p>{{bankName}}: The partnership's finances will be maintained in a joint account, and each partner will have access to all financial records upon request.</p>
+                </div>
+            </div>
+
+            <div class="section">
+                <span class="section-title">6. Term and Termination</span>
+                <div class="section-content">
+                    <p>This partnership will commence on <strong>{{commencementDate}}</strong>, and will continue until terminated by mutual agreement or upon the incapacity of one of the partners.</p>
+                </div>
+            </div>
+
+            <div class="section">
+                <span class="section-title">7. Dispute Resolution</span>
+                <div class="section-content">
+                    <p>{{disputeResolution}}</p>
+                </div>
+            </div>
+
+            <div class="section">
+                <span class="section-title">8. Governing Law</span>
+                <div class="section-content">
+                    <p>{{governingLaw}}</p>
+                </div>
+            </div>
+
+            <div class="section">
+                <span class="section-title">9. Entire Agreement</span>
+                <div class="section-content">
+                    <p>{{entireAgreement}}</p>
+                </div>
+            </div>
+
+            <div class="signature-section">
+                <div class="signature-block">
+                    <p style="font-weight: bold; margin-bottom: 30px;">Partner 1:</p>
+                    <div class="signature-line"></div>
+                    <div class="signature-info">
+                        <p><strong>Name:</strong> {{partner1Name}}</p>
+                        <p><strong>Title:</strong> {{partner1Title}}</p>
+                        <p><strong>Date:</strong> {{commencementDate}}</p>
+                    </div>
+                </div>
+                <div class="signature-block">
+                    <p style="font-weight: bold; margin-bottom: 30px;">Partner 2:</p>
+                    <div class="signature-line"></div>
+                    <div class="signature-info">
+                        <p><strong>Name:</strong> {{partner2Name}}</p>
+                        <p><strong>Title:</strong> {{partner2Title}}</p>
+                        <p><strong>Date:</strong> {{commencementDate}}</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="footer">
+                <p>CONFIDENTIAL BUSINESS DOCUMENT - MM DOCS v1</p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
