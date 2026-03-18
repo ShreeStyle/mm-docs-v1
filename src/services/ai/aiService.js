@@ -211,31 +211,26 @@ Return ONLY valid, richly detailed, FORMALLY WRITTEN JSON document content. No c
 
       INDIAN BUSINESS FORMAT:
       - Use DD/MM/YYYY date format
-      - All amounts in INR (₹) with words in brackets
-      - Include GST applicability note (if applicable)
+      - Include items table with description, quantity, rate, amount
+      - Break down costs into subtotal, taxAmount (GST), othersFee (if any), and totalAmount
       - Professional Indian business language
-      - Include items table, total, GST note, payment terms, validity, bank details
 
-      PRIORITY: If 'items' array is provided in CONTEXT DATA, use it exactly.
-      Return ONLY valid JSON with this structure:
+      PRIORITY: Retain any provided form fields exactly. For 'items', generate a realistic breakdown of products/services based on the 'projectDescription' or 'serviceDescription' if provided.
+      Return ONLY valid JSON with this structure (merge with context data):
       {
-        "title": "Commercial Quotation for ${context.topic || topic}",
-        "quoteNumber": "QTN/${new Date().getFullYear()}/${Date.now().toString().slice(-4)}",
-        "date": "${new Date().toLocaleDateString('en-IN', { day: '2-digit', month: '2-digit', year: 'numeric' })}",
-        "client": "${context.clientName || context.customerName || context.client || '[Client Name]'}",
+        "quotationNumber": "${context.quotationNumber || new Date().getFullYear().toString() + Date.now().toString().slice(-4)}",
+        "customerId": "${context.customerId || 'CUST-'+Date.now().toString().slice(-4)}",
+        "quotationDate": "${context.quotationDate || new Date().toLocaleDateString('en-IN', { day: '2-digit', month: '2-digit', year: 'numeric' })}",
+        "validUntil": "${context.validUntil || '30 days from date'}",
+        "projectDescription": "${context.projectDescription || context.serviceDescription || context.topic || 'Professional Services Engagement'}",
         "items": ${context.items ? JSON.stringify(context.items) : `[
-          { "sno": 1, "description": "${context.description || 'Professional Services'}", "amount": "₹${context.amount || 0}" }
+          { "description": "Phase 1 - Discovery and Strategy Planning", "quantity": 1, "rate": ${context.amount ? context.amount * 0.3 : 15000}, "amount": ${context.amount ? context.amount * 0.3 : 15000} },
+          { "description": "Phase 2 - Execution and Delivery", "quantity": 1, "rate": ${context.amount ? context.amount * 0.7 : 35000}, "amount": ${context.amount ? context.amount * 0.7 : 35000} }
         ]`},
-        "subtotal": "₹${context.subtotal || context.amount || 0}",
-        "gstNote": "GST as applicable shall be charged extra at prevailing rates.",
-        "total": "₹${context.total || context.amount || 0}",
-        "totalInWords": "Rupees [Amount in Words] Only",
-        "paymentTerms": ["50% advance along with purchase order", "50% on completion/delivery"],
-        "validity": "30 days from the date of this quotation",
-        "disclaimer": "This is an AI-generated template. Verify all details and pricing before use.",
-        "signatureBlocks": {
-          "authorised": { "name": "________________", "designation": "Authorised Signatory", "company": "${context.companyName || brandContext.name}", "date": "________________" }
-        }
+        "subtotal": "${context.subtotal || context.amount || 50000}",
+        "taxAmount": "${context.taxAmount || ((context.subtotal || context.amount || 50000) * 0.18)}",
+        "othersFee": "${context.othersFee || 0}",
+        "totalAmount": "${context.totalAmount || ((context.subtotal || context.amount || 50000) * 1.18)}"
       }`;
 
     } else if (effectiveType === "profile") {
@@ -1360,16 +1355,28 @@ const generateMockContent = (type, topic, providedData = {}, brandContext = {}) 
       kpis: ["20% Increase in engagement", "Lower CAC", "Brand lift"]
     };
   } else if (effectiveType === "invoice" || effectiveType === "quotation") {
+    const rawTotal = providedData.totalAmount || providedData.amount || 10000;
+    const subtotal = Math.round(Number(rawTotal) * 0.85);
+    const tax = Math.round(Number(rawTotal) * 0.15);
+    
     return {
       title: `Professional ${topicTitle}`,
-      components: [
-        { component: `${topicTitle} Strategic Planning`, description: "Consultation, deep market analysis, and planning", amount: "$2,500" },
-        { component: "Implementation Engine", description: "Full deployment and integration of the core architecture", amount: "$7,500" }
+      quotationNumber: providedData.quotationNumber || `QTN-${Date.now().toString().slice(-4)}`,
+      customerId: providedData.customerId || "CUST-001",
+      quotationDate: providedData.quotationDate || new Date().toLocaleDateString('en-IN'),
+      validUntil: providedData.validUntil || "30 Days",
+      projectDescription: providedData.projectDescription || providedData.serviceDescription || `Setup and Delivery of ${topicTitle}`,
+      items: [
+        { description: `Strategic Planning for ${topicTitle}`, quantity: 1, rate: subtotal * 0.3, amount: subtotal * 0.3 },
+        { description: "Implementation and execution", quantity: 1, rate: subtotal * 0.7, amount: subtotal * 0.7 }
       ],
-      total: "$10,000",
+      subtotal: subtotal.toString(),
+      taxAmount: tax.toString(),
+      othersFee: "0",
+      totalAmount: rawTotal.toString(),
+      currencySymbol: providedData.currencySymbol || "₹",
       paymentTerms: ["50% Advance", "50% on Go-Live"],
-      validity: "30 days",
-      support: "6 months included"
+      validity: "30 days"
     };
   } else if (effectiveType === "sales email") {
     return {

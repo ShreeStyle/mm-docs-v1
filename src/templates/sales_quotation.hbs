@@ -376,45 +376,41 @@
     </div>
 
     <div class="terms-section">
-        <div class="terms-title">Terms & Conditions</div>
+        <div class="terms-title">Standard Terms & Conditions</div>
         <ol class="terms-list">
-            <li>Prices are valid for {{#if validityDays}}{{validityDays}}{{else}}30{{/if}} days from the quotation date.
-            </li>
-            <li>Payment terms: {{#if paymentTerms}}{{paymentTerms}}{{else}}100% advance before delivery{{/if}}.</li>
-            <li>Delivery: {{#if deliveryTerms}}{{deliveryTerms}}{{else}}Within 7-10 business days after order
-                confirmation{{/if}}.</li>
-            <li>Warranty: {{#if warrantyTerms}}{{warrantyTerms}}{{else}}As per manufacturer's warranty policy{{/if}}.
-            </li>
-            <li>Prices are subject to change without prior notice after validity period expires.</li>
+            <li><strong>Validity:</strong> This quotation remains valid and binding for {{#if validityDays}}{{validityDays}}{{else}}30{{/if}} days from the date of issuance.</li>
+            <li><strong>Payment terms:</strong> {{#if paymentTerms}}{{paymentTerms}}{{else}}To be settled strictly as per the aforementioned schedule. Standard terms dictate 100% advance execution unless mutually agreed otherwise.{{/if}}</li>
+            <li><strong>Fulfillment & Delivery:</strong> {{#if deliveryTerms}}{{deliveryTerms}}{{else}}Estimated delivery within 7-10 business days following order confirmation, subject to inventory availability and operational bandwidth.{{/if}}</li>
+            <li><strong>Warranty & Support:</strong> {{#if warrantyTerms}}{{warrantyTerms}}{{else}}Covered comprehensively under the prevailing standard manufacturer's warranty policies.{{/if}}</li>
+            <li><strong>Liability & Revisions:</strong> Prices and specifications are subject to review and potential structural changes should the scope of work or market conditions be significantly altered post-acceptance.</li>
         </ol>
     </div>
 
     <div class="accept-section">
-        <div class="accept-title">Client Acceptance</div>
-        <p style="font-size: 12px; color: #065f46; margin-bottom: 12px;">By signing below, I accept this quotation and
-            agree to the terms stated above.</p>
+        <div class="accept-title">Authorization & Acceptance</div>
+        <p style="font-size: 12px; color: #065f46; margin-bottom: 12px;">By affixing my signature below, I acknowledge that I am duly authorized to accept this formal quotation on behalf of my organization and commit to the outlined terms and conditions.</p>
         <div class="accept-grid">
             <div class="accept-field">
-                <div class="label">Client Signature</div>
+                <div class="label">Authorized Signature</div>
                 <div class="line"></div>
             </div>
             <div class="accept-field">
-                <div class="label">Date</div>
+                <div class="label">Date of Acceptance</div>
                 <div class="line"></div>
             </div>
             <div class="accept-field">
-                <div class="label">Name</div>
+                <div class="label">Printed Name & Title</div>
                 <div class="line"></div>
             </div>
             <div class="accept-field">
-                <div class="label">PO Number (if any)</div>
+                <div class="label">Purchase Order No. (If Applicable)</div>
                 <div class="line"></div>
             </div>
         </div>
     </div>
 
     <div class="footer">
-        <p>Thank you for your business. {{companyName}}</p>
+        <p>We sincerely appreciate the opportunity to serve your business needs. Should you require any further clarification, please do not hesitate to contact us. <br>&copy; {{companyName}}</p>
     </div>
 </body>
 
