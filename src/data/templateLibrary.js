@@ -131,6 +131,32 @@ const TEMPLATE_LIBRARY = {
 
     invoices: [
         {
+            id: "invoice_professional",
+            title: "Professional Business Invoice",
+            category: "invoice",
+            description: "Elite corporate invoice with structured items and bank details",
+            tags: ["professional", "corporate", "finance"],
+            content: {
+                invoiceNumber: "01234",
+                invoiceDate: "2024-03-18",
+                dueDate: "2024-04-18",
+                clientName: "Client Name",
+                clientCompany: "Client Company",
+                clientAddress: "Client Address",
+                bankName: "HDFC Bank",
+                accountName: "MM Docs Private Limited",
+                accountNumber: "50200012345678",
+                items: [
+                    { description: "Professional Services", unitPrice: 100, qty: 1, total: 100 }
+                ],
+                subtotal: 100,
+                taxPercentage: 10,
+                taxAmount: 10,
+                totalAmount: 110,
+                signatureName: "Authorized Signatory"
+            }
+        },
+        {
             id: "invoice_consulting",
             title: "Consulting Services Invoice",
             category: "invoice",

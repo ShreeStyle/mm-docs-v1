@@ -1830,13 +1830,18 @@ export default function Dashboard() {
                 // Finance Documents
                 invoice: [
                     ...commonFields,
-                    { id: 'clientName', label: 'Client Name', type: 'text', placeholder: 'e.g. XYZ Corporation', required: true },
-                    { id: 'clientAddress', label: 'Client Address', type: 'textarea', placeholder: 'Complete billing address', required: true },
-                    { id: 'invoiceNumber', label: 'Invoice Number', type: 'text', placeholder: 'e.g. INV-2026-001', required: true },
+                    { id: 'clientName', label: 'Client Name', type: 'text', placeholder: 'e.g. Richard Sanchez', required: true },
+                    { id: 'clientCompany', label: 'Client Company', type: 'text', placeholder: 'e.g. Thynk Unlimited', required: true },
+                    { id: 'clientAddress', label: 'Client Address', type: 'textarea', placeholder: 'e.g. 123 Anywhere St., Any City', required: true },
+                    { id: 'invoiceNumber', label: 'Invoice Number', type: 'text', placeholder: 'e.g. 01234', required: true },
                     { id: 'invoiceDate', label: 'Invoice Date', type: 'date', required: true },
                     { id: 'dueDate', label: 'Due Date', type: 'date', required: true },
-                    { id: 'totalAmount', label: 'Total Amount (₹)', type: 'number', placeholder: 'e.g. 118000', required: true },
-                    { id: 'serviceDescription', label: 'Service/Product Description', type: 'textarea', placeholder: 'Detailed description of services or products', required: true }
+                    { id: 'bankName', label: 'Bank Name', type: 'text', placeholder: 'e.g. Borcele Bank', required: true },
+                    { id: 'accountName', label: 'Account Name', type: 'text', placeholder: 'e.g. Adeline Palmerston', required: true },
+                    { id: 'accountNumber', label: 'Account No.', type: 'text', placeholder: 'e.g. 0123 4567 8901', required: true },
+                    { id: 'invoiceItems', label: 'Invoice Items', type: 'textarea', placeholder: 'Describe items: e.g. Brand consultation 100 1\nLogo design 100 1', required: true },
+                    { id: 'taxPercentage', label: 'Tax Percentage (%)', type: 'number', placeholder: 'e.g. 10', required: true },
+                    { id: 'signatureName', label: 'Signature Name', type: 'text', placeholder: 'e.g. Adeline Palmerston', required: true }
                 ],
                 purchase_order: [
                     ...commonFields,
@@ -2083,30 +2088,31 @@ Authorized Signatory          Authorized Signatory
                 invoice: {
                     title: 'Invoice',
                     content: `
-INVOICE
+INVOICE # ${formData.invoiceNumber || '01234'}
 
-${formData.companyName || '[Company Name]'}
-${formData.companyAddress || '[Company Address]'}
-
-BILL TO:
+ISSUED TO:
 ${formData.clientName || '[Client Name]'}
+${formData.clientCompany || '[Client Company]'}
 ${formData.clientAddress || '[Client Address]'}
 
-Invoice #: ${formData.invoiceNumber || 'INV-' + new Date().getFullYear() + '-' + Math.floor(Math.random() * 10000).toString().padStart(4, '0')}
-Invoice Date: ${formData.invoiceDate || currentDate}
+PAY TO:
+${formData.bankName || '[Bank Name]'}
+Account Name: ${formData.accountName || '[Account Name]'}
+Account No.: ${formData.accountNumber || '[Account Number]'}
+
+DETAILS:
+Date: ${formData.invoiceDate || currentDate}
 Due Date: ${formData.dueDate || '[Due Date]'}
 
-DESCRIPTION:
-${formData.serviceDescription || '[Service/Product Description]'}
+ITEMS:
+${formData.invoiceItems || '[Line Items Description]'}
 
-AMOUNT: ₹${formData.totalAmount ? Number(formData.totalAmount).toLocaleString() : '[Total Amount]'}
-
-PAYMENT TERMS:
-${formData.paymentTerms || 'Payment is due within 30 days of invoice date. Late payments may incur additional charges.'}
+Tax: ${formData.taxPercentage || '0'}%
 
 Thank you for your business!
 
-${formData.companyName || '[Company Name]'}
+Best regards,
+${formData.signatureName || '[Signature Name]'}
                     `
                 },
                 business_proposal: {

@@ -920,83 +920,38 @@ Return ONLY valid, richly detailed, FORMALLY WRITTEN JSON document content. No c
       const context = { ...providedData, ...inputData };
       console.log(`📋 Consolidated context for invoice:`, context);
 
-      userPrompt = `Generate a GST-COMPLIANT, INDIAN-STANDARD Tax Invoice using the following context:
+      userPrompt = `Generate a LITERAL, PROFESSIONAL Invoice that matches an elite corporate standard. 
       
       CONTEXT DATA:
       ${JSON.stringify(context, null, 2)}
 
-      INDIAN GST COMPLIANCE (Rule 46):
-      - Invoice number MUST be unique serial for the financial year
-      - Date in DD/MM/YYYY format
-      - Supplier name, address, and GSTIN (mandatory)
-      - Recipient name, address, and GSTIN (if registered)
-      - Place of Supply (State)
-      - HSN/SAC codes for each item
-      - Description, Quantity/Unit, Rate per unit
-      - Taxable Value for each item
-      - CGST/SGST rates and amounts (intra-state) OR IGST rate and amount (inter-state)
-      - Total Amount in figures AND words (INR)
-      - Bank details section for payment
-      - All amounts in INR (₹)
+      STRICT INSTRUCTIONS:
+      - Use "ISSUED TO:", "PAY TO:", "INVOICE NO:", "DATE:", "DUE DATE:" as terminology.
+      - **CRITICAL**: Parse 'invoiceItems' into a JSON array 'items'. Each object { description, unitPrice, qty, total }.
+      - Calculate 'subtotal', 'taxAmount' (using ${context.taxPercentage || 10}%), and 'totalAmount'.
+      - Ensure 'signatureName' is included for the bottom signature.
 
-      PRIORITY: If 'items' array is provided in CONTEXT DATA, use it exactly.
-
-      Return ONLY valid JSON with this structure:
+      Return ONLY valid JSON:
       {
-        "title": "Tax Invoice",
-        "invoiceNumber": "${context.invoiceNumber || 'INV/' + new Date().getFullYear() + '-' + (new Date().getFullYear() + 1).toString().slice(-2) + '/' + Date.now().toString().slice(-4)}",
-        "invoiceDate": "${context.invoiceDate || new Date().toLocaleDateString('en-IN', { day: '2-digit', month: '2-digit', year: 'numeric' })}",
-        "placeOfSupply": "${context.placeOfSupply || '[State Name]'}",
-        "from": {
-          "company": "${context.fromCompany || brandContext.name}",
-          "address": "${context.fromAddress || '[Registered Office Address]'}",
-          "gstin": "${context.fromGSTIN || context.gstNumber || '[Supplier GSTIN]'}",
-          "pan": "${context.fromPAN || '[PAN Number]'}",
-          "stateCode": "${context.fromStateCode || '[State Code]'}"
-        },
-        "to": {
-          "client": "${context.toClient || context.client || context.customerName || context.clientName || '[Client/Buyer Name]'}",
-          "address": "${context.toAddress || '[Client Address]'}",
-          "gstin": "${context.toGSTIN || context.clientGST || '[Client GSTIN (if registered)]'}",
-          "stateCode": "${context.toStateCode || '[State Code]'}"
-        },
-        "items": ${context.items ? JSON.stringify(context.items) : `[
-          {
-            "sno": 1,
-            "description": "${context.description || 'Professional Services'}",
-            "hsnSac": "${context.hsnSac || '998311'}",
-            "quantity": "${context.quantity || 1}",
-            "unit": "${context.unit || 'Nos'}",
-            "rate": "${context.rate || context.amount || 0}",
-            "taxableValue": "${context.amount || 0}",
-            "cgstRate": "9%",
-            "cgstAmount": "0",
-            "sgstRate": "9%",
-            "sgstAmount": "0"
-          }
-        ]`},
-        "subtotal": "${context.subtotal || context.amount || 0}",
-        "cgstTotal": "${context.cgstTotal || 0}",
-        "sgstTotal": "${context.sgstTotal || 0}",
-        "igstTotal": "${context.igstTotal || 0}",
-        "total": "${context.total || context.amount || 0}",
-        "totalInWords": "Rupees [Amount in Words] Only",
-        "dueDate": "${context.dueDate || context.duedate || '[Due Date in DD/MM/YYYY]'}",
-        "paymentTerms": "${context.paymentTerms || 'Net 30 days from invoice date'}",
-        "bankDetails": {
-          "bankName": "${context.bankName || '[Bank Name]'}",
-          "accountNumber": "${context.accountNumber || '[A/c Number]'}",
-          "ifscCode": "${context.ifscCode || '[IFSC Code]'}",
-          "branch": "${context.branch || '[Branch Name]'}"
-        },
-        "notes": "${context.notes || 'Thank you for your business. Payment is due as per terms mentioned above.'}",
-        "disclaimer": "This is an AI-generated template document. Verify all tax calculations and GST compliance with a qualified CA before use.",
-        "signatureBlocks": {
-          "authorised": { "name": "________________", "designation": "Authorised Signatory", "company": "${context.fromCompany || brandContext.name}", "date": "________________" }
-        }
+        "invoiceNumber": "${context.invoiceNumber || '01234'}",
+        "invoiceDate": "${context.invoiceDate || '11.02.2030'}",
+        "dueDate": "${context.dueDate || '11.03.2030'}",
+        "clientName": "${context.clientName || 'Richard Sanchez'}",
+        "clientCompany": "${context.clientCompany || 'Thynk Unlimited'}",
+        "clientAddress": "${context.clientAddress || '123 Anywhere St., Any City'}",
+        "bankName": "${context.bankName || 'Borcele Bank'}",
+        "accountName": "${context.accountName || 'Adeline Palmerston'}",
+        "accountNumber": "${context.accountNumber || '0123 4567 8901'}",
+        "items": [
+           { "description": "Brand consultation", "unitPrice": 100, "qty": 1, "total": 100 }
+        ],
+        "subtotal": 100,
+        "taxPercentage": ${context.taxPercentage || 10},
+        "taxAmount": 10,
+        "totalAmount": 110,
+        "signatureName": "${context.signatureName || 'Adeline Palmerston'}"
       }`;
-
-    } else if (effectiveType === "purchase_order") {
+  } else if (effectiveType === "purchase_order") {
       // Parse structured input data
       const inputData = {};
       if (topic.includes('|')) {
@@ -1455,7 +1410,54 @@ const generateMockContent = (type, topic, providedData = {}, brandContext = {}) 
       ],
       kpis: ["20% Increase in engagement", "Lower CAC", "Brand lift"]
     };
-  } else if (effectiveType === "invoice" || effectiveType === "quotation") {
+  } else if (effectiveType === "invoice") {
+    console.log(`📝 Building invoice fallback with data:`, providedData);
+    const taxRate = parseFloat(providedData.taxPercentage) || 10;
+    
+    // Parse items from generic text if possible
+    let items = [];
+    if (providedData.invoiceItems) {
+      const lines = providedData.invoiceItems.split('\n');
+      lines.forEach(line => {
+        // Simple parser: "Description text 100 2" -> {desc: "Description text", price: 100, qty: 2}
+        const parts = line.trim().split(/\s+/);
+        if (parts.length >= 3) {
+          const qty = parseFloat(parts.pop()) || 1;
+          const price = parseFloat(parts.pop()) || 0;
+          const desc = parts.join(' ');
+          items.push({ description: desc, unitPrice: price, qty: qty, total: price * qty });
+        }
+      });
+    }
+
+    if (items.length === 0) {
+      items = [
+        { description: topicTitle || "Professional Services", unitPrice: providedData.amount || 100, qty: 1, total: providedData.amount || 100 }
+      ];
+    }
+
+    const subtotal = items.reduce((sum, item) => sum + item.total, 0);
+    const taxAmount = (subtotal * taxRate) / 100;
+    const totalAmount = subtotal + taxAmount;
+
+    return {
+      invoiceNumber: providedData.invoiceNumber || "01234",
+      invoiceDate: providedData.invoiceDate || new Date().toLocaleDateString('en-IN'),
+      dueDate: providedData.dueDate || new Date().toLocaleDateString('en-IN'),
+      clientName: providedData.clientName || "[Client Name]",
+      clientCompany: providedData.clientCompany || "[Client Company]",
+      clientAddress: providedData.clientAddress || "[Client Address]",
+      bankName: providedData.bankName || "[Bank Name]",
+      accountName: providedData.accountName || "[Account Name]",
+      accountNumber: providedData.accountNumber || "[Account Number]",
+      items: items,
+      subtotal: subtotal,
+      taxPercentage: taxRate,
+      taxAmount: taxAmount,
+      totalAmount: totalAmount,
+      signatureName: providedData.signatureName || brandContext.name || "[Name]"
+    };
+  } else if (effectiveType === "quotation") {
     const rawTotal = providedData.totalAmount || providedData.amount || 10000;
     const subtotal = Math.round(Number(rawTotal) * 0.85);
     const tax = Math.round(Number(rawTotal) * 0.15);
