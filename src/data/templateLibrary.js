@@ -731,6 +731,29 @@ const TEMPLATE_LIBRARY = {
                     "Estimated timeline: 16-20 weeks"
                 ]
             }
+        },
+        {
+            id: "sales_contract_camera",
+            title: "Professional Sales Contract",
+            category: "sales_contract",
+            description: "Standard sales contract for goods and products",
+            tags: ["sales", "contract", "legal", "goods"],
+            content: {
+                contractDate: "October 24, 2024",
+                sellerName: "Daniel Gallego",
+                sellerHandle: "@reallygreatsite",
+                sellerAddress: "123 Business Road,\nMumbai, Maharashtra 400001",
+                buyerName: "Korina Villanueva",
+                buyerHandle: "@reallygreatsite",
+                buyerAddress: "456 Resident Avenue,\nBangalore, Karnataka 560001",
+                productName: "Vintage Camera",
+                condition: "Excellent / Refurbished",
+                quantity: "1",
+                price: "1200",
+                paymentTerms: "The Buyer agrees to pay the full purchase price of ₹1,200 upon delivery of the Product. Payment shall be made via digital transfer or cash as agreed.",
+                deliveryTerms: "The Seller agrees to deliver the Product to the Buyer's specified address within 3 working days of the contract date.",
+                warrantyTerms: "The Seller guarantees that the Product is in the stated condition. A 30-day functional warranty is provided from the date of delivery."
+            }
         }
     ],
 

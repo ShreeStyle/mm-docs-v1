@@ -233,6 +233,56 @@ Return ONLY valid, richly detailed, FORMALLY WRITTEN JSON document content. No c
         "totalAmount": "${context.totalAmount || ((context.subtotal || context.amount || 50000) * 1.18)}"
       }`;
 
+    } else if (effectiveType === "sales_contract") {
+      // Parse structured input data
+      const inputData = {};
+      if (topic.includes('|')) {
+        topic.split('|').forEach(pair => {
+          const [key, value] = pair.split(':').map(s => s.trim());
+          if (key && value) {
+            inputData[key.toLowerCase().replace(/\s+/g, '')] = value;
+          }
+        });
+      }
+
+      // Merge with providedData from frontend form
+      const context = { ...providedData, ...inputData };
+      console.log(`📋 Consolidated context for sales_contract:`, context);
+
+      userPrompt = `Generate a LEGALLY ROBUST, FORMAL SALES CONTRACT using the following context:
+      
+      CONTEXT DATA:
+      ${JSON.stringify(context, null, 2)}
+
+      TONE REQUIREMENT: Use strictly formal, executive legal language. 
+      - Use phrases like "The Buyer shall...", "Subject to...", "Notwithstanding any other provision...".
+      - NO conversational language. NO generic descriptions. 
+      - Draft actual, binding contractual clauses for Payment, Delivery, and Warranty.
+      - Ensure the wording is "perfect professional" as per elite corporate standards.
+
+      Return ONLY valid JSON with this exact structure (merge with context data):
+      {
+        "contractDate": "${new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}",
+        "sellerName": "${context.sellerName || context.companyName || brandContext.name || '[Seller Name]'}",
+        "sellerHandle": "${context.sellerHandle || ''}",
+        "sellerAddress": "${context.companyAddress || brandContext.address || '[Seller Address]'}",
+        "buyerName": "${context.buyerName || context.clientName || '[Buyer Name]'}",
+        "buyerHandle": "${context.buyerHandle || ''}",
+        "buyerAddress": "${context.buyerAddress || context.clientAddress || '[Buyer Address]'}",
+        "productName": "${context.productName || context.productDescription || '[Product Name]'}",
+        "condition": "${context.condition || '[Condition]'}",
+        "quantity": "${context.quantity || '1'}",
+        "price": "${context.price || context.totalAmount || '[Price]'}",
+        "paymentTerms": "Draft a highly professional, formal payment clause: ${context.paymentTerms || 'Standard terms'}",
+        "deliveryTerms": "Draft a formal delivery and risk of loss clause: ${context.deliveryTerms || context.deliveryDate || 'Standard delivery'}",
+        "warrantyTerms": "Draft a formal warranty or 'as-is' disclaimer clause: ${context.warrantyTerms || context.warrantyPeriod || 'Limited warranty'}",
+        "sections": [
+          { "heading": "Indemnification", "content": "Generate a detailed professional clause on mutual indemnification." },
+          { "heading": "Limitation of Liability", "content": "Generate a sophisticated limitation of liability clause." },
+          { "heading": "Confidentiality", "content": "Generate a brief but formal confidentiality clause regarding the contract terms." }
+        ]
+      }`;
+
     } else if (effectiveType === "profile") {
       // Parse structured input data
       const inputData = {};
@@ -2276,6 +2326,28 @@ We appreciate the cooperation and assistance provided by management and staff th
       filingPlace: providedData.filingPlace || "[Location]",
       
       generatedDate: currentDate
+    };
+  } else if (effectiveType === "sales_contract") {
+    console.log('📝 Building sales contract fallback with data:', providedData);
+    return {
+      contractDate: providedData.contractDate || new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }),
+      sellerName: providedData.sellerName || providedData.companyName || brandContext.name || "[Seller Name]",
+      sellerHandle: providedData.sellerHandle || "",
+      sellerAddress: providedData.companyAddress || brandContext.address || "[Seller Address]",
+      buyerName: providedData.buyerName || providedData.clientName || "[Buyer Name]",
+      buyerHandle: providedData.buyerHandle || "",
+      buyerAddress: providedData.buyerAddress || providedData.clientAddress || "[Buyer Address]",
+      productName: providedData.productName || providedData.productDescription || "[Product Name]",
+      condition: providedData.condition || "[Condition]",
+      quantity: providedData.quantity || "1",
+      price: providedData.price || providedData.totalAmount || "[Price]",
+      paymentTerms: providedData.paymentTerms || "The Buyer shall remit the full Purchase Price to the Seller upon the execution of this Agreement and prior to the delivery of the Product. All payments shall be made in immediately available funds without any deduction or set-off.",
+      deliveryTerms: providedData.deliveryTerms || providedData.deliveryDate || "The Seller shall arrange for the delivery of the Product to the Buyer's designated facility within seven (7) business days of the Effective Date. Risk of loss and title shall pass to the Buyer upon delivery.",
+      warrantyTerms: providedData.warrantyTerms || providedData.warrantyPeriod || "The Product is sold on an 'as-is' and 'where-is' basis. The Seller makes no express or implied warranties regarding the Product's merchantability or fitness for any particular purpose, and all such warranties are hereby expressly disclaimed.",
+      sections: [
+        { heading: "INDEMNIFICATION", content: "Each Party shall indemnify, defend, and hold harmless the other Party from and against any and all claims, damages, liabilities, and expenses arising out of or related to a breach of this Agreement by the indemnifying Party." },
+        { heading: "LIMITATION OF LIABILITY", content: "To the maximum extent permitted by applicable law, neither Party shall be liable for any indirect, incidental, special, or consequential damages arising out of or in connection with this Agreement, regardless of the cause of action." }
+      ]
     };
   } else {
     return {

@@ -1781,14 +1781,20 @@ export default function Dashboard() {
                 ],
                 sales_contract: [
                     ...commonFields,
-                    { id: 'buyerName', label: 'Buyer Name', type: 'text', placeholder: 'e.g. ABC Corporation', required: true },
+                    { id: 'sellerName', label: 'Seller Name', type: 'text', placeholder: 'e.g. Daniel Gallego', required: true },
+                    { id: 'sellerHandle', label: 'Seller @Handle', type: 'text', placeholder: 'e.g. @reallygreatsite', required: false },
+                    { id: 'buyerName', label: 'Buyer Name', type: 'text', placeholder: 'e.g. Korina Villanueva', required: true },
+                    { id: 'buyerHandle', label: 'Buyer @Handle', type: 'text', placeholder: 'e.g. @reallygreatsite', required: false },
                     { id: 'buyerAddress', label: 'Buyer Address', type: 'textarea', placeholder: 'Complete buyer address', required: true },
-                    { id: 'productDescription', label: 'Product/Service Description', type: 'textarea', placeholder: 'Detailed description of goods or services', required: true },
-                    { id: 'quantity', label: 'Quantity', type: 'text', placeholder: 'e.g. 100 units', required: true },
-                    { id: 'totalAmount', label: 'Total Contract Value (₹)', type: 'number', placeholder: 'e.g. 2500000', required: true },
-                    { id: 'deliveryDate', label: 'Delivery Date', type: 'date', required: true },
-                    { id: 'paymentTerms', label: 'Payment Terms', type: 'textarea', placeholder: 'e.g. 30% advance, 70% on delivery', required: true }
+                    { id: 'productName', label: 'Product Name', type: 'text', placeholder: 'e.g. Vintage Camera', required: true },
+                    { id: 'condition', label: 'Product Condition', type: 'text', placeholder: 'e.g. Excellent', required: true },
+                    { id: 'quantity', label: 'Quantity', type: 'text', placeholder: 'e.g. 1', required: true },
+                    { id: 'price', label: 'Price (₹)', type: 'number', placeholder: 'e.g. 1200', required: true },
+                    { id: 'paymentTerms', label: 'Payment Terms', type: 'textarea', placeholder: 'e.g. The Buyer agrees to pay...', required: true },
+                    { id: 'deliveryTerms', label: 'Delivery Terms', type: 'textarea', placeholder: 'e.g. The Seller agrees to deliver...', required: true },
+                    { id: 'warrantyTerms', label: 'Warranty Terms', type: 'textarea', placeholder: 'e.g. The Seller guarantees...', required: true }
                 ],
+
                 partnership_agreement: [
                     ...commonFields,
                     { id: 'partnerName', label: 'Partner Name', type: 'text', placeholder: 'e.g. John Doe / XYZ Corp', required: true },
@@ -2171,32 +2177,34 @@ SALES CONTRACT
 Contract Date: ${currentDate}
 Contract #: SC-${new Date().getFullYear()}-${Math.floor(Math.random() * 1000).toString().padStart(3, '0')}
 
-SELLER: ${formData.companyName || '[Company Name]'}
-Address: ${formData.companyAddress || '[Company Address]'}
+SELLER: 
+${formData.sellerName || formData.companyName || '[Seller Name]'}
+${formData.sellerHandle ? formData.sellerHandle + '\n' : ''}${formData.companyAddress || '[Seller Address]'}
 
-BUYER: ${formData.clientName || '[Client Name]'}
-Address: ${formData.clientAddress || '[Client Address]'}
+BUYER: 
+${formData.buyerName || formData.clientName || '[Buyer Name]'}
+${formData.buyerHandle ? formData.buyerHandle + '\n' : ''}${formData.buyerAddress || formData.clientAddress || '[Buyer Address]'}
 
-PRODUCT/SERVICE: ${formData.productDescription || '[Product/Service Description]'}
+1. ITEM DETAILS:
+• Product: ${formData.productName || formData.productDescription || '[Product Name]'}
+• Condition: ${formData.condition || '[Condition]'}
+• Quantity: ${formData.quantity || '1'}
+• Price: ₹${formData.price || formData.totalAmount || '[Price]'}
 
-CONTRACT TERMS:
-• Total Contract Value: ₹${formData.contractValue ? Number(formData.contractValue).toLocaleString() : '[Contract Value]'}
-• Delivery Date: ${formData.deliveryDate || '[Delivery Date]'}
-• Payment Terms: ${formData.paymentTerms || '[Payment Terms]'}
-• Warranty Period: ${formData.warrantyPeriod || '[Warranty Period]'}
+2. PAYMENT TERMS:
+${formData.paymentTerms || '[Payment Terms]'}
 
-TERMS AND CONDITIONS:
-1. This contract is binding upon both parties
-2. Any modifications must be in writing and signed by both parties
-3. Delivery shall be made to the specified address
-4. Payment shall be made as per agreed terms
+3. DELIVERY:
+${formData.deliveryTerms || formData.deliveryDate || '[Delivery Details]'}
 
-SIGNATURES:
+4. WARRANTY:
+${formData.warrantyTerms || formData.warrantyPeriod || '[Warranty Details]'}
 
-${formData.companyName || '[Company Name]'}    ${formData.clientName || '[Client Name]'}
-_________________________    _________________________
-Authorized Signatory          Authorized Signatory
-Date: _______________         Date: _______________
+AUTHORISED SIGNATURES:
+
+${formData.sellerName || formData.companyName || '[Seller Name]'}              ${formData.buyerName || formData.clientName || '[Buyer Name]'}
+_________________________              _________________________
+Authorized Signatory                   Authorized Signatory
                     `
                 },
                 mou: {

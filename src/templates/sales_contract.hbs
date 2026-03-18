@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sales Contract</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-text: #000000;
+            --secondary-text: #111111;
+            --muted-text: #333333;
+            --border-main: #000000;
+            --border-light: #cccccc;
+        }
+
+        @page {
+            margin: 20mm;
+            size: A4;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, sans-serif;
+            margin: 0;
+            padding: 0;
+            color: var(--primary-text);
+            line-height: 1.6;
+            font-size: 11px; /* Formal contract size */
+            background-color: #ffffff;
+        }
+
+        .document-container {
+            width: 100%;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .header-title {
+            text-align: center;
+            margin-bottom: 40px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            font-weight: 800;
+            font-size: 20px;
+            border-bottom: 2px solid var(--border-main);
+            padding-bottom: 10px;
+        }
+
+        .meta-container {
+            width: 100%;
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: flex-end;
+            font-weight: 600;
+        }
+
+        .meta-box {
+            text-align: right;
+            border: 1px solid var(--border-main);
+            padding: 10px 15px;
+        }
+
+        .agreement-intro {
+            margin-bottom: 30px;
+            text-align: justify;
+            font-size: 11px;
+        }
+
+        .section {
+            margin-bottom: 20px;
+        }
+
+        .section-header {
+            font-weight: 700;
+            text-transform: uppercase;
+            text-decoration: underline;
+            margin-bottom: 10px;
+            display: block;
+            font-size: 12px;
+        }
+
+        .section-content {
+            padding-left: 20px;
+        }
+
+        .product-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+        }
+
+        .product-table th, .product-table td {
+            border: 1px solid var(--border-main);
+            padding: 8px 12px;
+            text-align: left;
+        }
+
+        .product-table th {
+            background-color: #f5f5f5;
+            text-transform: uppercase;
+            font-size: 10px;
+        }
+
+        .numbered-list {
+            padding-left: 0;
+            list-style-type: none;
+            counter-reset: clause-counter;
+        }
+
+        .numbered-list > li {
+            position: relative;
+            padding-left: 40px;
+            margin-bottom: 15px;
+            text-align: justify;
+        }
+
+        .numbered-list > li::before {
+            content: counter(clause-counter) ". ";
+            counter-increment: clause-counter;
+            position: absolute;
+            left: 0;
+            font-weight: 700;
+        }
+
+        .sub-clause {
+            margin-top: 10px;
+            list-style-type: lower-alpha;
+        }
+
+        .sub-clause li {
+            margin-bottom: 5px;
+        }
+
+        .formal-text {
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .signature-intro {
+            margin-top: 60px;
+            margin-bottom: 40px;
+            font-style: italic;
+        }
+
+        .signature-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 60px;
+            page-break-inside: avoid;
+        }
+
+        .signature-block {
+            border-top: 1.5px solid var(--border-main);
+            padding-top: 10px;
+        }
+
+        .signature-label {
+            font-size: 10px;
+            text-transform: uppercase;
+            font-weight: 700;
+            margin-bottom: 20px;
+            display: block;
+        }
+
+        .signature-field {
+            margin-bottom: 15px;
+            display: flex;
+            align-items: baseline;
+        }
+
+        .field-label {
+            min-width: 80px;
+            font-size: 10px;
+        }
+
+        .field-value {
+            border-bottom: 1px dotted var(--border-light);
+            flex-grow: 1;
+            padding-bottom: 2px;
+            font-weight: 600;
+        }
+
+        .footer {
+            margin-top: 100px;
+            border-top: 1px solid var(--border-light);
+            padding-top: 20px;
+            text-align: center;
+            font-size: 9px;
+            color: var(--muted-text);
+        }
+
+        /* Prevent page breaks inside important sections */
+        .no-break {
+            page-break-inside: avoid;
+        }
+    </style>
+</head>
+<body>
+    <div class="document-container">
+        <div class="header-title">Sales Contract</div>
+
+        <div class="meta-container">
+            <div class="meta-box">
+                Agreement No: SC-{{year}}-{{random_id}}<br>
+                Date: {{contractDate}}
+            </div>
+        </div>
+
+        <div class="agreement-intro">
+            THIS SALES CONTRACT (the <span class="formal-text">"Agreement"</span>) is made and entered into as of this {{contractDate}} (the <span class="formal-text">"Effective Date"</span>), by and between:
+            <br><br>
+            <span class="formal-text">{{sellerName}}</span>, {{#if sellerHandle}}{{sellerHandle}}, {{/if}}with its registered office located at {{{sellerAddress}}} (hereinafter referred to as the <span class="formal-text">"Seller"</span>);
+            <br><br>
+            <span class="formal-text">AND</span>
+            <br><br>
+            <span class="formal-text">{{buyerName}}</span>, {{#if buyerHandle}}{{buyerHandle}}, {{/if}}located at {{{buyerAddress}}} (hereinafter referred to as the <span class="formal-text">"Buyer"</span>).
+            <br><br>
+            (The Seller and the Buyer are each referred to herein as a <span class="formal-text">"Party"</span> and collectively as the <span class="formal-text">"Parties"</span>).
+        </div>
+
+        <ol class="numbered-list">
+            <li>
+                <span class="formal-text">SUBJECT MATTER OF SALE</span>
+                <p>The Seller hereby agrees to sell, and the Buyer hereby agrees to purchase, the following product(s) (the "Product") subject to the terms and conditions set forth in this Agreement:</p>
+                <table class="product-table">
+                    <thead>
+                        <tr>
+                            <th>Description of Goods</th>
+                            <th>Condition</th>
+                            <th>Quantity</th>
+                            <th>Unit Price</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>{{productName}}</strong></td>
+                            <td>{{condition}}</td>
+                            <td>{{quantity}}</td>
+                            <td>₹{{price}}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </li>
+
+            <li>
+                <span class="formal-text">PURCHASE PRICE AND PAYMENT</span>
+                <p>The total purchase price for the Product shall be <span class="formal-text">₹{{price}}</span> (the "Purchase Price"). The Buyer shall satisfy the Purchase Price according to the following payment terms:</p>
+                <div class="section-content">
+                    {{{paymentTerms}}}
+                </div>
+            </li>
+
+            <li>
+                <span class="formal-text">DELIVERY AND TITLE</span>
+                <p>The Seller shall deliver the Product to the Buyer in accordance with the following logistics and delivery specifications:</p>
+                <div class="section-content">
+                    {{{deliveryTerms}}}
+                </div>
+                <p>Title to and risk of loss of the Product shall pass to the Buyer upon delivery to the specified destination.</p>
+            </li>
+
+            <li>
+                <span class="formal-text">WARRANTY AND REPRESENTATIONS</span>
+                <p>The Seller provides the following warranties and representations concerning the Product's quality, condition, and fitness for purpose:</p>
+                <div class="section-content">
+                    {{{warrantyTerms}}}
+                </div>
+            </li>
+
+            {{#if sections}}
+                {{#each sections}}
+                <li>
+                    <span class="formal-text">{{this.heading}}</span>
+                    <p>{{{this.content}}}</p>
+                </li>
+                {{/each}}
+            {{/if}}
+
+            <li>
+                <span class="formal-text">GOVERNING LAW</span>
+                <p>This Agreement shall be governed by and construed in accordance with the laws of India. Any disputes arising out of or in connection with this Agreement shall be subject to the exclusive jurisdiction of the courts located in India.</p>
+            </li>
+        </ol>
+
+        <div class="signature-intro">
+            IN WITNESS WHEREOF, the Parties have executed this Agreement by their duly authorized representatives as of the Effective Date first written above.
+        </div>
+
+        <div class="signature-grid">
+            <div class="signature-block">
+                <span class="signature-label">FOR AND ON BEHALF OF THE SELLER</span>
+                <div class="signature-field">
+                    <span class="field-label">Signature:</span>
+                    <div class="field-value"></div>
+                </div>
+                <div class="signature-field">
+                    <span class="field-label">Name:</span>
+                    <div class="field-value">{{sellerName}}</div>
+                </div>
+                <div class="signature-field">
+                    <span class="field-label">Title:</span>
+                    <div class="field-value">Authorized Signatory</div>
+                </div>
+                <div class="signature-field">
+                    <span class="field-label">Date:</span>
+                    <div class="field-value">{{contractDate}}</div>
+                </div>
+            </div>
+
+            <div class="signature-block">
+                <span class="signature-label">FOR AND ON BEHALF OF THE BUYER</span>
+                <div class="signature-field">
+                    <span class="field-label">Signature:</span>
+                    <div class="field-value"></div>
+                </div>
+                <div class="signature-field">
+                    <span class="field-label">Name:</span>
+                    <div class="field-value">{{buyerName}}</div>
+                </div>
+                <div class="signature-field">
+                    <span class="field-label">Title:</span>
+                    <div class="field-value">Authorized Signatory</div>
+                </div>
+                <div class="signature-field">
+                    <span class="field-label">Date:</span>
+                    <div class="field-value">{{contractDate}}</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">
+            CONFIDENTIAL BUSINESS DOCUMENT &copy; {{year}} {{sellerName}}. All Rights Reserved.
+            <br>
+            Template generated by MM Docs ProfessionalDocAI system.
+        </div>
+    </div>
+</body>
+</html>

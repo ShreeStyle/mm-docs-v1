@@ -158,6 +158,7 @@ const getTemplateForDocumentType = (documentType) => {
     'business_proposal': 'proposal',
     'business-proposal': 'proposal',
     'business-proposal-001': 'proposal',
+    'sales_contract': 'sales_contract',
     'quotation': 'quotation',
     'invoice': 'invoice',
     'gst_invoice': 'gst_invoice',
