@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Eye, Loader2, ArrowLeft } from 'lucide-react';
 import { api } from '../utils/api';
 import { BASE_URL } from '../config/api';
+import Handlebars from 'handlebars';
 
 const TemplatesPage = () => {
     const navigate = useNavigate();
@@ -108,20 +109,20 @@ const TemplatesPage = () => {
         console.log('🎨 PDF URL:', template.pdfUrl);
 
         const getPreviewContent = () => {
-            let content = template.content || '';
+            const content = template.content || '';
 
-            // Replace placeholders with realistic professional sample data
-            const sampleData = {
+            // Realistic professional sample data
+            const previewData = {
                 // Invoice specific
                 clientName: 'ABC Corporation Pvt Ltd',
-                clientAddress: '123 Business Street<br>Mumbai, Maharashtra - 400001<br>India',
+                clientAddress: '123 Business Street\nMumbai, Maharashtra - 400001\nIndia',
                 invoiceNumber: 'INV-2024-001',
                 invoiceDate: new Date().toLocaleDateString('en-IN'),
                 dueDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toLocaleDateString('en-IN'),
                 totalAmount: '1,18,000',
-                serviceDescription: 'Professional Software Development Services<br>• Web Application Development<br>• API Integration<br>• Database Design & Implementation',
+                serviceDescription: 'Professional Software Development Services\n• Web Application Development\n• API Integration\n• Database Design & Implementation',
                 companyName: 'Your Company Ltd',
-                companyAddress: 'Tech Park, Sector 5<br>Bangalore, Karnataka - 560001<br>India',
+                companyAddress: 'Tech Park, Sector 5\nBangalore, Karnataka - 560001\nIndia',
                 companyPhone: '+91-9876543210',
                 companyEmail: 'billing@yourcompany.com',
                 gstNumber: '29ABCDE1234F1Z5',
@@ -158,33 +159,41 @@ const TemplatesPage = () => {
 
                 // Legal templates
                 partyName: 'Business Partner Corp',
-                partyAddress: '456 Corporate Avenue<br>Delhi, NCR - 110001<br>India',
+                partyAddress: '456 Corporate Avenue\nDelhi, NCR - 110001\nIndia',
                 effectiveDate: '2024-03-01',
                 duration: '2',
                 purpose: 'Joint software development project for enterprise solutions',
 
+                // Purchase Order
+                poDate: new Date().toLocaleDateString('en-IN'),
+                poNumber: 'PO-123456',
+                vendorCompanyName: 'GLOBAL SUPPLIES INC.',
+                vendorContact: 'Sales Dept',
+                vendorAddress: '789 Industrial Way\nMumbai, MH 400001',
+                shipToName: 'Warehouse Manager',
+                shipToAddress: '321 Receiving Lane\nBangalore, KA 560001',
+                requisitioner: 'Alice Smith',
+                shipVia: 'UPS Ground',
+                fob: 'Destination',
+                shippingTerms: 'Net 30',
+                items: [
+                    { itemNumber: 'SKU-001', description: 'Product Alpha', quantity: 10, unitPrice: '150.00', total: '1,500.00' },
+                    { itemNumber: 'SKU-002', description: 'Product Beta', quantity: 5, unitPrice: '200.00', total: '1,000.00' }
+                ],
+                tax: '150.00',
+                shipping: '50.00',
+                total: '2,700.00',
+
                 currentDate: new Date().toLocaleDateString('en-IN')
             };
 
-            // Replace all placeholders with sample data
-            Object.keys(sampleData).forEach(key => {
-                const regex = new RegExp(`{{${key}}}`, 'g');
-                content = content.replace(regex, sampleData[key]);
-            });
-
-            // Handle Handlebars conditional blocks for preview
-            content = content.replace(/{{#if\s+[\w.]+}}([\s\S]*?){{\/if}}/g, '$1');
-            content = content.replace(/{{#unless\s+[\w.]+}}([\s\S]*?){{\/unless}}/g, '');
-            content = content.replace(/{{else}}[\s\S]*?(?={{\/if}})/g, '');
-            content = content.replace(/{{#each\s+[\w.]+}}([\s\S]*?){{\/each}}/g, '$1');
-
-            // Remove any remaining Handlebars syntax
-            content = content.replace(/{{[^}]*}}/g, '');
-
-            // Clean up extra whitespace
-            content = content.replace(/\n\s*\n\s*\n/g, '\n\n');
-
-            return content;
+            try {
+                const compiledTemplate = Handlebars.compile(content);
+                return compiledTemplate(previewData);
+            } catch (e) {
+                console.error('Error rendering template preview:', e);
+                return `<div style="color: red; padding: 20px;">Preview Error: ${e.message}</div>`;
+            }
         };
 
         return (

@@ -179,7 +179,8 @@ exports.updateDocument = async (req, res) => {
 // Create a new document with AI generation and template rendering
 exports.generateDocument = async (req, res) => {
     try {
-        const { type, topic, title, content: providedData } = req.body;
+        const { type, topic, title, content: rawContent, providedData: pData } = req.body;
+        const providedData = pData || rawContent || {};
         const userId = req.user.id;
 
         console.log(`🚀 Generating document: type=${type}, topic=${topic}, userId=${userId}`);

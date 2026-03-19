@@ -257,13 +257,14 @@
 <body>
     <div class="header">
         <div class="company-info">
-            <div class="company-name">{{#if companyName}}{{companyName}}{{else}}[Company Name]{{/if}}</div>
+            <div class="company-name">ACME Corporation</div>
             <div class="company-details">
-                {{#if companyAddress}}{{{companyAddress}}}{{else}}[Street Address]
-[City, ST ZIP]{{/if}}
-                {{#if companyPhone}}Phone: {{companyPhone}}{{/if}}
-                {{#if companyFax}}Fax: {{companyFax}}{{/if}}
-                {{#if companyWebsite}}Website: {{companyWebsite}}{{/if}}
+                123 Business Way
+Suite 100
+Innovation City, IC 12345
+                Phone: (555) 123-4567
+                Fax: (555) 123-4568
+                Website: www.acme.com
             </div>
         </div>
         <div class="doc-title-container">
@@ -271,11 +272,11 @@
             <table class="po-meta-table">
                 <tr>
                     <td class="label">DATE</td>
-                    <td class="value">{{#if poDate}}{{poDate}}{{else}}9/17/2015{{/if}}</td>
+                    <td class="value">10/25/2024</td>
                 </tr>
                 <tr>
                     <td class="label">PO #</td>
-                    <td class="value">{{#if poNumber}}{{poNumber}}{{else}}[123456]{{/if}}</td>
+                    <td class="value">PO-998877</td>
                 </tr>
             </table>
         </div>
@@ -287,22 +288,22 @@
         <div class="party-box">
             <div class="party-header">VENDOR</div>
             <div class="party-content">
-                {{#if vendorName}}<strong>{{vendorName}}</strong>{{else}}[Company Name]{{/if}}
-                {{#if vendorContact}}{{{vendorContact}}}{{else}}[Contact or Department]{{/if}}
-                {{#if vendorAddress}}{{{vendorAddress}}}{{else}}[Street Address]
-[City, ST ZIP]{{/if}}
-                {{#if vendorPhone}}Phone: {{vendorPhone}}{{/if}}
-                {{#if vendorFax}}Fax: {{vendorFax}}{{/if}}
+                <strong>Global Supplies Inc.</strong>
+                Sales Department
+                789 Industry Blvd
+Manufacturing Town, MT 54321
+                Phone: (444) 987-6543
+                Fax: (444) 987-6544
             </div>
         </div>
         <div class="party-box">
             <div class="party-header">SHIP TO</div>
             <div class="party-content">
-                {{#if shipToName}}<strong>{{shipToName}}</strong>{{else}}[Name]{{/if}}
-                {{#if shipToCompanyName}}{{{shipToCompanyName}}}{{else}}[Company Name]{{/if}}
-                {{#if shipToAddress}}{{{shipToAddress}}}{{else}}[Street Address]
-[City, ST ZIP]{{/if}}
-                {{#if shipToPhone}}Phone: {{shipToPhone}}{{/if}}
+                <strong>Warehouse Manager</strong>
+                ACME Logistics Center
+                321 Shipping Lane
+Distribution Hub, DH 67890
+                Phone: (555) 000-1111
             </div>
         </div>
     </div>
@@ -318,10 +319,10 @@
         </thead>
         <tbody>
             <tr>
-                <td>{{requisitioner}}</td>
-                <td>{{shipVia}}</td>
-                <td>{{fob}}</td>
-                <td>{{shippingTerms}}</td>
+                <td>Alice Smith</td>
+                <td>FedEx Priority</td>
+                <td>Destination</td>
+                <td>Net 30 Days</td>
             </tr>
         </tbody>
     </table>
@@ -337,34 +338,28 @@
             </tr>
         </thead>
         <tbody>
-            {{#if items}}
-                {{#each items}}
                 <tr>
-                    <td class="col-item">{{this.itemNumber}}</td>
-                    <td class="col-desc">{{this.description}}</td>
-                    <td class="col-qty">{{this.quantity}}</td>
-                    <td class="col-price">{{this.unitPrice}}</td>
-                    <td class="col-total">{{this.total}}</td>
-                </tr>
-                {{/each}}
-            {{else}}
-                <tr>
-                    <td class="col-item">[23423423]</td>
-                    <td class="col-desc">Product XYZ</td>
-                    <td class="col-qty">15</td>
-                    <td class="col-price">150.00</td>
-                    <td class="col-total">2,250.00</td>
+                    <td class="col-item">SKU-001</td>
+                    <td class="col-desc">High-Performance Laptops</td>
+                    <td class="col-qty">10</td>
+                    <td class="col-price">1200.00</td>
+                    <td class="col-total">12,000.00</td>
                 </tr>
                 <tr>
-                    <td class="col-item">[45645645]</td>
-                    <td class="col-desc">Product ABC</td>
-                    <td class="col-qty">1</td>
-                    <td class="col-price">75.00</td>
-                    <td class="col-total">75.00</td>
+                    <td class="col-item">SKU-202</td>
+                    <td class="col-desc">Ergonomic Office Chairs</td>
+                    <td class="col-qty">25</td>
+                    <td class="col-price">250.00</td>
+                    <td class="col-total">6,250.00</td>
                 </tr>
-            {{/if}}
+                <tr>
+                    <td class="col-item">SKU-303</td>
+                    <td class="col-desc">Wireless Mechanical Keyboards</td>
+                    <td class="col-qty">50</td>
+                    <td class="col-price">85.00</td>
+                    <td class="col-total">4,250.00</td>
+                </tr>
             
-            {{!-- Empty rows to maintain table structure if few items --}}
             <tr class="empty-row"><td class="col-item"></td><td class="col-desc"></td><td class="col-qty"></td><td class="col-price"></td><td class="col-total">-</td></tr>
             <tr class="empty-row"><td class="col-item"></td><td class="col-desc"></td><td class="col-qty"></td><td class="col-price"></td><td class="col-total">-</td></tr>
             <tr class="empty-row"><td class="col-item"></td><td class="col-desc"></td><td class="col-qty"></td><td class="col-price"></td><td class="col-total">-</td></tr>
@@ -382,23 +377,23 @@
         <table class="totals-table">
             <tr>
                 <td class="label">SUBTOTAL</td>
-                <td>{{#if subtotal}}{{subtotal}}{{else}}2,325.00{{/if}}</td>
+                <td>22,500.00</td>
             </tr>
             <tr>
                 <td class="label">TAX</td>
-                <td>{{#if tax}}{{tax}}{{else}}-{{/if}}</td>
+                <td>1,800.00</td>
             </tr>
             <tr>
                 <td class="label">SHIPPING</td>
-                <td>{{#if shipping}}{{shipping}}{{else}}-{{/if}}</td>
+                <td>350.00</td>
             </tr>
             <tr>
                 <td class="label">OTHER</td>
-                <td>{{#if other}}{{other}}{{else}}-{{/if}}</td>
+                <td>0.00</td>
             </tr>
             <tr class="total-row">
                 <td class="label total-row">TOTAL</td>
-                <td class="total-row-value">$ {{#if total}}{{total}}{{else}}2,325.00{{/if}}</td>
+                <td class="total-row-value">$ 24,650.00</td>
             </tr>
         </table>
     </div>
@@ -406,13 +401,13 @@
     <div class="comments-section">
         <div class="comments-header">Comments or Special Instructions</div>
         <div class="comments-box">
-            {{comments}}
+            Please handle the laptops with care. Deliver to the back entrance of the warehouse.
         </div>
     </div>
 
     <div class="footer">
         <div>If you have any questions about this purchase order, please contact</div>
-        <div class="footer-contact">[{{#if footerContactName}}{{footerContactName}}{{else}}Name{{/if}}, {{#if footerContactPhone}}{{footerContactPhone}}{{else}}Phone #{{/if}}, {{#if footerContactEmail}}{{footerContactEmail}}{{else}}E-mail{{/if}}]</div>
+        <div class="footer-contact">[Procurement Dept, (555) 123-4500, procurement@acme.com]</div>
     </div>
 </body>
 

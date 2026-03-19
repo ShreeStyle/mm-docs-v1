@@ -13,6 +13,7 @@ import {
     TrendingUp, DollarSign, Shield, Users, Bell,
     Filter, Download, Eye, Edit3, Archive, User, Menu, X
 } from 'lucide-react';
+import Handlebars from 'handlebars';
 
 const LogoIcon = () => (
     <svg width="24" height="24" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -1641,6 +1642,67 @@ export default function Dashboard() {
     const DocumentGenerationPage = () => {
         const [formData, setFormData] = useState({});
         const [isGenerating, setIsGenerating] = useState(false);
+        const [smartFillText, setSmartFillText] = useState('');
+
+        const handleSmartFill = () => {
+            if (!smartFillText.trim()) return;
+
+            const newFormData = { ...formData };
+            
+            // Standardize field IDs for mapping
+            const fieldMap = {
+                'company name': 'companyName',
+                'company address': 'companyAddress',
+                'vendor name': 'vendorName',
+                'vendor address': 'vendorAddress',
+                'vendor contact': 'vendorContact',
+                'ship to name': 'shipToName',
+                'ship to company': 'shipToCompanyName',
+                'ship to address': 'shipToAddress',
+                'ship to phone': 'shipToPhone',
+                'po number': 'poNumber',
+                'po#': 'poNumber',
+                'purchase order number': 'poNumber',
+                'po date': 'poDate',
+                'requisitioner': 'requisitioner',
+                'ship via': 'shipVia',
+                'fob': 'fob',
+                'shipping terms': 'shippingTerms',
+                'terms': 'shippingTerms',
+                'tax rate': 'taxRate',
+                'tax': 'taxRate',
+                'shipping cost': 'shippingCost',
+                'shipping': 'shippingCost',
+                'other charges': 'otherCharges',
+                'comments': 'comments'
+            };
+
+            // Parse "Key: Value" or "Key - Value" patterns
+            const lines = smartFillText.split(/,|\n/);
+            lines.forEach(line => {
+                const parts = line.split(/:|-|：/);
+                if (parts.length >= 2) {
+                    const key = parts[0].trim().toLowerCase();
+                    const value = parts.slice(1).join(':').trim();
+                    
+                    if (fieldMap[key]) {
+                        newFormData[fieldMap[key]] = value;
+                    }
+                }
+            });
+
+            // Special handling for poItems (multiline)
+            if (smartFillText.includes('po items:')) {
+                const poItemsMatch = smartFillText.match(/po items:\s*([\s\S]*?)(?=,|$)/i);
+                if (poItemsMatch && poItemsMatch[1]) {
+                    newFormData.poItems = poItemsMatch[1].trim();
+                }
+            }
+
+            setFormData(newFormData);
+            setSmartFillText('');
+            alert('✨ Form fields updated based on your input!');
+        };
 
         // Get form fields based on document type
         const getFormFields = () => {
@@ -1847,11 +1909,22 @@ export default function Dashboard() {
                     ...commonFields,
                     { id: 'vendorName', label: 'Vendor Name', type: 'text', placeholder: 'e.g. ABC Suppliers Pvt. Ltd.', required: true },
                     { id: 'vendorAddress', label: 'Vendor Address', type: 'textarea', placeholder: 'Complete vendor address', required: true },
-                    { id: 'poNumber', label: 'Purchase Order Number', type: 'text', placeholder: 'e.g. PO-2026-001', required: true },
+                    { id: 'vendorContact', label: 'Vendor Contact / Dept', type: 'text', placeholder: 'e.g. Sales Department', required: false },
+                    { id: 'shipToName', label: 'Ship To (Name)', type: 'text', placeholder: 'e.g. Receiver Name', required: true },
+                    { id: 'shipToCompanyName', label: 'Ship To (Company)', type: 'text', placeholder: 'e.g. Acme Corp', required: false },
+                    { id: 'shipToAddress', label: 'Ship To Address', type: 'textarea', placeholder: 'Complete delivery address', required: true },
+                    { id: 'shipToPhone', label: 'Ship To Phone', type: 'text', placeholder: 'e.g. +91-98765-43210', required: false },
+                    { id: 'poNumber', label: 'Purchase Order #', type: 'text', placeholder: 'e.g. PO-2026-001', required: true },
                     { id: 'poDate', label: 'PO Date', type: 'date', required: true },
-                    { id: 'deliveryDate', label: 'Expected Delivery Date', type: 'date', required: true },
-                    { id: 'itemDescription', label: 'Items Description', type: 'textarea', placeholder: 'Detailed description of items to be purchased', required: true },
-                    { id: 'totalAmount', label: 'Total Amount (₹)', type: 'number', placeholder: 'e.g. 500000', required: true }
+                    { id: 'requisitioner', label: 'Requisitioner', type: 'text', placeholder: 'e.g. Name of requester', required: false },
+                    { id: 'shipVia', label: 'Ship Via', type: 'text', placeholder: 'e.g. FedEx / Surface', required: false },
+                    { id: 'fob', label: 'F.O.B.', type: 'text', placeholder: 'e.g. Shipping point', required: false },
+                    { id: 'shippingTerms', label: 'Shipping Terms', type: 'text', placeholder: 'e.g. Net 30', required: false },
+                    { id: 'poItems', label: 'Order Items (One per line)', type: 'textarea', placeholder: 'Format: ITEM# | DESCRIPTION | QTY | UNIT PRICE\ne.g. 101 | Laptop | 2 | 50000', required: true },
+                    { id: 'taxRate', label: 'Tax Rate (%)', type: 'number', placeholder: 'e.g. 18', required: false },
+                    { id: 'shippingCost', label: 'Shipping Cost (₹)', type: 'number', placeholder: 'e.g. 500', required: false },
+                    { id: 'otherCharges', label: 'Other Charges (₹)', type: 'number', placeholder: 'e.g. 100', required: false },
+                    { id: 'comments', label: 'Comments or Special Instructions', type: 'textarea', placeholder: 'Any additional instructions for the vendor', required: false }
                 ],
                 receipt: [
                     ...commonFields,
@@ -2506,6 +2579,141 @@ For ${formData.companyName || '[Company Name]'}         CONSULTANT
 _________________________         _________________________
 Authorized Signatory              ${formData.consultantName || '[Name]'}
                     `
+                },
+                purchase_order: {
+                    title: 'Purchase Order',
+                    content: (() => {
+                        const items = (formData.poItems || '').split('\n')
+                            .filter(line => line.trim())
+                            .map(line => {
+                                const parts = line.split('|').map(s => s.trim());
+                                const itemNo = parts[0] || '';
+                                const desc = parts[1] || '';
+                                const qty = parseFloat(parts[2]) || 0;
+                                const price = parseFloat(parts[3]) || 0;
+                                return { itemNo, desc, qty, price, total: qty * price };
+                            });
+                        
+                        const subtotal = items.reduce((sum, item) => sum + item.total, 0);
+                        const tax = subtotal * (parseFloat(formData.taxRate) / 100 || 0);
+                        const shipping = parseFloat(formData.shippingCost) || 0;
+                        const other = parseFloat(formData.otherCharges) || 0;
+                        const grandTotal = subtotal + tax + shipping + other;
+
+                        return (
+                            <div style={{ width: '100%', fontFamily: 'Inter, system-ui, sans-serif', whiteSpace: 'normal' }}>
+                                <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '20px' }}>
+                                    <div style={{ border: '2px solid #1E40AF', borderRadius: '4px', overflow: 'hidden' }}>
+                                        <div style={{ display: 'flex', borderBottom: '1px solid #1E40AF' }}>
+                                            <div style={{ backgroundColor: '#EFF6FF', padding: '4px 8px', fontSize: '11px', fontWeight: 'bold', borderRight: '1px solid #1E40AF', color: '#1E40AF' }}>DATE</div>
+                                            <div style={{ padding: '4px 12px', fontSize: '13px' }}>{formData.poDate || new Date().toLocaleDateString()}</div>
+                                        </div>
+                                        <div style={{ display: 'flex' }}>
+                                            <div style={{ backgroundColor: '#EFF6FF', padding: '4px 8px', fontSize: '11px', fontWeight: 'bold', borderRight: '1px solid #1E40AF', color: '#1E40AF' }}>PO #</div>
+                                            <div style={{ padding: '4px 12px', fontSize: '13px', fontWeight: 'bold' }}>{formData.poNumber || '[Enter PO#]'}</div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '30px', marginBottom: '30px' }}>
+                                    <div style={{ padding: '15px', border: '1px solid #E5E7EB', borderRadius: '8px' }}>
+                                        <h4 style={{ color: '#1E40AF', margin: '0 0 10px 0', borderBottom: '2px solid #1E40AF', fontSize: '12px', paddingBottom: '4px' }}>VENDOR</h4>
+                                        <div style={{ fontSize: '13px', lineHeight: '1.4' }}>
+                                            <p style={{ margin: '0', fontWeight: 'bold' }}>{formData.vendorName || '[Vendor Name]'}</p>
+                                            <p style={{ margin: '0' }}>{formData.vendorAddress || '[Vendor Address]'}</p>
+                                            {formData.vendorContact && <p style={{ margin: '5px 0 0 0', fontStyle: 'italic', fontSize: '11px' }}>Attn: {formData.vendorContact}</p>}
+                                        </div>
+                                    </div>
+                                    <div style={{ padding: '15px', border: '1px solid #E5E7EB', borderRadius: '8px' }}>
+                                        <h4 style={{ color: '#1E40AF', margin: '0 0 10px 0', borderBottom: '2px solid #1E40AF', fontSize: '12px', paddingBottom: '4px' }}>SHIP TO</h4>
+                                        <div style={{ fontSize: '13px', lineHeight: '1.4' }}>
+                                            <p style={{ margin: '0', fontWeight: 'bold' }}>{formData.shipToName || '[Receiver Name]'}</p>
+                                            {formData.shipToCompanyName && <p style={{ margin: '0', fontWeight: '600' }}>{formData.shipToCompanyName}</p>}
+                                            <p style={{ margin: '0' }}>{formData.shipToAddress || '[Ship To Address]'}</p>
+                                            {formData.shipToPhone && <p style={{ margin: '5px 0 0 0', fontSize: '11px' }}>Ph: {formData.shipToPhone}</p>}
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1fr', backgroundColor: '#F8FAFC', padding: '10px', borderRadius: '4px', marginBottom: '25px', border: '1px solid #E2E8F0' }}>
+                                    <div style={{ borderRight: '1px solid #CBD5E1', padding: '0 10px' }}>
+                                        <label style={{ fontSize: '9px', fontWeight: 'bold', color: '#64748B', display: 'block', textTransform: 'uppercase' }}>Requisitioner</label>
+                                        <div style={{ fontSize: '12px' }}>{formData.requisitioner || '-'}</div>
+                                    </div>
+                                    <div style={{ borderRight: '1px solid #CBD5E1', padding: '0 10px' }}>
+                                        <label style={{ fontSize: '9px', fontWeight: 'bold', color: '#64748B', display: 'block', textTransform: 'uppercase' }}>Ship Via</label>
+                                        <div style={{ fontSize: '12px' }}>{formData.shipVia || '-'}</div>
+                                    </div>
+                                    <div style={{ borderRight: '1px solid #CBD5E1', padding: '0 10px' }}>
+                                        <label style={{ fontSize: '9px', fontWeight: 'bold', color: '#64748B', display: 'block', textTransform: 'uppercase' }}>F.O.B.</label>
+                                        <div style={{ fontSize: '12px' }}>{formData.fob || '-'}</div>
+                                    </div>
+                                    <div style={{ padding: '0 10px' }}>
+                                        <label style={{ fontSize: '9px', fontWeight: 'bold', color: '#64748B', display: 'block', textTransform: 'uppercase' }}>Terms</label>
+                                        <div style={{ fontSize: '12px' }}>{formData.shippingTerms || '-'}</div>
+                                    </div>
+                                </div>
+
+                                <table style={{ width: '100%', borderCollapse: 'collapse', marginBottom: '30px' }}>
+                                    <thead>
+                                        <tr style={{ backgroundColor: '#1E40AF', color: 'white' }}>
+                                            <th style={{ padding: '10px', textAlign: 'left', fontSize: '11px', fontWeight: 'bold' }}>ITEM #</th>
+                                            <th style={{ padding: '10px', textAlign: 'left', fontSize: '11px', fontWeight: 'bold' }}>DESCRIPTION</th>
+                                            <th style={{ padding: '10px', textAlign: 'center', fontSize: '11px', fontWeight: 'bold' }}>QTY</th>
+                                            <th style={{ padding: '10px', textAlign: 'right', fontSize: '11px', fontWeight: 'bold' }}>UNIT PRICE</th>
+                                            <th style={{ padding: '10px', textAlign: 'right', fontSize: '11px', fontWeight: 'bold' }}>TOTAL</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {items.length > 0 ? items.map((item, idx) => (
+                                            <tr key={idx} style={{ borderBottom: '1px solid #E2E8F0' }}>
+                                                <td style={{ padding: '10px', fontSize: '12px' }}>{item.itemNo}</td>
+                                                <td style={{ padding: '10px', fontSize: '12px' }}>{item.desc}</td>
+                                                <td style={{ padding: '10px', textAlign: 'center', fontSize: '12px' }}>{item.qty}</td>
+                                                <td style={{ padding: '10px', textAlign: 'right', fontSize: '12px' }}>₹{item.price.toLocaleString()}</td>
+                                                <td style={{ padding: '10px', textAlign: 'right', fontSize: '12px', fontWeight: '600' }}>₹{item.total.toLocaleString()}</td>
+                                            </tr>
+                                        )) : (
+                                            <tr>
+                                                <td colSpan="5" style={{ padding: '30px', textAlign: 'center', color: '#94A3B8', fontSize: '13px', fontStyle: 'italic' }}>Enter items in the form to see the populated table.</td>
+                                            </tr>
+                                        )}
+                                    </tbody>
+                                </table>
+
+                                <div style={{ display: 'grid', gridTemplateColumns: '1.5fr 1fr', gap: '40px' }}>
+                                    <div style={{ padding: '15px', backgroundColor: '#F8FAFC', borderRadius: '6px', border: '1px dashed #CBD5E1' }}>
+                                        <h5 style={{ margin: '0 0 8px 0', fontSize: '10px', color: '#64748B', fontWeight: 'bold' }}>SPECIAL INSTRUCTIONS</h5>
+                                        <div style={{ fontSize: '12px', lineHeight: '1.5', color: '#475569' }}>{formData.comments || 'No special instructions.'}</div>
+                                    </div>
+                                    <div>
+                                        <div style={{ display: 'flex', justifyContent: 'space-between', padding: '6px 0', fontSize: '13px', color: '#475569' }}>
+                                            <span>Subtotal</span>
+                                            <span>₹{subtotal.toLocaleString()}</span>
+                                        </div>
+                                        <div style={{ display: 'flex', justifyContent: 'space-between', padding: '6px 0', fontSize: '13px', color: '#475569' }}>
+                                            <span>Tax ({formData.taxRate || 0}%)</span>
+                                            <span>₹{tax.toLocaleString()}</span>
+                                        </div>
+                                        <div style={{ display: 'flex', justifyContent: 'space-between', padding: '6px 0', fontSize: '13px', color: '#475569' }}>
+                                            <span>Shipping</span>
+                                            <span>₹{shipping.toLocaleString()}</span>
+                                        </div>
+                                        {other > 0 && (
+                                            <div style={{ display: 'flex', justifyContent: 'space-between', padding: '6px 0', fontSize: '13px', color: '#475569' }}>
+                                                <span>Other</span>
+                                                <span>₹{other.toLocaleString()}</span>
+                                            </div>
+                                        )}
+                                        <div style={{ display: 'flex', justifyContent: 'space-between', padding: '12px 10px', marginTop: '10px', backgroundColor: '#1E40AF', borderRadius: '4px', color: 'white', fontWeight: 'bold', fontSize: '15px' }}>
+                                            <span>TOTAL</span>
+                                            <span>₹{grandTotal.toLocaleString()}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        );
+                    })()
                 }
             };
 
@@ -2690,6 +2898,66 @@ Authorized Signatory              ${formData.consultantName || '[Name]'}
                         </h3>
 
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+                            {/* Smart Fill Section */}
+                            <div style={{
+                                padding: '16px',
+                                backgroundColor: '#F0F9FF',
+                                border: '1px solid #BAE6FD',
+                                borderRadius: '12px',
+                                marginBottom: '10px'
+                            }}>
+                                <label style={{
+                                    display: 'block',
+                                    fontSize: '13px',
+                                    fontWeight: '700',
+                                    color: '#0369A1',
+                                    marginBottom: '8px',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    gap: '6px'
+                                }}>
+                                    <Sparkles size={14} /> Smart Fill from Prompt
+                                </label>
+                                <textarea
+                                    value={smartFillText}
+                                    onChange={(e) => setSmartFillText(e.target.value)}
+                                    placeholder="Paste your requirements here (e.g., Vendor: ABC, PO#: 123...) then click Auto-fill."
+                                    rows={3}
+                                    style={{
+                                        width: '100%',
+                                        padding: '10px',
+                                        border: '1px solid #93C5FD',
+                                        borderRadius: '8px',
+                                        fontSize: '12px',
+                                        fontFamily: 'Inter, sans-serif',
+                                        resize: 'none',
+                                        outline: 'none',
+                                        marginBottom: '10px'
+                                    }}
+                                />
+                                <button
+                                    onClick={handleSmartFill}
+                                    style={{
+                                        width: '100%',
+                                        padding: '8px',
+                                        backgroundColor: '#0EA5E9',
+                                        color: 'white',
+                                        border: 'none',
+                                        borderRadius: '6px',
+                                        fontSize: '12px',
+                                        fontWeight: '600',
+                                        cursor: 'pointer',
+                                        transition: 'background-color 0.2s'
+                                    }}
+                                    onMouseEnter={(e) => e.target.style.backgroundColor = '#0284C7'}
+                                    onMouseLeave={(e) => e.target.style.backgroundColor = '#0EA5E9'}
+                                >
+                                    Auto-fill Form Fields
+                                </button>
+                                <p style={{ fontSize: '10px', color: '#64748B', marginTop: '6px', textAlign: 'center' }}>
+                                    This will extract details from your text and populate the fields below.
+                                </p>
+                            </div>
                             {validationErrors.length > 0 && (
                                 <div style={{
                                     padding: '12px 16px',
@@ -3172,7 +3440,126 @@ Authorized Signatory              ${formData.consultantName || '[Name]'}
                             color: '#374151',
                             fontFamily: 'Inter, sans-serif'
                         }}>
-                            {typeof generatedDoc.content === 'string' ? (
+                            {generatedDoc.type === 'purchase_order' && generatedDoc.content && typeof generatedDoc.content === 'object' ? (
+                                // Specialized Purchase Order Renderer
+                                <div style={{ width: '100%', whiteSpace: 'normal' }}>
+                                    <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '20px' }}>
+                                        <div style={{ border: '2px solid #1E40AF', borderRadius: '4px', overflow: 'hidden' }}>
+                                            <div style={{ display: 'flex', borderBottom: '1px solid #1E40AF' }}>
+                                                <div style={{ backgroundColor: '#EFF6FF', padding: '4px 8px', fontSize: '11px', fontWeight: 'bold', borderRight: '1px solid #1E40AF', color: '#1E40AF' }}>DATE</div>
+                                                <div style={{ padding: '4px 12px', fontSize: '13px' }}>{generatedDoc.content.poDate || new Date(generatedDoc.createdAt).toLocaleDateString()}</div>
+                                            </div>
+                                            <div style={{ display: 'flex' }}>
+                                                <div style={{ backgroundColor: '#EFF6FF', padding: '4px 8px', fontSize: '11px', fontWeight: 'bold', borderRight: '1px solid #1E40AF', color: '#1E40AF' }}>PO #</div>
+                                                <div style={{ padding: '4px 12px', fontSize: '13px', fontWeight: 'bold' }}>{generatedDoc.content.poNumber || generatedDoc.title}</div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '30px', marginBottom: '30px' }}>
+                                        <div style={{ padding: '15px', border: '1px solid #E5E7EB', borderRadius: '8px' }}>
+                                            <h4 style={{ color: '#1E40AF', margin: '0 0 10px 0', borderBottom: '2px solid #1E40AF', fontSize: '12px', paddingBottom: '4px' }}>VENDOR</h4>
+                                            <div style={{ fontSize: '13px', lineHeight: '1.4' }}>
+                                                <p style={{ margin: '0', fontWeight: 'bold' }}>{generatedDoc.content.vendorName || '[Vendor Name]'}</p>
+                                                <p style={{ margin: '0' }}>{generatedDoc.content.vendorAddress || '[Vendor Address]'}</p>
+                                                {generatedDoc.content.vendorContact && <p style={{ margin: '5px 0 0 0', fontStyle: 'italic', fontSize: '11px' }}>Attn: {generatedDoc.content.vendorContact}</p>}
+                                            </div>
+                                        </div>
+                                        <div style={{ padding: '15px', border: '1px solid #E5E7EB', borderRadius: '8px' }}>
+                                            <h4 style={{ color: '#1E40AF', margin: '0 0 10px 0', borderBottom: '2px solid #1E40AF', fontSize: '12px', paddingBottom: '4px' }}>SHIP TO</h4>
+                                            <div style={{ fontSize: '13px', lineHeight: '1.4' }}>
+                                                <p style={{ margin: '0', fontWeight: 'bold' }}>{generatedDoc.content.shipToName || '[Receiver Name]'}</p>
+                                                {generatedDoc.content.shipToCompanyName && <p style={{ margin: '0', fontWeight: '600' }}>{generatedDoc.content.shipToCompanyName}</p>}
+                                                <p style={{ margin: '0' }}>{generatedDoc.content.shipToAddress || '[Ship To Address]'}</p>
+                                                {generatedDoc.content.shipToPhone && <p style={{ margin: '5px 0 0 0', fontSize: '11px' }}>Ph: {generatedDoc.content.shipToPhone}</p>}
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1fr', backgroundColor: '#F8FAFC', padding: '10px', borderRadius: '4px', marginBottom: '25px', border: '1px solid #E2E8F0' }}>
+                                        <div style={{ borderRight: '1px solid #CBD5E1', padding: '0 10px' }}>
+                                            <label style={{ fontSize: '9px', fontWeight: 'bold', color: '#64748B', display: 'block', textTransform: 'uppercase' }}>Requisitioner</label>
+                                            <div style={{ fontSize: '12px' }}>{generatedDoc.content.requisitioner || '-'}</div>
+                                        </div>
+                                        <div style={{ borderRight: '1px solid #CBD5E1', padding: '0 10px' }}>
+                                            <label style={{ fontSize: '9px', fontWeight: 'bold', color: '#64748B', display: 'block', textTransform: 'uppercase' }}>Ship Via</label>
+                                            <div style={{ fontSize: '12px' }}>{generatedDoc.content.shipVia || '-'}</div>
+                                        </div>
+                                        <div style={{ borderRight: '1px solid #CBD5E1', padding: '0 10px' }}>
+                                            <label style={{ fontSize: '9px', fontWeight: 'bold', color: '#64748B', display: 'block', textTransform: 'uppercase' }}>F.O.B.</label>
+                                            <div style={{ fontSize: '12px' }}>{generatedDoc.content.fob || '-'}</div>
+                                        </div>
+                                        <div style={{ padding: '0 10px' }}>
+                                            <label style={{ fontSize: '9px', fontWeight: 'bold', color: '#64748B', display: 'block', textTransform: 'uppercase' }}>Terms</label>
+                                            <div style={{ fontSize: '12px' }}>{generatedDoc.content.shippingTerms || '-'}</div>
+                                        </div>
+                                    </div>
+
+                                    <table style={{ width: '100%', borderCollapse: 'collapse', marginBottom: '30px' }}>
+                                        <thead>
+                                            <tr style={{ backgroundColor: '#1E40AF', color: 'white' }}>
+                                                <th style={{ padding: '10px', textAlign: 'left', fontSize: '11px', fontWeight: 'bold' }}>ITEM #</th>
+                                                <th style={{ padding: '10px', textAlign: 'left', fontSize: '11px', fontWeight: 'bold' }}>DESCRIPTION</th>
+                                                <th style={{ padding: '10px', textAlign: 'center', fontSize: '11px', fontWeight: 'bold' }}>QTY</th>
+                                                <th style={{ padding: '10px', textAlign: 'right', fontSize: '11px', fontWeight: 'bold' }}>UNIT PRICE</th>
+                                                <th style={{ padding: '10px', textAlign: 'right', fontSize: '11px', fontWeight: 'bold' }}>TOTAL</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {Array.isArray(generatedDoc.content.items) ? generatedDoc.content.items.map((item, idx) => (
+                                                <tr key={idx} style={{ borderBottom: '1px solid #E2E8F0' }}>
+                                                    <td style={{ padding: '10px', fontSize: '12px' }}>{item.itemNumber}</td>
+                                                    <td style={{ padding: '10px', fontSize: '12px' }}>{item.description}</td>
+                                                    <td style={{ padding: '10px', textAlign: 'center', fontSize: '12px' }}>{item.quantity}</td>
+                                                    <td style={{ padding: '10px', textAlign: 'right', fontSize: '12px' }}>₹{Number(item.unitPrice || item.price || 0).toLocaleString()}</td>
+                                                    <td style={{ padding: '10px', textAlign: 'right', fontSize: '12px', fontWeight: '600' }}>₹{Number(item.total).toLocaleString()}</td>
+                                                </tr>
+                                            )) : (
+                                                <tr>
+                                                    <td colSpan="5" style={{ padding: '20px', textAlign: 'center', color: '#6B7280' }}>No items found.</td>
+                                                </tr>
+                                            )}
+                                        </tbody>
+                                    </table>
+
+                                    <div style={{ display: 'grid', gridTemplateColumns: '1.5fr 1fr', gap: '40px' }}>
+                                        <div style={{ padding: '15px', backgroundColor: '#F8FAFC', borderRadius: '6px', border: '1px dashed #CBD5E1' }}>
+                                            <h5 style={{ margin: '0 0 8px 0', fontSize: '10px', color: '#64748B', fontWeight: 'bold' }}>SPECIAL INSTRUCTIONS</h5>
+                                            <div style={{ fontSize: '12px', lineHeight: '1.5', color: '#475569' }}>{generatedDoc.content.comments || 'No special instructions.'}</div>
+                                        </div>
+                                        <div>
+                                            <div style={{ display: 'flex', justifyContent: 'space-between', padding: '6px 0', fontSize: '13px', color: '#475569' }}>
+                                                <span>Subtotal</span>
+                                                <span>₹{Number(generatedDoc.content.subtotal || 0).toLocaleString()}</span>
+                                            </div>
+                                            <div style={{ display: 'flex', justifyContent: 'space-between', padding: '6px 0', fontSize: '13px', color: '#475569' }}>
+                                                <span>Tax</span>
+                                                <span>₹{Number(generatedDoc.content.tax || 0).toLocaleString()}</span>
+                                            </div>
+                                            <div style={{ display: 'flex', justifyContent: 'space-between', padding: '6px 0', fontSize: '13px', color: '#475569' }}>
+                                                <span>Shipping</span>
+                                                <span>₹{Number(generatedDoc.content.shipping || 0).toLocaleString()}</span>
+                                            </div>
+                                            <div style={{ display: 'flex', justifyContent: 'space-between', padding: '12px 10px', marginTop: '10px', backgroundColor: '#1E40AF', borderRadius: '4px', color: 'white', fontWeight: 'bold', fontSize: '15px' }}>
+                                                <span>TOTAL</span>
+                                                <span>₹{Number(generatedDoc.content.total || 0).toLocaleString()}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    {/* Resilience: Render any additional sections if the AI returned them */}
+                                    {Array.isArray(generatedDoc.content.sections) && generatedDoc.content.sections.length > 0 && (
+                                        <div style={{ marginTop: '30px', borderTop: '1px solid #E2E8F0', paddingTop: '20px' }}>
+                                            {generatedDoc.content.sections.map((section, sIdx) => (
+                                                <div key={sIdx} style={{ marginBottom: '20px' }}>
+                                                    <h4 style={{ fontSize: '13px', fontWeight: 'bold', color: '#1E40AF', marginBottom: '8px', textTransform: 'uppercase' }}>{section.heading}</h4>
+                                                    <div style={{ fontSize: '12px', lineHeight: '1.6', color: '#334155' }}>{section.content}</div>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    )}
+                                </div>
+                            ) : typeof generatedDoc.content === 'string' ? (
                                 // Handle string content
                                 generatedDoc.content.split('\n').map((line, i) => (
                                     <p key={i} style={{
@@ -3345,42 +3732,13 @@ Authorized Signatory              ${formData.consultantName || '[Name]'}
     }
 
     // Templates Page - Professional Template Management
+    // Templates Page - Professional Template Management
     const TemplatesPage = () => {
         const [selectedCategory, setSelectedCategory] = useState('all');
         const [selectedTemplate, setSelectedTemplate] = useState(null);
         const [previewMode, setPreviewMode] = useState(false);
         const [templates, setTemplates] = useState([]);
         const [loading, setLoading] = useState(true);
-
-        // Fetch templates from API on mount
-        useEffect(() => {
-            fetchTemplatesFromAPI();
-        }, [selectedCategory]);
-
-        const fetchTemplatesFromAPI = async () => {
-            try {
-                setLoading(true);
-                const params = selectedCategory !== 'all' ? `?category=${selectedCategory}` : '';
-                const response = await api.get(`/templates${params}`);
-                
-                if (response.success) {
-                    console.log('✅ Fetched templates:', response.data);
-                    setTemplates(response.data);
-                } else {
-                    console.error('Failed to fetch templates:', response);
-                }
-            } catch (error) {
-                console.error('Error fetching templates:', error);
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        // Debug logging for preview mode
-        useEffect(() => {
-            console.log('📊 PreviewMode changed:', previewMode);
-            console.log('📋 SelectedTemplate:', selectedTemplate?.name || 'null');
-        }, [previewMode, selectedTemplate]);
 
         const templateCategories = {
             all: 'All Templates',
@@ -3391,14 +3749,67 @@ Authorized Signatory              ${formData.consultantName || '[Name]'}
             compliance: 'Compliance Documents'
         };
 
-        const getAllTemplates = () => {
-            return templates;
+        const previewData = {
+            companyName: 'Media Masala Pvt Ltd',
+            companyAddress: 'Unit 402, Business Bay, Mumbai 400001',
+            companyEmail: 'contact@mediamasala.com',
+            companyPhone: '+91 22 1234 5678',
+            clientName: 'Global Solutions Corp',
+            clientAddress: '123 Tech Park, Bangalore 560001',
+            clientEmail: 'info@globalsolutions.com',
+            date: new Date().toLocaleDateString(),
+            currentDate: new Date().toLocaleDateString(),
+            poNumber: 'PO-2024-001',
+            poDate: new Date().toLocaleDateString(),
+            vendorCompanyName: 'Global Supplies Inc',
+            vendorAddress: '789 Industry Parkway, Mumbai 400018',
+            vendorContact: 'John Doe',
+            shipToName: 'Warehouse Manager',
+            shipToAddress: 'Plot 42, SEZ Zone, Bangalore 560066',
+            requisitioner: 'Alice Smith',
+            shipVia: 'Surface Transport',
+            fob: 'Destination',
+            shippingTerms: 'Net 30',
+            items: [
+                { itemNumber: 'SKU-001', description: 'Enterprise Server Rack', quantity: 2, unitPrice: '45,000.00', totalPrice: '90,000.00' },
+                { itemNumber: 'SKU-002', description: 'Network Switch 48-Port', quantity: 5, unitPrice: '12,000.00', totalPrice: '60,000.00' }
+            ],
+            subtotal: '1,50,000.00',
+            tax: '27,000.00',
+            shipping: '5,000.00',
+            totalAmount: '1,82,000.00',
+            invoiceNumber: 'INV-2024-884',
+            employeeName: 'Rahul Sharma',
+            candidateName: 'Priya Patel',
+            position: 'Senior Product Manager',
+            department: 'Product Strategy',
+            salary: '₹35,00,000 PA',
+            startDate: 'April 1, 2026',
+            reportingTo: 'Siddharth Mehta',
+            partyName: 'Innovation Labs Inc',
+            effectiveDate: 'March 15, 2026',
+            duration: '3 years',
+            purpose: 'AI document processing partnership exploration'
         };
 
+        useEffect(() => {
+            const fetchTemplates = async () => {
+                try {
+                    setLoading(true);
+                    const params = selectedCategory !== 'all' ? `?category=${selectedCategory}` : '';
+                    const response = await api.get(`/templates${params}`);
+                    if (response.success) setTemplates(response.data);
+                } catch (error) {
+                    console.error('Error fetching templates:', error);
+                } finally {
+                    setLoading(false);
+                }
+            };
+            fetchTemplates();
+        }, [selectedCategory]);
+
         const handleTemplateSelect = (template) => {
-            // For PDF templates, download directly
             if (template.templateType === 'pdf') {
-                console.log('📥 Downloading PDF template:', template.pdfUrl);
                 const link = document.createElement('a');
                 link.href = `${BASE_URL}${template.pdfUrl}`;
                 link.download = `${template.name}.pdf`;
@@ -3408,1056 +3819,57 @@ Authorized Signatory              ${formData.consultantName || '[Name]'}
                 document.body.removeChild(link);
                 return;
             }
-
-            console.log('🔴 REDIRECTING TO EDITOR:', template.name);
-            console.trace('Called from:');
-            // Find the category for this template
-            const templateCategory = template.category;
-
-            // Set the states in the main Dashboard component
-            setSelectedCategory(templateCategory);
             setSelectedDocType(template.id);
-            // Go directly to document generation page with form
             setCurrentView('generate-document');
         };
 
         const handlePreviewTemplate = (template) => {
-            console.log('🟢 OPENING PREVIEW MODAL:', template.name);
-            console.log('Current previewMode:', previewMode);
             setSelectedTemplate(template);
             setPreviewMode(true);
-            console.log('PreviewMode set to true');
         };
 
         const closePreview = () => {
-            setSelectedTemplate(null);
             setPreviewMode(false);
+            setSelectedTemplate(null);
         };
 
-        // Preview Modal Component
         const PreviewModal = ({ template, onClose }) => {
-            console.log('🎭 PreviewModal rendering with template:', template?.name || 'null');
             if (!template) return null;
-
-            // Sample data for template preview (realistic examples)
-            const placeholderData = {
-                offer_letter: {
-                    candidateName: 'Sarah Johnson',
-                    position: 'Senior Software Engineer',
-                    salary: '$120,000 per annum',
-                    startDate: 'April 15, 2026',
-                    department: 'Engineering',
-                    companyName: 'Tech Innovations Inc.',
-                    companyAddress: '123 Silicon Valley Blvd, San Francisco, CA 94105'
-                },
-                appointment_letter: {
-                    employeeName: 'Michael Chen',
-                    position: 'Project Manager',
-                    department: 'Operations',
-                    appointmentDate: 'March 10, 2026',
-                    companyName: 'Global Solutions Ltd.',
-                    companyAddress: '456 Business Park, New York, NY 10001'
-                },
-                experience_certificate: {
-                    employeeName: 'Priya Sharma',
-                    position: 'Marketing Specialist',
-                    joiningDate: 'January 15, 2023',
-                    relievingDate: 'February 28, 2026',
-                    companyName: 'Digital Marketing Hub',
-                    companyAddress: '789 Corporate Ave, Austin, TX 78701'
-                },
-                warning_letter: {
-                    employeeName: 'James Wilson',
-                    violationType: 'Repeated Tardiness',
-                    incidentDescription: 'This letter is to formally address concerns regarding your repeated late arrivals to work over the past three weeks.',
-                    companyName: 'Professional Services Corp.',
-                    companyAddress: '321 Executive Plaza, Boston, MA 02101'
-                },
-                onboarding_letter: {
-                    employeeName: 'Emily Martinez',
-                    position: 'Data Analyst',
-                    startDate: 'April 1, 2026',
-                    orientation: 'Your orientation will take place on April 1st at 9:00 AM in Conference Room A. You will meet with HR, IT, and your team lead.',
-                    companyName: 'Analytics Pro Inc.',
-                    companyAddress: '555 Data Drive, Seattle, WA 98101'
-                },
-                nda: {
-                    partyName: 'Acme Technologies LLC',
-                    effectiveDate: 'March 1, 2026',
-                    duration: '3 years',
-                    purpose: 'Protection of confidential business information and trade secrets related to software development projects',
-                    companyName: 'SecureCode Solutions',
-                    companyAddress: '888 Privacy Lane, Denver, CO 80202'
-                },
-                terms_of_service: {
-                    serviceName: 'CloudSync Platform',
-                    effectiveDate: 'January 1, 2026',
-                    serviceDescription: 'Cloud-based file synchronization and collaboration platform for teams',
-                    userObligations: 'Users must maintain account security, use service lawfully, and respect intellectual property rights',
-                    restrictions: 'No unauthorized access, no malicious uploads, no redistribution of licensed content',
-                    companyName: 'CloudSync Inc.',
-                    companyAddress: '777 Cloud Street, Portland, OR 97201'
-                },
-                privacy_policy: {
-                    serviceName: 'DataGuard App',
-                    effectiveDate: 'February 1, 2026',
-                    dataCollected: 'Name, email address, usage data, device information, cookies',
-                    dataUsage: 'Service improvement, personalization, analytics, customer support',
-                    dataSecurity: 'AES-256 encryption, secure servers, regular security audits, GDPR compliance',
-                    contactEmail: 'privacy@dataguard.com',
-                    companyName: 'DataGuard Technologies',
-                    companyAddress: '999 Security Blvd, Chicago, IL 60601'
-                },
-                mou: {
-                    partyName: 'Innovation Labs Ltd.',
-                    partyAddress: '234 Research Park, Cambridge, MA 02139',
-                    effectiveDate: 'March 15, 2026',
-                    purpose: 'Collaborative research and development in artificial intelligence applications',
-                    duration: '2 years with option to extend',
-                    companyName: 'Future Tech Corp.',
-                    companyAddress: '456 Innovation Way, Palo Alto, CA 94301'
-                },
-                service_agreement: {
-                    clientName: 'Retail Solutions Inc.',
-                    serviceType: 'IT Infrastructure Management and Support',
-                    duration: '12 months',
-                    terms: 'Monthly retainer of $5,000, 24/7 support, 4-hour response time, quarterly reviews',
-                    companyName: 'TechSupport Pro',
-                    companyAddress: '678 Service Road, Dallas, TX 75201'
-                },
-                business_proposal: {
-                    clientName: 'Metro City Council',
-                    projectTitle: 'Smart City Infrastructure Deployment',
-                    projectValue: '$2.5 Million',
-                    timeline: '18 months from project initiation',
-                    companyName: 'Urban Tech Solutions',
-                    companyAddress: '890 City Center, Los Angeles, CA 90012'
-                },
-                sales_contract: {
-                    buyerName: 'Greenfield Manufacturing Co.',
-                    buyerAddress: '432 Industrial Park, Detroit, MI 48201',
-                    productDescription: '500 Units of Premium Steel Components (Model XB-2000)',
-                    quantity: '500 units',
-                    totalAmount: '$85,000',
-                    deliveryDate: 'May 30, 2026',
-                    paymentTerms: '50% advance, 50% upon delivery',
-                    companyName: 'Superior Components Inc.',
-                    companyAddress: '111 Manufacturing Ave, Pittsburgh, PA 15201'
-                },
-                partnership_agreement: {
-                    partnerName: 'Jennifer Thompson',
-                    partnerAddress: '789 Business Square, Miami, FL 33101',
-                    businessName: 'Coastal Ventures LLC',
-                    businessType: 'Real Estate Development',
-                    capitalContribution: 'Partner A: $200,000, Partner B: $200,000',
-                    profitSharingRatio: '50:50',
-                    effectiveDate: 'April 1, 2026',
-                    companyName: 'Coastal Ventures LLC',
-                    companyAddress: '789 Business Square, Miami, FL 33101'
-                },
-                quotation: {
-                    clientName: 'Bright Future Enterprises',
-                    quotationNumber: 'QT-2026-0145',
-                    totalAmount: '$15,750',
-                    validUntil: 'April 15, 2026',
-                    companyName: 'Professional Services Ltd.',
-                    companyAddress: '222 Commerce Street, Phoenix, AZ 85001'
-                },
-                invoice: {
-                    clientName: 'Sunshine Retail Corp.',
-                    invoiceNumber: 'INV-2026-0892',
-                    totalAmount: '$8,500',
-                    dueDate: 'April 5, 2026',
-                    companyName: 'Quality Supplies Inc.',
-                    companyAddress: '333 Trade Center, Atlanta, GA 30301'
-                },
-                purchase_order: {
-                    vendorName: 'Office Essentials Suppliers',
-                    vendorAddress: '444 Warehouse Drive, Houston, TX 77001',
-                    poNumber: 'PO-2026-3421',
-                    poDate: 'March 10, 2026',
-                    deliveryDate: 'March 25, 2026',
-                    itemDescription: 'Office furniture - 20 ergonomic chairs, 10 standing desks',
-                    totalAmount: '$12,400',
-                    companyName: 'Growing Business Inc.',
-                    companyAddress: '555 Corporate Plaza, Philadelphia, PA 19101'
-                },
-                receipt: {
-                    customerName: 'David Anderson',
-                    receiptNumber: 'RCP-2026-5678',
-                    receiptDate: 'March 5, 2026',
-                    paymentMethod: 'Credit Card (Visa ending 4532)',
-                    amount: '$2,350',
-                    paymentFor: 'Professional consulting services - February 2026',
-                    description: 'Strategic business consulting and market analysis',
-                    companyName: 'Consulting Experts LLC',
-                    companyAddress: '666 Advisor Lane, San Diego, CA 92101'
-                },
-                credit_note: {
-                    clientName: 'Premier Products Ltd.',
-                    clientAddress: '777 Customer Road, Nashville, TN 37201',
-                    creditNoteNumber: 'CN-2026-0234',
-                    creditNoteDate: 'March 8, 2026',
-                    invoiceNumber: 'INV-2026-0756',
-                    creditAmount: '$1,200',
-                    reason: 'Product return - 3 defective units (Model Z-100)',
-                    companyName: 'Quality Manufacturing Co.',
-                    companyAddress: '888 Factory Lane, Cleveland, OH 44101'
-                },
-                gst_invoice: {
-                    clientName: 'Global Traders Pvt. Ltd.',
-                    gstNumber: '29ABCDE1234F1Z5',
-                    baseAmount: '₹50,000',
-                    invoiceDate: 'March 12, 2026',
-                    companyName: 'Tech Solutions India',
-                    companyAddress: 'Plot 45, Sector 18, Gurgaon, Haryana 122001, India'
-                },
-                audit_report: {
-                    auditPeriod: 'January 1 - December 31, 2025',
-                    auditType: 'Internal Financial Audit',
-                    auditorName: 'Anderson & Associates CPAs',
-                    findings: 'Overall financial controls are adequate with minor recommendations for improvement in inventory management',
-                    companyName: 'Reliable Business Solutions',
-                    companyAddress: '999 Audit Plaza, Minneapolis, MN 55401'
-                },
-                gst_filing_summary: {
-                    gstNumber: '27AAAAA0000A1Z5',
-                    filingPeriod: 'February 2026',
-                    returnType: 'GSTR-3B',
-                    totalSales: '₹15,50,000',
-                    totalPurchases: '₹8,75,000',
-                    outputTax: '₹2,79,000',
-                    inputTax: '₹1,57,500',
-                    companyName: 'Indian Enterprises Pvt. Ltd.',
-                    companyAddress: 'Block B, Tech Park, Bangalore, Karnataka 560001, India'
-                },
-                policy_document: {
-                    policyTitle: 'Remote Work Policy',
-                    policyNumber: 'HR-POL-2026-08',
-                    effectiveDate: 'April 1, 2026',
-                    department: 'Human Resources',
-                    policyObjective: 'Establish guidelines for remote work arrangements and maintain productivity standards',
-                    policyScope: 'All full-time employees eligible for remote work',
-                    policyGuidelines: 'Maintain regular hours, secure internet connection required, daily check-ins with supervisor',
-                    companyName: 'Modern Workplace Inc.',
-                    companyAddress: '147 Progressive Ave, San Francisco, CA 94102'
-                },
-                regulatory_filing: {
-                    filingType: 'Annual Compliance Report',
-                    filingNumber: 'ACR-2026-8765',
-                    regulatoryBody: 'Securities and Exchange Commission',
-                    filingDate: 'March 15, 2026',
-                    filingPeriod: 'Fiscal Year 2025',
-                    filingDetails: 'Annual financial statements, management discussion, governance disclosure',
-                    companyName: 'Public Corporation Ltd.',
-                    companyAddress: '258 Wall Street, New York, NY 10005'
-                }
-            };
-
-            const data = placeholderData[template.id] || {};
-
-            // For Letter of Recommendation, show the actual PDF
-            if (template.id === 'letter-of-recommendation-001') {
-                return (
-                    <div style={{
-                        position: 'fixed',
-                        top: 0,
-                        left: 0,
-                        right: 0,
-                        bottom: 0,
-                        backgroundColor: 'rgba(0, 0, 0, 0.8)',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        zIndex: 1000
-                    }}>
-                        <div style={{
-                            backgroundColor: 'white',
-                            borderRadius: '16px',
-                            padding: '24px',
-                            maxWidth: '1100px',
-                            width: '95%',
-                            height: '90vh',
-                            position: 'relative',
-                            boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.3)',
-                            display: 'flex',
-                            flexDirection: 'column'
-                        }}>
-                            {/* Close Button */}
-                            <button
-                                onClick={onClose}
-                                style={{
-                                    position: 'absolute',
-                                    top: '16px',
-                                    right: '16px',
-                                    width: '36px',
-                                    height: '36px',
-                                    borderRadius: '50%',
-                                    border: 'none',
-                                    backgroundColor: '#EF4444',
-                                    color: 'white',
-                                    cursor: 'pointer',
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'center',
-                                    fontSize: '20px',
-                                    fontWeight: 'bold',
-                                    zIndex: 10
-                                }}
-                            >
-                                ×
-                            </button>
-
-                            {/* Template Header */}
-                            <div style={{ marginBottom: '16px' }}>
-                                <h3 style={{
-                                    fontSize: '20px',
-                                    fontWeight: '600',
-                                    color: '#111827',
-                                    margin: '0 0 4px 0',
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    gap: '8px'
-                                }}>
-                                    <span>{template.icon}</span>
-                                    {template.name}
-                                </h3>
-                                <p style={{
-                                    fontSize: '13px',
-                                    color: '#6B7280',
-                                    margin: 0
-                                }}>{template.description}</p>
-                            </div>
-
-                            {/* PDF Viewer */}
-                            <div style={{ flex: 1, overflow: 'hidden', borderRadius: '8px', border: '1px solid #E5E7EB' }}>
-                                <iframe
-                                    src="/uploads/template-previews/letter-of-recommendation-preview.pdf"
-                                    style={{
-                                        width: '100%',
-                                        height: '100%',
-                                        border: 'none'
-                                    }}
-                                    title="Letter of Recommendation Preview"
-                                />
-                            </div>
-
-                            {/* Use Template Button */}
-                            <button
-                                onClick={() => {
-                                    onClose();
-                                    handleTemplateSelect(template);
-                                }}
-                                style={{
-                                    marginTop: '16px',
-                                    width: '100%',
-                                    padding: '14px',
-                                    backgroundColor: '#10B981',
-                                    color: 'white',
-                                    border: 'none',
-                                    borderRadius: '8px',
-                                    fontSize: '15px',
-                                    fontWeight: '600',
-                                    cursor: 'pointer'
-                                }}
-                            >
-                                Use This Template
-                            </button>
-                        </div>
-                    </div>
+            let renderedContent = null;
+            try {
+                const compiledTemplate = Handlebars.compile(template.content || '');
+                renderedContent = (
+                    <div dangerouslySetInnerHTML={{ __html: compiledTemplate(previewData) }} />
                 );
+            } catch (err) {
+                renderedContent = <div style={{ textAlign: 'center', padding: '20px' }}>Preview not available</div>;
             }
 
             return (
                 <div style={{
-                    position: 'fixed',
-                    top: 0,
-                    left: 0,
-                    right: 0,
-                    bottom: 0,
-                    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    zIndex: 1000
+                    position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
+                    backgroundColor: 'rgba(0,0,0,0.5)', display: 'flex',
+                    alignItems: 'center', justifyContent: 'center', zIndex: 2000, padding: '20px'
                 }}>
                     <div style={{
-                        backgroundColor: 'white',
-                        borderRadius: '16px',
-                        padding: '32px',
-                        maxWidth: '900px',
-                        width: '90%',
-                        maxHeight: '90vh',
-                        overflow: 'auto',
-                        position: 'relative',
-                        boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1)'
+                        backgroundColor: 'white', borderRadius: '16px', width: '100%',
+                        maxWidth: '800px', maxHeight: '90vh', overflow: 'hidden',
+                        display: 'flex', flexDirection: 'column', position: 'relative',
+                        boxShadow: '0 20px 25px -5px rgba(0,0,0,0.1)'
                     }}>
-                        {/* Close Button */}
-                        <button
-                            onClick={onClose}
-                            style={{
-                                position: 'absolute',
-                                top: '16px',
-                                right: '16px',
-                                width: '32px',
-                                height: '32px',
-                                borderRadius: '50%',
-                                border: 'none',
-                                backgroundColor: '#F3F4F6',
-                                color: '#6B7280',
-                                cursor: 'pointer',
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                fontSize: '18px',
-                                fontWeight: 'bold'
-                            }}
-                        >
-                            ×
-                        </button>
-
-                        {/* Template Header */}
-                        <div style={{ marginBottom: '24px' }}>
-                            <div style={{
-                                display: 'flex',
-                                alignItems: 'center',
-                                gap: '12px',
-                                marginBottom: '16px'
-                            }}>
-                                <div style={{
-                                    fontSize: '32px'
-                                }}>
-                                    {template.icon}
-                                </div>
-                                <div>
-                                    <h3 style={{
-                                        fontSize: '20px',
-                                        fontWeight: '600',
-                                        color: '#111827',
-                                        margin: '0 0 4px 0'
-                                    }}>{template.name}</h3>
-                                    <p style={{
-                                        fontSize: '14px',
-                                        color: '#6B7280',
-                                        margin: 0
-                                    }}>{template.description}</p>
-                                </div>
+                        <button onClick={onClose} style={{ position: 'absolute', top: '16px', right: '16px', border: 'none', background: 'none', fontSize: '24px', cursor: 'pointer' }}>×</button>
+                        <div style={{ padding: '32px', overflowY: 'auto' }}>
+                            <h3 style={{ fontSize: '20px', fontWeight: 'bold', marginBottom: '16px' }}>{template.name}</h3>
+                            <div style={{ backgroundColor: 'white', padding: '24px', border: '1px solid #eee', borderRadius: '8px' }}>
+                                {renderedContent}
                             </div>
-                        </div>
-
-                        {/* Template Structure Preview */}
-                        <div style={{
-                            backgroundColor: '#F9FAFB',
-                            border: '1px solid #E5E7EB',
-                            borderRadius: '8px',
-                            padding: '20px',
-                            marginBottom: '24px'
-                        }}>
-                            <h4 style={{
-                                fontSize: '14px',
-                                fontWeight: '600',
-                                color: '#374151',
-                                marginBottom: '8px'
-                            }}>Template Preview (Sample Data):</h4>
-                            <p style={{
-                                fontSize: '12px',
-                                color: '#6B7280',
-                                marginBottom: '12px',
-                                fontStyle: 'italic'
-                            }}>
-                                Below is a preview with realistic sample data. Click "Use This Template" below to create your own document with your actual data.
-                            </p>
-
-                            <div style={{
-                                fontFamily: 'Times New Roman, serif',
-                                fontSize: '12px',
-                                lineHeight: '1.6',
-                                color: '#000'
-                            }}>
-                                {template.id === 'offer_letter' && (
-                                    <div>
-                                        <div style={{ textAlign: 'center', marginBottom: '20px', borderBottom: '2px solid #000', paddingBottom: '10px' }}>
-                                            <div style={{ fontSize: '16px', fontWeight: 'bold' }}>{data.companyName}</div>
-                                            <div style={{ fontSize: '10px' }}>{data.companyAddress}</div>
-                                        </div>
-                                        <div style={{ textAlign: 'center', fontSize: '14px', fontWeight: 'bold', marginBottom: '20px', textDecoration: 'underline' }}>
-                                            OFFER LETTER
-                                        </div>
-                                        <div style={{ marginBottom: '15px' }}>
-                                            <strong>Date:</strong> March 5, 2026
-                                        </div>
-                                        <div style={{ marginBottom: '15px' }}>
-                                            <strong>To,</strong><br />
-                                            <strong>{data.candidateName}</strong>
-                                        </div>
-                                        <div style={{ marginBottom: '15px' }}>
-                                            <strong>Subject: Offer of Employment - {data.position}</strong>
-                                        </div>
-                                        <div style={{ marginBottom: '15px' }}>
-                                            Dear {data.candidateName},
-                                        </div>
-                                        <div style={{ marginBottom: '15px' }}>
-                                            We are pleased to offer you the position of <strong>{data.position}</strong> with {data.companyName}. We believe your skills and experience will be a valuable asset to our team.
-                                        </div>
-                                        <div style={{ marginBottom: '15px' }}>
-                                            <strong>Position Details:</strong><br />
-                                            • Position: {data.position}<br />
-                                            • Department: {data.department}<br />
-                                            • Reporting To: Head of Engineering<br />
-                                            • Start Date: {data.startDate}<br />
-                                            • Location: San Francisco, CA
-                                        </div>
-                                        <div style={{ marginBottom: '15px' }}>
-                                            <strong>Compensation & Benefits:</strong><br />
-                                            • Annual Salary: {data.salary}<br />
-                                            • Sign-on Bonus: $10,000<br />
-                                            • Stock Options: 5,000 shares (4-year vesting)<br />
-                                            • Health Insurance: Medical, Dental, Vision<br />
-                                            • 401(k) matching up to 6%<br />
-                                            • Paid Time Off: 20 days annually<br />
-                                            • Professional Development Budget: $2,000/year
-                                        </div>
-                                        <div style={{ marginBottom: '15px' }}>
-                                            <strong>Employment Terms:</strong><br />
-                                            This is a full-time position. Your employment will be at-will, meaning either you or the company may terminate the relationship at any time, with or without cause.
-                                        </div>
-                                        <div style={{ marginBottom: '15px' }}>
-                                            Please sign and return this letter by March 12, 2026, to confirm your acceptance. We look forward to welcoming you to our team!
-                                        </div>
-                                        <div style={{ marginTop: '30px' }}>
-                                            Sincerely,<br /><br />
-                                            <strong>John Smith</strong><br />
-                                            Chief Technology Officer<br />
-                                            {data.companyName}
-                                        </div>
-                                        <div style={{ marginTop: '40px', borderTop: '1px solid #000', paddingTop: '20px' }}>
-                                            <strong>Acceptance:</strong><br />
-                                            I, {data.candidateName}, accept the above offer of employment.<br /><br />
-                                            Signature: __________________ Date: __________
-                                        </div>
-                                    </div>
-                                )}
-
-                                {template.id === 'appointment_letter' && (
-                                    <div>
-                                        <div style={{ textAlign: 'center', marginBottom: '20px', borderBottom: '2px solid #000', paddingBottom: '10px' }}>
-                                            <div style={{ fontSize: '16px', fontWeight: 'bold' }}>{data.companyName}</div>
-                                            <div style={{ fontSize: '10px' }}>{data.companyAddress}</div>
-                                        </div>
-                                        <div style={{ textAlign: 'center', fontSize: '14px', fontWeight: 'bold', marginBottom: '20px', textDecoration: 'underline' }}>
-                                            APPOINTMENT LETTER
-                                        </div>
-                                        <div style={{ marginBottom: '15px' }}>
-                                            <strong>Date:</strong> {data.appointmentDate}
-                                        </div>
-                                        <div style={{ marginBottom: '15px' }}>
-                                            <strong>To,</strong><br />
-                                            <strong>{data.employeeName}</strong>
-                                        </div>
-                                        <div style={{ marginBottom: '15px' }}>
-                                            <strong>Subject: Appointment as {data.position}</strong>
-                                        </div>
-                                        <div style={{ marginBottom: '15px' }}>
-                                            Dear {data.employeeName},
-                                        </div>
-                                        <div style={{ marginBottom: '15px' }}>
-                                            We are pleased to inform you that you have been appointed as <strong>{data.position}</strong> in the <strong>{data.department}</strong> department of {data.companyName}, effective from {data.appointmentDate}.
-                                        </div>
-                                        <div style={{ marginBottom: '15px' }}>
-                                            <strong>Terms of Appointment:</strong>
-                                        </div>
-                                        <div style={{ marginBottom: '15px', marginLeft: '20px' }}>
-                                            1. <strong>Position:</strong> {data.position}<br />
-                                            2. <strong>Department:</strong> {data.department}<br />
-                                            3. <strong>Work Location:</strong> New York, NY<br />
-                                            4. <strong>Working Hours:</strong> 9:00 AM to 6:00 PM (Mon-Fri)<br />
-                                            5. <strong>Probation Period:</strong> 3 months<br />
-                                            6. <strong>Notice Period:</strong> 30 days
-                                        </div>
-                                        <div style={{ marginBottom: '15px' }}>
-                                            <strong>Roles & Responsibilities:</strong>
-                                        </div>
-                                        <div style={{ marginBottom: '15px', marginLeft: '20px' }}>
-                                            • Managing and coordinating project activities<br />
-                                            • Leading team meetings and planning sessions<br />
-                                            • Ensuring project deliverables meet quality standards<br />
-                                            • Reporting to senior management on project progress<br />
-                                            • Managing stakeholder communications
-                                        </div>
-                                        <div style={{ marginBottom: '15px' }}>
-                                            Your performance will be reviewed periodically, and you will be eligible for performance-based incentives as per company policy.
-                                        </div>
-                                        <div style={{ marginBottom: '15px' }}>
-                                            We are confident that you will be a valuable member of our team and contribute to the company's continued success.
-                                        </div>
-                                        <div style={{ marginTop: '30px' }}>
-                                            Sincerely,<br /><br />
-                                            <strong>HR Department</strong><br />
-                                            {data.companyName}
-                                        </div>
-                                        <div style={{ marginTop: '40px', borderTop: '1px solid #000', paddingTop: '20px' }}>
-                                            <strong>Acknowledgement:</strong><br />
-                                            I, {data.employeeName}, acknowledge receipt of this appointment letter and accept the terms mentioned above.<br /><br />
-                                            Signature: __________________ Date: __________
-                                        </div>
-                                    </div>
-                                )}
-
-                                {template.id === 'experience_certificate' && (
-                                    <div>
-                                        <div style={{ textAlign: 'center', marginBottom: '20px', borderBottom: '2px solid #000', paddingBottom: '10px' }}>
-                                            <div style={{ fontSize: '16px', fontWeight: 'bold' }}>{data.companyName}</div>
-                                            <div style={{ fontSize: '10px' }}>{data.companyAddress}</div>
-                                        </div>
-                                        <div style={{ textAlign: 'center', fontSize: '16px', fontWeight: 'bold', marginBottom: '20px', textDecoration: 'underline', border: '2px solid #000', padding: '10px' }}>
-                                            EXPERIENCE CERTIFICATE
-                                        </div>
-                                        <div style={{ marginBottom: '15px' }}>
-                                            <strong>Date:</strong> March 2, 2026
-                                        </div>
-                                        <div style={{ marginBottom: '15px' }}>
-                                            <strong>TO WHOM IT MAY CONCERN</strong>
-                                        </div>
-                                        <div style={{ marginBottom: '15px' }}>
-                                            This is to certify that <strong>{data.employeeName}</strong> was employed with {data.companyName} as <strong>{data.position}</strong> from <strong>{data.joiningDate}</strong> to <strong>{data.relievingDate}</strong>.
-                                        </div>
-                                        <div style={{ marginBottom: '15px' }}>
-                                            During their tenure with us, {data.employeeName} demonstrated excellent professional skills and dedication to their work. They were responsible for:
-                                        </div>
-                                        <div style={{ marginBottom: '15px', marginLeft: '20px' }}>
-                                            • Developing and executing marketing campaigns<br />
-                                            • Managing social media presence and content strategy<br />
-                                            • Conducting market research and competitor analysis<br />
-                                            • Coordinating with cross-functional teams<br />
-                                            • Contributing to brand development initiatives
-                                        </div>
-                                        <div style={{ marginBottom: '15px' }}>
-                                            {data.employeeName} displayed high levels of professionalism, integrity, and commitment throughout their employment. Their contributions were valuable to our team's success.
-                                        </div>
-                                        <div style={{ marginBottom: '15px' }}>
-                                            We wish them all the best in their future endeavors.
-                                        </div>
-                                        <div style={{ marginTop: '40px' }}>
-                                            <strong>For {data.companyName}</strong><br /><br /><br />
-                                            _______________________<br />
-                                            <strong>Authorized Signatory</strong><br />
-                                            HR Manager<br />
-                                            {data.companyName}
-                                        </div>
-                                        <div style={{ marginTop: '20px', fontSize: '10px', color: '#666' }}>
-                                            <strong>Note:</strong> This certificate is issued upon request and does not constitute a recommendation or endorsement.
-                                        </div>
-                                    </div>
-                                )}
-
-                                {template.id === 'warning_letter' && (
-                                    <div>
-                                        <div style={{ textAlign: 'center', marginBottom: '20px', borderBottom: '2px solid #000', paddingBottom: '10px' }}>
-                                            <div style={{ fontSize: '16px', fontWeight: 'bold' }}>{data.companyName}</div>
-                                            <div style={{ fontSize: '10px' }}>{data.companyAddress}</div>
-                                        </div>
-                                        <div style={{ textAlign: 'center', fontSize: '14px', fontWeight: 'bold', marginBottom: '20px', textDecoration: 'underline', color: '#DC2626' }}>
-                                            WARNING LETTER
-                                        </div>
-                                        <div style={{ marginBottom: '15px' }}>
-                                            <strong>Date:</strong> March 2, 2026
-                                        </div>
-                                        <div style={{ marginBottom: '15px' }}>
-                                            <strong>To,</strong><br />
-                                            {data.employeeName}<br />
-                                            Employee ID: EMP-2456<br />
-                                            Operations Department
-                                        </div>
-                                        <div style={{ marginBottom: '15px' }}>
-                                            <strong>Subject: Warning Notice - {data.violationType}</strong>
-                                        </div>
-                                        <div style={{ marginBottom: '15px' }}>
-                                            Dear {data.employeeName},
-                                        </div>
-                                        <div style={{ marginBottom: '15px' }}>
-                                            {data.incidentDescription}
-                                        </div>
-                                        <div style={{ marginBottom: '15px' }}>
-                                            <strong>Incidents Recorded:</strong>
-                                        </div>
-                                        <div style={{ marginBottom: '15px', marginLeft: '20px' }}>
-                                            • February 5, 2026 - Arrived 45 minutes late<br />
-                                            • February 12, 2026 - Arrived 30 minutes late<br />
-                                            • February 19, 2026 - Arrived 50 minutes late<br />
-                                            • February 26, 2026 - Arrived 40 minutes late
-                                        </div>
-                                        <div style={{ marginBottom: '15px' }}>
-                                            This behavior is unacceptable and violates our company's attendance policy. Punctuality is essential for maintaining team productivity and ensuring smooth business operations.
-                                        </div>
-                                        <div style={{ marginBottom: '15px' }}>
-                                            <strong>Expected Improvement:</strong>
-                                        </div>
-                                        <div style={{ marginBottom: '15px', marginLeft: '20px' }}>
-                                            You are expected to:<br />
-                                            • Arrive at work on time (9:00 AM) daily<br />
-                                            • Inform your supervisor in advance if you anticipate being late<br />
-                                            • Demonstrate improved commitment to company policies
-                                        </div>
-                                        <div style={{ marginBottom: '15px', backgroundColor: '#FEF2F2', padding: '10px', border: '1px solid #DC2626' }}>
-                                            <strong>Warning:</strong> Failure to improve your attendance may result in further disciplinary action, including suspension or termination of employment.
-                                        </div>
-                                        <div style={{ marginBottom: '15px' }}>
-                                            We trust that you will take this matter seriously and demonstrate immediate improvement.
-                                        </div>
-                                        <div style={{ marginTop: '30px' }}>
-                                            Sincerely,<br /><br />
-                                            <strong>Sarah Johnson</strong><br />
-                                            HR Manager<br />
-                                            {data.companyName}
-                                        </div>
-                                        <div style={{ marginTop: '40px', borderTop: '1px solid #000', paddingTop: '20px' }}>
-                                            <strong>Employee Acknowledgement:</strong><br />
-                                            I acknowledge receipt of this warning letter.<br /><br />
-                                            Employee Signature: __________________ Date: __________
-                                        </div>
-                                    </div>
-                                )}
-
-                                {template.id === 'invoice' && (
-                                    <div>
-                                        <div style={{ textAlign: 'center', marginBottom: '20px', borderBottom: '3px solid #000', paddingBottom: '15px' }}>
-                                            <div style={{ fontSize: '18px', fontWeight: 'bold' }}>{data.companyName}</div>
-                                            <div style={{ fontSize: '10px' }}>{data.companyAddress}</div>
-                                        </div>
-                                        <div style={{ textAlign: 'center', fontSize: '20px', fontWeight: 'bold', marginBottom: '20px', color: '#3B82F6' }}>
-                                            INVOICE
-                                        </div>
-                                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '20px' }}>
-                                            <div>
-                                                <strong>Bill To:</strong><br />
-                                                {data.clientName}<br />
-                                                789 Customer Street<br />
-                                                Atlanta, GA 30301
-                                            </div>
-                                            <div style={{ textAlign: 'right' }}>
-                                                <strong>Invoice #:</strong> {data.invoiceNumber}<br />
-                                                <strong>Date:</strong> March 2, 2026<br />
-                                                <strong>Due Date:</strong> {data.dueDate}
-                                            </div>
-                                        </div>
-                                        <table style={{ width: '100%', borderCollapse: 'collapse', marginBottom: '20px', border: '1px solid #000' }}>
-                                            <thead>
-                                                <tr style={{ backgroundColor: '#F3F4F6' }}>
-                                                    <th style={{ border: '1px solid #000', padding: '8px', textAlign: 'left' }}>Description</th>
-                                                    <th style={{ border: '1px solid #000', padding: '8px', textAlign: 'center' }}>Qty</th>
-                                                    <th style={{ border: '1px solid #000', padding: '8px', textAlign: 'right' }}>Rate</th>
-                                                    <th style={{ border: '1px solid #000', padding: '8px', textAlign: 'right' }}>Amount</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                <tr>
-                                                    <td style={{ border: '1px solid #000', padding: '8px' }}>Premium Product Supplies</td>
-                                                    <td style={{ border: '1px solid #000', padding: '8px', textAlign: 'center' }}>50</td>
-                                                    <td style={{ border: '1px solid #000', padding: '8px', textAlign: 'right' }}>$100.00</td>
-                                                    <td style={{ border: '1px solid #000', padding: '8px', textAlign: 'right' }}>$5,000.00</td>
-                                                </tr>
-                                                <tr>
-                                                    <td style={{ border: '1px solid #000', padding: '8px' }}>Professional Services</td>
-                                                    <td style={{ border: '1px solid #000', padding: '8px', textAlign: 'center' }}>20</td>
-                                                    <td style={{ border: '1px solid #000', padding: '8px', textAlign: 'right' }}>$150.00</td>
-                                                    <td style={{ border: '1px solid #000', padding: '8px', textAlign: 'right' }}>$3,000.00</td>
-                                                </tr>
-                                                <tr>
-                                                    <td style={{ border: '1px solid #000', padding: '8px' }}>Shipping & Handling</td>
-                                                    <td style={{ border: '1px solid #000', padding: '8px', textAlign: 'center' }}>1</td>
-                                                    <td style={{ border: '1px solid #000', padding: '8px', textAlign: 'right' }}>$500.00</td>
-                                                    <td style={{ border: '1px solid #000', padding: '8px', textAlign: 'right' }}>$500.00</td>
-                                                </tr>
-                                            </tbody>
-                                        </table>
-                                        <div style={{ textAlign: 'right', marginBottom: '20px' }}>
-                                            <div style={{ marginBottom: '5px' }}>Subtotal: $8,500.00</div>
-                                            <div style={{ marginBottom: '5px' }}>Tax (0%): $0.00</div>
-                                            <div style={{ fontSize: '16px', fontWeight: 'bold', paddingTop: '10px', borderTop: '2px solid #000' }}>
-                                                Total Due: {data.totalAmount}
-                                            </div>
-                                        </div>
-                                        <div style={{ marginTop: '30px', fontSize: '11px' }}>
-                                            <strong>Payment Terms:</strong> Payment is due within 30 days of invoice date.<br />
-                                            <strong>Payment Methods:</strong> Bank Transfer, Check, Credit Card<br />
-                                            <strong>Late Fee:</strong> 1.5% per month on overdue balances<br /><br />
-                                            <strong>Bank Details:</strong><br />
-                                            Bank Name: First National Bank<br />
-                                            Account Number: 1234567890<br />
-                                            Routing Number: 987654321<br />
-                                            Account Name: {data.companyName}
-                                        </div>
-                                        <div style={{ marginTop: '20px', fontSize: '10px', textAlign: 'center', color: '#666' }}>
-                                            Thank you for your business!
-                                        </div>
-                                    </div>
-                                )}
-
-                                {template.id === 'nda' && (
-                                    <div>
-                                        <div style={{ textAlign: 'center', fontSize: '18px', fontWeight: 'bold', marginBottom: '20px', textDecoration: 'underline' }}>
-                                            NON-DISCLOSURE AGREEMENT (NDA)
-                                        </div>
-                                        <div style={{ marginBottom: '15px' }}>
-                                            This Non-Disclosure Agreement ("Agreement") is entered into on <strong>{data.effectiveDate}</strong> by and between:
-                                        </div>
-                                        <div style={{ marginBottom: '15px', marginLeft: '20px' }}>
-                                            <strong>Disclosing Party:</strong> {data.companyName}<br />
-                                            Address: {data.companyAddress}<br /><br />
-                                            <strong>Receiving Party:</strong> {data.partyName}
-                                        </div>
-                                        <div style={{ marginBottom: '15px' }}>
-                                            <strong>1. PURPOSE</strong><br />
-                                            The purpose of this Agreement is to protect confidential information disclosed between the parties for: {data.purpose}.
-                                        </div>
-                                        <div style={{ marginBottom: '15px' }}>
-                                            <strong>2. CONFIDENTIAL INFORMATION</strong><br />
-                                            "Confidential Information" means any and all information disclosed by the Disclosing Party, including but not limited to:<br />
-                                            \u2022 Technical data, trade secrets, and know-how<br />
-                                            \u2022 Business operations, strategies, and plans<br />
-                                            \u2022 Customer lists and supplier information<br />
-                                            \u2022 Financial information and projections<br />
-                                            \u2022 Software code, algorithms, and technical specifications
-                                        </div>
-                                        <div style={{ marginBottom: '15px' }}>
-                                            <strong>3. OBLIGATIONS</strong><br />
-                                            The Receiving Party agrees to:<br />
-                                            a) Maintain confidentiality of all Confidential Information<br />
-                                            b) Use the information solely for the agreed purpose<br />
-                                            c) Not disclose information to third parties without written consent<br />
-                                            d) Implement reasonable security measures to protect the information<br />
-                                            e) Return or destroy all confidential materials upon request
-                                        </div>
-                                        <div style={{ marginBottom: '15px' }}>
-                                            <strong>4. TERM</strong><br />
-                                            This Agreement shall remain in effect for a period of <strong>{data.duration}</strong> from the Effective Date.
-                                        </div>
-                                        <div style={{ marginBottom: '15px' }}>
-                                            <strong>5. EXCEPTIONS</strong><br />
-                                            This Agreement does not apply to information that:<br />
-                                            \u2022 Is or becomes publicly available through no breach of this Agreement<br />
-                                            \u2022 Was rightfully in possession prior to disclosure<br />
-                                            \u2022 Is independently developed without use of Confidential Information<br />
-                                            \u2022 Is required to be disclosed by law or court order
-                                        </div>
-                                        <div style={{ marginBottom: '15px' }}>
-                                            <strong>6. GOVERNING LAW</strong><br />
-                                            This Agreement shall be governed by and construed in accordance with the laws of California, United States.
-                                        </div>
-                                        <div style={{ marginTop: '40px' }}>
-                                            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                                                <div>
-                                                    <strong>DISCLOSING PARTY</strong><br /><br />
-                                                    Signature: __________________<br />
-                                                    Name: {data.companyName}<br />
-                                                    Date: __________
-                                                </div>
-                                                <div>
-                                                    <strong>RECEIVING PARTY</strong><br /><br />
-                                                    Signature: __________________<br />
-                                                    Name: {data.partyName}<br />
-                                                    Date: __________
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                )}
-
-                                {template.id === 'quotation' && (
-                                    <div>
-                                        <div style={{ textAlign: 'center', marginBottom: '20px', borderBottom: '3px solid #000', paddingBottom: '15px' }}>
-                                            <div style={{ fontSize: '18px', fontWeight: 'bold' }}>{data.companyName}</div>
-                                            <div style={{ fontSize: '10px' }}>{data.companyAddress}</div>
-                                        </div>
-                                        <div style={{ textAlign: 'center', fontSize: '20px', fontWeight: 'bold', marginBottom: '20px', color: '#10B981' }}>
-                                            QUOTATION
-                                        </div>
-                                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '20px' }}>
-                                            <div>
-                                                <strong>To:</strong><br />
-                                                {data.clientName}<br />
-                                                567 Business Avenue<br />
-                                                Phoenix, AZ 85001
-                                            </div>
-                                            <div style={{ textAlign: 'right' }}>
-                                                <strong>Quotation #:</strong> {data.quotationNumber}<br />
-                                                <strong>Date:</strong> March 2, 2026<br />
-                                                <strong>Valid Until:</strong> {data.validUntil}
-                                            </div>
-                                        </div>
-                                        <div style={{ marginBottom: '20px' }}>
-                                            Dear {data.clientName},<br /><br />
-                                            Thank you for your inquiry. We are pleased to provide you with the following quotation for our professional services:
-                                        </div>
-                                        <table style={{ width: '100%', borderCollapse: 'collapse', marginBottom: '20px', border: '1px solid #000' }}>
-                                            <thead>
-                                                <tr style={{ backgroundColor: '#F3F4F6' }}>
-                                                    <th style={{ border: '1px solid #000', padding: '8px', textAlign: 'left' }}>Item Description</th>
-                                                    <th style={{ border: '1px solid #000', padding: '8px', textAlign: 'center' }}>Quantity</th>
-                                                    <th style={{ border: '1px solid #000', padding: '8px', textAlign: 'right' }}>Unit Price</th>
-                                                    <th style={{ border: '1px solid #000', padding: '8px', textAlign: 'right' }}>Total</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                <tr>
-                                                    <td style={{ border: '1px solid #000', padding: '8px' }}>Website Development - E-commerce Platform</td>
-                                                    <td style={{ border: '1px solid #000', padding: '8px', textAlign: 'center' }}>1</td>
-                                                    <td style={{ border: '1px solid #000', padding: '8px', textAlign: 'right' }}>$8,500.00</td>
-                                                    <td style={{ border: '1px solid #000', padding: '8px', textAlign: 'right' }}>$8,500.00</td>
-                                                </tr>
-                                                <tr>
-                                                    <td style={{ border: '1px solid #000', padding: '8px' }}>SEO Optimization - 6 Months</td>
-                                                    <td style={{ border: '1px solid #000', padding: '8px', textAlign: 'center' }}>1</td>
-                                                    <td style={{ border: '1px solid #000', padding: '8px', textAlign: 'right' }}>$4,500.00</td>
-                                                    <td style={{ border: '1px solid #000', padding: '8px', textAlign: 'right' }}>$4,500.00</td>
-                                                </tr>
-                                                <tr>
-                                                    <td style={{ border: '1px solid #000', padding: '8px' }}>Content Management System Setup</td>
-                                                    <td style={{ border: '1px solid #000', padding: '8px', textAlign: 'center' }}>1</td>
-                                                    <td style={{ border: '1px solid #000', padding: '8px', textAlign: 'right' }}>$2,250.00</td>
-                                                    <td style={{ border: '1px solid #000', padding: '8px', textAlign: 'right' }}>$2,250.00</td>
-                                                </tr>
-                                                <tr>
-                                                    <td style={{ border: '1px solid #000', padding: '8px' }}>Training & Support - 3 Months</td>
-                                                    <td style={{ border: '1px solid #000', padding: '8px', textAlign: 'center' }}>1</td>
-                                                    <td style={{ border: '1px solid #000', padding: '8px', textAlign: 'right' }}>$500.00</td>
-                                                    <td style={{ border: '1px solid #000', padding: '8px', textAlign: 'right' }}>$500.00</td>
-                                                </tr>
-                                            </tbody>
-                                        </table>
-                                        <div style={{ textAlign: 'right', marginBottom: '20px' }}>
-                                            <div style={{ marginBottom: '5px' }}>Subtotal: $15,750.00</div>
-                                            <div style={{ marginBottom: '5px' }}>Discount (0%): $0.00</div>
-                                            <div style={{ fontSize: '16px', fontWeight: 'bold', paddingTop: '10px', borderTop: '2px solid #000' }}>
-                                                Total Quote: {data.totalAmount}
-                                            </div>
-                                        </div>
-                                        <div style={{ marginTop: '20px', fontSize: '11px' }}>
-                                            <strong>Terms & Conditions:</strong><br />
-                                            • This quotation is valid until {data.validUntil}<br />
-                                            • 50% advance payment required to commence work<br />
-                                            • Estimated project completion: 8-10 weeks<br />
-                                            • Payment terms: 50% advance, 25% at milestone, 25% on completion<br />
-                                            • Prices are in USD and exclude applicable taxes
-                                        </div>
-                                        <div style={{ marginTop: '20px' }}>
-                                            We look forward to working with you. Please contact us if you have any questions.<br /><br />
-                                            Best regards,<br />
-                                            <strong>{data.companyName}</strong>
-                                        </div>
-                                    </div>
-                                )}
-
-                                {!['offer_letter', 'appointment_letter', 'experience_certificate', 'warning_letter', 'invoice', 'nda', 'quotation'].includes(template.id) && (
-                                    <div style={{ textAlign: 'center', padding: '40px 20px' }}>
-                                        <div style={{ fontSize: '48px', marginBottom: '20px' }}>{template.icon}</div>
-                                        <div style={{ fontSize: '18px', fontWeight: '600', color: '#111827', marginBottom: '10px' }}>
-                                            {template.name}
-                                        </div>
-                                        <div style={{ fontSize: '14px', color: '#6B7280', marginBottom: '20px' }}>
-                                            {template.description}
-                                        </div>
-                                        <div style={{ backgroundColor: '#F9FAFB', border: '1px solid #E5E7EB', borderRadius: '8px', padding: '20px', marginTop: '20px' }}>
-                                            <div style={{ fontSize: '12px', color: '#6B7280', marginBottom: '15px' }}>
-                                                <strong>This template includes:</strong>
-                                            </div>
-                                            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', justifyContent: 'center' }}>
-                                                {template.fields.map((field) => (
-                                                    <span
-                                                        key={field}
-                                                        style={{
-                                                            backgroundColor: 'white',
-                                                            border: '1px solid #E5E7EB',
-                                                            color: '#374151',
-                                                            padding: '6px 12px',
-                                                            borderRadius: '6px',
-                                                            fontSize: '12px',
-                                                            fontWeight: '500'
-                                                        }}
-                                                    >
-                                                        {field}
-                                                    </span>
-                                                ))}
-                                            </div>
-                                            <div style={{ fontSize: '12px', color: '#6B7280', marginTop: '20px', fontStyle: 'italic' }}>
-                                                Click "Use This Template" below to create your personalized document with all fields filled in.
-                                            </div>
-                                        </div>
-                                    </div>
-                                )}
+                            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '12px', marginTop: '24px' }}>
+                                <button onClick={onClose} style={{ padding: '10px 20px', borderRadius: '8px', border: '1px solid #ddd' }}>Close</button>
+                                <button
+                                    onClick={() => { handleTemplateSelect(template); onClose(); }}
+                                    style={{ padding: '10px 20px', backgroundColor: '#F97316', color: 'white', border: 'none', borderRadius: '8px', fontWeight: '600' }}
+                                >Use Template</button>
                             </div>
-                        </div>
-
-                        {/* Required Fields */}
-                        <div style={{ marginBottom: '24px' }}>
-                            <h4 style={{
-                                fontSize: '14px',
-                                fontWeight: '600',
-                                color: '#374151',
-                                marginBottom: '8px'
-                            }}>Required Fields:</h4>
-                            <div style={{
-                                display: 'flex',
-                                flexWrap: 'wrap',
-                                gap: '6px'
-                            }}>
-                                {template.fields.map((field) => (
-                                    <span
-                                        key={field}
-                                        style={{
-                                            backgroundColor: template.color + '15',
-                                            color: template.color,
-                                            padding: '4px 8px',
-                                            borderRadius: '6px',
-                                            fontSize: '12px',
-                                            fontWeight: '500'
-                                        }}
-                                    >
-                                        {field}
-                                    </span>
-                                ))}
-                            </div>
-                        </div>
-
-                        {/* Action Buttons */}
-                        <div style={{
-                            display: 'flex',
-                            gap: '12px',
-                            justifyContent: 'flex-end'
-                        }}>
-                            <button
-                                onClick={onClose}
-                                style={{
-                                    padding: '10px 20px',
-                                    backgroundColor: 'transparent',
-                                    color: '#6B7280',
-                                    border: '1px solid #D1D5DB',
-                                    borderRadius: '8px',
-                                    fontSize: '14px',
-                                    fontWeight: '500',
-                                    cursor: 'pointer'
-                                }}
-                            >
-                                Close
-                            </button>
-                            <button
-                                onClick={() => {
-                                    handleTemplateSelect(template);
-                                    onClose();
-                                }}
-                                style={{
-                                    padding: '10px 20px',
-                                    backgroundColor: template.color,
-                                    color: 'white',
-                                    border: 'none',
-                                    borderRadius: '8px',
-                                    fontSize: '14px',
-                                    fontWeight: '600',
-                                    cursor: 'pointer'
-                                }}
-                            >
-                                Use This Template
-                            </button>
                         </div>
                     </div>
                 </div>
@@ -4466,266 +3878,49 @@ Authorized Signatory              ${formData.consultantName || '[Name]'}
 
         return (
             <div style={{ padding: '20px' }}>
-                {/* Header */}
                 <div style={{ marginBottom: '20px' }}>
-                    <h2 style={{
-                        fontSize: '24px',
-                        fontWeight: '700',
-                        color: '#111827',
-                        margin: '0 0 6px 0'
-                    }}>Document Templates</h2>
-                    <p style={{
-                        fontSize: '14px',
-                        color: '#6B7280',
-                        margin: 0
-                    }}>Ready-to-use document structures. Select a template to create a document with your data.</p>
+                    <h2 style={{ fontSize: '24px', fontWeight: '700', color: '#111827', margin: 0 }}>Document Templates</h2>
+                    <p style={{ fontSize: '14px', color: '#6B7280' }}>Select a template to create a document.</p>
                 </div>
 
-                {/* Templates Grid - All Templates Displayed */}
-                <div style={{ marginBottom: '16px' }}>
-                    <p style={{
-                        fontSize: '13px',
-                        color: '#6B7280',
-                        margin: 0
-                    }}>Showing all {getAllTemplates().length} templates</p>
-                </div>
-
-                {/* Templates Grid */}
-                <div style={{
-                    display: 'grid',
-                    gridTemplateColumns: 'repeat(auto-fill, minmax(150px, 1fr))',
-                    gap: '10px'
-                }}>
-                    {loading ? (
-                        <div style={{ textAlign: 'center', padding: '60px', gridColumn: '1 / -1' }}>
-                            <div style={{ fontSize: '14px', color: '#6B7280' }}>Loading templates...</div>
-                        </div>
-                    ) : getAllTemplates().map((template) => (
-                        <div
-                            key={template.templateId}
-                            onClick={(e) => {
-                                if (!e.target.closest('button')) {
-                                    handleTemplateSelect(template);
-                                }
-                            }}
+                <div style={{ display: 'flex', gap: '8px', marginBottom: '24px' }}>
+                    {Object.entries(templateCategories).map(([key, label]) => (
+                        <button
+                            key={key}
+                            onClick={() => setSelectedCategory(key)}
                             style={{
-                                backgroundColor: 'white',
-                                border: '1px solid #E5E7EB',
-                                borderRadius: '6px',
-                                padding: '8px',
-                                boxShadow: '0 1px 2px rgba(0, 0, 0, 0.06)',
-                                transition: 'all 0.2s ease',
-                                cursor: 'pointer',
-                                position: 'relative'
+                                padding: '6px 12px', borderRadius: '8px', fontSize: '13px',
+                                backgroundColor: selectedCategory === key ? '#F97316' : 'white',
+                                color: selectedCategory === key ? 'white' : '#4B5563',
+                                border: '1px solid #E5E7EB'
                             }}
-                            onMouseEnter={(e) => {
-                                e.currentTarget.style.transform = 'translateY(-2px)';
-                                e.currentTarget.style.boxShadow = '0 3px 8px rgba(0, 0, 0, 0.1)';
-                            }}
-                            onMouseLeave={(e) => {
-                                e.currentTarget.style.transform = 'translateY(0)';
-                                e.currentTarget.style.boxShadow = '0 1px 2px rgba(0, 0, 0, 0.06)';
-                            }}
-                        >
-                            {/* Featured Badge */}
-                            {template.metadata?.featured && (
-                                <div style={{
-                                    position: 'absolute',
-                                    top: '-6px',
-                                    right: '10px',
-                                    backgroundColor: '#F97316',
-                                    color: 'white',
-                                    padding: '2px 8px',
-                                    borderRadius: '8px',
-                                    fontSize: '9px',
-                                    fontWeight: '600',
-                                    textTransform: 'uppercase',
-                                    letterSpacing: '0.3px',
-                                    boxShadow: '0 1px 4px rgba(249, 115, 22, 0.3)',
-                                    zIndex: 10
-                                }}>
-                                    ⭐ Featured
-                                </div>
-                            )}
-
-                            {/* Visual Document Preview */}
-                            <div style={{
-                                width: '100%',
-                                height: '110px',
-                                backgroundColor: '#F9FAFB',
-                                borderRadius: '4px',
-                                marginBottom: '6px',
-                                overflow: 'hidden',
-                                border: '1px solid #E5E7EB',
-                                position: 'relative'
-                            }}>
-                                {template.templateType === 'pdf' ? (
-                                    <>
-                                        {/* PDF Preview - YOUR GREEN GREY PDF! */}
-                                        <iframe
-                                            src={`${BASE_URL}${template.pdfUrl}#toolbar=0&navpanes=0&scrollbar=0`}
-                                            style={{
-                                                width: '100%',
-                                                height: '100%',
-                                                border: 'none',
-                                                pointerEvents: 'none',
-                                                transform: 'scale(1)',
-                                                transformOrigin: 'top left'
-                                            }}
-                                            title={`${template.name} preview`}
-                                        />
-                                        {/* PandaDoc-style badge */}
-                                        <div style={{
-                                            position: 'absolute',
-                                            top: '8px',
-                                            left: '8px',
-                                            backgroundColor: 'white',
-                                            padding: '4px 8px',
-                                            borderRadius: '4px',
-                                            fontSize: '10px',
-                                            fontWeight: '600',
-                                            color: '#059669',
-                                            boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
-                                            display: 'flex',
-                                            alignItems: 'center',
-                                            gap: '4px'
-                                        }}>
-                                            <span style={{ fontSize: '12px' }}>📄</span> PandaDoc
-                                        </div>
-                                    </>
-                                ) : (
-                                    <div style={{
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        justifyContent: 'center',
-                                        height: '100%',
-                                        fontSize: '64px',
-                                        opacity: 0.3
-                                    }}>
-                                        {template.icon || '📄'}
-                                    </div>
-                                )}
-                            </div>
-
-                            {/* Template Title */}
-                            <h3 style={{
-                                fontSize: '13px',
-                                fontWeight: '600',
-                                color: '#111827',
-                                margin: '0 0 4px 0',
-                                overflow: 'hidden',
-                                textOverflow: 'ellipsis',
-                                whiteSpace: 'nowrap'
-                            }}>{template.name}</h3>
-
-                            {/* Creator info */}
-                            <div style={{
-                                fontSize: '9px',
-                                color: '#9CA3AF',
-                                marginBottom: '8px',
-                                display: 'flex',
-                                flexDirection: 'column',
-                                gap: '1px'
-                            }}>
-                                <div>Prepared for: <span style={{ color: '#6B7280' }}>Your Company</span></div>
-                                <div>Created by: <span style={{ color: '#6B7280' }}>{templateCategories[template.category] || 'Professional'}</span></div>
-                            </div>
-
-                            {/* Action Button */}
-                            <button
-                                onClick={(e) => {
-                                    e.stopPropagation();
-                                    handleTemplateSelect(template);
-                                }}
-                                style={{
-                                    width: '100%',
-                                    padding: '6px',
-                                    backgroundColor: '#F97316',
-                                    color: 'white',
-                                    border: 'none',
-                                    borderRadius: '5px',
-                                    fontSize: '11px',
-                                    fontWeight: '600',
-                                    cursor: 'pointer',
-                                    transition: 'all 0.2s ease'
-                                }}
-                                onMouseEnter={(e) => {
-                                    e.currentTarget.style.backgroundColor = '#EA580C';
-                                }}
-                                onMouseLeave={(e) => {
-                                    e.currentTarget.style.backgroundColor = '#F97316';
-                                }}
-                            >
-                                {template.templateType === 'pdf' ? 'Download PDF' : 'Use this template'}
-                            </button>
-                        </div>
+                        >{label}</button>
                     ))}
                 </div>
 
-                {/* Template Statistics */}
-                <div style={{
-                    marginTop: '48px',
-                    display: 'grid',
-                    gridTemplateColumns: 'repeat(4, 1fr)',
-                    gap: '24px'
-                }}>
-                    {Object.entries(templateCategories).slice(1).map(([key, label]) => {
-                        const categoryTemplates = templates.filter(t => t.category === key);
-                        const colors = ['#3B82F6', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6'];
-                        const colorIndex = Object.keys(templateCategories).slice(1).indexOf(key);
-
-                        return (
-                            <div
-                                key={key}
-                                style={{
-                                    backgroundColor: 'white',
-                                    border: '1px solid #E5E7EB',
-                                    borderRadius: '12px',
-                                    padding: '20px',
-                                    textAlign: 'center',
-                                    boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)'
-                                }}
-                            >
-                                <div style={{
-                                    width: '40px',
-                                    height: '40px',
-                                    borderRadius: '10px',
-                                    backgroundColor: `${colors[colorIndex]}15`,
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'center',
-                                    margin: '0 auto 12px auto',
-                                    fontSize: '20px',
-                                    color: colors[colorIndex]
-                                }}>
-                                    {categoryTemplates.length}
-                                </div>
-                                <h4 style={{
-                                    fontSize: '14px',
-                                    fontWeight: '600',
-                                    color: '#111827',
-                                    margin: '0 0 4px 0'
-                                }}>{label}</h4>
-                                <p style={{
-                                    fontSize: '12px',
-                                    color: '#6B7280',
-                                    margin: 0
-                                }}>Available Templates</p>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))', gap: '16px' }}>
+                    {loading ? <p>Loading...</p> : templates.map((template) => (
+                        <div
+                            key={template.templateId}
+                            onClick={() => handlePreviewTemplate(template)}
+                            style={{ backgroundColor: 'white', border: '1px solid #E5E7EB', borderRadius: '8px', padding: '12px', cursor: 'pointer' }}
+                        >
+                            <div style={{ width: '100%', height: '100px', backgroundColor: '#F9FAFB', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '40px', marginBottom: '8px' }}>
+                                {template.icon || '📄'}
                             </div>
-                        );
-                    })}
+                            <h3 style={{ fontSize: '14px', fontWeight: '600', margin: '0 0 4px 0' }}>{template.name}</h3>
+                            <button
+                                onClick={(e) => { e.stopPropagation(); handleTemplateSelect(template); }}
+                                style={{ width: '100%', padding: '6px', backgroundColor: '#F97316', color: 'white', border: 'none', borderRadius: '6px', fontSize: '12px', fontWeight: '600' }}
+                            >Use Template</button>
+                        </div>
+                    ))}
                 </div>
-
-                {/* Preview Modal */}
-                {previewMode && selectedTemplate && (
-                    <PreviewModal
-                        template={selectedTemplate}
-                        onClose={closePreview}
-                    />
-                )}
+                {previewMode && selectedTemplate && <PreviewModal template={selectedTemplate} onClose={closePreview} />}
             </div>
         );
     };
+
 
     // Main render function
     const renderMainContent = () => {

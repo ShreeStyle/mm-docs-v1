@@ -224,16 +224,50 @@ const CreateDocument = () => {
             invoiceDate: formData.invoiceDate || new Date().toLocaleDateString('en-IN'),
             totalAmount: formData.totalAmount || '1,18,000',
             currentDate: new Date().toLocaleDateString('en-IN'),
+            // Purchase Order Specific Fallbacks
+            poDate: formData.poDate || new Date().toLocaleDateString('en-IN'),
+            poNumber: formData.poNumber || '123456',
+            vendorCompanyName: formData.vendorCompanyName || 'VENDOR NAME',
+            vendorContact: formData.vendorContact || 'Contact Person',
+            vendorAddress: formData.vendorAddress || '123 Vendor Street\nCity, State 12345',
+            shipToName: formData.shipToName || 'RECIPIENT NAME',
+            shipToAddress: formData.shipToAddress || '456 Delivery Ave\nCity, State 67890',
+            requisitioner: formData.requisitioner || 'John Doe',
+            shipVia: formData.shipVia || 'UPS Ground',
+            fob: formData.fob || 'Destination',
+            shippingTerms: formData.shippingTerms || 'Net 30',
+            comments: formData.comments || 'Thank you for your business.',
+            footerContactName: formData.footerContactName || 'Support Team',
+            footerContactPhone: formData.footerContactPhone || '1-800-MM-DOCS',
+            footerContactEmail: formData.footerContactEmail || 'support@mediamasala.com',
+            items: formData.items || [
+                { itemNumber: 'SKU-001', description: 'Product/Service 1', quantity: 1, unitPrice: '100.00', total: '100.00' },
+                { itemNumber: 'SKU-002', description: 'Product/Service 2', quantity: 2, unitPrice: '50.00', total: '100.00' }
+            ],
+            subtotal: formData.subtotal || '200.00',
+            tax: formData.tax || '-',
+            shipping: formData.shipping || '-',
+            other: formData.other || '-',
+            total: formData.total || '200.00',
+            requisitioner: formData.requisitioner || 'Alice Smith',
+            shipVia: formData.shipVia || 'FedEx Priority',
+            fob: formData.fob || 'Origin',
+            shippingTerms: formData.shippingTerms || 'Net 30'
         };
 
         try {
+            console.log('Rendering preview with data:', previewData);
             // Use Handlebars to compile the layout
             const compiledTemplate = Handlebars.compile(content);
             const html = compiledTemplate(previewData);
             return html;
         } catch (e) {
-            console.error('Error compiling template:', e);
-            return '<div style="color: red; padding: 20px;">Error generating preview. Template syntax might be invalid.</div>';
+            console.error('CRITICAL: Error compiling template:', e);
+            return `<div style="color: red; padding: 20px; font-family: sans-serif;">
+                <h3>Error generating preview</h3>
+                <p>Template syntax might be invalid or a field is causing issues.</p>
+                <pre style="background: #eee; padding: 10px; border-radius: 4px;">${e.message}</pre>
+            </div>`;
         }
     };
 

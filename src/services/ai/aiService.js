@@ -951,7 +951,7 @@ Return ONLY valid, richly detailed, FORMALLY WRITTEN JSON document content. No c
         "totalAmount": 110,
         "signatureName": "${context.signatureName || 'Adeline Palmerston'}"
       }`;
-  } else if (effectiveType === "purchase_order") {
+    } else if (effectiveType === "purchase_order" || effectiveType === "purchase-order-001") {
       // Parse structured input data
       const inputData = {};
       if (topic.includes('|')) {
@@ -967,6 +967,40 @@ Return ONLY valid, richly detailed, FORMALLY WRITTEN JSON document content. No c
       const context = { ...providedData, ...inputData };
       console.log(`📋 Consolidated context for purchase_order:`, context);
 
+      // Map potential alternate field names from frontend form
+      context.tax = context.tax || context.taxAmount;
+      context.shipping = context.shipping || context.shippingCost;
+      context.other = context.other || context.otherCharges;
+      context.total = context.total || context.grandTotal || context.amount;
+
+      // Specialized parsing for poItems in providedData (for frontend live entries)
+      if (context.poItems && typeof context.poItems === 'string' && !context.items) {
+          console.log(`🧩 Parsing poItems string into structured items array...`);
+          const parsedItems = context.poItems.split('\n')
+              .filter(line => line.trim().includes('|'))
+              .map((line, idx) => {
+                  const parts = line.split('|').map(s => s.trim());
+                  const qty = parseFloat(parts[2]) || 0;
+                  const price = parseFloat(parts[3]) || 0;
+                  return {
+                      itemNumber: parts[0] || (idx + 1).toString(),
+                      description: parts[1] || 'Line Item',
+                      quantity: qty,
+                      unitPrice: price,
+                      total: qty * price
+                  };
+              });
+          
+          if (parsedItems.length > 0) {
+              context.items = parsedItems;
+              context.subtotal = parsedItems.reduce((sum, item) => sum + item.total, 0);
+              context.tax = context.subtotal * (parseFloat(context.taxRate) / 100 || 0);
+              context.shipping = parseFloat(context.shippingCost) || 0;
+              context.other = parseFloat(context.otherCharges) || 0;
+              context.total = context.subtotal + context.tax + context.shipping + context.other;
+          }
+      }
+
       userPrompt = `Generate a PROFESSIONALLY FORMATTED, BUSINESS-STANDARD Purchase Order using the following context:
       
       CONTEXT DATA:
@@ -979,26 +1013,48 @@ Return ONLY valid, richly detailed, FORMALLY WRITTEN JSON document content. No c
       - NO casual language
       
       PRIORITY: If 'items' array is provided in CONTEXT DATA, use it exactly.
-      If 'supplierName' is provided, use it.
+      Ensure all fields from the reference design are populated.
 
       Return ONLY valid JSON with this structure:
       {
-        "title": "Purchase Order",
+        "companyName": "${brandContext.name}",
+        "companyAddress": "${brandContext.address || '[Company Address]'}",
+        "companyPhone": "${brandContext.phone || '[Company Phone]'}",
+        "companyFax": "${brandContext.fax || '[Company Fax]'}",
+        "companyWebsite": "${brandContext.website || '[Company Website]'}",
+        "poDate": "${context.poDate || new Date().toLocaleDateString('en-IN', { day: '2-digit', month: '2-digit', year: 'numeric' })}",
         "poNumber": "${context.poNumber || 'PO-' + Date.now().toString().slice(-6)}",
-        "issueDate": "${context.issueDate || new Date().toLocaleDateString('en-IN', { year: 'numeric', month: 'long', day: 'numeric' })}",
-        "buyer": "${context.buyer || brandContext.name}",
-        "supplier": "${context.supplier || context.supplierName || context.client || '[Supplier Name]'}",
+        "vendorName": "${context.vendorName || context.vendorCompanyName || '[Vendor Name]'}",
+        "vendorContact": "${context.vendorContact || '[Contact or Department]'}",
+        "vendorAddress": "${context.vendorAddress || '[Vendor Address]'}",
+        "vendorPhone": "${context.vendorPhone || '[Vendor Phone]'}",
+        "vendorFax": "${context.vendorFax || '[Vendor Fax]'}",
+        "shipToName": "${context.shipToName || '[Name]'}",
+        "shipToCompanyName": "${context.shipToCompanyName || brandContext.name}",
+        "shipToAddress": "${context.shipToAddress || brandContext.address || '[Ship To Address]'}",
+        "shipToPhone": "${context.shipToPhone || brandContext.phone || '[Ship To Phone]'}",
+        "requisitioner": "${context.requisitioner || '[Requisitioner Name]'}",
+        "shipVia": "${context.shipVia || 'Standard'}",
+        "fob": "${context.fob || 'Origin'}",
+        "shippingTerms": "${context.shippingTerms || 'Net 30'}",
         "items": ${context.items ? JSON.stringify(context.items) : `[
           {
             "itemNumber": "1",
-            "description": "${context.items_desc || context.description || 'Goods/Services'}",
+            "description": "${context.items_desc || context.description || 'Professional Services'}",
             "quantity": "${context.quantity || 1}",
-            "unitPrice": "${context.rate || context.amount || 0}",
-            "totalPrice": "${context.amount || 0}"
+            "unitPrice": "${context.unitPrice || context.rate || context.amount || 0}",
+            "total": "${context.total || context.amount || 0}"
           }
         ]`},
-        "totalAmount": "${context.total || context.amount || 0}",
-        "deliveryDate": "${context.deliveryDate || context.duedate || '[Delivery Date]'}"
+        "subtotal": "${context.subtotal || 0}",
+        "tax": "${context.tax || 0}",
+        "shipping": "${context.shipping || 0}",
+        "other": "${context.other || 0}",
+        "total": "${context.total || context.amount || 0}",
+        "comments": "${context.comments || 'Please notify us immediately if you are unable to ship as specified.'}",
+        "footerContactName": "${brandContext.name}",
+        "footerContactPhone": "${brandContext.phone || ''}",
+        "footerContactEmail": "${brandContext.email || ''}"
       }`;
 
     } else if (effectiveType === "gst_invoice") {
@@ -2422,6 +2478,84 @@ We appreciate the cooperation and assistance provided by management and staff th
       disputeResolution: providedData.disputeResolution || "In the event of a dispute, the partners agree to first attempt mediation through a professional mediator.",
       governingLaw: providedData.governingLaw || "This Agreement shall be governed by the laws of the State of [State].",
       entireAgreement: providedData.entireAgreement || "This Agreement constitutes the full agreement between the partners, overriding any prior agreements."
+    };
+  } else if (effectiveType === "purchase_order") {
+    console.log('📝 Building purchase_order fallback with data:', providedData);
+    
+    // Parse structured input from topic if possible
+    const topicData = {};
+    if (topic && topic.includes(':')) {
+      topic.split(/[|,]/).forEach(pair => {
+        const [key, value] = pair.split(':').map(s => s.trim());
+        if (key && value) {
+          const cleanKey = key.toLowerCase().replace(/\s+/g, '');
+          topicData[cleanKey] = value;
+          // Map common variations
+          if (cleanKey === 'vendor') topicData.vendorName = value;
+          if (cleanKey === 'shipto') topicData.shipToName = value;
+          if (cleanKey === 'po#') topicData.poNumber = value;
+        }
+      });
+    }
+
+    const context = { ...providedData, ...topicData };
+    
+    // Parse items from generic text or topic
+    let items = [];
+    const itemsSource = context.poItems || context.items || context.itemslist;
+    
+    if (itemsSource && typeof itemsSource === 'string') {
+      const lines = itemsSource.split('\n').filter(line => line.trim());
+      lines.forEach((line, index) => {
+        const parts = line.includes('|') ? line.split('|').map(p => p.trim()) : line.split(/[,;]/).map(p => p.trim());
+        if (parts.length >= 2) {
+          const itemNo = parts[0] || (index + 1).toString();
+          const desc = parts[1] || "";
+          const qty = parseFloat(parts[2]) || 1;
+          const price = parseFloat(parts[3]) || 0;
+          items.push({
+            itemNumber: itemNo,
+            description: desc,
+            quantity: qty,
+            unitPrice: price,
+            total: qty * price
+          });
+        }
+      });
+    } else if (Array.isArray(context.items)) {
+      items = context.items;
+    }
+
+    const subtotal = items.reduce((sum, item) => sum + (Number(item.total) || 0), 0);
+    const taxRate = parseFloat(context.taxRate || context.taxPercentage) || 0;
+    const tax = context.tax || context.taxAmount || (subtotal * taxRate) / 100;
+    const shipping = parseFloat(context.shippingCost || context.shipping) || 0;
+    const other = parseFloat(context.otherCharges || context.other) || 0;
+    const total = context.total || context.totalAmount || (subtotal + tax + shipping + other);
+
+    return {
+      companyName: brandContext.name || context.companyName || "MM Docs",
+      companyAddress: brandContext.address || context.companyAddress || "Professional Document Platform",
+      poNumber: context.poNumber || context.ponumber || `PO-${Date.now().toString().slice(-6)}`,
+      poDate: context.poDate || context.date || new Date().toLocaleDateString(),
+      vendorName: context.vendorName || context.vendor || "[Vendor Name]",
+      vendorAddress: context.vendorAddress || "[Vendor Address]",
+      vendorContact: context.vendorContact || "",
+      shipToName: context.shipToName || context.shipto || "[Receiver Name]",
+      shipToCompanyName: context.shipToCompanyName || brandContext.name || "",
+      shipToAddress: context.shipToAddress || context.shipaddress || "[Ship To Address]",
+      shipToPhone: context.shipToPhone || context.shipphone || "",
+      requisitioner: context.requisitioner || "-",
+      shipVia: context.shipVia || context.shippingmethod || "-",
+      fob: context.fob || "-",
+      shippingTerms: context.shippingTerms || context.terms || "-",
+      items: items,
+      subtotal: subtotal,
+      tax: tax,
+      shipping: shipping,
+      other: other,
+      total: total,
+      comments: context.comments || ""
     };
   } else {
     return {
