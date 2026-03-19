@@ -3297,66 +3297,7 @@ Authorized Signatory              ${formData.consultantName || '[Name]'}
                         </h3>
 
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-                            {/* Smart Fill Section */}
-                            <div style={{
-                                padding: '16px',
-                                backgroundColor: '#F0F9FF',
-                                border: '1px solid #BAE6FD',
-                                borderRadius: '12px',
-                                marginBottom: '10px'
-                            }}>
-                                <label style={{
-                                    display: 'block',
-                                    fontSize: '13px',
-                                    fontWeight: '700',
-                                    color: '#0369A1',
-                                    marginBottom: '8px',
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    gap: '6px'
-                                }}>
-                                    <Sparkles size={14} /> Smart Fill from Prompt
-                                </label>
-                                <textarea
-                                    value={smartFillText}
-                                    onChange={(e) => setSmartFillText(e.target.value)}
-                                    placeholder="Paste your requirements here (e.g., Vendor: ABC, PO#: 123...) then click Auto-fill."
-                                    rows={3}
-                                    style={{
-                                        width: '100%',
-                                        padding: '10px',
-                                        border: '1px solid #93C5FD',
-                                        borderRadius: '8px',
-                                        fontSize: '12px',
-                                        fontFamily: 'Inter, sans-serif',
-                                        resize: 'none',
-                                        outline: 'none',
-                                        marginBottom: '10px'
-                                    }}
-                                />
-                                <button
-                                    onClick={handleSmartFill}
-                                    style={{
-                                        width: '100%',
-                                        padding: '8px',
-                                        backgroundColor: '#0EA5E9',
-                                        color: 'white',
-                                        border: 'none',
-                                        borderRadius: '6px',
-                                        fontSize: '12px',
-                                        fontWeight: '600',
-                                        cursor: 'pointer',
-                                        transition: 'background-color 0.2s'
-                                    }}
-                                    onMouseEnter={(e) => e.target.style.backgroundColor = '#0284C7'}
-                                    onMouseLeave={(e) => e.target.style.backgroundColor = '#0EA5E9'}
-                                >
-                                    Auto-fill Form Fields
-                                </button>
-                                <p style={{ fontSize: '10px', color: '#64748B', marginTop: '6px', textAlign: 'center' }}>
-                                    This will extract details from your text and populate the fields below.
-                                </p>
-                            </div>
+
                             {validationErrors.length > 0 && (
                                 <div style={{
                                     padding: '12px 16px',
