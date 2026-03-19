@@ -1162,29 +1162,35 @@ Return ONLY valid, richly detailed, FORMALLY WRITTEN JSON document content. No c
       Return ONLY valid JSON with this structure:
       {
         "title": "Tax Invoice",
-        "invoiceNumber": "${context.invoiceNumber || 'GST-INV-' + Date.now().toString().slice(-6)}",
-        "invoiceDate": "${context.invoiceDate || new Date().toLocaleDateString('en-IN', { year: 'numeric', month: 'long', day: 'numeric' })}",
-        "dueDate": "${context.dueDate || '[Due Date]'}",
-        "companyName": "${context.supplierName || context.company || brandContext.name}",
-        "companyAddress": "${context.supplierAddress || '[Supplier Address]'}",
-        "gstNumber": "${context.supplierGSTIN || '[Supplier GSTIN]'}",
-        "clientName": "${context.buyerName || context.client || context.customerName || '[Buyer Name]'}",
-        "clientAddress": "${context.buyerAddress || '[Buyer Address]'}",
-        "clientGST": "${context.buyerGSTIN || '[Buyer GSTIN]'}",
+        "invoiceNumber": "${context.invoiceNumber || 'GST-' + Date.now().toString().slice(-6)}",
+        "invoiceDate": "${context.invoiceDate || new Date().toLocaleDateString('en-IN')}",
+        "dueDate": "${context.dueDate || ''}",
+        "customerId": "${context.customerId || ''}",
+        "companyName": "${context.companyName || brandContext.name}",
+        "companyAddress": "${context.companyAddress || brandContext.address || ''}",
+        "gstNumber": "${context.gstNumber || ''}",
+        "clientName": "${context.clientName || ''}",
+        "clientGST": "${context.clientGST || ''}",
+        "billToAddress": "${context.billToAddress || ''}",
+        "shipToName": "${context.shipToName || ''}",
+        "shipToAddress": "${context.shipToAddress || context.billToAddress || ''}",
         "items": ${context.items ? JSON.stringify(context.items) : `[
           {
-            "description": "${context.description || 'Services'}",
-            "hsn": "${context.hsn || '998314'}",
-            "quantity": "${context.quantity || 1}",
-            "rate": "${context.rate || context.amount || 0}",
-            "amount": "${context.amount || 0}"
+            "qty": 1,
+            "product": "${context.product || 'Professional Services'}",
+            "description": "${context.description || 'Service description'}",
+            "unitPrice": ${context.amount || 0},
+            "total": ${context.amount || 0}
           }
         ]`},
-        "subtotal": "${context.subtotal || context.amount || 0}",
-        "taxAmount": "${context.taxAmount || (context.amount || 0) * 0.18}",
-        "cgstAmount": "${(context.amount || 0) * 0.09}",
-        "sgstAmount": "${(context.amount || 0) * 0.09}",
-        "totalAmount": "${context.total || (context.amount || 0) * 1.18}"
+        "subtotal": ${context.subtotal || context.amount || 0},
+        "discount": ${context.discount || 0},
+        "taxableValue": ${context.taxableValue || (context.subtotal || context.amount || 0) - (context.discount || 0)},
+        "taxRate": ${context.taxRate || 18},
+        "taxAmount": ${context.taxAmount || 0},
+        "otherCharges": ${context.otherCharges || 0},
+        "total": ${context.total || context.amount || 0},
+        "terms": "${context.terms || '1. Total payment due in 30 days\\n2. Please include the invoice number on your check'}"
       }`;
 
     } else if (effectiveType === "compliance_certificate") {
@@ -1630,6 +1636,60 @@ const generateMockContent = (type, topic, providedData = {}, brandContext = {}) 
       footerPhone: providedData.footerPhone || brandContext.phone || "",
       footerEmail: providedData.footerEmail || brandContext.email || "",
       footerWebsite: providedData.footerWebsite || brandContext.website || ""
+    };
+  } else if (effectiveType === "gst_invoice") {
+    console.log(`📝 Building GST invoice fallback with data:`, providedData);
+    const taxRate = parseFloat(providedData.taxRate) || 18;
+    const discount = parseFloat(providedData.discount) || 0;
+    const otherCharges = parseFloat(providedData.otherCharges) || 0;
+    
+    let items = [];
+    if (providedData.invoiceItems) {
+      providedData.invoiceItems.split('\n')
+        .filter(line => line.trim())
+        .forEach(line => {
+          const parts = line.split('|').map(s => s.trim());
+          const qty = parseFloat(parts[0]) || 1;
+          const product = parts[1] || 'Product';
+          const description = parts[2] || '...';
+          const unitPrice = parseFloat(parts[3]) || 0;
+          items.push({ qty, product, description, unitPrice, total: qty * unitPrice });
+        });
+    }
+
+    if (items.length === 0) {
+      items = [
+        { qty: 1, product: topicTitle || "Services", description: "Professional services rendered", unitPrice: providedData.amount || 1000, total: providedData.amount || 1000 }
+      ];
+    }
+
+    const subtotal = items.reduce((sum, item) => sum + item.total, 0);
+    const taxableValue = subtotal - discount;
+    const taxAmount = (taxableValue * taxRate) / 100;
+    const total = taxableValue + taxAmount + otherCharges;
+
+    return {
+      title: "Tax Invoice",
+      invoiceNumber: providedData.invoiceNumber || `GST-${Date.now().toString().slice(-6)}`,
+      invoiceDate: providedData.invoiceDate || new Date().toLocaleDateString('en-IN'),
+      dueDate: providedData.dueDate || "",
+      customerId: providedData.customerId || "",
+      companyName: providedData.companyName || brandContext.name || "MM Docs",
+      companyAddress: providedData.companyAddress || brandContext.address || "",
+      gstNumber: providedData.gstNumber || "",
+      clientName: providedData.clientName || "[Client Name]",
+      clientGST: providedData.clientGST || "",
+      billToAddress: providedData.billToAddress || "[Address]",
+      shipToName: providedData.shipToName || "",
+      shipToAddress: providedData.shipToAddress || providedData.billToAddress || "",
+      items: items,
+      subtotal: subtotal,
+      discount: discount,
+      taxableValue: taxableValue,
+      taxRate: taxRate,
+      taxAmount: taxAmount,
+      total: total,
+      terms: providedData.terms || "1. Total payment due in 30 days\n2. Please include the invoice number on your check"
     };
   } else if (effectiveType === "quotation") {
     const rawTotal = providedData.totalAmount || providedData.amount || 10000;

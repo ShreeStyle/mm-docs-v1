@@ -1954,14 +1954,23 @@ export default function Dashboard() {
                 ],
                 gst_invoice: [
                     ...commonFields,
-                    { id: 'gstNumber', label: 'Company GST Number', type: 'text', placeholder: 'e.g. 29ABCDE1234F1Z5', required: true },
-                    { id: 'clientName', label: 'Client Name', type: 'text', placeholder: 'e.g. XYZ Corporation', required: true },
-                    { id: 'clientGST', label: 'Client GST Number', type: 'text', placeholder: 'e.g. 27FGHIJ5678K2L9', required: true },
-                    { id: 'clientAddress', label: 'Client Address', type: 'textarea', placeholder: 'Complete billing address', required: true },
-                    { id: 'invoiceNumber', label: 'Invoice Number', type: 'text', placeholder: 'e.g. GST-INV-2026-001', required: true },
+                    { id: 'companyName', label: 'Company Name', type: 'text', placeholder: 'Your Business Name', required: true },
+                    { id: 'companyAddress', label: 'Company Address', type: 'textarea', placeholder: 'Your Complete Business Address', required: true },
+                    { id: 'gstNumber', label: 'Company GSTIN', type: 'text', placeholder: 'e.g. 29ABCDE1234F1Z5', required: true },
+                    { id: 'invoiceNumber', label: 'Invoice Number', type: 'text', placeholder: 'e.g. GST-2026-001', required: true },
                     { id: 'invoiceDate', label: 'Invoice Date', type: 'date', required: true },
-                    { id: 'baseAmount', label: 'Base Amount (₹)', type: 'number', placeholder: 'e.g. 100000', required: true },
-                    { id: 'serviceDescription', label: 'Service/Product Description', type: 'textarea', placeholder: 'Detailed description for GST compliance', required: true }
+                    { id: 'dueDate', label: 'Due Date', type: 'date', required: false },
+                    { id: 'customerId', label: 'Customer ID', type: 'text', placeholder: 'e.g. CUST-123', required: false },
+                    { id: 'clientName', label: 'Bill To (Name)', type: 'text', placeholder: 'e.g. John Doe', required: true },
+                    { id: 'clientGST', label: 'Billing GSTIN', type: 'text', placeholder: 'e.g. 27FGHIJ5678K2L9', required: false },
+                    { id: 'billToAddress', label: 'Billing Address', type: 'textarea', placeholder: 'Complete billing address', required: true },
+                    { id: 'shipToName', label: 'Ship To (Name)', type: 'text', placeholder: 'e.g. John Doe', required: false },
+                    { id: 'shipToAddress', label: 'Shipping Address', type: 'textarea', placeholder: 'Leave blank if same as billing', required: false },
+                    { id: 'invoiceItems', label: 'Invoice Items (Format: Qty | Product | Description | Unit Price)', type: 'textarea', placeholder: '3 | Cloth | abc | 110\n5 | Furniture | White wool | 550', required: true },
+                    { id: 'discount', label: 'Discount (₹)', type: 'number', placeholder: 'e.g. 140', required: false },
+                    { id: 'taxRate', label: 'Tax Rate (%)', type: 'number', placeholder: 'e.g. 18', required: false },
+                    { id: 'otherCharges', label: 'Other Charges (₹)', type: 'number', placeholder: 'e.g. 0', required: false },
+                    { id: 'terms', label: 'Terms and Conditions', type: 'textarea', placeholder: '1. Total payment due in 30 days...', required: false }
                 ],
 
                 // Compliance Documents
@@ -2840,6 +2849,139 @@ Authorized Signatory              ${formData.consultantName || '[Name]'}
                             </div>
                         )
                     })()
+                },
+                gst_invoice: {
+                    title: 'GST Tax Invoice',
+                    content: (() => {
+                        const items = (formData.invoiceItems || '').split('\n')
+                            .filter(line => line.trim())
+                            .map(line => {
+                                const parts = line.split('|').map(s => s.trim());
+                                const qty = parseFloat(parts[0]) || 0;
+                                const product = parts[1] || '';
+                                const description = parts[2] || '';
+                                const unitPrice = parseFloat(parts[3]) || 0;
+                                return { qty, product, description, unitPrice, total: qty * unitPrice };
+                            });
+                        
+                        const subtotal = items.reduce((sum, item) => sum + item.total, 0);
+                        const discount = parseFloat(formData.discount) || 0;
+                        const taxableValue = subtotal - discount;
+                        const taxRate = parseFloat(formData.taxRate) || 18;
+                        const taxAmount = taxableValue * (taxRate / 100);
+                        const other = parseFloat(formData.otherCharges) || 0;
+                        const total = taxableValue + taxAmount + other;
+
+                        const greenPrimary = '#10B981';
+
+                        return (
+                            <div style={{ width: '100%', fontFamily: 'Inter, system-ui, sans-serif', whiteSpace: 'normal', scale: '0.9', transformOrigin: 'top center', color: '#111827' }}>
+                                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '30px', borderBottom: `2px solid ${greenPrimary}`, paddingBottom: '15px' }}>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
+                                        <div style={{ width: '50px', height: '50px', backgroundColor: '#F3F4F6', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#9CA3AF', fontSize: '10px', fontWeight: 'bold' }}>LOGO</div>
+                                        <div>
+                                            <h2 style={{ margin: '0', color: '#111827', fontSize: '24px', fontWeight: '800' }}>{formData.companyName || brandKit?.name || 'Company Name'}</h2>
+                                            <p style={{ margin: '0', fontSize: '11px', color: '#6B7280' }}>{(formData.companyAddress || brandKit?.address || 'Company Address')}</p>
+                                            <p style={{ margin: '0', fontSize: '11px', color: '#111827', fontWeight: 'bold' }}>GSTIN: {formData.gstNumber || '29ABCDE1234F1Z5'}</p>
+                                        </div>
+                                    </div>
+                                    <h1 style={{ margin: '0', color: greenPrimary, fontSize: '32px', fontWeight: '900', letterSpacing: '2px' }}>TAX INVOICE</h1>
+                                </div>
+
+                                <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '25px' }}>
+                                    <div style={{ display: 'grid', gridTemplateColumns: '100px 120px', gap: '0', border: '1px solid #E5E7EB' }}>
+                                        <div style={{ padding: '4px 8px', fontSize: '11px', fontWeight: 'bold', borderBottom: '1px solid #E5E7EB', borderRight: '1px solid #E5E7EB', backgroundColor: '#F9FAFB' }}>DATE</div>
+                                        <div style={{ padding: '4px 8px', fontSize: '11px', borderBottom: '1px solid #E5E7EB' }}>{formData.invoiceDate || new Date().toLocaleDateString()}</div>
+                                        <div style={{ padding: '4px 8px', fontSize: '11px', fontWeight: 'bold', borderBottom: '1px solid #E5E7EB', borderRight: '1px solid #E5E7EB', backgroundColor: '#F9FAFB' }}>INVOICE #</div>
+                                        <div style={{ padding: '4px 8px', fontSize: '11px', borderBottom: '1px solid #E5E7EB', fontWeight: 'bold' }}>{formData.invoiceNumber || '[123456]'}</div>
+                                        <div style={{ padding: '4px 8px', fontSize: '11px', fontWeight: 'bold', borderBottom: '1px solid #E5E7EB', borderRight: '1px solid #E5E7EB', backgroundColor: '#F9FAFB' }}>CUSTOMER ID</div>
+                                        <div style={{ padding: '4px 8px', fontSize: '11px', borderBottom: '1px solid #E5E7EB' }}>{formData.customerId || '[123]'}</div>
+                                        <div style={{ padding: '4px 8px', fontSize: '11px', fontWeight: 'bold', borderRight: '1px solid #E5E7EB', backgroundColor: '#F9FAFB' }}>DUE DATE</div>
+                                        <div style={{ padding: '4px 8px', fontSize: '11px' }}>{formData.dueDate || new Date().toLocaleDateString()}</div>
+                                    </div>
+                                </div>
+
+                                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px', marginBottom: '25px' }}>
+                                    <div style={{ border: '1px solid #E5E7EB', borderRadius: '6px', overflow: 'hidden' }}>
+                                        <div style={{ backgroundColor: greenPrimary, color: 'white', padding: '6px 15px', fontWeight: 'bold', fontSize: '13px', textTransform: 'uppercase' }}>BILL TO</div>
+                                        <div style={{ padding: '15px', fontSize: '13px', lineHeight: '1.5' }}>
+                                            <p style={{ margin: '0', fontWeight: 'bold' }}>{formData.clientName || '[Customer Name]'}</p>
+                                            <div style={{ whiteSpace: 'pre-wrap' }}>{formData.billToAddress || '[Address]' }</div>
+                                            {formData.clientGST && <p style={{ margin: '5px 0 0 0', fontWeight: '600' }}>GSTIN: {formData.clientGST}</p>}
+                                        </div>
+                                    </div>
+                                    <div style={{ border: '1px solid #E5E7EB', borderRadius: '6px', overflow: 'hidden' }}>
+                                        <div style={{ backgroundColor: greenPrimary, color: 'white', padding: '6px 15px', fontWeight: 'bold', fontSize: '13px', textTransform: 'uppercase' }}>SHIP TO</div>
+                                        <div style={{ padding: '15px', fontSize: '13px', lineHeight: '1.5' }}>
+                                            <p style={{ margin: '0', fontWeight: 'bold' }}>{formData.shipToName || formData.clientName || '[Receiver Name]'}</p>
+                                            <div style={{ whiteSpace: 'pre-wrap' }}>{formData.shipToAddress || formData.billToAddress || '[Address]' }</div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <table style={{ width: '100%', borderCollapse: 'collapse', marginBottom: '30px' }}>
+                                    <thead>
+                                        <tr style={{ backgroundColor: greenPrimary, color: 'white' }}>
+                                            <th style={{ padding: '8px', textAlign: 'left', fontSize: '12px' }}>No.</th>
+                                            <th style={{ padding: '8px', textAlign: 'left', fontSize: '12px' }}>PRODUCT</th>
+                                            <th style={{ padding: '8px', textAlign: 'center', fontSize: '12px' }}>QTY</th>
+                                            <th style={{ padding: '8px', textAlign: 'right', fontSize: '12px' }}>PRICE</th>
+                                            <th style={{ padding: '8px', textAlign: 'right', fontSize: '12px' }}>AMOUNT</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {items.length > 0 ? items.map((item, idx) => (
+                                            <tr key={idx} style={{ backgroundColor: idx % 2 === 0 ? 'white' : '#F9FAFB', borderBottom: '1px solid #E5E7EB' }}>
+                                                <td style={{ padding: '8px', fontSize: '12px', borderLeft: '1px solid #E5E7EB', borderRight: '1px solid #E5E7EB' }}>{idx + 1}</td>
+                                                <td style={{ padding: '8px', fontSize: '12px', borderRight: '1px solid #E5E7EB' }}>
+                                                    <div style={{ fontWeight: 'bold' }}>{item.product}</div>
+                                                    <div style={{ fontSize: '10px', color: '#6B7280' }}>{item.description}</div>
+                                                </td>
+                                                <td style={{ padding: '8px', textAlign: 'center', fontSize: '12px', borderRight: '1px solid #E5E7EB' }}>{item.qty}</td>
+                                                <td style={{ padding: '8px', textAlign: 'right', fontSize: '12px', borderRight: '1px solid #E5E7EB' }}>₹{item.unitPrice.toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
+                                                <td style={{ padding: '8px', textAlign: 'right', fontSize: '12px', fontWeight: 'bold', borderRight: '1px solid #E5E7EB' }}>₹{item.total.toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
+                                            </tr>
+                                        )) : (
+                                            <tr>
+                                                <td colSpan="5" style={{ padding: '40px', textAlign: 'center', color: '#9CA3AF', fontSize: '13px', border: '1px solid #E5E7EB' }}>Fill in invoice items to populate the table</td>
+                                            </tr>
+                                        )}
+                                    </tbody>
+                                </table>
+
+                                <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr', gap: '40px' }}>
+                                    <div>
+                                        <div style={{ backgroundColor: greenPrimary, color: 'white', padding: '4px 12px', fontWeight: 'bold', fontSize: '12px', marginBottom: '0', textTransform: 'uppercase' }}>Terms & Conditions</div>
+                                        <div style={{ border: '1px solid #E5E7EB', padding: '12px', fontSize: '11px', minHeight: '100px', backgroundColor: 'white', whiteSpace: 'pre-wrap' }}>
+                                            {formData.terms || '1. Total payment due in 30 days\n2. Please include the invoice number on your check'}
+                                        </div>
+                                    </div>
+                                    <div style={{ alignSelf: 'start' }}>
+                                        <div style={{ display: 'flex', justifyContent: 'space-between', padding: '4px 8px', fontSize: '13px', borderBottom: '1px solid #E5E7EB' }}>
+                                            <span style={{ fontWeight: '600' }}>Subtotal</span>
+                                            <span>₹{subtotal.toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
+                                        </div>
+                                        <div style={{ display: 'flex', justifyContent: 'space-between', padding: '4px 8px', fontSize: '13px', borderBottom: '1px solid #E5E7EB' }}>
+                                            <span style={{ fontWeight: '600' }}>Discount</span>
+                                            <span>₹{discount.toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
+                                        </div>
+                                        <div style={{ display: 'flex', justifyContent: 'space-between', padding: '4px 8px', fontSize: '13px', borderBottom: '1px solid #E5E7EB' }}>
+                                            <span style={{ fontWeight: '600' }}>Tax ({taxRate}%)</span>
+                                            <span>₹{taxAmount.toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
+                                        </div>
+                                        <div style={{ display: 'flex', justifyContent: 'space-between', padding: '12px 10px', backgroundColor: '#F3F4F6', fontWeight: '900', fontSize: '16px', marginTop: '5px', borderRadius: '4px' }}>
+                                            <span style={{ color: '#111827' }}>TOTAL</span>
+                                            <span style={{ color: greenPrimary }}>₹{total.toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div style={{ textAlign: 'center', marginTop: '40px', color: '#6B7280', fontSize: '12px' }}>
+                                    <p style={{ marginTop: '15px', fontWeight: '900', color: greenPrimary, fontStyle: 'italic', fontSize: '16px' }}>Thank You For Your Business!</p>
+                                </div>
+                            </div>
+                        )
+                    })()
                 }
             };
 
@@ -3490,76 +3632,82 @@ Authorized Signatory              ${formData.consultantName || '[Name]'}
                         overflowY: 'auto',
                         padding: '20px'
                     }}>
-                        {/* Company Header - Compact */}
-                        <div style={{
-                            textAlign: 'center',
-                            marginBottom: '20px',
-                            paddingBottom: '12px',
-                            borderBottom: '2px solid #F97316'
-                        }}>
-                            <div style={{
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                gap: '8px',
-                                marginBottom: '6px'
-                            }}>
+                        {/* Document Content Box */}
+                        <div style={{ backgroundColor: 'white', border: '1px solid #E5E7EB', borderRadius: '8px', padding: '30px', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.1)', overflowY: 'auto', maxHeight: 'calc(100vh - 180px)' }}>
+                            {/* Company Header - Only show for simple/generic documents */}
+                            {!(generatedDoc.type === 'gst_invoice' || generatedDoc.type === 'purchase_order' || generatedDoc.type === 'receipt' || generatedDoc.type === 'payment_receipt') && (
                                 <div style={{
-                                    width: '24px',
-                                    height: '24px',
-                                    borderRadius: '6px',
-                                    backgroundColor: '#F97316',
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'center',
-                                    color: 'white',
-                                    fontSize: '12px',
-                                    fontWeight: '600'
+                                    textAlign: 'center',
+                                    marginBottom: '20px',
+                                    paddingBottom: '12px',
+                                    borderBottom: '2px solid #F97316'
                                 }}>
-                                    {(brandKit?.name || generatedDoc.content?.companyName || 'MM').charAt(0)}
+                                    <div style={{
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                        gap: '8px',
+                                        marginBottom: '6px'
+                                    }}>
+                                        <div style={{
+                                            width: '24px',
+                                            height: '24px',
+                                            borderRadius: '6px',
+                                            backgroundColor: '#F97316',
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            justifyContent: 'center',
+                                            color: 'white',
+                                            fontSize: '12px',
+                                            fontWeight: '600'
+                                        }}>
+                                            {(brandKit?.name || generatedDoc.content?.companyName || 'MM').charAt(0)}
+                                        </div>
+                                        <div>
+                                            <h1 style={{
+                                                fontSize: '16px',
+                                                fontWeight: '700',
+                                                color: '#111827',
+                                                margin: 0
+                                            }}>{brandKit?.name || generatedDoc.content?.companyName || 'MM Docs'}</h1>
+                                            <p style={{
+                                                fontSize: '10px',
+                                                color: '#6B7280',
+                                                margin: 0
+                                            }}>{generatedDoc.content?.companyAddress || 'Professional Document Platform'}</p>
+                                        </div>
+                                    </div>
                                 </div>
-                                <div>
-                                    <h1 style={{
-                                        fontSize: '16px',
+                            )}
+
+                            {/* Document Title - Only show for simple/generic documents */}
+                            {!(generatedDoc.type === 'gst_invoice' || generatedDoc.type === 'purchase_order' || generatedDoc.type === 'receipt' || generatedDoc.type === 'payment_receipt') && (
+                                <div style={{ textAlign: 'center', marginBottom: '20px' }}>
+                                    <h2 style={{
+                                        fontSize: '20px',
                                         fontWeight: '700',
                                         color: '#111827',
-                                        margin: 0
-                                    }}>{brandKit?.name || generatedDoc.content?.companyName || 'MM Docs'}</h1>
+                                        margin: '0 0 4px 0',
+                                        textTransform: 'uppercase',
+                                        letterSpacing: '0.5px'
+                                    }}>
+                                        {generatedDoc.content?.title || generatedDoc.title}
+                                    </h2>
                                     <p style={{
-                                        fontSize: '10px',
+                                        fontSize: '11px',
                                         color: '#6B7280',
                                         margin: 0
-                                    }}>{generatedDoc.content?.companyAddress || 'Professional Document Platform'}</p>
+                                    }}>
+                                        {generatedDoc.content?.date || new Date().toLocaleDateString('en-US', {
+                                            year: 'numeric',
+                                            month: 'long',
+                                            day: 'numeric'
+                                        })}
+                                    </p>
                                 </div>
-                            </div>
-                        </div>
+                            )}
 
-                        {/* Document Title - Compact */}
-                        <div style={{ textAlign: 'center', marginBottom: '20px' }}>
-                            <h2 style={{
-                                fontSize: '20px',
-                                fontWeight: '700',
-                                color: '#111827',
-                                margin: '0 0 4px 0',
-                                textTransform: 'uppercase',
-                                letterSpacing: '0.5px'
-                            }}>
-                                {generatedDoc.content?.title || generatedDoc.title}
-                            </h2>
-                            <p style={{
-                                fontSize: '11px',
-                                color: '#6B7280',
-                                margin: 0
-                            }}>
-                                {generatedDoc.content?.date || new Date().toLocaleDateString('en-US', {
-                                    year: 'numeric',
-                                    month: 'long',
-                                    day: 'numeric'
-                                })}
-                            </p>
-                        </div>
-
-                        {/* AI Generated Content Display */}
+                            {/* AI Generated Content Display */}
                         <div style={{
                             fontSize: '12px',
                             lineHeight: '1.5',
@@ -3802,6 +3950,109 @@ Authorized Signatory              ${formData.consultantName || '[Name]'}
                                         </div>
                                     )}
                                 </div>
+                            ) : (generatedDoc.type === 'gst_invoice') && generatedDoc.content && typeof generatedDoc.content === 'object' ? (
+                                // Professional GST Invoice Sync Renderer
+                                <div style={{ width: '100%', fontFamily: 'Inter, system-ui, sans-serif', color: '#111827', whiteSpace: 'normal' }}>
+                                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '30px', borderBottom: '2px solid #10B981', paddingBottom: '15px' }}>
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
+                                            <div style={{ width: '50px', height: '50px', backgroundColor: '#F3F4F6', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#9CA3AF', fontSize: '10px', fontWeight: 'bold' }}>LOGO</div>
+                                            <div>
+                                                <h2 style={{ margin: '0', color: '#111827', fontSize: '24px', fontWeight: '800' }}>{generatedDoc.content.companyName || 'Company Name'}</h2>
+                                                <p style={{ margin: '0', fontSize: '11px', color: '#6B7280' }}>{generatedDoc.content.companyAddress}</p>
+                                                <p style={{ margin: '0', fontSize: '11px', color: '#111827', fontWeight: 'bold' }}>GSTIN: {generatedDoc.content.gstNumber || 'N/A'}</p>
+                                            </div>
+                                        </div>
+                                        <h1 style={{ margin: '0', color: '#10B981', fontSize: '32px', fontWeight: '900', letterSpacing: '2px' }}>TAX INVOICE</h1>
+                                    </div>
+
+                                    <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '25px' }}>
+                                        <div style={{ display: 'grid', gridTemplateColumns: '100px 120px', gap: '0', border: '1px solid #E5E7EB' }}>
+                                            <div style={{ padding: '4px 8px', fontSize: '11px', fontWeight: 'bold', borderBottom: '1px solid #E5E7EB', borderRight: '1px solid #E5E7EB', backgroundColor: '#F9FAFB' }}>DATE</div>
+                                            <div style={{ padding: '4px 8px', fontSize: '11px', borderBottom: '1px solid #E5E7EB' }}>{generatedDoc.content.invoiceDate}</div>
+                                            <div style={{ padding: '4px 8px', fontSize: '11px', fontWeight: 'bold', borderBottom: '1px solid #E5E7EB', borderRight: '1px solid #E5E7EB', backgroundColor: '#F9FAFB' }}>INVOICE #</div>
+                                            <div style={{ padding: '4px 8px', fontSize: '11px', borderBottom: '1px solid #E5E7EB', fontWeight: 'bold' }}>{generatedDoc.content.invoiceNumber}</div>
+                                            <div style={{ padding: '4px 8px', fontSize: '11px', fontWeight: 'bold', borderBottom: '1px solid #E5E7EB', borderRight: '1px solid #E5E7EB', backgroundColor: '#F9FAFB' }}>CUSTOMER ID</div>
+                                            <div style={{ padding: '4px 8px', fontSize: '11px', borderBottom: '1px solid #E5E7EB' }}>{generatedDoc.content.customerId || 'N/A'}</div>
+                                            <div style={{ padding: '4px 8px', fontSize: '11px', fontWeight: 'bold', borderRight: '1px solid #E5E7EB', backgroundColor: '#F9FAFB' }}>DUE DATE</div>
+                                            <div style={{ padding: '4px 8px', fontSize: '11px' }}>{generatedDoc.content.dueDate || 'N/A'}</div>
+                                        </div>
+                                    </div>
+
+                                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px', marginBottom: '25px' }}>
+                                        <div style={{ border: '1px solid #E5E7EB', borderRadius: '6px', overflow: 'hidden' }}>
+                                            <div style={{ backgroundColor: '#10B981', color: 'white', padding: '6px 15px', fontWeight: 'bold', fontSize: '13px', textTransform: 'uppercase' }}>BILL TO</div>
+                                            <div style={{ padding: '15px', fontSize: '13px', lineHeight: '1.5' }}>
+                                                <p style={{ margin: '0', fontWeight: 'bold' }}>{generatedDoc.content.clientName}</p>
+                                                <div style={{ whiteSpace: 'pre-wrap' }}>{generatedDoc.content.billToAddress}</div>
+                                                {generatedDoc.content.clientGST && <p style={{ margin: '5px 0 0 0', fontWeight: '600' }}>GSTIN: {generatedDoc.content.clientGST}</p>}
+                                            </div>
+                                        </div>
+                                        <div style={{ border: '1px solid #E5E7EB', borderRadius: '6px', overflow: 'hidden' }}>
+                                            <div style={{ backgroundColor: '#10B981', color: 'white', padding: '6px 15px', fontWeight: 'bold', fontSize: '13px', textTransform: 'uppercase' }}>SHIP TO</div>
+                                            <div style={{ padding: '15px', fontSize: '13px', lineHeight: '1.5' }}>
+                                                <p style={{ margin: '0', fontWeight: 'bold' }}>{generatedDoc.content.shipToName || generatedDoc.content.clientName}</p>
+                                                <div style={{ whiteSpace: 'pre-wrap' }}>{generatedDoc.content.shipToAddress || generatedDoc.content.billToAddress}</div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <table style={{ width: '100%', borderCollapse: 'collapse', marginBottom: '30px' }}>
+                                        <thead>
+                                            <tr style={{ backgroundColor: '#10B981', color: 'white' }}>
+                                                <th style={{ padding: '8px', textAlign: 'left', fontSize: '12px' }}>No.</th>
+                                                <th style={{ padding: '8px', textAlign: 'left', fontSize: '12px' }}>PRODUCT</th>
+                                                <th style={{ padding: '8px', textAlign: 'center', fontSize: '12px' }}>QTY</th>
+                                                <th style={{ padding: '8px', textAlign: 'right', fontSize: '12px' }}>PRICE</th>
+                                                <th style={{ padding: '8px', textAlign: 'right', fontSize: '12px' }}>AMOUNT</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {Array.isArray(generatedDoc.content.items) && generatedDoc.content.items.map((item, idx) => (
+                                                <tr key={idx} style={{ backgroundColor: idx % 2 === 0 ? 'white' : '#F9FAFB', borderBottom: '1px solid #E5E7EB' }}>
+                                                    <td style={{ padding: '8px', fontSize: '12px', borderLeft: '1px solid #E5E7EB', borderRight: '1px solid #E5E7EB' }}>{idx + 1}</td>
+                                                    <td style={{ padding: '8px', fontSize: '12px', borderRight: '1px solid #E5E7EB' }}>
+                                                        <div style={{ fontWeight: 'bold' }}>{item.product}</div>
+                                                        <div style={{ fontSize: '10px', color: '#6B7280' }}>{item.description}</div>
+                                                    </td>
+                                                    <td style={{ padding: '8px', textAlign: 'center', fontSize: '12px', borderRight: '1px solid #E5E7EB' }}>{item.qty}</td>
+                                                    <td style={{ padding: '8px', textAlign: 'right', fontSize: '12px', borderRight: '1px solid #E5E7EB' }}>₹{Number(item.unitPrice || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
+                                                    <td style={{ padding: '8px', textAlign: 'right', fontSize: '12px', fontWeight: 'bold', borderRight: '1px solid #E5E7EB' }}>₹{Number(item.total || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
+                                                </tr>
+                                            ))}
+                                        </tbody>
+                                    </table>
+
+                                    <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr', gap: '40px' }}>
+                                        <div>
+                                            <div style={{ backgroundColor: '#10B981', color: 'white', padding: '4px 12px', fontWeight: 'bold', fontSize: '12px', marginBottom: '0', textTransform: 'uppercase' }}>Terms & Conditions</div>
+                                            <div style={{ border: '1px solid #E5E7EB', padding: '12px', fontSize: '11px', minHeight: '100px', backgroundColor: 'white', whiteSpace: 'pre-wrap' }}>
+                                                {generatedDoc.content.terms}
+                                            </div>
+                                        </div>
+                                        <div style={{ alignSelf: 'start' }}>
+                                            <div style={{ display: 'flex', justifyContent: 'space-between', padding: '4px 8px', fontSize: '13px', borderBottom: '1px solid #E5E7EB' }}>
+                                                <span style={{ fontWeight: '600' }}>Subtotal</span>
+                                                <span>₹{Number(generatedDoc.content.subtotal || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
+                                            </div>
+                                            <div style={{ display: 'flex', justifyContent: 'space-between', padding: '4px 8px', fontSize: '13px', borderBottom: '1px solid #E5E7EB' }}>
+                                                <span style={{ fontWeight: '600' }}>Discount</span>
+                                                <span>₹{Number(generatedDoc.content.discount || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
+                                            </div>
+                                            <div style={{ display: 'flex', justifyContent: 'space-between', padding: '4px 8px', fontSize: '13px', borderBottom: '1px solid #E5E7EB' }}>
+                                                <span style={{ fontWeight: '600' }}>Tax ({generatedDoc.content.taxRate || 18}%)</span>
+                                                <span>₹{Number(generatedDoc.content.taxAmount || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
+                                            </div>
+                                            <div style={{ display: 'flex', justifyContent: 'space-between', padding: '12px 10px', backgroundColor: '#F3F4F6', fontWeight: '900', fontSize: '16px', marginTop: '5px', borderRadius: '4px' }}>
+                                                <span style={{ color: '#111827' }}>TOTAL</span>
+                                                <span style={{ color: '#10B981' }}>₹{Number(generatedDoc.content.total || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div style={{ textAlign: 'center', marginTop: '40px', borderTop: '1px solid #F3F4F6', paddingTop: '15px' }}>
+                                        <p style={{ margin: '0', fontSize: '16px', fontWeight: '900', fontStyle: 'italic', color: '#10B981' }}>Thank You For Your Business!</p>
+                                    </div>
+                                </div>
                             ) : typeof generatedDoc.content === 'string' ? (
                                 // Handle string content
                                 generatedDoc.content.split('\n').map((line, i) => (
@@ -3969,6 +4220,7 @@ Authorized Signatory              ${formData.consultantName || '[Name]'}
                             </p>
                         </div>
                     </div>
+                </div>
                 </div>
             </div>
         );
