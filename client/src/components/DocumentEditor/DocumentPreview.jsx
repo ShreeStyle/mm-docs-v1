@@ -1,39 +1,66 @@
 import React, { useRef, useEffect, useState } from 'react';
-import { ZoomIn, ZoomOut, Maximize2, ChevronLeft, ChevronRight } from 'lucide-react';
+import * as pdfjsLib from 'pdfjs-dist';
+import { ZoomIn, ZoomOut, Maximize2, ChevronLeft, ChevronRight, X, Loader2 } from 'lucide-react';
 
-const DocumentPreview = ({ document, fields, onFieldDrop, onFieldSelect, onFieldUpdate, selectedFieldId }) => {
+// Set up pdfjs worker
+pdfjsLib.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.js`;
+
+const DocumentPreview = ({ document, fields, onFieldDrop, onFieldSelect, onFieldUpdate, selectedFieldId, onFieldDelete }) => {
     const canvasRef = useRef(null);
     const containerRef = useRef(null);
     const [zoom, setZoom] = useState(100);
     const [currentPage, setCurrentPage] = useState(1);
     const [canvasSize, setCanvasSize] = useState({ width: 800, height: 1100 });
+    const [pdf, setPdf] = useState(null);
+    const [rendering, setRendering] = useState(false);
 
-    // Drag and Resize State
-    const [isDragging, setIsDragging] = useState(false);
-    const [isResizing, setIsResizing] = useState(false);
-    const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
-    const [resizeHandle, setResizeHandle] = useState(null);
-    const [resizeStart, setResizeStart] = useState({});
-
+    // Load PDF
     useEffect(() => {
-        if (canvasRef.current) {
-            const canvas = canvasRef.current;
-            const ctx = canvas.getContext('2d');
+        const loadPdf = async () => {
+            if (document?.documentContent?.originalPdf) {
+                try {
+                    const loadingTask = pdfjsLib.getDocument(document.documentContent.originalPdf);
+                    const pdfDoc = await loadingTask.promise;
+                    setPdf(pdfDoc);
+                } catch (err) {
+                    console.error('Error loading PDF:', err);
+                }
+            }
+        };
+        loadPdf();
+    }, [document?.documentContent?.originalPdf]);
 
-            // Clear canvas
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
+    // Render Page
+    useEffect(() => {
+        const renderPage = async () => {
+            if (!pdf || !canvasRef.current || rendering) return;
 
-            // Draw white background (simulating paper)
-            ctx.fillStyle = '#ffffff';
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            setRendering(true);
+            try {
+                const page = await pdf.getPage(currentPage);
+                const canvas = canvasRef.current;
+                const context = canvas.getContext('2d');
+                
+                // Set scale for high DPI displays
+                const viewport = page.getViewport({ scale: 1.5 }); // Base scale
+                canvas.height = viewport.height;
+                canvas.width = viewport.width;
+                setCanvasSize({ width: viewport.width, height: viewport.height });
 
-            // Draw placeholder text
-            ctx.fillStyle = '#f1f5f9';
-            ctx.font = '16px Arial';
-            ctx.textAlign = 'center';
-            ctx.fillText('Loading Document Preview...', canvas.width / 2, canvas.height / 2);
-        }
-    }, [currentPage, zoom, document]);
+                const renderContext = {
+                    canvasContext: context,
+                    viewport: viewport
+                };
+                await page.render(renderContext).promise;
+            } catch (err) {
+                console.error('Error rendering page:', err);
+            } finally {
+                setRendering(false);
+            }
+        };
+
+        renderPage();
+    }, [pdf, currentPage, document]);
 
     const handleCanvasDrop = (e) => {
         e.preventDefault();
@@ -240,6 +267,15 @@ const DocumentPreview = ({ document, fields, onFieldDrop, onFieldSelect, onField
                         <div className="resize-handle resize-handle-ne" onMouseDown={(e) => handleResizeMouseDown(e, field, 'ne')} />
                         <div className="resize-handle resize-handle-sw" onMouseDown={(e) => handleResizeMouseDown(e, field, 'sw')} />
                         <div className="resize-handle resize-handle-se" onMouseDown={(e) => handleResizeMouseDown(e, field, 'se')} />
+                        <button 
+                            className="field-delete-btn"
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                onFieldDelete(field.id || field._id);
+                            }}
+                        >
+                            <X size={12} />
+                        </button>
                     </>
                 )}
             </div>
@@ -288,6 +324,12 @@ const DocumentPreview = ({ document, fields, onFieldDrop, onFieldSelect, onField
             </div>
 
             <div className="preview-canvas">
+                {rendering && (
+                    <div className="rendering-overlay">
+                        <Loader2 className="spinner" size={48} />
+                        <p>Rendering page...</p>
+                    </div>
+                )}
                 <div
                     ref={containerRef}
                     className="canvas-container"

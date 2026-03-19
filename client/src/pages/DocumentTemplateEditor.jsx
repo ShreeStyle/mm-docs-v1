@@ -57,6 +57,16 @@ const DocumentTemplateEditor = () => {
 
     // Type Tab State
     const [typedName, setTypedName] = useState('');
+    const [handwritingFonts] = useState([
+        'Brush Script MT, cursive',
+        'Lucida Handwriting, cursive',
+        'Bradley Hand, cursive',
+        'Dancing Script, cursive',
+        'Pacifico, cursive',
+        'Caveat, cursive',
+        'Satisfy, cursive',
+        'Great Vibes, cursive'
+    ]);
     const [selectedFont, setSelectedFont] = useState('Brush Script MT, cursive');
 
     // Upload Tab State
@@ -410,13 +420,18 @@ const DocumentTemplateEditor = () => {
         ));
     };
 
-    // Canvas initialization for signature modal
+    // Initialize signature canvas when modal opens
+    const canvasInitialized = useRef(false);
     useEffect(() => {
-        if (showSignatureModal && signatureTab === 'draw' && signatureCanvasRef.current) {
+        if (showSignatureModal && signatureTab === 'draw' && signatureCanvasRef.current && !canvasInitialized.current) {
             const canvas = signatureCanvasRef.current;
             const ctx = canvas.getContext('2d');
             ctx.fillStyle = 'white';
             ctx.fillRect(0, 0, canvas.width, canvas.height);
+            canvasInitialized.current = true;
+        }
+        if (!showSignatureModal) {
+            canvasInitialized.current = false;
         }
     }, [showSignatureModal, signatureTab]);
 
@@ -1900,6 +1915,32 @@ const DocumentTemplateEditor = () => {
             switch (element.type) {
                 case 'signature':
                 case 'initials':
+                    if (typeof element.value === 'string' && element.value.startsWith('data:image')) {
+                        return (
+                            <img 
+                                src={element.value} 
+                                alt="Signature" 
+                                style={{ width: '100%', height: '100%', objectFit: 'contain', pointerEvents: 'none' }} 
+                            />
+                        );
+                    } else if (typeof element.value === 'object') {
+                        return (
+                            <div style={{ 
+                                display: 'flex', 
+                                alignItems: 'center', 
+                                justifyContent: 'center', 
+                                height: '100%',
+                                fontFamily: element.value.font || 'Brush Script MT, cursive',
+                                fontSize: element.type === 'signature' ? '24px' : '20px',
+                                color: element.value.color || '#000',
+                                fontStyle: 'italic'
+                            }}>
+                                {element.value.text}
+                            </div>
+                        );
+                    }
+                    return <div className="element-content">{element.name}</div>;
+                    
                 case 'date':
                     return <input type="date" value={element.value} onChange={(e) => handleElementValueChange(element.id, e.target.value)} className="field-input" onClick={(e) => e.stopPropagation()} />;
                 case 'checkbox':
@@ -3203,25 +3244,34 @@ const DocumentTemplateEditor = () => {
                                     </div>
 
                                     {/* Style Selection - Show actual font preview */}
-                                    <div className="font-options" style={{ marginTop: '20px', display: 'flex', gap: '12px', flexWrap: 'wrap', justifyContent: 'center' }}>
-                                        {[
-                                            { name: 'Brush Script MT, cursive', label: 'Style 1' },
-                                            { name: 'Lucida Handwriting, cursive', label: 'Style 2' },
-                                            { name: 'Bradley Hand, cursive', label: 'Style 3' }
-                                        ].map(font => (
+                                    <div className="font-options" style={{ 
+                                        marginTop: '20px', 
+                                        display: 'grid', 
+                                        gridTemplateColumns: 'repeat(2, 1fr)', 
+                                        gap: '12px', 
+                                        maxHeight: '200px', 
+                                        overflowY: 'auto',
+                                        padding: '10px'
+                                    }}>
+                                        {handwritingFonts.map((font, index) => (
                                             <button
-                                                key={font.name}
-                                                className={`tab-btn ${selectedFont === font.name ? 'active' : ''}`}
+                                                key={font}
+                                                className={`signature-font-option ${selectedFont === font ? 'active' : ''}`}
                                                 style={{
-                                                    borderBottom: selectedFont === font.name ? '3px solid #16a34a' : 'none',
-                                                    padding: '10px 20px',
-                                                    fontFamily: font.name,
-                                                    fontSize: '20px',
-                                                    color: selectedFont === font.name ? '#111827' : '#64748b'
+                                                    padding: '15px',
+                                                    border: selectedFont === font ? '2px solid #F97316' : '1px solid #e2e8f0',
+                                                    borderRadius: '8px',
+                                                    background: selectedFont === font ? '#fff7ed' : 'white',
+                                                    fontFamily: font,
+                                                    fontSize: '24px',
+                                                    textAlign: 'center',
+                                                    cursor: 'pointer',
+                                                    transition: 'all 0.2s',
+                                                    color: '#1e293b'
                                                 }}
-                                                onClick={() => setSelectedFont(font.name)}
+                                                onClick={() => setSelectedFont(font)}
                                             >
-                                                {typedName || (currentSignatureElement?.type === 'initials' ? 'JD' : 'John Doe')}
+                                                {typedName || (currentSignatureElement?.type === 'initials' ? userInfo.initials : userInfo.name)}
                                             </button>
                                         ))}
                                     </div>

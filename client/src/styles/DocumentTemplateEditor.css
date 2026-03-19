@@ -2,6 +2,9 @@
    DOCUMENT TEMPLATE EDITOR - MINIMAL STYLE
    ============================================ */
 
+@import url('https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400..700&family=Pacifico&family=Caveat:wght@400..700&family=Satisfy&family=Great+Vibes&display=swap');
+
+
 * {
     box-sizing: border-box;
     margin: 0;
@@ -2542,4 +2545,42 @@ body.dragging * {
 .pricing-footer svg {
     color: #6b7280;
     flex-shrink: 0;
+}
+.signature-font-option {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 80px;
+}
+
+.signature-font-option:hover {
+    border-color: #F97316 !important;
+    background: #fff7ed !important;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.signature-font-option.active {
+    border-color: #F97316 !important;
+    background: #fff7ed !important;
+    box-shadow: 0 0 0 2px rgba(249, 115, 22, 0.2);
+}
+
+/* Custom Scrollbar for font options */
+.font-options::-webkit-scrollbar {
+    width: 6px;
+}
+
+.font-options::-webkit-scrollbar-track {
+    background: #f1f5f9;
+    border-radius: 10px;
+}
+
+.font-options::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 10px;
+}
+
+.font-options::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8;
 }

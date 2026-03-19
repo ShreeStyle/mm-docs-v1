@@ -30,6 +30,16 @@ const DocumentEditor = () => {
     const [selectedFont, setSelectedFont] = useState('Brush Script MT, cursive');
     const [selectedFieldId, setSelectedFieldId] = useState(null);
     const [signatureColor, setSignatureColor] = useState('#000000');
+    const [handwritingFonts] = useState([
+        'Brush Script MT, cursive',
+        'Lucida Handwriting, cursive',
+        'Bradley Hand, cursive',
+        'Dancing Script, cursive',
+        'Pacifico, cursive',
+        'Caveat, cursive',
+        'Satisfy, cursive',
+        'Great Vibes, cursive'
+    ]);
 
     // Sidebar Resizing State
     const [sidebarWidth, setSidebarWidth] = useState(320);
@@ -47,12 +57,17 @@ const DocumentEditor = () => {
     }, [documentId]);
 
     // Initialize signature canvas when modal opens
+    const canvasInitialized = useRef(false);
     useEffect(() => {
-        if (showSignatureModal && signatureTab === 'draw' && signatureCanvasRef.current) {
+        if (showSignatureModal && signatureTab === 'draw' && signatureCanvasRef.current && !canvasInitialized.current) {
             const canvas = signatureCanvasRef.current;
             const ctx = canvas.getContext('2d');
             ctx.fillStyle = 'white';
             ctx.fillRect(0, 0, canvas.width, canvas.height);
+            canvasInitialized.current = true;
+        }
+        if (!showSignatureModal) {
+            canvasInitialized.current = false;
         }
     }, [showSignatureModal, signatureTab]);
 
@@ -151,6 +166,16 @@ const DocumentEditor = () => {
         });
     };
 
+    const deleteField = (fieldId) => {
+        setFields(prev => {
+            const newFields = prev.filter(f => f.id !== fieldId && f._id !== fieldId);
+            autoSave(newFields);
+            return newFields;
+        });
+        setSelectedField(null);
+        setSelectedFieldId(null);
+    };
+
     // Signature Canvas Drawing Functions
     const startDrawing = (e) => {
         const canvas = signatureCanvasRef.current;
@@ -230,10 +255,13 @@ const DocumentEditor = () => {
         }
 
         // Update the field with signature data
-        updateField(currentSignatureField.id || currentSignatureField._id, {
-            value: signatureValue,
-            completed: true
-        });
+        const fieldId = currentSignatureField?.id || currentSignatureField?._id;
+        if (fieldId) {
+            updateField(fieldId, {
+                value: signatureValue,
+                completed: true
+            });
+        }
 
         // Close modal and reset
         setShowSignatureModal(false);
@@ -347,12 +375,19 @@ const DocumentEditor = () => {
         <div className="document-editor">
             {/* Header */}
             <div className="editor-header">
-                <h1 className="editor-title">{document?.title || 'Untitled Document'}</h1>
+                <div className="header-left">
+                    <button className="btn-back" onClick={() => navigate('/dashboard/documents')}>
+                        <ChevronLeft size={20} />
+                    </button>
+                    <h1 className="editor-title">{document?.title || 'Untitled Document'}</h1>
+                </div>
                 <div className="editor-actions">
                     <button
                         className="btn-secondary"
                         onClick={() => {
-                            setCurrentSignatureField({ fieldType: 'signature' });
+                            // Create a temporary field for testing if none selected
+                            const tempField = { id: 'temp-' + Date.now(), fieldType: 'signature' };
+                            setCurrentSignatureField(tempField);
                             setShowSignatureModal(true);
                         }}
                         style={{ background: '#F97316', color: 'white', border: 'none' }}
@@ -387,6 +422,7 @@ const DocumentEditor = () => {
                         handleFieldSelect(field);
                     }}
                     onFieldUpdate={updateField}
+                    onFieldDelete={deleteField}
                     selectedFieldId={selectedFieldId}
                 />
 
@@ -426,6 +462,38 @@ const DocumentEditor = () => {
                         onColorChange={setActiveColor}
                         activeColor={activeColor}
                     />
+
+                    {/* Properties Panel */}
+                    {selectedFieldId && (
+                        <div className="properties-panel">
+                            <div className="panel-header">
+                                <h3>Field Properties</h3>
+                            </div>
+                            <div className="property-group">
+                                <label>Label</label>
+                                <input 
+                                    type="text" 
+                                    value={fields.find(f => f.id === selectedFieldId || f._id === selectedFieldId)?.label || ''} 
+                                    onChange={(e) => updateField(selectedFieldId, { label: e.target.value })}
+                                />
+                            </div>
+                            <div className="property-group">
+                                <label>Assigned To</label>
+                                <select 
+                                    value={fields.find(f => f.id === selectedFieldId || f._id === selectedFieldId)?.properties?.assignedTo || 'CLIENT'}
+                                    onChange={(e) => updateField(selectedFieldId, { properties: { ...fields.find(f => f.id === selectedFieldId || f._id === selectedFieldId)?.properties, assignedTo: e.target.value } })}
+                                >
+                                    <option value="CLIENT">Recipient (Client)</option>
+                                    <option value="SENDER">Sender (Me)</option>
+                                </select>
+                            </div>
+                            <div className="property-actions">
+                                <button className="btn-danger-outline" onClick={() => deleteField(selectedFieldId)}>
+                                    <Trash2 size={14} /> Delete Field
+                                </button>
+                            </div>
+                        </div>
+                    )}
                 </div>
             </div>
 
@@ -552,25 +620,32 @@ const DocumentEditor = () => {
                                     </div>
 
                                     {/* Style Selection - Show actual font preview */}
-                                    <div className="font-options" style={{ marginTop: '20px', display: 'flex', gap: '12px', flexWrap: 'wrap', justifyContent: 'center' }}>
-                                        {[
-                                            { name: 'Brush Script MT, cursive', label: 'Style 1' },
-                                            { name: 'Lucida Handwriting, cursive', label: 'Style 2' },
-                                            { name: 'Bradley Hand, cursive', label: 'Style 3' }
-                                        ].map(font => (
+                                    <div className="font-options" style={{ 
+                                        marginTop: '20px', 
+                                        display: 'grid', 
+                                        gridTemplateColumns: 'repeat(2, 1fr)', 
+                                        gap: '12px', 
+                                        maxHeight: '200px', 
+                                        overflowY: 'auto',
+                                        padding: '10px'
+                                    }}>
+                                        {handwritingFonts.map((font, index) => (
                                             <button
-                                                key={font.name}
-                                                className={`signature-tab ${selectedFont === font.name ? 'active' : ''}`}
+                                                key={font}
+                                                className={`signature-font-option ${selectedFont === font ? 'active' : ''}`}
                                                 style={{
-                                                    borderBottom: selectedFont === font.name ? '3px solid #16a34a' : 'none',
-                                                    padding: '10px 20px',
-                                                    borderRadius: 0,
-                                                    height: 'auto',
-                                                    fontFamily: font.name,
-                                                    fontSize: '20px',
-                                                    color: selectedFont === font.name ? '#111827' : '#64748b'
+                                                    padding: '15px',
+                                                    border: selectedFont === font ? '2px solid #F97316' : '1px solid #e2e8f0',
+                                                    borderRadius: '8px',
+                                                    background: selectedFont === font ? '#fff7ed' : 'white',
+                                                    fontFamily: font,
+                                                    fontSize: '24px',
+                                                    textAlign: 'center',
+                                                    cursor: 'pointer',
+                                                    transition: 'all 0.2s',
+                                                    color: '#1e293b'
                                                 }}
-                                                onClick={() => setSelectedFont(font.name)}
+                                                onClick={() => setSelectedFont(font)}
                                             >
                                                 {typedName || (currentSignatureField?.fieldType === 'initials' ? 'JD' : 'John Doe')}
                                             </button>
@@ -630,7 +705,7 @@ const DocumentEditor = () => {
                                 className="btn-apply"
                                 onClick={handleApplySignature}
                                 disabled={
-                                    (signatureTab === 'draw' && !isDrawing && !signatureCanvasRef.current?.toDataURL().includes('base64')) ||
+                                    (signatureTab === 'draw' && !signatureCanvasRef.current) ||
                                     (signatureTab === 'type' && !typedName) ||
                                     (signatureTab === 'upload' && !uploadedImage)
                                 }
