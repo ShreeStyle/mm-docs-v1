@@ -1674,7 +1674,21 @@ export default function Dashboard() {
                 'shipping cost': 'shippingCost',
                 'shipping': 'shippingCost',
                 'other charges': 'otherCharges',
-                'comments': 'comments'
+                'comments': 'comments',
+                'credit note number': 'creditNoteNumber',
+                'credit note #': 'creditNoteNumber',
+                'cn#': 'creditNoteNumber',
+                'credit note date': 'creditNoteDate',
+                'original invoice number': 'invoiceNumber',
+                'original invoice date': 'invoiceDate',
+                'client name': 'clientName',
+                'customer name': 'clientName',
+                'client address': 'clientAddress',
+                'customer address': 'clientAddress',
+                'reason for credit': 'reason',
+                'credit reason': 'reason',
+                'signature name': 'signatureName',
+                'authorized signatory': 'signatureName'
             };
 
             // Parse "Key: Value" or "Key - Value" patterns
@@ -1692,12 +1706,13 @@ export default function Dashboard() {
             });
 
             // Special handling for poItems/receiptItems (multiline)
-            if (smartFillText.toLowerCase().includes('po items:') || smartFillText.toLowerCase().includes('items:')) {
-                const itemsMatch = smartFillText.match(/(?:po items:|items:)\s*([\s\S]*?)(?=\n\n|\n[a-z]+:|$)/i);
+            if (smartFillText.toLowerCase().includes('po items:') || smartFillText.toLowerCase().includes('items:') || smartFillText.toLowerCase().includes('credit note items:')) {
+                const itemsMatch = smartFillText.match(/(?:po items:|items:|credit note items:)\s*([\s\S]*?)(?=\n\n|\n[a-z]+:|$)/i);
                 if (itemsMatch && itemsMatch[1]) {
                     const cleanItems = itemsMatch[1].trim();
                     newFormData.poItems = cleanItems;
                     newFormData.receiptItems = cleanItems;
+                    newFormData.creditNoteItems = cleanItems;
                 }
             }
 
@@ -1944,18 +1959,24 @@ export default function Dashboard() {
                 ],
                 credit_note: [
                     ...commonFields,
-                    { id: 'clientName', label: 'Client Name', type: 'text', placeholder: 'e.g. XYZ Corporation', required: true },
-                    { id: 'clientAddress', label: 'Client Address', type: 'textarea', placeholder: 'Complete client address', required: true },
-                    { id: 'creditNoteNumber', label: 'Credit Note Number', type: 'text', placeholder: 'e.g. CN-2026-001', required: true },
-                    { id: 'creditNoteDate', label: 'Credit Note Date', type: 'date', required: true },
-                    { id: 'invoiceNumber', label: 'Original Invoice Number', type: 'text', placeholder: 'e.g. INV-2025-999', required: true },
-                    { id: 'creditAmount', label: 'Credit Amount (₹)', type: 'number', placeholder: 'e.g. 10000', required: true },
-                    { id: 'reason', label: 'Reason for Credit', type: 'textarea', placeholder: 'e.g. Product return / Overcharge / Discount', required: true }
+                    { id: 'clientName', label: 'Customer Name', type: 'text', placeholder: 'e.g. John Smith', required: true },
+                    { id: 'clientAddress', label: 'Customer Address', type: 'textarea', placeholder: 'Complete customer address', required: true },
+                    { id: 'shipToName', label: 'Ship To (Name)', type: 'text', placeholder: 'e.g. John Smith', required: false },
+                    { id: 'shipToAddress', label: 'Ship To Address', type: 'textarea', placeholder: 'Complete shipping address', required: false },
+                    { id: 'creditNoteNumber', label: 'Credit Note #', type: 'text', placeholder: 'e.g. US-001', required: true },
+                    { id: 'creditNoteDate', label: 'Credit Note Date', type: 'date', required: false },
+                    { id: 'poNumber', label: 'P.O. #', type: 'text', placeholder: 'e.g. 2312/2019', required: false },
+                    { id: 'dueDate', label: 'Due Date', type: 'date', required: false },
+                    { id: 'invoiceNumber', label: 'Original Invoice #', type: 'text', placeholder: 'e.g. INV-2025-001', required: true },
+                    { id: 'invoiceDate', label: 'Original Invoice Date', type: 'date', required: false },
+                    { id: 'creditNoteItems', label: 'Credit Note Items (Format: Qty | Description | Unit Price)', type: 'textarea', placeholder: '1 | Front and rear brake cables | 100\n2 | New set of pedal arms | 15\n3 | Labor 3hrs | 5', required: true },
+                    { id: 'taxRate', label: 'Sales Tax (%)', type: 'number', placeholder: 'e.g. 6.25', required: false },
+                    { id: 'reason', label: 'Reason for Credit', type: 'textarea', placeholder: 'e.g. Product return / Overcharge / Discount adjustment', required: true },
+                    { id: 'signatureName', label: 'Authorized Signature Name', type: 'text', placeholder: 'e.g. John Smith', required: false },
+                    { id: 'terms', label: 'Terms & Conditions', type: 'textarea', placeholder: 'e.g. Payment is due within 15 days...', required: false }
                 ],
                 gst_invoice: [
                     ...commonFields,
-                    { id: 'companyName', label: 'Company Name', type: 'text', placeholder: 'Your Business Name', required: true },
-                    { id: 'companyAddress', label: 'Company Address', type: 'textarea', placeholder: 'Your Complete Business Address', required: true },
                     { id: 'gstNumber', label: 'Company GSTIN', type: 'text', placeholder: 'e.g. 29ABCDE1234F1Z5', required: true },
                     { id: 'invoiceNumber', label: 'Invoice Number', type: 'text', placeholder: 'e.g. GST-2026-001', required: true },
                     { id: 'invoiceDate', label: 'Invoice Date', type: 'date', required: true },
@@ -2985,10 +3006,120 @@ Authorized Signatory              ${formData.consultantName || '[Name]'}
                 }
             };
 
-            return previews[selectedDocType] || {
-                title: selectedDocType.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase()),
-                content: 'Document preview will appear here as you fill the form...'
-            };
+            return previews[selectedDocType] || (() => {
+                if (selectedDocType === 'credit_note') {
+                    const cnItems = (formData.creditNoteItems || '').split('\n')
+                        .filter(line => line.trim())
+                        .map(line => {
+                            const parts = line.split('|').map(s => s.trim());
+                            const qty = parseFloat(parts[0]) || 1;
+                            const description = parts[1] || 'Item';
+                            const unitPrice = parseFloat(parts[2]) || 0;
+                            const amount = (qty * unitPrice).toFixed(2);
+                            return { qty, description, unitPrice: unitPrice.toFixed(2), amount };
+                        });
+                    const subtotal = cnItems.reduce((s, i) => s + parseFloat(i.amount), 0);
+                    const taxRate = parseFloat(formData.taxRate) || 0;
+                    const taxAmount = subtotal * (taxRate / 100);
+                    const total = (subtotal + taxAmount).toFixed(2);
+
+                    return {
+                        title: 'Credit Note',
+                        content: (
+                            <div style={{ fontFamily: 'Inter, sans-serif', maxWidth: '600px', margin: '0 auto' }}>
+                                {/* Maroon header bar */}
+                                <div style={{ background: '#801818', height: '12px', borderRadius: '4px 4px 0 0', marginBottom: '20px' }} />
+
+                                <h1 style={{ fontSize: '30px', fontWeight: '300', letterSpacing: '2px', color: '#333', textTransform: 'uppercase', marginBottom: '20px' }}>Credit Note</h1>
+
+                                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '16px', marginBottom: '20px' }}>
+                                    <div>
+                                        <div style={{ fontSize: '10px', fontWeight: '700', color: '#999', textTransform: 'uppercase', marginBottom: '4px' }}>Customer</div>
+                                        <div style={{ fontWeight: '600' }}>{formData.clientName || '[Customer Name]'}</div>
+                                        <div style={{ fontSize: '12px', color: '#555', whiteSpace: 'pre-line' }}>{formData.clientAddress || '[Address]'}</div>
+                                    </div>
+                                    <div>
+                                        <div style={{ fontSize: '10px', fontWeight: '700', color: '#999', textTransform: 'uppercase', marginBottom: '4px' }}>Ship To</div>
+                                        <div style={{ fontWeight: '600' }}>{formData.shipToName || formData.clientName || '[Ship To]'}</div>
+                                        <div style={{ fontSize: '12px', color: '#555', whiteSpace: 'pre-line' }}>{formData.shipToAddress || formData.clientAddress || '[Address]'}</div>
+                                    </div>
+                                    <div style={{ textAlign: 'right', fontSize: '12px' }}>
+                                        <div><strong style={{ color: '#999' }}>Credit Note #</strong> {formData.creditNoteNumber || '--'}</div>
+                                        <div><strong style={{ color: '#999' }}>Date</strong> {formData.creditNoteDate || '--'}</div>
+                                        {formData.invoiceNumber && <div><strong style={{ color: '#999' }}>Invoice #</strong> {formData.invoiceNumber}</div>}
+                                    </div>
+                                </div>
+
+                                <div style={{ borderTop: '1px solid #e5e7eb', margin: '16px 0' }} />
+
+                                <div style={{ textAlign: 'center', margin: '20px 0' }}>
+                                    <h2 style={{ fontSize: '22px', fontWeight: '600', color: '#333' }}>{formData.companyName || '[Company Name]'}</h2>
+                                    <p style={{ fontSize: '12px', color: '#666' }}>{formData.companyAddress || '[Company Address]'}</p>
+                                </div>
+
+                                <table style={{ width: '100%', borderCollapse: 'collapse', marginTop: '16px' }}>
+                                    <thead>
+                                        <tr style={{ backgroundColor: '#801818', color: 'white' }}>
+                                            <th style={{ padding: '10px', textAlign: 'left', fontSize: '11px' }}>Description</th>
+                                            <th style={{ padding: '10px', textAlign: 'right', fontSize: '11px' }}>Unit Price</th>
+                                            <th style={{ padding: '10px', textAlign: 'right', fontSize: '11px' }}>Qty</th>
+                                            <th style={{ padding: '10px', textAlign: 'right', fontSize: '11px' }}>Amount</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {cnItems.length > 0 ? cnItems.map((item, i) => (
+                                            <tr key={i} style={{ borderBottom: '1px solid #f3f4f6' }}>
+                                                <td style={{ padding: '10px', fontSize: '13px' }}>{item.description}</td>
+                                                <td style={{ padding: '10px', textAlign: 'right', fontSize: '13px' }}>{item.unitPrice}</td>
+                                                <td style={{ padding: '10px', textAlign: 'right', fontSize: '13px' }}>{item.qty}</td>
+                                                <td style={{ padding: '10px', textAlign: 'right', fontSize: '13px', fontWeight: '500' }}>{item.amount}</td>
+                                            </tr>
+                                        )) : (
+                                            <tr>
+                                                <td colSpan={4} style={{ padding: '14px', color: '#9ca3af', textAlign: 'center', fontSize: '12px' }}>
+                                                    Enter items above (Qty | Description | Unit Price)
+                                                </td>
+                                            </tr>
+                                        )}
+                                    </tbody>
+                                </table>
+
+                                <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '16px' }}>
+                                    <div style={{ width: '240px', fontSize: '13px' }}>
+                                        <div style={{ display: 'flex', justifyContent: 'space-between', padding: '6px 0', color: '#555' }}>
+                                            <span style={{ fontWeight: '700', color: '#999', textTransform: 'uppercase', fontSize: '11px' }}>Subtotal</span>
+                                            <span>{subtotal.toFixed(2)}</span>
+                                        </div>
+                                        {taxRate > 0 && (
+                                            <div style={{ display: 'flex', justifyContent: 'space-between', padding: '6px 0', color: '#555' }}>
+                                                <span style={{ fontWeight: '700', color: '#999', textTransform: 'uppercase', fontSize: '11px' }}>Tax ({taxRate}%)</span>
+                                                <span>{taxAmount.toFixed(2)}</span>
+                                            </div>
+                                        )}
+                                        <div style={{ display: 'flex', justifyContent: 'space-between', padding: '10px 0', borderTop: '1px solid #e5e7eb', marginTop: '6px' }}>
+                                            <span style={{ fontWeight: '700', fontSize: '14px' }}>Total</span>
+                                            <span style={{ fontWeight: '700', fontSize: '18px' }}>₹ {total}</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {formData.reason && (
+                                    <div style={{ marginTop: '20px', padding: '12px', backgroundColor: '#fff5f5', borderLeft: '3px solid #801818', borderRadius: '4px' }}>
+                                        <div style={{ fontSize: '11px', fontWeight: '700', color: '#801818', textTransform: 'uppercase', marginBottom: '4px' }}>Reason for Credit</div>
+                                        <div style={{ fontSize: '13px', color: '#333' }}>{formData.reason}</div>
+                                    </div>
+                                )}
+
+                                <div style={{ background: '#801818', height: '12px', borderRadius: '0 0 4px 4px', marginTop: '20px' }} />
+                            </div>
+                        )
+                    };
+                }
+                return {
+                    title: selectedDocType.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase()),
+                    content: 'Document preview will appear here as you fill the form...'
+                };
+            })();
         };
 
         const handleGenerate = async () => {
@@ -3714,7 +3845,131 @@ Authorized Signatory              ${formData.consultantName || '[Name]'}
                             color: '#374151',
                             fontFamily: 'Inter, sans-serif'
                         }}>
-                            {generatedDoc.type === 'purchase_order' && generatedDoc.content && typeof generatedDoc.content === 'object' ? (
+                            {generatedDoc.type === 'credit_note' && generatedDoc.content && typeof generatedDoc.content === 'object' ? (
+                                // Specialized Credit Note Renderer (matches live preview)
+                                (() => {
+                                    const c = generatedDoc.content;
+                                    const cnItems = c.items && Array.isArray(c.items) ? c.items : 
+                                        (c.creditNoteItems ? c.creditNoteItems.split('\n').filter(l => l.trim()).map((line, idx) => {
+                                            const parts = line.split('|').map(p => p.trim());
+                                            const qty = parseFloat(parts[0]) || 1;
+                                            const description = parts[1] || `Item ${idx + 1}`;
+                                            const unitPrice = parseFloat(parts[2]) || 0;
+                                            return { quantity: qty, description, unitPrice: unitPrice.toFixed(2), amount: (qty * unitPrice).toFixed(2) };
+                                        }) : []);
+                                    const subtotal = c.subtotal || cnItems.reduce((s, i) => s + parseFloat(i.amount || 0), 0).toFixed(2);
+                                    const taxRate = c.taxRate;
+                                    const taxAmount = c.taxAmount;
+                                    const total = c.totalAmount || subtotal;
+                                    return (
+                                        <div style={{ fontFamily: 'Inter, sans-serif', background: 'white' }}>
+                                            {/* Maroon header bar */}
+                                            <div style={{ background: '#801818', height: '14px', borderRadius: '4px 4px 0 0', marginBottom: '28px' }} />
+
+                                            <h1 style={{ fontSize: '36px', fontWeight: '300', letterSpacing: '3px', color: '#333', textTransform: 'uppercase', marginBottom: '28px', padding: '0 4px' }}>Credit Note</h1>
+
+                                            {/* Customer / Ship To / Meta */}
+                                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '20px', marginBottom: '24px' }}>
+                                                <div>
+                                                    <div style={{ fontSize: '10px', fontWeight: '700', color: '#999', textTransform: 'uppercase', marginBottom: '6px', letterSpacing: '0.5px' }}>Customer</div>
+                                                    <div style={{ fontWeight: '600', fontSize: '13px' }}>{c.clientName || '[Customer Name]'}</div>
+                                                    <div style={{ fontSize: '12px', color: '#555', marginTop: '2px', whiteSpace: 'pre-line' }}>{c.clientAddress || ''}</div>
+                                                </div>
+                                                <div>
+                                                    <div style={{ fontSize: '10px', fontWeight: '700', color: '#999', textTransform: 'uppercase', marginBottom: '6px', letterSpacing: '0.5px' }}>Ship To</div>
+                                                    <div style={{ fontWeight: '600', fontSize: '13px' }}>{c.shipToName || c.clientName || '[Ship To]'}</div>
+                                                    <div style={{ fontSize: '12px', color: '#555', marginTop: '2px', whiteSpace: 'pre-line' }}>{c.shipToAddress || c.clientAddress || ''}</div>
+                                                </div>
+                                                <div style={{ textAlign: 'right', fontSize: '12px', lineHeight: '1.8' }}>
+                                                    <div><strong style={{ color: '#999', fontSize: '10px', textTransform: 'uppercase' }}>Credit Note #</strong> <span style={{ fontWeight: '600' }}>{c.creditNoteNumber || '--'}</span></div>
+                                                    <div><strong style={{ color: '#999', fontSize: '10px', textTransform: 'uppercase' }}>Date</strong> <span>{c.creditNoteDate || '--'}</span></div>
+                                                    {c.poNumber && <div><strong style={{ color: '#999', fontSize: '10px', textTransform: 'uppercase' }}>P.O. #</strong> <span>{c.poNumber}</span></div>}
+                                                    {c.dueDate && <div><strong style={{ color: '#999', fontSize: '10px', textTransform: 'uppercase' }}>Due</strong> <span>{c.dueDate}</span></div>}
+                                                    {c.invoiceNumber && <div><strong style={{ color: '#999', fontSize: '10px', textTransform: 'uppercase' }}>Invoice #</strong> <span>{c.invoiceNumber}</span></div>}
+                                                </div>
+                                            </div>
+
+                                            <div style={{ borderTop: '1px solid #e5e7eb', margin: '16px 0 20px 0' }} />
+
+                                            {/* Company branding center */}
+                                            <div style={{ textAlign: 'center', margin: '20px 0 28px 0' }}>
+                                                <h2 style={{ fontSize: '26px', fontWeight: '600', color: '#333', margin: '0 0 4px 0' }}>{c.companyName || '[Company Name]'}</h2>
+                                                <p style={{ fontSize: '12px', color: '#666', margin: 0, whiteSpace: 'pre-line' }}>{c.companyAddress || ''}</p>
+                                            </div>
+
+                                            {/* Items table */}
+                                            <table style={{ width: '100%', borderCollapse: 'collapse', marginTop: '8px' }}>
+                                                <thead>
+                                                    <tr style={{ backgroundColor: '#801818', color: 'white' }}>
+                                                        <th style={{ padding: '12px 14px', textAlign: 'left', fontSize: '11px', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Description</th>
+                                                        <th style={{ padding: '12px 14px', textAlign: 'right', fontSize: '11px', fontWeight: '600', textTransform: 'uppercase' }}>Unit Price</th>
+                                                        <th style={{ padding: '12px 14px', textAlign: 'right', fontSize: '11px', fontWeight: '600', textTransform: 'uppercase' }}>Qty</th>
+                                                        <th style={{ padding: '12px 14px', textAlign: 'right', fontSize: '11px', fontWeight: '600', textTransform: 'uppercase' }}>Amount</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    {cnItems.length > 0 ? cnItems.map((item, i) => (
+                                                        <tr key={i} style={{ borderBottom: '1px solid #f3f4f6', backgroundColor: i % 2 === 0 ? 'white' : '#fafafa' }}>
+                                                            <td style={{ padding: '12px 14px', fontSize: '13px', color: '#111827' }}>{item.description}</td>
+                                                            <td style={{ padding: '12px 14px', textAlign: 'right', fontSize: '13px' }}>{item.unitPrice}</td>
+                                                            <td style={{ padding: '12px 14px', textAlign: 'right', fontSize: '13px' }}>{item.quantity}</td>
+                                                            <td style={{ padding: '12px 14px', textAlign: 'right', fontSize: '13px', fontWeight: '500' }}>{item.amount}</td>
+                                                        </tr>
+                                                    )) : (
+                                                        <tr><td colSpan={4} style={{ padding: '20px', textAlign: 'center', color: '#9ca3af', fontSize: '12px' }}>No items</td></tr>
+                                                    )}
+                                                </tbody>
+                                            </table>
+
+                                            {/* Totals */}
+                                            <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '20px' }}>
+                                                <div style={{ width: '260px', fontSize: '13px' }}>
+                                                    <div style={{ display: 'flex', justifyContent: 'space-between', padding: '7px 0', borderBottom: '1px solid #f3f4f6', color: '#555' }}>
+                                                        <span style={{ fontWeight: '700', color: '#999', textTransform: 'uppercase', fontSize: '11px' }}>Subtotal</span>
+                                                        <span>{subtotal}</span>
+                                                    </div>
+                                                    {taxAmount && (
+                                                        <div style={{ display: 'flex', justifyContent: 'space-between', padding: '7px 0', borderBottom: '1px solid #f3f4f6', color: '#555' }}>
+                                                            <span style={{ fontWeight: '700', color: '#999', textTransform: 'uppercase', fontSize: '11px' }}>Sales Tax {taxRate ? `${taxRate}%` : ''}</span>
+                                                            <span>{taxAmount}</span>
+                                                        </div>
+                                                    )}
+                                                    <div style={{ display: 'flex', justifyContent: 'space-between', padding: '12px 0', marginTop: '4px' }}>
+                                                        <span style={{ fontWeight: '700', fontSize: '14px', color: '#111' }}>Credit Note Total</span>
+                                                        <span style={{ fontWeight: '800', fontSize: '20px', color: '#111' }}>₹ {total}</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            {/* Signature */}
+                                            {c.signatureName && (
+                                                <div style={{ textAlign: 'right', marginTop: '30px' }}>
+                                                    <div style={{ fontFamily: 'Dancing Script, cursive', fontSize: '42px', color: '#333', lineHeight: '1' }}>{c.signatureName}</div>
+                                                </div>
+                                            )}
+
+                                            {/* Reason */}
+                                            {c.reason && (
+                                                <div style={{ marginTop: '28px', padding: '14px 16px', backgroundColor: '#fff5f5', borderLeft: '3px solid #801818', borderRadius: '4px' }}>
+                                                    <div style={{ fontSize: '10px', fontWeight: '700', color: '#801818', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '6px' }}>Reason for Credit Note</div>
+                                                    <div style={{ fontSize: '13px', color: '#333' }}>{c.reason}</div>
+                                                </div>
+                                            )}
+
+                                            {/* Terms */}
+                                            {c.terms && (
+                                                <div style={{ marginTop: '20px', fontSize: '12px', color: '#555' }}>
+                                                    <div style={{ fontWeight: '700', color: '#999', textTransform: 'uppercase', fontSize: '10px', marginBottom: '4px' }}>Terms & Conditions</div>
+                                                    <div>{c.terms}</div>
+                                                </div>
+                                            )}
+
+                                            {/* Maroon footer bar */}
+                                            <div style={{ background: '#801818', height: '14px', borderRadius: '0 0 4px 4px', marginTop: '36px' }} />
+                                        </div>
+                                    );
+                                })()
+                            ) : generatedDoc.type === 'purchase_order' && generatedDoc.content && typeof generatedDoc.content === 'object' ? (
                                 // Specialized Purchase Order Renderer
                                 <div style={{ width: '100%', whiteSpace: 'normal' }}>
                                     <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '20px' }}>

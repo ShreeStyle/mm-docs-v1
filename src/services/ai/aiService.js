@@ -1129,6 +1129,53 @@ Return ONLY valid, richly detailed, FORMALLY WRITTEN JSON document content. No c
         "footerWebsite": "${context.footerWebsite || brandContext.website || ''}"
       }`;
 
+    } else if (effectiveType === "credit_note") {
+      const context = { ...providedData };
+      console.log(`📋 Consolidated context for credit_note:`, context);
+
+      // Parse credit note items from textarea if provided
+      let parsedItems = [];
+      if (context.creditNoteItems && typeof context.creditNoteItems === 'string') {
+        const lines = context.creditNoteItems.split('\n').filter(l => l.trim());
+        parsedItems = lines.map((line, idx) => {
+          const parts = line.split('|').map(p => p.trim());
+          const qty = parseFloat(parts[0]) || 1;
+          const description = parts[1] || `Item ${idx + 1}`;
+          const unitPrice = parseFloat(parts[2]) || 0;
+          const amount = qty * unitPrice;
+          return { quantity: qty, description, unitPrice: unitPrice.toFixed(2), amount: amount.toFixed(2) };
+        });
+      }
+      const subtotal = parsedItems.reduce((sum, item) => sum + parseFloat(item.amount), 0);
+      const taxRate = parseFloat(context.taxRate) || 0;
+      const taxAmount = subtotal * (taxRate / 100);
+      const totalAmount = subtotal + taxAmount;
+
+      return {
+        title: `Credit Note ${context.creditNoteNumber || ''}`.trim(),
+        companyName: context.companyName || brandContext.name,
+        companyAddress: context.companyAddress || brandContext.address || '',
+        clientName: context.clientName || '',
+        clientAddress: context.clientAddress || '',
+        shipToName: context.shipToName || '',
+        shipToAddress: context.shipToAddress || '',
+        creditNoteNumber: context.creditNoteNumber || `CN-${Date.now().toString().slice(-6)}`,
+        creditNoteDate: context.creditNoteDate || new Date().toLocaleDateString('en-IN'),
+        poNumber: context.poNumber || '',
+        dueDate: context.dueDate || '',
+        invoiceNumber: context.invoiceNumber || '',
+        invoiceDate: context.invoiceDate || '',
+        creditNoteItems: context.creditNoteItems || '',
+        items: parsedItems,
+        subtotal: subtotal.toFixed(2),
+        taxRate: taxRate || null,
+        taxAmount: taxAmount > 0 ? taxAmount.toFixed(2) : null,
+        totalAmount: totalAmount.toFixed(2),
+        reason: context.reason || 'Adjustment for returned goods or overbilling.',
+        signatureName: context.signatureName || context.companyName || brandContext.name,
+        terms: context.terms || 'Payment is due within 15 days'
+      };
+
     } else if (effectiveType === "gst_invoice") {
       // Parse structured input data
       const inputData = {};

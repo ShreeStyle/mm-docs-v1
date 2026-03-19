@@ -11,6 +11,34 @@ handlebars.registerHelper("length", function(array) {
     return Array.isArray(array) ? array.length : 0;
 });
 
+handlebars.registerHelper("numberFormat", function(value) {
+    if (value === undefined || value === null) return "0.00";
+    return parseFloat(value).toLocaleString('en-IN', {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+    });
+});
+
+handlebars.registerHelper("lt", function(v1, v2) {
+    return v1 < v2;
+});
+
+handlebars.registerHelper("eq", function(v1, v2) {
+    return v1 === v2;
+});
+
+handlebars.registerHelper("range", function(v1, v2) {
+    const range = [];
+    for (let i = v1; i < v2; i++) {
+        range.push(i);
+    }
+    return range;
+});
+
+handlebars.registerHelper("calc", function(v1, v2) {
+    return (parseFloat(v1 || 0) - parseFloat(v2 || 0)).toFixed(2);
+});
+
 // Load template function
 const loadTemplate = (templateName) => {
   const templatePath = path.join(__dirname, "../../templates", `${templateName}.hbs`);
@@ -174,7 +202,10 @@ const getTemplateForDocumentType = (documentType) => {
     'letter_of_recommendation': 'recommendation_letter',
     'letter-of-recommendation-001': 'recommendation_letter',
     'email': 'email',
-    'sales_email': 'email'
+    'sales_email': 'email',
+    'credit_note': 'credit_note',
+    'receipt': 'receipt',
+    'purchase_order': 'purchase_order'
   };
 
   // If it's in the map, use it
@@ -276,6 +307,26 @@ exports.renderDocument = async (document, brandKit) => {
       fontFamily: brandKit?.fontFamily || 'Inter',
       generatedDate: new Date().toLocaleDateString()
     };
+
+    // Parse credit_note items from text format: "Qty | Description | Unit Price"
+    if (document.type === 'credit_note' && data.creditNoteItems && typeof data.creditNoteItems === 'string') {
+      const lines = data.creditNoteItems.split('\n').filter(line => line.trim());
+      const parsedItems = lines.map(line => {
+        const parts = line.split('|').map(p => p.trim());
+        const qty = parseFloat(parts[0]) || 1;
+        const description = parts[1] || 'Item';
+        const unitPrice = parseFloat(parts[2]) || 0;
+        const amount = qty * unitPrice;
+        return { quantity: qty, description, unitPrice: unitPrice.toFixed(2), amount: amount.toFixed(2) };
+      });
+      data.items = parsedItems;
+      const subtotal = parsedItems.reduce((sum, item) => sum + parseFloat(item.amount), 0);
+      const taxRate = parseFloat(data.taxRate) || 0;
+      const taxAmount = subtotal * (taxRate / 100);
+      data.subtotal = subtotal.toFixed(2);
+      data.taxAmount = taxAmount > 0 ? taxAmount.toFixed(2) : null;
+      data.totalAmount = (subtotal + taxAmount).toFixed(2);
+    }
 
     // Ensure sections are objects if they came in as strings (common AI/formatting issue)
     if (Array.isArray(data.sections)) {
