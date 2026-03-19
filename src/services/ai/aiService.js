@@ -1056,6 +1056,78 @@ Return ONLY valid, richly detailed, FORMALLY WRITTEN JSON document content. No c
         "footerContactPhone": "${brandContext.phone || ''}",
         "footerContactEmail": "${brandContext.email || ''}"
       }`;
+    } else if (effectiveType === "receipt" || effectiveType === "payment_receipt") {
+      // Parse structured input data
+      const inputData = {};
+      if (topic.includes('|') && topic.includes(':')) {
+        topic.split('|').forEach(pair => {
+            const parts = pair.split(':');
+            if (parts.length >= 2) {
+                const key = parts[0].trim().toLowerCase().replace(/\s+/g, '');
+                const value = parts.slice(1).join(':').trim();
+                inputData[key] = value;
+            }
+        });
+      }
+
+      // Merge with providedData from frontend form
+      const context = { ...providedData, ...inputData };
+      
+      // Handle items parsing if receiptItems is provided
+      if (context.receiptItems && !context.items) {
+          context.items = context.receiptItems.split('\n')
+              .filter(line => line.trim())
+              .map(line => {
+                  const parts = line.split('|').map(s => s.trim());
+                  const qty = parseFloat(parts[0]) || 1;
+                  const description = parts[1] || '...';
+                  const unitPrice = parseFloat(parts[2]) || 0;
+                  return { qty, description, unitPrice, total: qty * unitPrice };
+              });
+          
+          if (context.items.length > 0) {
+              context.subtotal = context.items.reduce((sum, item) => sum + item.total, 0);
+              const rate = parseFloat(context.taxRate) || 5;
+              context.tax = context.subtotal * (rate / 100);
+              context.total = context.subtotal + context.tax;
+          }
+      }
+
+      userPrompt = `Generate a PROFESSIONAL, MINIMALIST Payment Receipt using the following context:
+      
+      CONTEXT DATA:
+      ${JSON.stringify(context, null, 2)}
+
+      TONE REQUIREMENT: Formal business receipt. Strict, professional, and clear.
+      
+      PRIORITY: If 'items' array is present, use it. Ensure all fields for the blue-themed receipt are populated.
+
+      Return ONLY valid JSON with this structure:
+      {
+        "title": "Payment Receipt",
+        "receiptNumber": "${context.receiptNumber || 'REC-' + Date.now().toString().slice(-6)}",
+        "receiptDate": "${context.receiptDate || new Date().toLocaleDateString('en-IN')}",
+        "companyName": "${brandContext.name}",
+        "companyAddress": "${brandContext.address || '[Company Address]'}",
+        "customerName": "${context.customerName || '[Customer Name]'}",
+        "customerAddress": "${context.customerAddress || '[Customer Address]'}",
+        "items": ${context.items ? JSON.stringify(context.items) : `[
+          {
+            "qty": 1,
+            "description": "${context.description || 'Professional Services'}",
+            "unitPrice": ${context.amount || 0},
+            "total": ${context.amount || 0}
+          }
+        ]`},
+        "subtotal": ${context.subtotal || context.amount || 0},
+        "tax": ${context.tax || 0},
+        "total": ${context.total || context.amount || 0},
+        "terms": "${context.terms || 'Payment is due within 14 days of project completion'}",
+        "bankInfo": "${context.bankInfo || ''}",
+        "footerPhone": "${context.footerPhone || brandContext.phone || ''}",
+        "footerEmail": "${context.footerEmail || brandContext.email || ''}",
+        "footerWebsite": "${context.footerWebsite || brandContext.website || ''}"
+      }`;
 
     } else if (effectiveType === "gst_invoice") {
       // Parse structured input data
@@ -1512,6 +1584,52 @@ const generateMockContent = (type, topic, providedData = {}, brandContext = {}) 
       taxAmount: taxAmount,
       totalAmount: totalAmount,
       signatureName: providedData.signatureName || brandContext.name || "[Name]"
+    };
+  } else if (effectiveType === "receipt" || effectiveType === "payment_receipt") {
+    console.log(`📝 Building receipt fallback with data:`, providedData);
+    
+    // Parse items from receiptItems textarea
+    let items = [];
+    if (providedData.receiptItems) {
+      providedData.receiptItems.split('\n')
+        .filter(line => line.trim())
+        .forEach(line => {
+          const parts = line.split('|').map(s => s.trim());
+          const qty = parseFloat(parts[0]) || 1;
+          const description = parts[1] || '...';
+          const unitPrice = parseFloat(parts[2]) || 0;
+          items.push({ qty, description, unitPrice, total: qty * unitPrice });
+        });
+    }
+
+    if (items.length === 0) {
+      items = [
+        { qty: 1, description: providedData.description || topicTitle || "Professional Services", unitPrice: providedData.amount || 0, total: providedData.amount || 0 }
+      ];
+    }
+
+    const subtotal = items.reduce((sum, item) => sum + item.total, 0);
+    const taxRate = parseFloat(providedData.taxRate) || 5;
+    const tax = subtotal * (taxRate / 100);
+    const total = subtotal + tax;
+
+    return {
+      title: "Payment Receipt",
+      receiptNumber: providedData.receiptNumber || `REC-${Date.now().toString().slice(-6)}`,
+      receiptDate: providedData.receiptDate || new Date().toLocaleDateString('en-IN'),
+      companyName: brandContext.name || "MM Docs",
+      companyAddress: brandContext.address || "[Company Address]",
+      customerName: providedData.customerName || "[Customer Name]",
+      customerAddress: providedData.customerAddress || "[Customer Address]",
+      items: items,
+      subtotal: subtotal,
+      tax: tax,
+      total: total,
+      terms: providedData.terms || "Payment is due within 14 days of project completion",
+      bankInfo: providedData.bankInfo || "",
+      footerPhone: providedData.footerPhone || brandContext.phone || "",
+      footerEmail: providedData.footerEmail || brandContext.email || "",
+      footerWebsite: providedData.footerWebsite || brandContext.website || ""
     };
   } else if (effectiveType === "quotation") {
     const rawTotal = providedData.totalAmount || providedData.amount || 10000;

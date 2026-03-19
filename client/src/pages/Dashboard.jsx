@@ -1691,11 +1691,13 @@ export default function Dashboard() {
                 }
             });
 
-            // Special handling for poItems (multiline)
-            if (smartFillText.includes('po items:')) {
-                const poItemsMatch = smartFillText.match(/po items:\s*([\s\S]*?)(?=,|$)/i);
-                if (poItemsMatch && poItemsMatch[1]) {
-                    newFormData.poItems = poItemsMatch[1].trim();
+            // Special handling for poItems/receiptItems (multiline)
+            if (smartFillText.toLowerCase().includes('po items:') || smartFillText.toLowerCase().includes('items:')) {
+                const itemsMatch = smartFillText.match(/(?:po items:|items:)\s*([\s\S]*?)(?=\n\n|\n[a-z]+:|$)/i);
+                if (itemsMatch && itemsMatch[1]) {
+                    const cleanItems = itemsMatch[1].trim();
+                    newFormData.poItems = cleanItems;
+                    newFormData.receiptItems = cleanItems;
                 }
             }
 
@@ -1928,13 +1930,17 @@ export default function Dashboard() {
                 ],
                 receipt: [
                     ...commonFields,
-                    { id: 'customerName', label: 'Customer Name', type: 'text', placeholder: 'e.g. Rajesh Kumar', required: true },
-                    { id: 'receiptNumber', label: 'Receipt Number', type: 'text', placeholder: 'e.g. REC-2026-001', required: true },
+                    { id: 'receiptNumber', label: 'Receipt Number', type: 'text', placeholder: 'e.g. REC-10001', required: true },
                     { id: 'receiptDate', label: 'Receipt Date', type: 'date', required: true },
-                    { id: 'paymentMethod', label: 'Payment Method', type: 'select', options: ['Cash', 'Credit Card', 'Debit Card', 'UPI', 'Bank Transfer', 'Cheque'], required: true },
-                    { id: 'amount', label: 'Amount Received (₹)', type: 'number', placeholder: 'e.g. 50000', required: true },
-                    { id: 'paymentFor', label: 'Payment For', type: 'text', placeholder: 'e.g. Invoice INV-2026-001', required: true },
-                    { id: 'description', label: 'Description', type: 'textarea', placeholder: 'Brief description of the payment', required: true }
+                    { id: 'customerName', label: 'Customer Name (Received From)', type: 'text', placeholder: 'e.g. Priya Sharma', required: true },
+                    { id: 'customerAddress', label: 'Customer Address', type: 'textarea', placeholder: 'Customer street address, city, state', required: true },
+                    { id: 'receiptItems', label: 'Receipt Items (Format: Qty | Description | Unit Price)', type: 'textarea', placeholder: '1 | Consulting Services | 5000\n1 | Software License | 2000', required: true },
+                    { id: 'taxRate', label: 'Tax Rate (%)', type: 'number', placeholder: 'e.g. 5', required: false },
+                    { id: 'bankInfo', label: 'Payment Instruction (e.g. Bank/Check)', type: 'text', placeholder: 'e.g. ICICI Bank - Acct: 12345678', required: false },
+                    { id: 'terms', label: 'Terms and Conditions', type: 'textarea', placeholder: 'Payment is due within 14 days of project completion...', required: false },
+                    { id: 'footerPhone', label: 'Footer Phone', type: 'tel', placeholder: 'e.g. +1 234 56 789', required: false },
+                    { id: 'footerEmail', label: 'Footer Email', type: 'email', placeholder: 'e.g. company@email.com', required: false },
+                    { id: 'footerWebsite', label: 'Footer Website', type: 'text', placeholder: 'e.g. company.com', required: false }
                 ],
                 credit_note: [
                     ...commonFields,
@@ -2713,6 +2719,126 @@ Authorized Signatory              ${formData.consultantName || '[Name]'}
                                 </div>
                             </div>
                         );
+                    })()
+                },
+                receipt: {
+                    title: 'Payment Receipt',
+                    content: (() => {
+                        const items = (formData.receiptItems || '').split('\n')
+                            .filter(line => line.trim())
+                            .map(line => {
+                                const parts = line.split('|').map(s => s.trim());
+                                const qty = parseFloat(parts[0]) || 0;
+                                const desc = parts[1] || '...';
+                                const price = parseFloat(parts[2]) || 0;
+                                return { qty, desc, price, total: qty * price };
+                            });
+                        
+                        const subtotal = items.reduce((sum, item) => sum + item.total, 0);
+                        const tax = subtotal * (parseFloat(formData.taxRate) / 100 || 0);
+                        const total = subtotal + tax;
+
+                        return (
+                            <div style={{ width: '100%', fontFamily: 'Inter, system-ui, sans-serif', whiteSpace: 'normal', color: '#374151' }}>
+                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '30px' }}>
+                                    <div style={{ fontSize: '13px', lineHeight: '1.4' }}>
+                                        <p style={{ margin: '0', fontWeight: 'bold', color: '#1E40AF', textTransform: 'uppercase', fontSize: '11px' }}>FROM</p>
+                                        <p style={{ margin: '0', fontWeight: '800', fontSize: '15px' }}>{formData.companyName || 'YOUR COMPANY'}</p>
+                                        <div style={{ whiteSpace: 'pre-wrap' }}>{formData.companyAddress || 'Your Address 123\nCA 12345'}</div>
+                                    </div>
+                                    <div style={{ textAlign: 'right' }}>
+                                        <div style={{ width: '200px', height: '60px', border: '1px solid #E5E7EB', borderRadius: '4px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#9CA3AF', fontSize: '12px', marginBottom: '15px', backgroundColor: '#F9FAFB' }}>
+                                            {brandKit?.logo ? <img src={brandKit.logo} alt="Logo" style={{ maxHeight: '100%', maxWidth: '100%' }} /> : 'Logo Placeholder'}
+                                        </div>
+                                        <h1 style={{ color: '#1E40AF', fontSize: '32px', fontWeight: '900', margin: '0', letterSpacing: '0.05em' }}>RECEIPT</h1>
+                                    </div>
+                                </div>
+
+                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '35px' }}>
+                                    <div style={{ fontSize: '13px', lineHeight: '1.4' }}>
+                                        <p style={{ margin: '0', fontWeight: 'bold', color: '#1E40AF', textTransform: 'uppercase', fontSize: '11px' }}>TO</p>
+                                        <p style={{ margin: '0', fontWeight: '700' }}>{formData.customerName || 'Customer Name'}</p>
+                                        <div style={{ whiteSpace: 'pre-wrap' }}>{formData.customerAddress || 'Customer Address 123\nCA 12345'}</div>
+                                    </div>
+                                    <div style={{ minWidth: '180px' }}>
+                                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '2px' }}>
+                                            <span style={{ fontSize: '11px', fontWeight: 'bold', color: '#1E40AF' }}>Receipt #:</span>
+                                            <span style={{ fontSize: '13px' }}>{formData.receiptNumber || '0000001'}</span>
+                                        </div>
+                                        <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                                            <span style={{ fontSize: '11px', fontWeight: 'bold', color: '#1E40AF' }}>Receipt Date:</span>
+                                            <span style={{ fontSize: '13px' }}>{formData.receiptDate || new Date().toLocaleDateString()}</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <table style={{ width: '100%', borderCollapse: 'collapse', marginBottom: '25px', fontSize: '12px' }}>
+                                    <thead>
+                                        <tr style={{ border: '1px solid #1E40AF' }}>
+                                            <th style={{ backgroundColor: '#FFFFFF', color: '#1E40AF', padding: '8px', textAlign: 'left', borderRight: '1px solid #E2E8F0', width: '50px' }}>QTY</th>
+                                            <th style={{ backgroundColor: '#FFFFFF', color: '#1E40AF', padding: '8px', textAlign: 'left', borderRight: '1px solid #E2E8F0' }}>Description</th>
+                                            <th style={{ backgroundColor: '#FFFFFF', color: '#1E40AF', padding: '8px', textAlign: 'right', borderRight: '1px solid #E2E8F0', width: '100px' }}>Unit Price</th>
+                                            <th style={{ backgroundColor: '#FFFFFF', color: '#1E40AF', padding: '8px', textAlign: 'right', width: '100px' }}>Amount</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {items.length > 0 ? items.map((item, idx) => (
+                                            <tr key={idx} style={{ border: '1px solid #E2E8F0', borderTop: 'none' }}>
+                                                <td style={{ padding: '8px', borderRight: '1px solid #E2E8F0' }}>{item.qty}</td>
+                                                <td style={{ padding: '8px', borderRight: '1px solid #E2E8F0' }}>{item.desc}</td>
+                                                <td style={{ padding: '8px', textAlign: 'right', borderRight: '1px solid #E2E8F0' }}>{item.price.toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
+                                                <td style={{ padding: '8px', textAlign: 'right' }}>{item.total.toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
+                                            </tr>
+                                        )) : (
+                                            <tr style={{ border: '1px solid #E2E8F0', borderTop: 'none' }}>
+                                                <td colSpan="4" style={{ padding: '20px', textAlign: 'center', color: '#94A3B8', fontStyle: 'italic' }}>No items added yet.</td>
+                                            </tr>
+                                        )}
+                                        {/* Fill remaining space to match screenshot look */}
+                                        {[...Array(Math.max(0, 5 - items.length))].map((_, i) => (
+                                            <tr key={`empty-${i}`} style={{ border: '1px solid #E2E8F0', borderTop: 'none', height: '30px' }}>
+                                                <td style={{ borderRight: '1px solid #E2E8F0' }}></td>
+                                                <td style={{ borderRight: '1px solid #E2E8F0' }}></td>
+                                                <td style={{ borderRight: '1px solid #E2E8F0' }}></td>
+                                                <td></td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+
+                                <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '30px' }}>
+                                    <div style={{ minWidth: '200px' }}>
+                                        <div style={{ display: 'flex', justifyContent: 'space-between', padding: '4px 0' }}>
+                                            <span style={{ fontSize: '13px' }}>Subtotal</span>
+                                            <span style={{ fontSize: '13px' }}>{subtotal.toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
+                                        </div>
+                                        <div style={{ display: 'flex', justifyContent: 'space-between', padding: '4px 0' }}>
+                                            <span style={{ fontSize: '13px' }}>Sales Tax ({formData.taxRate || '5'}%)</span>
+                                            <span style={{ fontSize: '13px' }}>{tax.toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
+                                        </div>
+                                        <div style={{ display: 'flex', justifyContent: 'space-between', padding: '8px 12px', marginTop: '5px', backgroundColor: '#EFF6FF', borderTop: '2px solid #1E40AF', borderBottom: '2px solid #1E40AF' }}>
+                                            <span style={{ fontSize: '14px', fontWeight: '900', color: '#1E40AF' }}>Total</span>
+                                            <span style={{ fontSize: '14px', fontWeight: '900', color: '#1E40AF' }}>{total.toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div style={{ marginBottom: '40px' }}>
+                                    <h4 style={{ color: '#1E40AF', margin: '0 0 8px 0', fontSize: '11px', fontWeight: 'bold', textTransform: 'uppercase' }}>TERMS AND CONDITIONS</h4>
+                                    <div style={{ fontSize: '12px', color: '#475569', lineHeight: '1.6' }}>
+                                        <p style={{ margin: '0 0 5px 0' }}>{formData.terms || 'Payment is due within 14 days of project completion'}</p>
+                                        <p style={{ margin: '0 0 5px 0' }}>All checks to be made out to ________________</p>
+                                        <p style={{ margin: '0' }}>Thank you for your business!</p>
+                                    </div>
+                                </div>
+
+                                <div style={{ display: 'flex', justifyContent: 'space-between', borderTop: '1px solid #E2E8F0', paddingTop: '15px', fontSize: '11px', color: '#64748B' }}>
+                                    <span>Tel: {formData.footerPhone || '+1 234 56 789'}</span>
+                                    <span>Email: {formData.footerEmail || brandKit?.email || 'company@email.com'}</span>
+                                    <span>Web: {formData.footerWebsite || brandKit?.website || 'company.com'}</span>
+                                </div>
+                            </div>
+                        )
                     })()
                 }
             };
@@ -3554,6 +3680,123 @@ Authorized Signatory              ${formData.consultantName || '[Name]'}
                                                 <div key={sIdx} style={{ marginBottom: '20px' }}>
                                                     <h4 style={{ fontSize: '13px', fontWeight: 'bold', color: '#1E40AF', marginBottom: '8px', textTransform: 'uppercase' }}>{section.heading}</h4>
                                                     <div style={{ fontSize: '12px', lineHeight: '1.6', color: '#334155' }}>{section.content}</div>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    )}
+                                </div>
+                            ) : (generatedDoc.type === 'receipt' || generatedDoc.type === 'payment_receipt') && generatedDoc.content && typeof generatedDoc.content === 'object' ? (
+                                // Specialized Receipt Renderer
+                                <div style={{ width: '100%', whiteSpace: 'normal', color: '#374151', fontFamily: 'Inter, sans-serif' }}>
+                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '30px' }}>
+                                        <div style={{ fontSize: '13px', lineHeight: '1.4' }}>
+                                            <p style={{ margin: '0', fontWeight: 'bold', color: '#1E40AF', textTransform: 'uppercase', fontSize: '11px' }}>FROM</p>
+                                            <p style={{ margin: '0', fontWeight: '800', fontSize: '15px' }}>{generatedDoc.content.companyName || 'YOUR COMPANY'}</p>
+                                            <div style={{ whiteSpace: 'pre-wrap' }}>{generatedDoc.content.companyAddress || 'Company Address'}</div>
+                                        </div>
+                                        <div style={{ textAlign: 'right' }}>
+                                            <div style={{ width: '200px', height: '60px', border: '1px solid #E5E7EB', borderRadius: '4px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#9CA3AF', fontSize: '12px', marginBottom: '15px', backgroundColor: '#F9FAFB' }}>
+                                                {brandKit?.logo ? <img src={brandKit.logo} alt="Logo" style={{ maxHeight: '100%', maxWidth: '100%' }} /> : 'RECEIPT'}
+                                            </div>
+                                            <h1 style={{ color: '#1E40AF', fontSize: '32px', fontWeight: '900', margin: '0', letterSpacing: '0.05em' }}>RECEIPT</h1>
+                                        </div>
+                                    </div>
+
+                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '35px' }}>
+                                        <div style={{ fontSize: '13px', lineHeight: '1.4' }}>
+                                            <p style={{ margin: '0', fontWeight: 'bold', color: '#1E40AF', textTransform: 'uppercase', fontSize: '11px' }}>TO</p>
+                                            <p style={{ margin: '0', fontWeight: '700' }}>{generatedDoc.content.customerName || generatedDoc.content.clientName || 'Customer Name'}</p>
+                                            <div style={{ whiteSpace: 'pre-wrap' }}>{generatedDoc.content.customerAddress || generatedDoc.content.clientAddress || 'Customer Address'}</div>
+                                        </div>
+                                        <div style={{ minWidth: '180px' }}>
+                                            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '2px' }}>
+                                                <span style={{ fontSize: '11px', fontWeight: 'bold', color: '#1E40AF' }}>Receipt #:</span>
+                                                <span style={{ fontSize: '13px' }}>{generatedDoc.content.receiptNumber || generatedDoc.title}</span>
+                                            </div>
+                                            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                                                <span style={{ fontSize: '11px', fontWeight: 'bold', color: '#1E40AF' }}>Receipt Date:</span>
+                                                <span style={{ fontSize: '13px' }}>{generatedDoc.content.receiptDate || new Date(generatedDoc.createdAt).toLocaleDateString()}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <table style={{ width: '100%', borderCollapse: 'collapse', marginBottom: '25px', fontSize: '12px' }}>
+                                        <thead>
+                                            <tr style={{ border: '1px solid #1E40AF' }}>
+                                                <th style={{ backgroundColor: '#FFFFFF', color: '#1E40AF', padding: '8px', textAlign: 'left', borderRight: '1px solid #E2E8F0', width: '50px' }}>QTY</th>
+                                                <th style={{ backgroundColor: '#FFFFFF', color: '#1E40AF', padding: '8px', textAlign: 'left', borderRight: '1px solid #E2E8F0' }}>Description</th>
+                                                <th style={{ backgroundColor: '#FFFFFF', color: '#1E40AF', padding: '8px', textAlign: 'right', borderRight: '1px solid #E2E8F0', width: '100px' }}>Unit Price</th>
+                                                <th style={{ backgroundColor: '#FFFFFF', color: '#1E40AF', padding: '8px', textAlign: 'right', width: '100px' }}>Amount</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {Array.isArray(generatedDoc.content.items) && generatedDoc.content.items.length > 0 ? (
+                                                generatedDoc.content.items.map((item, idx) => (
+                                                    <tr key={idx} style={{ border: '1px solid #E2E8F0', borderTop: 'none' }}>
+                                                        <td style={{ padding: '8px', borderRight: '1px solid #E2E8F0' }}>{item.qty || item.quantity}</td>
+                                                        <td style={{ padding: '8px', borderRight: '1px solid #E2E8F0' }}>{item.desc || item.description}</td>
+                                                        <td style={{ padding: '8px', textAlign: 'right', borderRight: '1px solid #E2E8F0' }}>₹{Number(item.price || item.unitPrice || 0).toLocaleString()}</td>
+                                                        <td style={{ padding: '8px', textAlign: 'right' }}>₹{Number(item.total || 0).toLocaleString()}</td>
+                                                    </tr>
+                                                ))
+                                            ) : (
+                                                <tr style={{ border: '1px solid #E2E8F0', borderTop: 'none' }}>
+                                                    <td colSpan="4" style={{ padding: '20px', textAlign: 'center', color: '#94A3B8', fontStyle: 'italic' }}>No items found.</td>
+                                                </tr>
+                                            )}
+                                            {/* Static rows to maintain structural look if few items */}
+                                            {Array.isArray(generatedDoc.content.items) && generatedDoc.content.items.length < 5 && (
+                                                [...Array(5 - generatedDoc.content.items.length)].map((_, i) => (
+                                                    <tr key={`fill-${i}`} style={{ height: '30px', border: '1px solid #E2E8F0', borderTop: 'none' }}>
+                                                        <td style={{ borderRight: '1px solid #E2E8F0' }}></td>
+                                                        <td style={{ borderRight: '1px solid #E2E8F0' }}></td>
+                                                        <td style={{ borderRight: '1px solid #E2E8F0' }}></td>
+                                                        <td></td>
+                                                    </tr>
+                                                ))
+                                            )}
+                                        </tbody>
+                                    </table>
+
+                                    <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '30px' }}>
+                                        <div style={{ minWidth: '200px' }}>
+                                            <div style={{ display: 'flex', justifyContent: 'space-between', padding: '4px 0' }}>
+                                                <span style={{ fontSize: '13px' }}>Subtotal</span>
+                                                <span style={{ fontSize: '13px' }}>₹{Number(generatedDoc.content.subtotal || 0).toLocaleString()}</span>
+                                            </div>
+                                            <div style={{ display: 'flex', justifyContent: 'space-between', padding: '4px 0' }}>
+                                                <span style={{ fontSize: '13px' }}>Sales Tax</span>
+                                                <span style={{ fontSize: '13px' }}>₹{Number(generatedDoc.content.tax || 0).toLocaleString()}</span>
+                                            </div>
+                                            <div style={{ display: 'flex', justifyContent: 'space-between', padding: '8px 12px', marginTop: '5px', backgroundColor: '#EFF6FF', borderTop: '2px solid #1E40AF', borderBottom: '2px solid #1E40AF' }}>
+                                                <span style={{ fontSize: '14px', fontWeight: '900', color: '#1E40AF' }}>Total</span>
+                                                <span style={{ fontSize: '14px', fontWeight: '900', color: '#1E40AF' }}>₹{Number(generatedDoc.content.total || 0).toLocaleString()}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div style={{ marginBottom: '40px' }}>
+                                        <h4 style={{ color: '#1E40AF', margin: '0 0 8px 0', fontSize: '11px', fontWeight: 'bold', textTransform: 'uppercase' }}>TERMS AND CONDITIONS</h4>
+                                        <div style={{ fontSize: '12px', color: '#475569', lineHeight: '1.6' }}>
+                                            <p style={{ margin: '0 0 5px 0' }}>{generatedDoc.content.terms || 'Payment is due within 14 days of project completion'}</p>
+                                            <p style={{ margin: '0 0 5px 0' }}>{generatedDoc.content.bankInfo ? `Payment Instructions: ${generatedDoc.content.bankInfo}` : 'All checks to be made out to ________________'}</p>
+                                            <p style={{ margin: '0' }}>Thank you for your business!</p>
+                                        </div>
+                                    </div>
+
+                                    <div style={{ display: 'flex', justifyContent: 'space-between', borderTop: '1px solid #E2E8F0', paddingTop: '15px', fontSize: '11px', color: '#64748B' }}>
+                                        <span>Tel: {generatedDoc.content.footerPhone || '+1 234 56 789'}</span>
+                                        <span>Email: {generatedDoc.content.footerEmail || 'company@email.com'}</span>
+                                        <span>Web: {generatedDoc.content.footerWebsite || 'company.com'}</span>
+                                    </div>
+
+                                    {/* Resilience: Render additional sections if any */}
+                                    {Array.isArray(generatedDoc.content.sections) && generatedDoc.content.sections.length > 0 && (
+                                        <div style={{ marginTop: '30px', borderTop: '1px dashed #E2E8F0', paddingTop: '15px' }}>
+                                            {generatedDoc.content.sections.map((section, sIdx) => (
+                                                <div key={sIdx} style={{ marginBottom: '15px' }}>
+                                                    <h5 style={{ fontSize: '12px', fontWeight: 'bold', color: '#1E40AF' }}>{section.heading}</h5>
+                                                    <p style={{ fontSize: '11px', color: '#475569' }}>{section.content}</p>
                                                 </div>
                                             ))}
                                         </div>
