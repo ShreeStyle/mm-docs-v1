@@ -30,12 +30,12 @@ function App() {
           {/* Redirect /product to /dashboard for backward compatibility */}
           <Route path="/product" element={<Navigate to="/dashboard" replace />} />
           <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/documents" element={<MyDocuments />} />
+          <Route path="/documents" element={<Dashboard />} />
           <Route path="/documents/create" element={<Dashboard />} />
-          <Route path="/compliance" element={<ComplianceCenter />} />
+          <Route path="/compliance" element={<Dashboard />} />
           <Route path="/settings" element={<SettingsPage />} />
-          <Route path="/templates" element={<TemplatesPage />} />
-          <Route path="/dashboard/templates" element={<TemplatesPage />} />
+          <Route path="/templates" element={<Dashboard />} />
+          <Route path="/dashboard/templates" element={<Dashboard />} />
           <Route path="/template/editor/:templateId" element={<DocumentTemplateEditor />} />
           <Route path="/dashboard/create-document/:templateId" element={<CreateDocument />} />
           <Route path="/document/recipients/:templateId" element={<DocumentRecipients />} />

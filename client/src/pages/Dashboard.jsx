@@ -1,5 +1,5 @@
-import React, { useState, useRef, useEffect, useCallback } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import React, { useState, useEffect } from 'react';
+import { AnimatePresence } from 'framer-motion';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { api } from '../utils/api';
@@ -11,7 +11,8 @@ import {
     Paperclip, AtSign, Globe, FileText, Bot, Zap,
     ChevronRight, Layout, LogOut, BarChart, Star,
     TrendingUp, DollarSign, Shield, Users, Bell,
-    Filter, Download, Eye, Edit3, Archive, User, Menu, X
+    Filter, Download, Eye, Edit3, Archive, User, Menu, X,
+    AlertCircle
 } from 'lucide-react';
 import Handlebars from 'handlebars';
 
@@ -22,38 +23,26 @@ const LogoIcon = () => (
 );
 
 export default function Dashboard() {
-    const { user, logout, login, token } = useAuth();
+    const { user, logout, token } = useAuth();
     const navigate = useNavigate();
     const location = useLocation();
 
     // Navigation state
     const [currentView, setCurrentView] = useState('dashboard');
-    const [selectedCategory, setSelectedCategory] = useState(null);
     const [selectedDocType, setSelectedDocType] = useState(null);
 
     // Data states
     const [docs, setDocs] = useState([]);
     const [brandKit, setBrandKit] = useState(null);
     const [error, setError] = useState(null);
-    const [isGenerating, setIsGenerating] = useState(false);
     const [generatedDoc, setGeneratedDoc] = useState(null);
     const [searchQuery, setSearchQuery] = useState('');
 
     // Form states
-    const [genericDocData, setGenericDocData] = useState({
-        employeeName: '', position: '', department: '', startDate: '', salary: '', reportingTo: '',
-        partyName: '', agreementType: '', effectiveDate: '', terms: '',
-        clientName: '', amount: '', dueDate: '', items: '',
-        period: '', companyName: '', details: '',
-        companyEmail: '', companyPhone: '', reportingTime: '', reportingLocation: '',
-        managerEmail: '', managerPhone: '', hrContactPerson: '', hrEmail: '', hrPhone: '',
-        dresscode: '', workingHours: ''
-    });
-
     // Validation state
     const [validationErrors, setValidationErrors] = useState([]);
 
-    const [isPro, setIsPro] = useState(user?.plan === 'pro');
+    const [isPro] = useState(user?.plan === 'pro');
 
     // Responsive state
     const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
@@ -735,15 +724,48 @@ export default function Dashboard() {
                                             }}>{doc.type?.replace(/_/g, ' ') || 'Document'} • {new Date(doc.createdAt).toLocaleDateString()}</p>
                                         </div>
                                     </div>
-                                    <div style={{
-                                        backgroundColor: '#DCFCE7',
-                                        color: '#166534',
-                                        padding: '4px 12px',
-                                        borderRadius: '20px',
-                                        fontSize: '12px',
-                                        fontWeight: '600'
-                                    }}>
-                                        Completed
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                        <div style={{
+                                            backgroundColor: '#DCFCE7',
+                                            color: '#166534',
+                                            padding: '4px 12px',
+                                            borderRadius: '20px',
+                                            fontSize: '12px',
+                                            fontWeight: '600'
+                                        }}>
+                                            Completed
+                                        </div>
+                                        <button
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                navigate(`/document/editor/${doc._id}`);
+                                            }}
+                                            style={{
+                                                padding: '6px',
+                                                backgroundColor: 'transparent',
+                                                border: '1px solid #E5E7EB',
+                                                borderRadius: '6px',
+                                                cursor: 'pointer',
+                                                color: '#6B7280',
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                                justifyContent: 'center',
+                                                transition: 'all 0.2s ease'
+                                            }}
+                                            onMouseEnter={(e) => {
+                                                e.target.style.borderColor = '#F97316';
+                                                e.target.style.color = '#F97316';
+                                                e.target.style.backgroundColor = '#FEF3E2';
+                                            }}
+                                            onMouseLeave={(e) => {
+                                                e.target.style.borderColor = '#E5E7EB';
+                                                e.target.style.color = '#6B7280';
+                                                e.target.style.backgroundColor = 'transparent';
+                                            }}
+                                            title="Edit Document"
+                                        >
+                                            <Edit3 size={14} />
+                                        </button>
                                     </div>
                                 </div>
                             ))
@@ -832,7 +854,6 @@ export default function Dashboard() {
                                             return;
                                         }
                                         setCurrentView('create');
-                                        setSelectedCategory(action.category);
                                         setSelectedDocType(action.type);
                                     }}
                                     style={{
@@ -1338,6 +1359,34 @@ export default function Dashboard() {
 
                                     <div style={{ display: 'flex', gap: '8px' }}>
                                         <button
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                navigate(`/document/editor/${doc._id}`);
+                                            }}
+                                            style={{
+                                                padding: '6px',
+                                                backgroundColor: 'transparent',
+                                                border: '1px solid #E5E7EB',
+                                                borderRadius: '6px',
+                                                cursor: 'pointer',
+                                                color: '#6B7280',
+                                                transition: 'all 0.2s ease'
+                                            }}
+                                            onMouseEnter={(e) => {
+                                                e.target.style.borderColor = '#F97316';
+                                                e.target.style.color = '#F97316';
+                                                e.target.style.backgroundColor = '#FEF3E2';
+                                            }}
+                                            onMouseLeave={(e) => {
+                                                e.target.style.borderColor = '#E5E7EB';
+                                                e.target.style.color = '#6B7280';
+                                                e.target.style.backgroundColor = 'transparent';
+                                            }}
+                                            title="Edit Document"
+                                        >
+                                            <Edit3 size={14} />
+                                        </button>
+                                        <button
                                             onClick={() => handleViewDocument(doc)}
                                             style={{
                                                 padding: '6px',
@@ -1465,7 +1514,6 @@ export default function Dashboard() {
                             <button
                                 onClick={() => {
                                     setCurrentView('create');
-                                    setSelectedCategory(null);
                                     setSelectedDocType(null);
                                 }}
                                 style={{
@@ -1972,7 +2020,12 @@ export default function Dashboard() {
                 ]
             };
 
-            return fieldsByType[selectedDocType] || commonFields;
+            // Normalize selectedDocType (e.g. 'offer-letter-001' -> 'offer_letter')
+            const normalizedType = selectedDocType 
+                ? selectedDocType.split('-').slice(0, -1).join('_') || selectedDocType.replace(/-/g, '_')
+                : '';
+            
+            return fieldsByType[normalizedType] || fieldsByType[selectedDocType] || commonFields;
         };
 
         const handleInputChange = (fieldId, value) => {
@@ -4501,14 +4554,13 @@ Authorized Signatory              ${formData.consultantName || '[Name]'}
                                 Generated with MM Docs AI • {brandKit?.name || "Professional"} Workspace
                             </p>
                         </div>
-                    </div>
-                </div>
                 </div>
             </div>
-        );
-    }
+        </div>
+    </div>
+);
+};
 
-    // Templates Page - Professional Template Management
     // Templates Page - Professional Template Management
     const TemplatesPage = () => {
         const [selectedCategory, setSelectedCategory] = useState('all');
@@ -4604,7 +4656,8 @@ Authorized Signatory              ${formData.consultantName || '[Name]'}
                 return;
             }
 
-            setSelectedDocType(template.id);
+            const docId = template.templateId || template.id;
+            setSelectedDocType(docId);
             setCurrentView('generate-document');
         };
 
@@ -4626,7 +4679,7 @@ Authorized Signatory              ${formData.consultantName || '[Name]'}
                 renderedContent = (
                     <div dangerouslySetInnerHTML={{ __html: compiledTemplate(previewData) }} />
                 );
-            } catch (err) {
+            } catch {
                 renderedContent = <div style={{ textAlign: 'center', padding: '20px' }}>Preview not available</div>;
             }
 
@@ -4693,11 +4746,43 @@ Authorized Signatory              ${formData.consultantName || '[Name]'}
                             <div style={{ width: '100%', height: '100px', backgroundColor: '#F9FAFB', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '40px', marginBottom: '8px' }}>
                                 {template.icon || '📄'}
                             </div>
-                            <h3 style={{ fontSize: '14px', fontWeight: '600', margin: '0 0 4px 0' }}>{template.name}</h3>
-                            <button
-                                onClick={(e) => { e.stopPropagation(); handleTemplateSelect(template); }}
-                                style={{ width: '100%', padding: '6px', backgroundColor: '#F97316', color: 'white', border: 'none', borderRadius: '6px', fontSize: '12px', fontWeight: '600' }}
-                            >Use Template</button>
+                            <h3 style={{ fontSize: '14px', fontWeight: '600', margin: '0 0 4px 0', color: '#111827' }}>{template.name}</h3>
+                            <div style={{ display: 'flex', gap: '8px', marginTop: '8px' }}>
+                                <button
+                                    onClick={(e) => { e.stopPropagation(); handleTemplateSelect(template); }}
+                                    style={{ flex: 1, padding: '8px', backgroundColor: '#F97316', color: 'white', border: 'none', borderRadius: '6px', fontSize: '12px', fontWeight: '600', cursor: 'pointer' }}
+                                >Use Template</button>
+                                <button
+                                    onClick={(e) => { 
+                                        e.stopPropagation(); 
+                                        navigate(`/template/editor/${template.templateId || template.id}`); 
+                                    }}
+                                    style={{ 
+                                        padding: '8px', 
+                                        backgroundColor: 'white', 
+                                        color: '#6B7280', 
+                                        border: '1px solid #E5E7EB', 
+                                        borderRadius: '6px', 
+                                        fontSize: '12px', 
+                                        fontWeight: '600', 
+                                        cursor: 'pointer',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center'
+                                    }}
+                                    onMouseEnter={(e) => {
+                                        e.currentTarget.style.borderColor = '#F97316';
+                                        e.currentTarget.style.color = '#F97316';
+                                    }}
+                                    onMouseLeave={(e) => {
+                                        e.currentTarget.style.borderColor = '#E5E7EB';
+                                        e.currentTarget.style.color = '#6B7280';
+                                    }}
+                                    title="Edit Template"
+                                >
+                                    <Edit3 size={14} />
+                                </button>
+                            </div>
                         </div>
                     ))}
                 </div>
@@ -4916,6 +5001,30 @@ Authorized Signatory              ${formData.consultantName || '[Name]'}
             <div style={{ marginLeft: isMobile ? '0' : '280px' }}>
                 <TopHeader />
                 <main>
+                    {error && (
+                        <div style={{
+                            padding: '12px 16px',
+                            backgroundColor: '#FEF2F2',
+                            border: '1px solid #FECACA',
+                            borderRadius: '8px',
+                            color: '#B91C1C',
+                            margin: '16px 24px',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'space-between'
+                        }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                <AlertCircle size={18} />
+                                <span style={{ fontSize: '14px', fontWeight: '500' }}>{error}</span>
+                            </div>
+                            <button 
+                                onClick={() => setError(null)}
+                                style={{ background: 'none', border: 'none', color: '#B91C1C', cursor: 'pointer', fontSize: '18px' }}
+                            >
+                                ×
+                            </button>
+                        </div>
+                    )}
                     {renderMainContent()}
                 </main>
             </div>
