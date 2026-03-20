@@ -820,12 +820,17 @@ export default function Dashboard() {
                             {[
                                 { label: 'Create Offer Letter', category: 'hr', type: 'offer_letter' },
                                 { label: 'Generate Invoice', category: 'finance', type: 'invoice' },
+                                { label: 'GST Filing Summary', category: 'finance', type: 'gst_filing_summary', customPath: '/gst-filing-summary' },
                                 { label: 'Create NDA', category: 'legal', type: 'nda' },
                                 { label: 'Business Proposal', category: 'sales', type: 'proposal' }
                             ].map((action, index) => (
                                 <button
                                     key={index}
                                     onClick={() => {
+                                        if (action.customPath) {
+                                            navigate(action.customPath);
+                                            return;
+                                        }
                                         setCurrentView('create');
                                         setSelectedCategory(action.category);
                                         setSelectedDocType(action.type);
@@ -1928,6 +1933,16 @@ export default function Dashboard() {
                     { id: 'outputTax', label: 'Output GST (₹)', type: 'number', placeholder: 'e.g. 900000', required: true },
                     { id: 'inputTax', label: 'Input GST (₹)', type: 'number', placeholder: 'e.g. 540000', required: true }
                 ],
+                'gst-filing-summary-001': [
+                    ...commonFields,
+                    { id: 'gstNumber', label: 'GST Number', type: 'text', placeholder: 'e.g. 29ABCDE1234F1Z5', required: true },
+                    { id: 'filingPeriod', label: 'Filing Period', type: 'text', placeholder: 'e.g. January 2026 / Q4 FY2025-26', required: true },
+                    { id: 'returnType', label: 'Return Type', type: 'select', options: ['GSTR-1', 'GSTR-3B', 'GSTR-4', 'GSTR-9'], required: true },
+                    { id: 'totalSales', label: 'Total Sales (₹)', type: 'number', placeholder: 'e.g. 5000000', required: true },
+                    { id: 'totalPurchases', label: 'Total Purchases (₹)', type: 'number', placeholder: 'e.g. 3000000', required: true },
+                    { id: 'outputTax', label: 'Output GST (₹)', type: 'number', placeholder: 'e.g. 900000', required: true },
+                    { id: 'inputTax', label: 'Input GST (₹)', type: 'number', placeholder: 'e.g. 540000', required: true }
+                ],
                 audit_report: [
                     ...commonFields,
                     { id: 'auditPeriod', label: 'Audit Period', type: 'text', placeholder: 'e.g. FY 2025-26', required: true },
@@ -2669,6 +2684,154 @@ Authorized Signatory              ${formData.consultantName || '[Name]'}
                                             <span>₹{grandTotal.toLocaleString()}</span>
                                         </div>
                                     </div>
+                                </div>
+                            </div>
+                        );
+                    })()
+                },
+                gst_filing_summary: {
+                    title: 'GST Filing Summary',
+                    content: (() => {
+                        return (
+                            <div style={{ width: '100%', fontFamily: 'Inter, sans-serif', padding: '20px', backgroundColor: 'white', borderRadius: '8px', border: '1px solid #E5E7EB' }}>
+                                <div style={{ borderBottom: '2px solid #F97316', paddingBottom: '15px', marginBottom: '20px', textAlign: 'center' }}>
+                                    <h1 style={{ margin: 0, color: '#F97316', fontSize: '24px', fontWeight: 'bold' }}>GST Filing Summary</h1>
+                                    <p style={{ margin: '5px 0 0 0', color: '#6B7280', fontSize: '14px' }}>Period: {formData.filingPeriod || '[Filing Period]'}</p>
+                                </div>
+
+                                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px', marginBottom: '30px' }}>
+                                    <div style={{ padding: '12px', backgroundColor: '#F9FAFB', borderRadius: '6px' }}>
+                                        <p style={{ margin: 0, fontSize: '11px', color: '#9CA3AF', textTransform: 'uppercase', fontWeight: 'bold' }}>Company Name</p>
+                                        <p style={{ margin: '4px 0 0 0', fontSize: '15px', fontWeight: '600' }}>{formData.companyName || '[Company Name]'}</p>
+                                    </div>
+                                    <div style={{ padding: '12px', backgroundColor: '#F9FAFB', borderRadius: '6px' }}>
+                                        <p style={{ margin: 0, fontSize: '11px', color: '#9CA3AF', textTransform: 'uppercase', fontWeight: 'bold' }}>GSTIN</p>
+                                        <p style={{ margin: '4px 0 0 0', fontSize: '15px', fontWeight: '600' }}>{formData.gstNumber || '[GSTIN Number]'}</p>
+                                    </div>
+                                </div>
+
+                                <div style={{ marginBottom: '25px' }}>
+                                    <h3 style={{ fontSize: '14px', fontWeight: 'bold', color: '#374151', borderLeft: '4px solid #F97316', paddingLeft: '10px', marginBottom: '15px' }}>Filing Overview</h3>
+                                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
+                                        <div style={{ display: 'flex', justifyContent: 'space-between', padding: '10px', borderBottom: '1px solid #F3F4F6' }}>
+                                            <span style={{ fontSize: '13px', color: '#6B7280' }}>Return Type:</span>
+                                            <span style={{ fontSize: '13px', fontWeight: '600' }}>{formData.returnType || 'N/A'}</span>
+                                        </div>
+                                        <div style={{ display: 'flex', justifyContent: 'space-between', padding: '10px', borderBottom: '1px solid #F3F4F6' }}>
+                                            <span style={{ fontSize: '13px', color: '#6B7280' }}>Filing Period:</span>
+                                            <span style={{ fontSize: '13px', fontWeight: '600' }}>{formData.filingPeriod || 'N/A'}</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div style={{ marginBottom: '25px' }}>
+                                    <h3 style={{ fontSize: '14px', fontWeight: 'bold', color: '#374151', borderLeft: '4px solid #F97316', paddingLeft: '10px', marginBottom: '15px' }}>Financial Summary</h3>
+                                    <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                                        <tbody>
+                                            <tr style={{ backgroundColor: '#F9FAFB' }}>
+                                                <td style={{ padding: '12px', fontSize: '13px', color: '#374151' }}>Total Taxable Sales</td>
+                                                <td style={{ padding: '12px', fontSize: '13px', textAlign: 'right', fontWeight: 'bold' }}>₹{Number(formData.totalSales || 0).toLocaleString()}</td>
+                                            </tr>
+                                            <tr>
+                                                <td style={{ padding: '12px', fontSize: '13px', color: '#374151' }}>Total Taxable Purchases</td>
+                                                <td style={{ padding: '12px', fontSize: '13px', textAlign: 'right', fontWeight: 'bold' }}>₹{Number(formData.totalPurchases || 0).toLocaleString()}</td>
+                                            </tr>
+                                            <tr style={{ backgroundColor: '#EFF6FF' }}>
+                                                <td style={{ padding: '12px', fontSize: '13px', color: '#1E40AF', fontWeight: 'bold' }}>Output Tax Liability</td>
+                                                <td style={{ padding: '12px', fontSize: '13px', textAlign: 'right', color: '#1E40AF', fontWeight: 'bold' }}>₹{Number(formData.outputTax || 0).toLocaleString()}</td>
+                                            </tr>
+                                            <tr style={{ backgroundColor: '#F0FDF4' }}>
+                                                <td style={{ padding: '12px', fontSize: '13px', color: '#166534', fontWeight: 'bold' }}>Input Tax Credit (ITC)</td>
+                                                <td style={{ padding: '12px', fontSize: '13px', textAlign: 'right', color: '#166534', fontWeight: 'bold' }}>₹{Number(formData.inputTax || 0).toLocaleString()}</td>
+                                            </tr>
+                                            <tr style={{ borderTop: '2px solid #F97316' }}>
+                                                <td style={{ padding: '12px', fontSize: '15px', color: '#111827', fontWeight: '900' }}>Net GST Payable / Refund</td>
+                                                <td style={{ padding: '12px', fontSize: '15px', textAlign: 'right', color: '#F97316', fontWeight: '900' }}>
+                                                    ₹{Math.max(0, Number(formData.outputTax || 0) - Number(formData.inputTax || 0)).toLocaleString()}
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+
+                                <div style={{ padding: '15px', backgroundColor: '#FFF7ED', borderRadius: '8px', border: '1px dashed #FFEDD5', marginTop: '10px' }}>
+                                    <p style={{ margin: 0, fontSize: '12px', color: '#9A3412', lineHeight: '1.5' }}>
+                                        <strong>Note:</strong> This is a summary generated based on provided self-declared figures. Please ensure all data matches your accounting records before final filing on the GST portal.
+                                    </p>
+                                </div>
+                            </div>
+                        );
+                    })()
+                },
+                'gst-filing-summary-001': {
+                    title: 'GST Filing Summary',
+                    content: (() => {
+                        return (
+                            <div style={{ width: '100%', fontFamily: 'Inter, sans-serif', padding: '20px', backgroundColor: 'white', borderRadius: '8px', border: '1px solid #E5E7EB' }}>
+                                <div style={{ borderBottom: '2px solid #F97316', paddingBottom: '15px', marginBottom: '20px', textAlign: 'center' }}>
+                                    <h1 style={{ margin: 0, color: '#F97316', fontSize: '24px', fontWeight: 'bold' }}>GST Filing Summary</h1>
+                                    <p style={{ margin: '5px 0 0 0', color: '#6B7280', fontSize: '14px' }}>Period: {formData.filingPeriod || '[Filing Period]'}</p>
+                                </div>
+
+                                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px', marginBottom: '30px' }}>
+                                    <div style={{ padding: '12px', backgroundColor: '#F9FAFB', borderRadius: '6px' }}>
+                                        <p style={{ margin: 0, fontSize: '11px', color: '#9CA3AF', textTransform: 'uppercase', fontWeight: 'bold' }}>Company Name</p>
+                                        <p style={{ margin: '4px 0 0 0', fontSize: '15px', fontWeight: '600' }}>{formData.companyName || '[Company Name]'}</p>
+                                    </div>
+                                    <div style={{ padding: '12px', backgroundColor: '#F9FAFB', borderRadius: '6px' }}>
+                                        <p style={{ margin: 0, fontSize: '11px', color: '#9CA3AF', textTransform: 'uppercase', fontWeight: 'bold' }}>GSTIN</p>
+                                        <p style={{ margin: '4px 0 0 0', fontSize: '15px', fontWeight: '600' }}>{formData.gstNumber || '[GSTIN Number]'}</p>
+                                    </div>
+                                </div>
+
+                                <div style={{ marginBottom: '25px' }}>
+                                    <h3 style={{ fontSize: '14px', fontWeight: 'bold', color: '#374151', borderLeft: '4px solid #F97316', paddingLeft: '10px', marginBottom: '15px' }}>Filing Overview</h3>
+                                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
+                                        <div style={{ display: 'flex', justifyContent: 'space-between', padding: '10px', borderBottom: '1px solid #F3F4F6' }}>
+                                            <span style={{ fontSize: '13px', color: '#6B7280' }}>Return Type:</span>
+                                            <span style={{ fontSize: '13px', fontWeight: '600' }}>{formData.returnType || 'N/A'}</span>
+                                        </div>
+                                        <div style={{ display: 'flex', justifyContent: 'space-between', padding: '10px', borderBottom: '1px solid #F3F4F6' }}>
+                                            <span style={{ fontSize: '13px', color: '#6B7280' }}>Filing Period:</span>
+                                            <span style={{ fontSize: '13px', fontWeight: '600' }}>{formData.filingPeriod || 'N/A'}</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div style={{ marginBottom: '25px' }}>
+                                    <h3 style={{ fontSize: '14px', fontWeight: 'bold', color: '#374151', borderLeft: '4px solid #F97316', paddingLeft: '10px', marginBottom: '15px' }}>Financial Summary</h3>
+                                    <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                                        <tbody>
+                                            <tr style={{ backgroundColor: '#F9FAFB' }}>
+                                                <td style={{ padding: '12px', fontSize: '13px', color: '#374151' }}>Total Taxable Sales</td>
+                                                <td style={{ padding: '12px', fontSize: '13px', textAlign: 'right', fontWeight: 'bold' }}>₹{Number(formData.totalSales || 0).toLocaleString()}</td>
+                                            </tr>
+                                            <tr>
+                                                <td style={{ padding: '12px', fontSize: '13px', color: '#374151' }}>Total Taxable Purchases</td>
+                                                <td style={{ padding: '12px', fontSize: '13px', textAlign: 'right', fontWeight: 'bold' }}>₹{Number(formData.totalPurchases || 0).toLocaleString()}</td>
+                                            </tr>
+                                            <tr style={{ backgroundColor: '#EFF6FF' }}>
+                                                <td style={{ padding: '12px', fontSize: '13px', color: '#1E40AF', fontWeight: 'bold' }}>Output Tax Liability</td>
+                                                <td style={{ padding: '12px', fontSize: '13px', textAlign: 'right', color: '#1E40AF', fontWeight: 'bold' }}>₹{Number(formData.outputTax || 0).toLocaleString()}</td>
+                                            </tr>
+                                            <tr style={{ backgroundColor: '#F0FDF4' }}>
+                                                <td style={{ padding: '12px', fontSize: '13px', color: '#166534', fontWeight: 'bold' }}>Input Tax Credit (ITC)</td>
+                                                <td style={{ padding: '12px', fontSize: '13px', textAlign: 'right', color: '#166534', fontWeight: 'bold' }}>₹{Number(formData.inputTax || 0).toLocaleString()}</td>
+                                            </tr>
+                                            <tr style={{ borderTop: '2px solid #F97316' }}>
+                                                <td style={{ padding: '12px', fontSize: '15px', color: '#111827', fontWeight: '900' }}>Net GST Payable / Refund</td>
+                                                <td style={{ padding: '12px', fontSize: '15px', textAlign: 'right', color: '#F97316', fontWeight: '900' }}>
+                                                    ₹{Math.max(0, Number(formData.outputTax || 0) - Number(formData.inputTax || 0)).toLocaleString()}
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+
+                                <div style={{ padding: '15px', backgroundColor: '#FFF7ED', borderRadius: '8px', border: '1px dashed #FFEDD5', marginTop: '10px' }}>
+                                    <p style={{ margin: 0, fontSize: '12px', color: '#9A3412', lineHeight: '1.5' }}>
+                                        <strong>Note:</strong> This is a summary generated based on provided self-declared figures. Please ensure all data matches your accounting records before final filing on the GST portal.
+                                    </p>
                                 </div>
                             </div>
                         );
@@ -4433,6 +4596,14 @@ Authorized Signatory              ${formData.consultantName || '[Name]'}
                 document.body.removeChild(link);
                 return;
             }
+
+            // Force redirection for templates with dedicated specialized pages
+            if (template.id === 'gst_filing_summary' || template.id === 'gst-filing-summary-001' || 
+                template.templateId === 'gst_filing_summary' || template.templateId === 'gst-filing-summary-001') {
+                navigate('/gst-filing-summary');
+                return;
+            }
+
             setSelectedDocType(template.id);
             setCurrentView('generate-document');
         };

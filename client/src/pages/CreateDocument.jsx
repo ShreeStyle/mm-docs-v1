@@ -20,6 +20,11 @@ const CreateDocument = () => {
 
     // Fetch template data on component mount
     useEffect(() => {
+        if (templateId === 'gst_filing_summary') {
+            navigate('/gst-filing-summary');
+            return;
+        }
+
         if (templateId) {
             fetchTemplate();
         } else {

@@ -2461,45 +2461,96 @@ We appreciate the cooperation and assistance provided by management and staff th
     console.log('📝 Building GST Filing Summary with data:', providedData);
     const currentDate = new Date().toLocaleDateString('en-IN', { year: 'numeric', month: 'long', day: 'numeric' });
     
-    // Calculate net tax payable
-    const outputTax = parseFloat(String(providedData.outputTax || '0').replace(/[^0-9.]/g, '')) || 0;
-    const inputTax = parseFloat(String(providedData.inputTax || '0').replace(/[^0-9.]/g, '')) || 0;
-    const netTaxPayable = Math.max(0, outputTax - inputTax);
+    // Map providedData to template structure
+    const companyName = providedData.companyName || brandContext.name || "[Company Name]";
+    const gstNo = providedData.gstNumber || providedData.gstNo || "[GST Number]";
+    const dateRange = providedData.filingPeriod || providedData.dateRange || "[Filing Period]";
+    const mobile = providedData.mobile || brandContext.phone || "";
     
-    return {
-      title: "GST Filing Summary",
-      companyName: providedData.companyName || brandContext.name || "[Company Name]",
-      companyAddress: providedData.companyAddress || "[Company Address]",
-      gstNumber: providedData.gstNumber || "[GST Number]",
-      filingPeriod: providedData.filingPeriod || "[Filing Period]",
-      returnType: providedData.returnType || "GSTR-3B",
-      filingDate: providedData.filingDate || currentDate,
-      
-      totalSales: providedData.totalSales || "0",
-      totalPurchases: providedData.totalPurchases || "0",
-      outputTax: providedData.outputTax || "0",
-      inputTax: providedData.inputTax || "0",
-      netTaxPayable: netTaxPayable.toFixed(2),
-      
-      interestPayable: providedData.interestPayable || "0",
-      lateFee: providedData.lateFee || "0",
-      
-      taxableSupplies: providedData.taxableSupplies || [
+    // Summary values
+    const totalTaxableValue = parseFloat(String(providedData.totalTaxableValue || providedData.totalSales || '0').replace(/[^0-9.]/g, '')) || 0;
+    const outputTax = parseFloat(String(providedData.outputTax || '0').replace(/[^0-9.]/g, '')) || 0;
+    const returnTax = parseFloat(String(providedData.returnTax || providedData.inputTax || '0').replace(/[^0-9.]/g, '')) || 0;
+    
+    // Calculate CGST/SGST (assuming 50/50 split of output tax if not provided)
+    const totalCGST = parseFloat(String(providedData.totalCGST || (outputTax / 2) || '0').replace(/[^0-9.]/g, '')) || 0;
+    const totalSGST = parseFloat(String(providedData.totalSGST || (outputTax / 2) || '0').replace(/[^0-9.]/g, '')) || 0;
+    
+    const netPayable = Math.max(0, (totalCGST + totalSGST) - returnTax);
+
+    // Parse sales records if provided (expecting array or string)
+    let sales = Array.isArray(providedData.sales) ? providedData.sales : [];
+    if (sales.length === 0 && providedData.salesTable) {
+      // Basic parser for string-based table input: "GSTIN|Customer|POS|InvNo|InvDate|Value|Tax%|Taxable|CGST|SGST|IGST|Cess"
+      providedData.salesTable.split('\n').filter(line => line.trim()).forEach(line => {
+        const p = line.split('|').map(s => s.trim());
+        sales.push({
+          gstin: p[0] || '',
+          customerName: p[1] || 'Customer',
+          placeOfSupply: { code: p[2] || '27', name: p[3] || 'Maharashtra' },
+          invoiceDetails: { no: p[4] || 'INV-001', date: p[5] || currentDate, value: parseFloat(p[6]) || 0 },
+          totalTaxPct: parseFloat(p[7]) || 18,
+          taxableValue: parseFloat(p[8]) || 0,
+          taxAmount: { central: parseFloat(p[9]) || 0, state: parseFloat(p[10]) || 0, integrated: parseFloat(p[11]) || 0, cess: parseFloat(p[12]) || 0 },
+          totalTax: (parseFloat(p[9]) || 0) + (parseFloat(p[10]) || 0) + (parseFloat(p[11]) || 0)
+        });
+      });
+    }
+
+    // Default sample sale if none provided and it's a "mock"
+    if (sales.length === 0) {
+      sales = [
         {
-          description: "Taxable supplies @ 18%",
-          amount: Math.round(parseFloat(String(providedData.totalSales || '0').replace(/[^0-9.]/g, '')) * 0.85).toLocaleString('en-IN')
-        },
-        {
-          description: "Taxable supplies @ 5%",
-          amount: Math.round(parseFloat(String(providedData.totalSales || '0').replace(/[^0-9.]/g, '')) * 0.15).toLocaleString('en-IN')
+          gstin: gstNo !== "[GST Number]" ? gstNo : "27AAACN1234A1Z1",
+          customerName: "Sample Customer",
+          placeOfSupply: { code: "27", name: "Maharashtra" },
+          invoiceDetails: { no: "INV/001", date: currentDate, value: totalTaxableValue * 1.18 },
+          totalTaxPct: 18,
+          taxableValue: totalTaxableValue || 0,
+          taxAmount: { central: totalCGST, state: totalSGST, integrated: 0, cess: 0 },
+          totalTax: totalCGST + totalSGST
         }
-      ],
-      
-      complianceStatus: providedData.complianceStatus || "Pending Filing",
-      filingReference: providedData.filingReference || "",
-      
-      remarks: providedData.remarks || `This GST filing summary has been prepared for ${providedData.returnType || 'GSTR-3B'} for the period ${providedData.filingPeriod || '[Filing Period]'}. All figures are based on books of accounts and supporting documentation. Please verify all amounts before final submission to the GST portal.`,
-      
+      ];
+    }
+
+    // Parse credit notes (salesReturn)
+    let salesReturn = Array.isArray(providedData.salesReturn) ? providedData.salesReturn : [];
+    if (salesReturn.length === 0 && providedData.creditNotesTable) {
+      providedData.creditNotesTable.split('\n').filter(line => line.trim()).forEach(line => {
+        const p = line.split('|').map(s => s.trim());
+        salesReturn.push({
+          gstin: p[0] || '',
+          customerName: p[1] || 'Customer',
+          placeOfSupply: { code: p[2] || '27', name: p[3] || 'Maharashtra' },
+          invoiceDetails: { no: p[4] || 'CN-001', date: p[5] || currentDate, value: parseFloat(p[6]) || 0 },
+          totalTaxPct: parseFloat(p[7]) || 18,
+          taxableValue: parseFloat(p[8]) || 0,
+          taxAmount: { central: parseFloat(p[9]) || 0, state: parseFloat(p[10]) || 0, integrated: parseFloat(p[11]) || 0, cess: parseFloat(p[12]) || 0 },
+          totalTax: (parseFloat(p[9]) || 0) + (parseFloat(p[10]) || 0) + (parseFloat(p[11]) || 0)
+        });
+      });
+    }
+
+    return {
+      title: "GSTR-1 Filing Summary",
+      companyName,
+      gstNo,
+      mobile,
+      dateRange,
+      summary: {
+        totalTaxableValue,
+        totalCGST,
+        totalSGST,
+        returnTax,
+        netPayable
+      },
+      sales,
+      salesReturn,
+      authorizedSignatory: {
+        name: providedData.signatoryName || "[Authorized Signatory]",
+        designation: providedData.signatoryDesignation || "Director"
+      },
+      signatorySignature: providedData.signatorySignature || "",
       generatedDate: currentDate
     };
   } else if (effectiveType === "policy_document") {

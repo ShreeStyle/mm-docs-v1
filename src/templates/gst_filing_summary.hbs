@@ -1,442 +1,356 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GST Filing Summary</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
-        * {
-            box-sizing: border-box;
+        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap');
+        
+        body {
+            font-family: 'Outfit', sans-serif;
+            color: #2D3748;
+            line-height: 1.4;
             margin: 0;
             padding: 0;
+            background: #fff;
+            font-size: 9px;
         }
 
-        body {
-            font-family: 'Inter', -apple-system, sans-serif;
-            line-height: 1.6;
-            color: #1f2937;
-            max-width: 850px;
-            margin: 0 auto;
+        .page-container {
             padding: 40px;
-            background: white;
-            font-size: 13px;
         }
 
-        .header {
-            text-align: center;
-            padding-bottom: 24px;
-            margin-bottom: 32px;
-            border-bottom: 3px solid #7c3aed;
+        .main-header {
+            background: linear-gradient(135deg, #1A202C 0%, #2D3748 100%);
+            color: white;
+            padding: 30px 40px;
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
 
-        .doc-title {
-            font-size: 32px;
-            font-weight: 800;
-            color: #7c3aed;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            margin-bottom: 8px;
-        }
-
-        .doc-subtitle {
-            font-size: 18px;
-            font-weight: 600;
-            color: #6b7280;
-            margin-bottom: 12px;
-        }
-
-        .filing-badge {
-            display: inline-block;
-            padding: 6px 16px;
-            border-radius: 9999px;
-            font-size: 11px;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            background: #f3e8ff;
-            color: #7c3aed;
-            margin-top: 8px;
-        }
-
-        .company-section {
-            background: #f9fafb;
-            border-left: 4px solid #7c3aed;
-            padding: 20px;
-            margin-bottom: 28px;
-            border-radius: 6px;
-        }
-
-        .company-name {
-            font-size: 20px;
+        .header-content h1 {
+            font-size: 28px;
+            margin: 0;
+            letter-spacing: 2px;
             font-weight: 700;
-            color: #111827;
-            margin-bottom: 8px;
+            color: #F6AD55;
         }
 
-        .company-detail {
-            font-size: 13px;
-            color: #4b5563;
-            line-height: 1.6;
+        .header-content p {
+            margin: 5px 0 0 0;
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .company-info {
+            text-align: right;
+        }
+
+        .company-info h2 {
+            font-size: 18px;
+            margin: 0;
+            color: #fff;
+        }
+
+        .company-info p {
+            margin: 2px 0;
+            font-size: 11px;
+            color: #CBD5E0;
+        }
+
+        .summary-ribbon {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            margin: 0 40px 30px 40px;
+        }
+
+        .summary-card {
+            background: #F7FAFC;
+            border: 1px solid #E2E8F0;
+            padding: 12px;
+            border-radius: 8px;
+            border-top: 3px solid #ED8936;
+        }
+
+        .summary-card .label {
+            font-size: 8px;
+            color: #718096;
+            text-transform: uppercase;
+            font-weight: 600;
             margin-bottom: 4px;
         }
 
-        .company-detail strong {
-            color: #111827;
-            font-weight: 600;
+        .summary-card .value {
+            font-size: 14px;
+            font-weight: 700;
+            color: #2D3748;
         }
 
-        .filing-meta {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 16px;
-            margin-bottom: 32px;
-        }
-
-        .meta-card {
-            background: #ffffff;
-            border: 1px solid #e5e7eb;
-            border-radius: 8px;
-            padding: 16px;
-        }
-
-        .meta-label {
-            font-size: 11px;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            color: #9ca3af;
-            font-weight: 600;
-            margin-bottom: 6px;
-        }
-
-        .meta-value {
-            font-size: 15px;
-            font-weight: 600;
-            color: #111827;
+        .section-container {
+            margin-bottom: 35px;
         }
 
         .section-title {
-            font-size: 18px;
+            font-size: 14px;
             font-weight: 700;
-            color: #111827;
-            margin-bottom: 16px;
-            padding-bottom: 8px;
-            border-bottom: 2px solid #e5e7eb;
+            color: #2D3748;
+            margin-bottom: 12px;
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 8px;
         }
 
-        .section-title::before {
+        .section-title::after {
             content: '';
-            width: 4px;
-            height: 20px;
-            background: #7c3aed;
-            border-radius: 2px;
+            flex: 1;
+            height: 1px;
+            background: #E2E8F0;
         }
 
-        .financial-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 16px;
-            margin-bottom: 32px;
-        }
-
-        .financial-card {
-            background: #f9fafb;
-            border: 1px solid #e5e7eb;
+        table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            margin-bottom: 0;
+            table-layout: fixed;
+            border: 1px solid #E2E8F0;
             border-radius: 8px;
-            padding: 20px;
+            overflow: hidden;
         }
 
-        .financial-label {
-            font-size: 12px;
-            color: #6b7280;
-            margin-bottom: 6px;
-        }
-
-        .financial-amount {
-            font-size: 24px;
+        th {
+            background-color: #F8FAFC;
+            color: #4A5568;
             font-weight: 700;
-            color: #111827;
-        }
-
-        .financial-amount.positive {
-            color: #059669;
-        }
-
-        .financial-amount.negative {
-            color: #dc2626;
-        }
-
-        .tax-breakdown {
-            background: #ffffff;
-            border: 2px solid #7c3aed;
-            border-radius: 10px;
-            padding: 24px;
-            margin-bottom: 32px;
-        }
-
-        .tax-breakdown-title {
-            font-size: 16px;
-            font-weight: 700;
-            color: #7c3aed;
-            margin-bottom: 16px;
+            font-size: 8px;
             text-transform: uppercase;
-            letter-spacing: 0.04em;
+            padding: 10px 8px;
+            border-bottom: 2px solid #E2E8F0;
+            text-align: center;
         }
 
-        .tax-row {
-            display: flex;
-            justify-content: space-between;
-            padding: 12px 0;
-            border-bottom: 1px solid #e5e7eb;
-            font-size: 14px;
+        td {
+            padding: 8px;
+            border-bottom: 1px solid #EDF2F7;
+            color: #4A5568;
+            word-wrap: break-word;
+            vertical-align: middle;
         }
 
-        .tax-row:last-child {
+        tr:last-child td {
             border-bottom: none;
         }
 
-        .tax-row.total {
-            font-weight: 700;
-            font-size: 16px;
-            color: #7c3aed;
-            padding-top: 16px;
-            border-top: 2px solid #7c3aed;
-            margin-top: 8px;
+        tr:nth-child(even) {
+            background-color: #FBFDFF;
         }
 
-        .tax-label {
-            color: #4b5563;
-        }
+        .text-right { text-align: right; }
+        .font-bold { font-weight: 700; }
+        .text-orange { color: #DD6B20; }
+        .text-blue { color: #2C5282; }
 
-        .tax-value {
-            font-weight: 600;
-            color: #111827;
-        }
-
-        .summary-section {
-            background: #f9fafb;
-            border-radius: 8px;
-            padding: 20px;
-            margin-bottom: 24px;
-        }
-
-        .summary-item {
-            display: flex;
-            justify-content: space-between;
-            padding: 10px 0;
-            border-bottom: 1px dashed #d1d5db;
-        }
-
-        .summary-item:last-child {
-            border-bottom: none;
-        }
-
-        .status-badge {
-            display: inline-block;
-            padding: 4px 12px;
-            border-radius: 4px;
-            font-size: 11px;
-            font-weight: 600;
-            text-transform: uppercase;
-        }
-
-        .status-badge.filed {
-            background: #d1fae5;
-            color: #065f46;
-        }
-
-        .status-badge.pending {
-            background: #fef3c7;
-            color: #92400e;
-        }
-
-        .compliance-note {
-            background: #eff6ff;
-            border-left: 4px solid #3b82f6;
-            padding: 16px;
-            border-radius: 4px;
-            margin-bottom: 24px;
-        }
-
-        .compliance-note-title {
-            font-size: 13px;
-            font-weight: 700;
-            color: #1e40af;
-            margin-bottom: 8px;
-        }
-
-        .compliance-note-text {
-            font-size: 12px;
-            color: #1e40af;
-            line-height: 1.6;
+        .sub-header {
+            background-color: #EDF2F7;
+            font-size: 7px;
+            color: #718096;
         }
 
         .footer {
-            margin-top: 48px;
-            padding-top: 20px;
-            border-top: 2px solid #e5e7eb;
-            text-align: center;
-            color: #9ca3af;
-            font-size: 11px;
+            margin-top: 60px;
+            display: flex;
+            justify-content: space-between;
+            padding: 0 40px 40px 40px;
         }
 
-        .footer-note {
-            margin-bottom: 8px;
+        .footer-left p {
+            margin: 2px 0;
+            color: #718096;
+        }
+
+        .signature-box {
+            text-align: right;
+            width: 200px;
+        }
+
+        .signature-line {
+            height: 1px;
+            background: #2D3748;
+            margin: 50px 0 10px 0;
+        }
+
+        .signature-box h3 {
+            margin: 0;
+            font-size: 11px;
+            text-transform: uppercase;
         }
 
         @media print {
-            body {
-                padding: 20px;
-            }
-
-            .financial-grid {
-                break-inside: avoid;
-            }
-
-            .tax-breakdown {
-                break-inside: avoid;
+            .page-break {
+                page-break-before: always;
             }
         }
     </style>
 </head>
-
 <body>
-    <div class="header">
-        <div class="doc-title">GST Filing Summary</div>
-        <div class="doc-subtitle">Goods and Services Tax Return Summary</div>
-        <div class="filing-badge">{{returnType}}</div>
-    </div>
-
-    <div class="company-section">
-        <div class="company-name">{{companyName}}</div>
-        <div class="company-detail">{{{companyAddress}}}</div>
-        <div class="company-detail"><strong>GSTIN:</strong> {{gstNumber}}</div>
-    </div>
-
-    <div class="filing-meta">
-        <div class="meta-card">
-            <div class="meta-label">Filing Period</div>
-            <div class="meta-value">{{filingPeriod}}</div>
+    <div class="main-header">
+        <div class="header-content">
+            <h1>GSTR-1</h1>
+            <p>Filing Period: <strong>{{dateRange}}</strong></p>
         </div>
-        <div class="meta-card">
-            <div class="meta-label">Return Type</div>
-            <div class="meta-value">{{returnType}}</div>
-        </div>
-        <div class="meta-card">
-            <div class="meta-label">Filing Date</div>
-            <div class="meta-value">{{#if filingDate}}{{filingDate}}{{else}}{{generatedDate}}{{/if}}</div>
+        <div class="company-info">
+            <h2>{{companyName}}</h2>
+            <p>GSTIN: {{gstNo}}{{#if mobile}} | Mob: {{mobile}}{{/if}}</p>
         </div>
     </div>
 
-    <div class="section-title">Financial Overview</div>
-    <div class="financial-grid">
-        <div class="financial-card">
-            <div class="financial-label">Total Sales (Turnover)</div>
-            <div class="financial-amount">₹{{totalSales}}</div>
+    <div class="summary-ribbon">
+        <div class="summary-card">
+            <div class="label">Taxable Turnover</div>
+            <div class="value">₹{{numberFormat summary.totalTaxableValue}}</div>
         </div>
-        <div class="financial-card">
-            <div class="financial-label">Total Purchases</div>
-            <div class="financial-amount">₹{{totalPurchases}}</div>
+        <div class="summary-card" style="border-top-color: #4299E1;">
+            <div class="label">Tax Credit (Returns)</div>
+            <div class="value">₹{{numberFormat summary.returnTax}}</div>
         </div>
-    </div>
-
-    <div class="section-title">Tax Computation</div>
-    <div class="tax-breakdown">
-        <div class="tax-breakdown-title">GST Summary</div>
-
-        <div class="tax-row">
-            <div class="tax-label">Output Tax (Tax on Sales)</div>
-            <div class="tax-value">₹{{outputTax}}</div>
+        <div class="summary-card" style="border-top-color: #48BB78;">
+            <div class="label">Central/State Tax</div>
+            <div class="value">₹{{numberFormat (add summary.totalCGST summary.totalSGST)}}</div>
         </div>
-
-        <div class="tax-row">
-            <div class="tax-label">Input Tax Credit (ITC)</div>
-            <div class="tax-value">₹{{inputTax}}</div>
-        </div>
-
-        {{#if interestPayable}}
-        <div class="tax-row">
-            <div class="tax-label">Interest Payable</div>
-            <div class="tax-value">₹{{interestPayable}}</div>
-        </div>
-        {{/if}}
-
-        {{#if lateFee}}
-        <div class="tax-row">
-            <div class="tax-label">Late Fee</div>
-            <div class="tax-value">₹{{lateFee}}</div>
-        </div>
-        {{/if}}
-
-        <div class="tax-row total">
-            <div class="tax-label">Net Tax Payable</div>
-            <div class="tax-value">₹{{#if netTaxPayable}}{{netTaxPayable}}{{else}}{{calc outputTax inputTax}}{{/if}}</div>
+        <div class="summary-card" style="border-top-color: #ED8936;">
+            <div class="label">Net GST Payable / Refund</div>
+            <div class="value" style="color: #DD6B20;">₹{{numberFormat summary.netPayable}}</div>
         </div>
     </div>
 
-    {{#if taxableSupplies}}
-    <div class="section-title">Taxable Supplies Breakdown</div>
-    <div class="summary-section">
-        {{#each taxableSupplies}}
-        <div class="summary-item">
-            <span>{{this.description}}</span>
-            <span style="font-weight: 600;">₹{{this.amount}}</span>
-        </div>
-        {{/each}}
-    </div>
-    {{/if}}
+    <div class="page-container">
 
-    {{#if complianceStatus}}
-    <div class="section-title">Filing Status</div>
-    <div class="summary-section">
-        <div class="summary-item">
-            <span>Compliance Status</span>
-            <span class="status-badge {{#if (eq complianceStatus 'Filed')}}filed{{else}}pending{{/if}}">{{complianceStatus}}</span>
+    <div class="page-container">
+        <div class="section-container">
+            <div class="section-title">Details of Outward Supplies (Sales)</div>
+            <table>
+                <thead>
+                    <tr>
+                        <th rowspan="2" style="width: 12%; text-align: left;">GSTIN</th>
+                        <th rowspan="2" style="width: 15%; text-align: left;">Customer Name</th>
+                        <th colspan="2" class="sub-header">Place of Supply</th>
+                        <th colspan="3" class="sub-header">Invoice Details</th>
+                        <th rowspan="2" style="width: 5%;">Tax %</th>
+                        <th rowspan="2" style="width: 8%; text-align: right;">Taxable</th>
+                        <th colspan="4" class="sub-header">Amount of Tax</th>
+                        <th rowspan="2" style="width: 7%; text-align: right;">Total Tax</th>
+                    </tr>
+                    <tr>
+                        <th class="sub-header">Code</th>
+                        <th class="sub-header">State</th>
+                        <th class="sub-header">No.</th>
+                        <th class="sub-header">Date</th>
+                        <th class="sub-header">Value</th>
+                        <th class="sub-header">CGST</th>
+                        <th class="sub-header">SGST</th>
+                        <th class="sub-header">IGST</th>
+                        <th class="sub-header">CESS</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {{#if sales}}
+                        {{#each sales}}
+                        <tr>
+                            <td class="font-bold">{{gstin}}</td>
+                            <td>{{customerName}}</td>
+                            <td style="text-align: center;">{{placeOfSupply.code}}</td>
+                            <td>{{placeOfSupply.name}}</td>
+                            <td>{{invoiceDetails.no}}</td>
+                            <td>{{invoiceDetails.date}}</td>
+                            <td class="text-right">{{numberFormat invoiceDetails.value}}</td>
+                            <td class="text-right">{{totalTaxPct}}%</td>
+                            <td class="text-right font-bold">{{numberFormat taxableValue}}</td>
+                            <td class="text-right">{{numberFormat taxAmount.central}}</td>
+                            <td class="text-right">{{numberFormat taxAmount.state}}</td>
+                            <td class="text-right text-blue">{{numberFormat taxAmount.integrated}}</td>
+                            <td class="text-right">{{numberFormat taxAmount.cess}}</td>
+                            <td class="text-right font-bold text-orange">₹{{numberFormat totalTax}}</td>
+                        </tr>
+                        {{/each}}
+                    {{else}}
+                        <tr><td colspan="14" style="text-align: center; padding: 40px; color: #A0AEC0;">No sales records found</td></tr>
+                    {{/if}}
+                </tbody>
+            </table>
         </div>
-        {{#if filingReference}}
-        <div class="summary-item">
-            <span>Filing Reference Number</span>
-            <span style="font-weight: 600;">{{filingReference}}</span>
-        </div>
-        {{/if}}
-    </div>
-    {{/if}}
 
-    <div class="compliance-note">
-        <div class="compliance-note-title">⚠️ Important Compliance Information</div>
-        <div class="compliance-note-text">
-            This GST filing summary is prepared based on the information provided. Please ensure all figures are accurate before final submission to the GST portal. Late filing may result in interest and penalties as per GST regulations. For detailed filing requirements, please refer to the official GST portal or consult with your tax advisor.
+        <div class="section-container">
+            <div class="section-title">Sales Returns & Credit Notes</div>
+            <table>
+                <thead>
+                    <tr>
+                        <th rowspan="2" style="width: 12%; text-align: left;">GSTIN</th>
+                        <th rowspan="2" style="width: 15%; text-align: left;">Customer</th>
+                        <th colspan="2" class="sub-header">POS</th>
+                        <th colspan="3" class="sub-header">Note Details</th>
+                        <th rowspan="2" style="width: 5%;">Tax %</th>
+                        <th rowspan="2" style="width: 8%; text-align: right;">Value</th>
+                        <th colspan="4" class="sub-header">Tax Adjustment</th>
+                        <th rowspan="2" style="width: 7%; text-align: right;">Total Credit</th>
+                    </tr>
+                    <tr>
+                        <th class="sub-header">Code</th>
+                        <th class="sub-header">State</th>
+                        <th class="sub-header">No.</th>
+                        <th class="sub-header">Date</th>
+                        <th class="sub-header">Value</th>
+                        <th class="sub-header">CGST</th>
+                        <th class="sub-header">SGST</th>
+                        <th class="sub-header">IGST</th>
+                        <th class="sub-header">CESS</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {{#if salesReturn}}
+                        {{#each salesReturn}}
+                        <tr>
+                            <td class="font-bold">{{gstin}}</td>
+                            <td>{{customerName}}</td>
+                            <td style="text-align: center;">{{placeOfSupply.code}}</td>
+                            <td>{{placeOfSupply.name}}</td>
+                            <td>{{invoiceDetails.no}}</td>
+                            <td>{{invoiceDetails.date}}</td>
+                            <td class="text-right">{{numberFormat invoiceDetails.value}}</td>
+                            <td class="text-right">{{totalTaxPct}}%</td>
+                            <td class="text-right font-bold">{{numberFormat taxableValue}}</td>
+                            <td class="text-right">{{numberFormat taxAmount.central}}</td>
+                            <td class="text-right">{{numberFormat taxAmount.state}}</td>
+                            <td class="text-right">{{numberFormat taxAmount.integrated}}</td>
+                            <td class="text-right">{{numberFormat taxAmount.cess}}</td>
+                            <td class="text-right font-bold" style="color: #4299E1;">₹{{numberFormat totalTax}}</td>
+                        </tr>
+                        {{/each}}
+                    {{else}}
+                        <tr><td colspan="14" style="text-align: center; padding: 40px; color: #A0AEC0;">No returns found</td></tr>
+                    {{/if}}
+                </tbody>
+            </table>
         </div>
     </div>
-
-    {{#if remarks}}
-    <div class="section-title">Additional Remarks</div>
-    <div class="summary-section">
-        <p style="color: #4b5563; line-height: 1.8;">{{remarks}}</p>
-    </div>
-    {{/if}}
 
     <div class="footer">
-        <div class="footer-note">
-            This is a system-generated GST filing summary document.
+        <div class="footer-left">
+            <p>Certified Signatory:</p>
+            <div style="height: 40px; margin: 10px 0;">
+                 {{#if signatorySignature}}
+                    <img src="{{signatorySignature}}" style="max-height: 40px;" />
+                {{/if}}
+            </div>
+            <p class="font-bold" style="color: #1A202C; font-size: 11px;">{{authorizedSignatory.name}}</p>
+            <p style="font-size: 9px;">{{authorizedSignatory.designation}}</p>
+            <p style="font-size: 7px; margin-top: 5px; color: #A0AEC0;">Generated on {{generatedDate}} | GSTR-1 Summary Report</p>
         </div>
-        <div class="footer-note">
-            Generated on {{generatedDate}} | {{companyName}}
+        <div class="signature-box">
+             <div class="signature-line"></div>
+             <h3>Authorized Stamp / Seal</h3>
         </div>
-        {{#if footerText}}
-        <div class="footer-note" style="margin-top: 12px;">
-            {{footerText}}
-        </div>
-        {{else}}
-        <div class="footer-note" style="margin-top: 12px;">
-            Generated with MM Docs AI • Professional Workspace
-        </div>
-        {{/if}}
     </div>
 </body>
-
 </html>

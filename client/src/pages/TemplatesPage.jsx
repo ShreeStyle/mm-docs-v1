@@ -67,7 +67,14 @@ const TemplatesPage = () => {
     };
 
     const handleTemplateSelect = (template) => {
-        console.log('Opening template editor for:', template.templateId);
+        console.log('Opening template editor for:', template.id || template.templateId);
+        
+        // Force redirection for specialized GST page
+        if (template.id === 'gst_filing_summary' || template.templateId === 'gst_filing_summary') {
+            navigate('/gst-filing-summary');
+            return;
+        }
+
         // Navigate to Canva-style template editor
         navigate(`/template/editor/${template.templateId}`);
     };
