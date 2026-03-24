@@ -132,7 +132,7 @@ Return ONLY valid, richly detailed, FORMALLY WRITTEN JSON document content. No c
     console.log(`📋 Topic for processing: ${topic}`);
 
     // For structured compliance documents, skip AI call and use template-based generation
-    const structuredDocTypes = ['audit_report', 'gst_filing_summary', 'gst_filing', 'policy_document', 'regulatory_filing'];
+    const structuredDocTypes = ['audit_report', 'gst_filing_summary', 'gst_filing', 'policy_document', 'regulatory_filing', 'invoice', 'gst_invoice', 'receipt', 'credit_note', 'purchase_order'];
     if (structuredDocTypes.includes(effectiveType)) {
       console.log(`✅ Using structured template for ${effectiveType} - skipping AI API call`);
       return generateMockContent(effectiveType, topic, providedData, brandContext);
@@ -2755,6 +2755,182 @@ We appreciate the cooperation and assistance provided by management and staff th
       governingLaw: providedData.governingLaw || "This Agreement shall be governed by the laws of the State of [State].",
       entireAgreement: providedData.entireAgreement || "This Agreement constitutes the full agreement between the partners, overriding any prior agreements."
     };
+  } else if (effectiveType === "invoice") {
+    console.log('📝 Building invoice fallback with data:', providedData);
+    
+    // Parse items from textarea format: "Description Price Qty" (one per line)
+    let items = [];
+    const itemsSource = providedData.invoiceItems;
+    if (itemsSource && typeof itemsSource === 'string') {
+      const lines = itemsSource.split('\n').filter(line => line.trim());
+      items = lines.map(line => {
+        const parts = line.trim().split(/\s+/);
+        if (parts.length < 3) return { description: line.trim(), unitPrice: "0.00", qty: 1, total: "0.00" };
+        const qty = parseFloat(parts.pop()) || 1;
+        const unitPrice = parseFloat(parts.pop()) || 0;
+        const description = parts.join(' ');
+        const total = qty * unitPrice;
+        return { description, unitPrice: unitPrice.toFixed(2), qty, total: total.toFixed(2) };
+      });
+    }
+
+    const subtotal = items.reduce((sum, item) => sum + parseFloat(item.total), 0);
+    const taxPercentage = parseFloat(providedData.taxPercentage) || 0;
+    const taxAmount = subtotal * (taxPercentage / 100);
+
+    return {
+      companyName: providedData.companyName || brandContext.name || "MM Docs",
+      companyAddress: providedData.companyAddress || brandContext.address || "[Company Address]",
+      clientName: providedData.clientName || "[Client Name]",
+      clientCompany: providedData.clientCompany || "[Client Company]",
+      clientAddress: providedData.clientAddress || "[Client Address]",
+      invoiceNumber: providedData.invoiceNumber || `INV-${Date.now().toString().slice(-6)}`,
+      invoiceDate: providedData.invoiceDate || new Date().toLocaleDateString(),
+      dueDate: providedData.dueDate || "",
+      bankName: providedData.bankName || "",
+      accountName: providedData.accountName || "",
+      accountNumber: providedData.accountNumber || "",
+      items: items,
+      subtotal: subtotal.toFixed(2),
+      taxPercentage: taxPercentage,
+      taxAmount: taxAmount.toFixed(2),
+      total: (subtotal + taxAmount).toFixed(2),
+      signatureName: providedData.signatureName || ""
+    };
+
+  } else if (effectiveType === "gst_invoice") {
+    console.log('📝 Building gst_invoice fallback with data:', providedData);
+    
+    // Parse items: "Qty | Product | Description | Unit Price"
+    let items = [];
+    const itemsSource = providedData.invoiceItems;
+    if (itemsSource && typeof itemsSource === 'string') {
+      const lines = itemsSource.split('\n').filter(line => line.trim());
+      items = lines.map(line => {
+        const parts = line.split('|').map(p => p.trim());
+        const qty = parseFloat(parts[0]) || 1;
+        const product = parts[1] || 'Product';
+        const description = parts[2] || '';
+        const unitPrice = parseFloat(parts[3]) || 0;
+        const total = qty * unitPrice;
+        return { qty, product, description, unitPrice, total };
+      });
+    }
+
+    const subtotal = items.reduce((sum, item) => sum + item.total, 0);
+    const discount = parseFloat(providedData.discount) || 0;
+    const taxRate = parseFloat(providedData.taxRate) || 0;
+    const taxAmount = (subtotal - discount) * (taxRate / 100);
+    const otherCharges = parseFloat(providedData.otherCharges) || 0;
+
+    return {
+      companyName: providedData.companyName || brandContext.name || "MM Docs",
+      companyAddress: providedData.companyAddress || brandContext.address || "[Company Address]",
+      gstNumber: providedData.gstNumber || "[GSTIN]",
+      clientName: providedData.clientName || "[Client Name]",
+      billToAddress: providedData.billToAddress || providedData.clientAddress || "",
+      clientGST: providedData.clientGST || "",
+      shipToName: providedData.shipToName || "",
+      shipToAddress: providedData.shipToAddress || "",
+      invoiceNumber: providedData.invoiceNumber || `GST-${Date.now().toString().slice(-6)}`,
+      invoiceDate: providedData.invoiceDate || new Date().toLocaleDateString(),
+      dueDate: providedData.dueDate || "",
+      customerId: providedData.customerId || "",
+      items: items,
+      subtotal: subtotal,
+      discount: discount,
+      taxRate: taxRate,
+      taxAmount: taxAmount,
+      otherCharges: otherCharges,
+      total: (subtotal - discount + taxAmount + otherCharges),
+      terms: providedData.terms || ""
+    };
+
+  } else if (effectiveType === "receipt") {
+    console.log('📝 Building receipt fallback with data:', providedData);
+    
+    // Parse items: "Qty | Description | Unit Price"
+    let items = [];
+    const itemsSource = providedData.receiptItems;
+    if (itemsSource && typeof itemsSource === 'string') {
+      const lines = itemsSource.split('\n').filter(line => line.trim());
+      items = lines.map(line => {
+        const parts = line.split('|').map(p => p.trim());
+        const qty = parseFloat(parts[0]) || 1;
+        const description = parts[1] || 'Item';
+        const unitPrice = parseFloat(parts[2]) || 0;
+        const total = qty * unitPrice;
+        return { qty, description, unitPrice: unitPrice.toFixed(2), total: total.toFixed(2) };
+      });
+    }
+
+    const subtotal = items.reduce((sum, item) => sum + parseFloat(item.total), 0);
+    const taxRate = parseFloat(providedData.taxRate) || 0;
+    const tax = subtotal * (taxRate / 100);
+
+    return {
+      companyName: providedData.companyName || brandContext.name || "MM Docs",
+      companyAddress: providedData.companyAddress || brandContext.address || "",
+      receiptNumber: providedData.receiptNumber || `REC-${Date.now().toString().slice(-6)}`,
+      receiptDate: providedData.receiptDate || new Date().toLocaleDateString(),
+      customerName: providedData.customerName || "[Customer Name]",
+      customerAddress: providedData.customerAddress || "",
+      items: items,
+      subtotal: subtotal.toFixed(2),
+      tax: tax.toFixed(2),
+      total: (subtotal + tax).toFixed(2),
+      bankInfo: providedData.bankInfo || "",
+      terms: providedData.terms || "",
+      footerPhone: providedData.footerPhone || "",
+      footerEmail: providedData.footerEmail || "",
+      footerWebsite: providedData.footerWebsite || ""
+    };
+
+  } else if (effectiveType === "credit_note") {
+    console.log('📝 Building credit_note fallback with data:', providedData);
+    
+    // Parse items: "Qty | Description | Unit Price"
+    let items = [];
+    const itemsSource = providedData.creditNoteItems;
+    if (itemsSource && typeof itemsSource === 'string') {
+      const lines = itemsSource.split('\n').filter(line => line.trim());
+      items = lines.map(line => {
+        const parts = line.split('|').map(p => p.trim());
+        const qty = parseFloat(parts[0]) || 1;
+        const description = parts[1] || 'Item';
+        const unitPrice = parseFloat(parts[2]) || 0;
+        const amount = qty * unitPrice;
+        return { quantity: qty, description, unitPrice: unitPrice.toFixed(2), amount: amount.toFixed(2) };
+      });
+    }
+
+    const subtotal = items.reduce((sum, item) => sum + parseFloat(item.amount), 0);
+    const taxRate = parseFloat(providedData.taxRate) || 0;
+    const taxAmount = subtotal * (taxRate / 100);
+
+    return {
+      companyName: providedData.companyName || brandContext.name || "MM Docs",
+      companyAddress: providedData.companyAddress || brandContext.address || "[Company Address]",
+      clientName: providedData.clientName || "[Customer Name]",
+      clientAddress: providedData.clientAddress || "",
+      shipToName: providedData.shipToName || "",
+      shipToAddress: providedData.shipToAddress || "",
+      creditNoteNumber: providedData.creditNoteNumber || `CN-${Date.now().toString().slice(-6)}`,
+      creditNoteDate: providedData.creditNoteDate || new Date().toLocaleDateString(),
+      poNumber: providedData.poNumber || "",
+      dueDate: providedData.dueDate || "",
+      invoiceNumber: providedData.invoiceNumber || "",
+      invoiceDate: providedData.invoiceDate || "",
+      items: items,
+      subtotal: subtotal.toFixed(2),
+      taxRate: taxRate,
+      taxAmount: taxAmount > 0 ? taxAmount.toFixed(2) : null,
+      totalAmount: (subtotal + taxAmount).toFixed(2),
+      reason: providedData.reason || "",
+      signatureName: providedData.signatureName || "",
+      terms: providedData.terms || ""
+    };
+
   } else if (effectiveType === "purchase_order") {
     console.log('📝 Building purchase_order fallback with data:', providedData);
     

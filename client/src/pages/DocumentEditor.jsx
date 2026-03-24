@@ -1,10 +1,10 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Eye, Send, Loader2, Save, X, Pencil, Type, Upload, Trash2, Check, ChevronDown } from 'lucide-react';
+import { Eye, Send, Loader2, Save, X, Pencil, Type, Upload, Trash2, Check, ChevronLeft, ChevronRight, GripVertical } from 'lucide-react';
 import { api } from '../utils/api';
-import DocumentPreview from '../components/DocumentEditor/DocumentPreview';
+import Canvas from '../components/DocumentEditor/Canvas';
 import FieldsPanel from '../components/DocumentEditor/FieldsPanel';
-import DrawingTools from '../components/DocumentEditor/DrawingTools';
+import PropertiesSidebar from '../components/DocumentEditor/PropertiesSidebar';
 import '../styles/DocumentEditor.css';
 
 const DocumentEditor = () => {
@@ -305,29 +305,80 @@ const DocumentEditor = () => {
         document.removeEventListener('mouseup', handleResizeEnd);
     };
 
-    const saveTimeoutRef = useRef(null);
+    const [selectedBlockId, setSelectedBlockId] = useState(null);
+    const [zoom, setZoom] = useState(1);
 
-    const autoSave = useCallback((updatedFields) => {
+    const handleUpdateBlock = (blockId, updates) => {
+        setDocument(prev => {
+            const newPages = prev.pages.map(page => ({
+                ...page,
+                blocks: page.blocks.map(block => 
+                    block.id === blockId ? { ...block, ...updates } : block
+                )
+            }));
+            const updated = { ...prev, pages: newPages };
+            autoSave(updated);
+            return updated;
+        });
+    };
+
+    const handleDeleteBlock = (blockId) => {
+        setDocument(prev => {
+            const newPages = prev.pages.map(page => ({
+                ...page,
+                blocks: page.blocks.filter(block => block.id !== blockId)
+            }));
+            const updated = { ...prev, pages: newPages };
+            autoSave(updated);
+            return updated;
+        });
+        setSelectedBlockId(null);
+    };
+
+    const handleAddBlock = (type, pageId = document.pages[0].id) => {
+        const newBlock = {
+            id: 'block-' + Date.now(),
+            type,
+            x: 100,
+            y: 100,
+            width: type === 'image' ? 300 : 200,
+            height: type === 'image' ? 200 : 50,
+            content: type === 'text' ? 'New Text Block' : '',
+            style: {
+                fontSize: '16px',
+                color: '#1e293b'
+            }
+        };
+
+        setDocument(prev => {
+            const newPages = prev.pages.map(page => 
+                page.id === pageId 
+                    ? { ...page, blocks: [...page.blocks, newBlock] }
+                    : page
+            );
+            return { ...prev, pages: newPages };
+        });
+        setSelectedBlockId(newBlock.id);
+    };
+
+    const autoSave = useCallback((updatedDoc) => {
         if (saveTimeoutRef.current) {
             clearTimeout(saveTimeoutRef.current);
         }
 
         saveTimeoutRef.current = setTimeout(async () => {
             try {
-                await api.put(`/document-editor/${documentId}/fields`, { fields: updatedFields });
+                await api.put(`/document-editor/${documentId}`, updatedDoc);
             } catch (err) {
                 console.error('Auto-save failed:', err);
             }
-        }, 1000); // 1-second debounce
+        }, 1000);
     }, [documentId]);
 
     const handleSave = async () => {
         try {
             setSaving(true);
-            await api.put(`/document-editor/${documentId}`, {
-                fields,
-                status: 'draft'
-            });
+            await api.put(`/document-editor/${documentId}`, document);
             alert('Document saved successfully!');
         } catch (err) {
             console.error('Error saving document:', err);
@@ -340,9 +391,7 @@ const DocumentEditor = () => {
     const handleSend = async () => {
         try {
             setSaving(true);
-            await api.post(`/document-editor/${documentId}/send`, {
-                fields
-            });
+            await api.post(`/document-editor/${documentId}/send`, document);
             alert('Document sent successfully!');
             navigate('/dashboard/documents');
         } catch (err) {
@@ -371,6 +420,15 @@ const DocumentEditor = () => {
         );
     }
 
+    // Default document initialization if none exists
+    const safeDocument = document || {
+        id: documentId,
+        title: 'Untitled Document',
+        pages: [{ id: 'page-1', width: 816, height: 1056, blocks: [] }]
+    };
+
+    const selectedBlock = safeDocument.pages.flatMap(p => p.blocks).find(b => b.id === selectedBlockId);
+
     return (
         <div className="document-editor">
             {/* Header */}
@@ -379,29 +437,15 @@ const DocumentEditor = () => {
                     <button className="btn-back" onClick={() => navigate('/dashboard/documents')}>
                         <ChevronLeft size={20} />
                     </button>
-                    <h1 className="editor-title">{document?.title || 'Untitled Document'}</h1>
+                    <h1 className="editor-title">{safeDocument.title}</h1>
                 </div>
                 <div className="editor-actions">
-                    <button
-                        className="btn-secondary"
-                        onClick={() => {
-                            // Create a temporary field for testing if none selected
-                            const tempField = { id: 'temp-' + Date.now(), fieldType: 'signature' };
-                            setCurrentSignatureField(tempField);
-                            setShowSignatureModal(true);
-                        }}
-                        style={{ background: '#F97316', color: 'white', border: 'none' }}
-                    >
-                        <Pencil size={16} />
-                        Test Signature Modal
-                    </button>
+                    <button className="btn-secondary" onClick={() => setZoom(prev => Math.max(0.5, prev - 0.1))}>-</button>
+                    <span className="zoom-label">{Math.round(zoom * 100)}%</span>
+                    <button className="btn-secondary" onClick={() => setZoom(prev => Math.min(2, prev + 0.1))}>+</button>
                     <button className="btn-secondary" onClick={handleSave} disabled={saving}>
                         <Save size={16} />
                         {saving ? 'Saving...' : 'Save'}
-                    </button>
-                    <button className="btn-secondary">
-                        <Eye size={16} />
-                        Preview
                     </button>
                     <button className="btn-primary" onClick={handleSend}>
                         <Send size={16} />
@@ -412,87 +456,32 @@ const DocumentEditor = () => {
 
             {/* Main Editor Layout */}
             <div className="editor-main">
-                {/* Document Preview (Left) */}
-                <DocumentPreview
-                    document={document}
-                    fields={fields}
-                    onFieldDrop={handleFieldDrop}
-                    onFieldSelect={(field) => {
-                        setSelectedFieldId(field.id || field._id);
-                        handleFieldSelect(field);
-                    }}
-                    onFieldUpdate={updateField}
-                    onFieldDelete={deleteField}
-                    selectedFieldId={selectedFieldId}
+                {/* Canvas Area (Center) */}
+                <Canvas
+                    document={safeDocument}
+                    selectedBlockId={selectedBlockId}
+                    onSelectBlock={setSelectedBlockId}
+                    onUpdateBlock={handleUpdateBlock}
+                    onDeleteBlock={handleDeleteBlock}
+                    zoom={zoom}
                 />
 
-                {/* Fields Panel (Right) */}
+                {/* Sidebar (Right) */}
                 <div 
                     className={`right-sidebar ${isResizingSidebar ? 'resizing' : ''}`}
                     style={{ width: `${sidebarWidth}px` }}
                 >
                     <div className="sidebar-resize-handle" onMouseDown={handleResizeStart} />
-                    <FieldsPanel
-                        onFieldDragStart={(field) => console.log('Dragging field:', field)}
-                        onFieldClick={(field) => {
-                            const newField = {
-                                id: 'new-' + Date.now(),
-                                fieldType: field.type,
-                                label: field.label,
-                                position: { x: 50, y: 50 }, // Default position
-                                page: 1, // Default page
-                                size: { width: 120, height: 40 },
-                                properties: { assignedTo: 'CLIENT' }
-                            };
-                            setFields(prev => {
-                                const updated = [...prev, newField];
-                                autoSave(updated);
-                                return updated;
-                            });
-
-                            if (field.type === 'signature' || field.type === 'initials') {
-                                setCurrentSignatureField(newField);
-                                setShowSignatureModal(true);
-                            }
-                        }}
-                    />
-                    <DrawingTools
-                        onToolSelect={setActiveTool}
-                        activeTool={activeTool}
-                        onColorChange={setActiveColor}
-                        activeColor={activeColor}
-                    />
-
-                    {/* Properties Panel */}
-                    {selectedFieldId && (
-                        <div className="properties-panel">
-                            <div className="panel-header">
-                                <h3>Field Properties</h3>
-                            </div>
-                            <div className="property-group">
-                                <label>Label</label>
-                                <input 
-                                    type="text" 
-                                    value={fields.find(f => f.id === selectedFieldId || f._id === selectedFieldId)?.label || ''} 
-                                    onChange={(e) => updateField(selectedFieldId, { label: e.target.value })}
-                                />
-                            </div>
-                            <div className="property-group">
-                                <label>Assigned To</label>
-                                <select 
-                                    value={fields.find(f => f.id === selectedFieldId || f._id === selectedFieldId)?.properties?.assignedTo || 'CLIENT'}
-                                    onChange={(e) => updateField(selectedFieldId, { properties: { ...fields.find(f => f.id === selectedFieldId || f._id === selectedFieldId)?.properties, assignedTo: e.target.value } })}
-                                >
-                                    <option value="CLIENT">Recipient (Client)</option>
-                                    <option value="SENDER">Sender (Me)</option>
-                                </select>
-                            </div>
-                            <div className="property-actions">
-                                <button className="btn-danger-outline" onClick={() => deleteField(selectedFieldId)}>
-                                    <Trash2 size={14} /> Delete Field
-                                </button>
-                            </div>
-                        </div>
+                    
+                    {selectedBlock ? (
+                        <PropertiesSidebar 
+                            block={selectedBlock} 
+                            onUpdate={handleUpdateBlock} 
+                        />
+                    ) : (
+                        <FieldsPanel
+                            onAddBlock={handleAddBlock}
+                        />
                     )}
                 </div>
             </div>

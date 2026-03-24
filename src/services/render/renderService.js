@@ -308,9 +308,20 @@ const normalizeGstData = (data) => {
       if (normalized.taxAmount.central_tax && !normalized.taxAmount.central) normalized.taxAmount.central = normalized.taxAmount.central_tax;
       if (normalized.taxAmount.state_tax && !normalized.taxAmount.state) normalized.taxAmount.state = normalized.taxAmount.state_tax;
       if (normalized.taxAmount.integrated_tax && !normalized.taxAmount.integrated) normalized.taxAmount.integrated = normalized.taxAmount.integrated_tax;
+      if (normalized.taxAmount.cess_tax && !normalized.taxAmount.cess) normalized.taxAmount.cess = normalized.taxAmount.cess_tax;
     }
 
-    if (item.total_tax && !item.totalTax) normalized.totalTax = item.total_tax;
+    if (item.total_tax && !item.totalTax) {
+      normalized.totalTax = item.total_tax;
+    } else if (!normalized.totalTax) {
+      // Calculate from components if missing
+      const c = parseFloat(normalized.taxAmount?.central) || 0;
+      const s = parseFloat(normalized.taxAmount?.state) || 0;
+      const i = parseFloat(normalized.taxAmount?.integrated) || 0;
+      const cess = parseFloat(normalized.taxAmount?.cess) || 0;
+      normalized.totalTax = c + s + i + cess;
+    }
+
     if (item.total_tax_pct && !item.totalTaxPct) normalized.totalTaxPct = item.total_tax_pct;
     if (item.taxable_value && !item.taxableValue) normalized.taxableValue = item.taxable_value;
 
@@ -405,7 +416,9 @@ exports.renderDocument = async (document, brandKit) => {
       generatedDate: new Date().toLocaleDateString()
     };
 
-    // Parse credit_note items from text format: "Qty | Description | Unit Price"
+    // Parse finance document items from text format (textarea inputs from Dashboard)
+    
+    // 1. Credit Note (Qty | Description | Unit Price)
     if (document.type === 'credit_note' && data.creditNoteItems && typeof data.creditNoteItems === 'string') {
       const lines = data.creditNoteItems.split('\n').filter(line => line.trim());
       const parsedItems = lines.map(line => {
@@ -423,6 +436,91 @@ exports.renderDocument = async (document, brandKit) => {
       data.subtotal = subtotal.toFixed(2);
       data.taxAmount = taxAmount > 0 ? taxAmount.toFixed(2) : null;
       data.totalAmount = (subtotal + taxAmount).toFixed(2);
+    }
+
+    // 2. Invoice (Description Price Qty) - uses last two parts as price and qty
+    if (document.type === 'invoice' && data.invoiceItems && typeof data.invoiceItems === 'string') {
+      const lines = data.invoiceItems.split('\n').filter(line => line.trim());
+      const parsedItems = lines.map(line => {
+        const parts = line.trim().split(/\s+/);
+        if (parts.length < 3) return { description: line, unitPrice: "0.00", qty: "1", total: "0.00" };
+        
+        const qty = parseFloat(parts.pop()) || 1;
+        const unitPrice = parseFloat(parts.pop()) || 0;
+        const description = parts.join(' ');
+        const total = qty * unitPrice;
+        return { description, unitPrice: unitPrice.toFixed(2), qty, total: total.toFixed(2) };
+      });
+      data.items = parsedItems;
+      const subtotal = parsedItems.reduce((sum, item) => sum + parseFloat(item.total), 0);
+      const taxRate = parseFloat(data.taxPercentage) || 0;
+      const taxAmount = subtotal * (taxRate / 100);
+      data.subtotal = subtotal.toFixed(2);
+      data.taxAmount = taxAmount.toFixed(2);
+      data.totalAmount = (subtotal + taxAmount).toFixed(2);
+    }
+
+    // 3. GST Invoice (Qty | Product | Description | Unit Price)
+    if (document.type === 'gst_invoice' && data.invoiceItems && typeof data.invoiceItems === 'string') {
+      const lines = data.invoiceItems.split('\n').filter(line => line.trim());
+      const parsedItems = lines.map(line => {
+        const parts = line.split('|').map(p => p.trim());
+        const qty = parseFloat(parts[0]) || 1;
+        const product = parts[1] || 'Product';
+        const description = parts[2] || '';
+        const unitPrice = parseFloat(parts[3]) || 0;
+        const total = qty * unitPrice;
+        return { qty, product, description, unitPrice, total };
+      });
+      data.items = parsedItems;
+      const subtotal = parsedItems.reduce((sum, item) => sum + item.total, 0);
+      const discount = parseFloat(data.discount) || 0;
+      const taxRate = parseFloat(data.taxRate) || 0;
+      const taxAmount = (subtotal - discount) * (taxRate / 100);
+      const otherCharges = parseFloat(data.otherCharges) || 0;
+      data.subtotal = subtotal;
+      data.taxAmount = taxAmount;
+      data.total = (subtotal - discount + taxAmount + otherCharges);
+    }
+
+    // 4. Receipt (Qty | Description | Unit Price)
+    if (document.type === 'receipt' && data.receiptItems && typeof data.receiptItems === 'string') {
+      const lines = data.receiptItems.split('\n').filter(line => line.trim());
+      const parsedItems = lines.map(line => {
+        const parts = line.split('|').map(p => p.trim());
+        const qty = parseFloat(parts[0]) || 1;
+        const description = parts[1] || 'Item';
+        const unitPrice = parseFloat(parts[2]) || 0;
+        const total = qty * unitPrice;
+        return { qty, description, unitPrice: unitPrice.toFixed(2), total: total.toFixed(2) };
+      });
+      data.items = parsedItems;
+      const subtotal = parsedItems.reduce((sum, item) => sum + parseFloat(item.total), 0);
+      const taxRate = parseFloat(data.taxRate) || 0;
+      const taxAmount = subtotal * (taxRate / 100);
+      data.subtotal = subtotal.toFixed(2);
+      data.tax = taxAmount.toFixed(2);
+      data.total = (subtotal + taxAmount).toFixed(2);
+    }
+
+    // 5. Purchase Order (ITEM# | DESCRIPTION | QTY | UNIT PRICE)
+    if (document.type === 'purchase_order' && data.poItems && typeof data.poItems === 'string') {
+      const lines = data.poItems.split('\n').filter(line => line.trim());
+      const parsedItems = lines.map(line => {
+        const parts = line.split('|').map(p => p.trim());
+        const itemNumber = parts[0] || '';
+        const description = parts[1] || 'Item';
+        const quantity = parseFloat(parts[2]) || 1;
+        const unitPrice = parseFloat(parts[3]) || 0;
+        const total = (quantity * unitPrice).toFixed(2);
+        return { itemNumber, description, quantity, unitPrice: unitPrice.toFixed(2), total };
+      });
+      data.items = parsedItems;
+      const subtotal = parsedItems.reduce((sum, item) => sum + parseFloat(item.total), 0);
+      const tax = parseFloat(data.taxRate) ? (subtotal * (parseFloat(data.taxRate) / 100)).toFixed(2) : 0;
+      data.subtotal = subtotal.toFixed(2);
+      data.tax = tax;
+      data.total = (parseFloat(subtotal) + parseFloat(tax) + (parseFloat(data.shippingCost) || 0) + (parseFloat(data.otherCharges) || 0)).toFixed(2);
     }
 
     // Ensure sections are objects if they came in as strings (common AI/formatting issue)

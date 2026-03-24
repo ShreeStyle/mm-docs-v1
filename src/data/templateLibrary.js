@@ -1185,6 +1185,7 @@ const TEMPLATE_LIBRARY = {
         }
     ],
 
+
     // Legal Documents - Professional Templates  
     legal_documents: [
         {

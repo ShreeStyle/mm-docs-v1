@@ -901,14 +901,7 @@ export default function Dashboard() {
                 color: '#6366F1',
                 bgColor: '#EEF2FF'
             },
-            {
-                id: 'legal',
-                name: 'Legal Documents',
-                icon: Shield,
-                description: 'Contracts and legal agreements',
-                color: '#8B5CF6',
-                bgColor: '#F5F3FF'
-            },
+
             {
                 id: 'sales',
                 name: 'Sales Documents',
@@ -944,13 +937,7 @@ export default function Dashboard() {
                 { label: 'Experience Certificate', type: 'experience_certificate' },
                 { label: 'Warning Letter', type: 'warning_letter' }
             ],
-            legal: [
-                { label: 'NDA', type: 'nda' },
-                { label: 'Service Agreement', type: 'service_agreement' },
-                { label: 'Terms of Service', type: 'terms_of_service' },
-                { label: 'Privacy Policy', type: 'privacy_policy' },
-                { label: 'MOU', type: 'mou' }
-            ],
+
             sales: [
                 { label: 'Business Proposal', type: 'business_proposal' },
                 { label: 'Quotation', type: 'quotation' },
@@ -973,7 +960,7 @@ export default function Dashboard() {
         };
 
         // If currentView is a category (hr, legal, etc.), show documents in that category
-        if (['hr', 'legal', 'sales', 'finance', 'compliance'].includes(currentView)) {
+        if (['hr', 'sales', 'finance', 'compliance'].includes(currentView)) {
             const category = categories.find(cat => cat.id === currentView);
             const documents = documentsByCategory[currentView];
 
@@ -1048,7 +1035,6 @@ export default function Dashboard() {
                                     <button
                                         key={index}
                                         onClick={() => {
-                                            setSelectedCategory(currentView);
                                             setSelectedDocType(doc.type);
                                             setCurrentView('generate-document');
                                         }}
@@ -1336,9 +1322,8 @@ export default function Dashboard() {
                                         textTransform: 'capitalize'
                                     }}>
                                         {doc.type?.includes('hr') ? 'HR' :
-                                            doc.type?.includes('legal') ? 'Legal' :
-                                                doc.type?.includes('sales') ? 'Sales' :
-                                                    doc.type?.includes('finance') ? 'Finance' : 'Other'}
+                                            doc.type?.includes('sales') ? 'Sales' :
+                                                doc.type?.includes('finance') ? 'Finance' : 'Other'}
                                     </div>
 
                                     <div style={{ fontSize: '14px', color: '#6B7280' }}>

@@ -449,7 +449,6 @@ const GSTFilingSummaryPage = () => {
         const calculate = () => {
             const allSales = formData.sales || [];
             const allReturns = formData.salesReturn || [];
-            const allPurchaseReturns = formData.purchaseReturn || [];
             
             const sum = { 
                 totalTaxableValue: 0, totalCGST: 0, totalSGST: 0, totalIGST: 0, totalTax: 0,
@@ -457,26 +456,46 @@ const GSTFilingSummaryPage = () => {
             };
             
             allSales.forEach(row => {
-                sum.totalTaxableValue += parseFloat(row.taxableValue) || 0;
-                sum.totalCGST += parseFloat(row.taxAmount?.central) || 0;
-                sum.totalSGST += parseFloat(row.taxAmount?.state) || 0;
-                sum.totalIGST += parseFloat(row.taxAmount?.integrated) || 0;
-                sum.totalTax += parseFloat(row.totalTax) || 0;
+                const taxable = parseFloat(row.taxableValue) || 0;
+                const central = parseFloat(row.taxAmount?.central) || 0;
+                const state = parseFloat(row.taxAmount?.state) || 0;
+                const integrated = parseFloat(row.taxAmount?.integrated) || 0;
+                const cess = parseFloat(row.taxAmount?.cess) || 0;
+                
+                // Use components if totalTax is missing or inconsistent
+                const rowTotalTax = parseFloat(row.totalTax) || (central + state + integrated + cess);
+                
+                sum.totalTaxableValue += taxable;
+                sum.totalCGST += central;
+                sum.totalSGST += state;
+                sum.totalIGST += integrated;
+                sum.totalTax += rowTotalTax;
             });
 
             allReturns.forEach(row => {
-                sum.returnTax += parseFloat(row.totalTax) || 0;
+                const central = parseFloat(row.taxAmount?.central) || 0;
+                const state = parseFloat(row.taxAmount?.state) || 0;
+                const integrated = parseFloat(row.taxAmount?.integrated) || 0;
+                const cess = parseFloat(row.taxAmount?.cess) || 0;
+                
+                const rowTotalTax = parseFloat(row.totalTax) || (central + state + integrated + cess);
+                sum.returnTax += rowTotalTax;
             });
 
             // Net Payable = Sales Tax - Returns
             sum.netPayable = sum.totalTax - sum.returnTax;
 
-            if (JSON.stringify(formData.summary) !== JSON.stringify(sum)) {
+            // Use string comparison for stable update check
+            const currentSummaryStr = JSON.stringify(formData.summary);
+            const newSummaryStr = JSON.stringify(sum);
+            
+            if (currentSummaryStr !== newSummaryStr) {
+                console.log("📊 Updating Summary Totals:", sum);
                 setFormData(prev => ({ ...prev, summary: sum }));
             }
         };
         calculate();
-    }, [formData.sales, formData.salesReturn, formData.purchaseReturn, formData.summary]);
+    }, [formData.sales, formData.salesReturn]); // Removed formData.summary from dependencies to avoid infinite loop
 
     // 3. Live Preview Engine (using direct doc.write)
     useEffect(() => {
@@ -519,11 +538,12 @@ const GSTFilingSummaryPage = () => {
                 newRow[field] = value;
             }
 
-            // Recalculate row total
+            // Recalculate row total including CESS
             const c = Number(newRow.taxAmount?.central || 0);
             const s = Number(newRow.taxAmount?.state || 0);
             const i = Number(newRow.taxAmount?.integrated || 0);
-            newRow.totalTax = c + s + i;
+            const cess = Number(newRow.taxAmount?.cess || 0);
+            newRow.totalTax = c + s + i + cess;
             
             newTable[index] = newRow;
             return { ...prev, [table]: newTable };
