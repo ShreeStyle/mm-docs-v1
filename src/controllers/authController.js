@@ -13,7 +13,8 @@ exports.login = async (req, res) => {
   try {
     console.log('🔐 Login attempt:', { email: req.body?.email, hasBody: !!req.body });
     
-    const { email, password } = req.body;
+    const password = req.body?.password;
+    const email = req.body?.email?.trim().toLowerCase();
 
     // Validate input
     if (!email || !password) {
@@ -168,7 +169,7 @@ exports.verifyOTP = async (req, res) => {
 
 exports.signup = async (req, res) => {
   try {
-    const { name, email, password } = req.body;
+    const { name, email, password, countryCode } = req.body;
 
     // check user exists
     const existingUser = await User.findOne({ email });
@@ -179,16 +180,38 @@ exports.signup = async (req, res) => {
     // hash password
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // create user
+    // Auto-detect timezone from country
+    const timezoneMap = {
+      IN: "Asia/Kolkata", US: "America/New_York", GB: "Europe/London",
+      AE: "Asia/Dubai", SG: "Asia/Singapore", AU: "Australia/Sydney",
+      CA: "America/Toronto", DE: "Europe/Berlin"
+    };
+
+    // create user with country-aware defaults
     const user = await User.create({
       name,
       email,
       password: hashedPassword,
+      countryCode: countryCode || "IN",
+      timezone: timezoneMap[countryCode] || "Asia/Kolkata",
+      onboardingStep: 0,
+      onboarded: false
     });
+
+    // Generate token so user is logged in immediately after signup
+    const token = generateToken(user._id);
 
     res.status(201).json({
       message: "Signup successful ✅",
       userId: user._id,
+      token,
+      onboarded: false,
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        countryCode: user.countryCode
+      }
     });
   } catch (err) {
     res.status(500).json({ message: "Signup failed", error: err.message });

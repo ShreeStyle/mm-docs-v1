@@ -4,6 +4,7 @@ import Navbar from './components/Navbar';
 import Landing from './pages/Landing';
 import Login from './pages/Login';
 import Signup from './pages/Signup';
+import Onboarding from './pages/Onboarding';
 import Dashboard from './pages/Dashboard';
 import MyDocuments from './pages/MyDocuments';
 import ComplianceCenter from './pages/ComplianceCenter';
@@ -26,6 +27,7 @@ function App() {
           <Route path="/" element={<><Navbar /><Landing /></>} />
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
+          <Route path="/onboarding" element={<Onboarding />} />
           <Route path="/signature-test" element={<SignatureTest />} />
           {/* Redirect /product to /dashboard for backward compatibility */}
           <Route path="/product" element={<Navigate to="/dashboard" replace />} />

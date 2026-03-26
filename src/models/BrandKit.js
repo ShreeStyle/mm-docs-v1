@@ -1,54 +1,47 @@
 const mongoose = require("mongoose");
 
 const brandKitSchema = new mongoose.Schema({
-    userId: { 
-        type: mongoose.Schema.Types.ObjectId, 
-        ref: "User", 
+    userId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
         required: true,
-        unique: true // One brand kit per user
+        unique: true
     },
-    
-    // Basic Info
-    brandName: { 
-        type: String, 
-        required: true, 
-        default: "My Company" 
-    },
-    
-    // Logo
-    logo: { 
-        type: String, 
-        default: "" 
-    }, // URL to logo
-    
-    // Colors
-    primaryColor: { 
-        type: String, 
-        default: "#7C3AED" 
-    }, // Main brand color
-    secondaryColor: { 
-        type: String, 
-        default: "#64748B" 
-    }, // Secondary brand color
-    accentColor: { 
-        type: String, 
-        default: "#3B82F6" 
-    }, // Accent color for highlights
-    
-    // Typography
-    fontFamily: { 
-        type: String, 
+
+    // ── Basic Info ──────────────────────────────────────────────────
+    brandName: { type: String, required: true, default: "My Company" },
+
+    // ── Assets ─────────────────────────────────────────────────────
+    logo: { type: String, default: "" },      // URL to full logo
+    favicon: { type: String, default: "" },   // URL to small square logo for portals/emails
+
+    // ── Colors ─────────────────────────────────────────────────────
+    primaryColor: { type: String, default: "#7C3AED" },
+    secondaryColor: { type: String, default: "#64748B" },
+    accentColor: { type: String, default: "#3B82F6" },
+
+    // ── Typography ─────────────────────────────────────────────────
+    fontFamily: {
+        type: String,
         default: "Inter",
         enum: ["Inter", "Poppins", "Roboto", "Open Sans", "Lato", "Montserrat", "Raleway", "Nunito", "Work Sans", "Plus Jakarta Sans"]
     },
-    
-    // Brand Description
-    description: { 
-        type: String, 
-        default: "" 
-    }, // Brand overview for AI context and documents
-    
-    // Footer Details
+
+    // ── AI Context ─────────────────────────────────────────────────
+    description: { type: String, default: "" }, // AI uses this for tone and context
+
+    // ── Document Style ─────────────────────────────────────────────
+    documentStyle: {
+        headerStyle: {
+            type: String,
+            enum: ["minimal", "bold", "centered", "logo-left"],
+            default: "logo-left"
+        },
+        tableStripeColor: { type: String, default: "#F8F7FF" }, // Alternating row color
+        showWatermark: { type: Boolean, default: true }
+    },
+
+    // ── Footer Details ─────────────────────────────────────────────
     footer: {
         website: { type: String, default: "" },
         email: { type: String, default: "" },
@@ -57,41 +50,30 @@ const brandKitSchema = new mongoose.Schema({
         customText: { type: String, default: "" }
     },
     
-    // Legacy support
-    colors: { 
-        type: [String], 
-        default: [] 
-    }, // Array of hex codes for backward compatibility
+    // ── Banking Details (For Finance Documents) ───────────────────
+    banking: {
+        bankName: { type: String, default: "" },
+        accountName: { type: String, default: "" },
+        accountNumber: { type: String, default: "" },
+        ifscCode: { type: String, default: "" },
+        upiId: { type: String, default: "" }
+    },
+
+    // ── Legacy Support ─────────────────────────────────────────────
+    colors: { type: [String], default: [] },
     fonts: {
         primary: { type: String, default: "Inter" },
-        secondary: { type: String, default: "Roboto" },
+        secondary: { type: String, default: "Roboto" }
     },
-    
-    // Pro Features
-    watermark: { 
-        type: Boolean, 
-        default: true 
-    }, // Pro users can remove watermark
-    
-    // Metadata
-    createdAt: { 
-        type: Date, 
-        default: Date.now 
-    },
-    updatedAt: { 
-        type: Date, 
-        default: Date.now 
-    }
+
+    watermark: { type: Boolean, default: true }
 }, {
     timestamps: true
 });
 
-// Pre-save hook to sync colors array with individual color fields
-brandKitSchema.pre('save', async function() {
-    // Sync colors array for backward compatibility
+// Sync colors array and fonts for backward compatibility
+brandKitSchema.pre("save", async function () {
     this.colors = [this.primaryColor, this.secondaryColor, this.accentColor].filter(Boolean);
-    
-    // Sync fonts for backward compatibility
     if (this.fonts) {
         this.fonts.primary = this.fontFamily;
     }

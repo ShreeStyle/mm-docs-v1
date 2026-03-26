@@ -164,7 +164,7 @@ const TEMPLATE_LIBRARY = {
             tags: ["consulting", "services"],
             content: {
                 invoiceNumber: "INV-2024-001",
-                billedTo: "Acme Corporation",
+                billedTo: "Your Organization",
                 items: [
                     { description: "Strategic Consulting (40 hours @ $150/hr)", amount: 6000 },
                     { description: "Market Research & Analysis", amount: 2500 },

@@ -34,6 +34,7 @@ export default function Dashboard() {
     // Data states
     const [docs, setDocs] = useState([]);
     const [brandKit, setBrandKit] = useState(null);
+    const [organization, setOrganization] = useState(null);
     const [error, setError] = useState(null);
     const [generatedDoc, setGeneratedDoc] = useState(null);
     const [searchQuery, setSearchQuery] = useState('');
@@ -121,10 +122,14 @@ export default function Dashboard() {
                 const fetchedDocs = await api.get('/documents');
                 setDocs(fetchedDocs);
                 try {
-                    const fetchedBrandKit = await api.get('/brand-kit');
+                    const [fetchedBrandKit, fetchedOrg] = await Promise.all([
+                        api.get('/brand-kit'),
+                        api.get('/organization')
+                    ]);
                     setBrandKit(fetchedBrandKit);
+                    setOrganization(fetchedOrg);
                 } catch (err) {
-                    console.log("No brand kit found or error fetching", err.message);
+                    console.log("No brand kit or organization found or error fetching", err.message);
                 }
             } catch (err) {
                 console.error("Error fetching documents:", err.message);
@@ -373,13 +378,11 @@ export default function Dashboard() {
                         margin: 0,
                         textTransform: 'capitalize'
                     }}>{currentView === 'dashboard' ? 'Dashboard' : currentView.replace(/([A-Z])/g, ' $1').trim()}</h1>
-                    {currentView === 'dashboard' && !isMobile && (
                         <p style={{
                             fontSize: '16px',
                             color: '#6B7280',
                             margin: '4px 0 0 0'
                         }}>Good evening, {user?.name?.split(' ')[0]} – MM Docs Excellence & Strategic Mastery</p>
-                    )}
                 </div>
             </div>
 
@@ -401,7 +404,7 @@ export default function Dashboard() {
                     />
                     <input
                         type="text"
-                        placeholder="Search documents, templates..."
+                        placeholder="e.g. Your Company Name"
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
                         style={{
@@ -1678,14 +1681,48 @@ export default function Dashboard() {
 
     // Document Generation Page with Form and Live Preview
     const DocumentGenerationPage = () => {
-        const [formData, setFormData] = useState({});
+        const [formData, setFormData] = useState({
+            companyName: organization?.name || brandKit?.brandName || '',
+            companyAddress: organization?.registeredAddress ? 
+                `${organization.registeredAddress.line1}${organization.registeredAddress.line2 ? ', ' + organization.registeredAddress.line2 : ''}, ${organization.registeredAddress.city}, ${organization.registeredAddress.state} - ${organization.registeredAddress.postalCode}` : 
+                brandKit?.footer?.address || '',
+            bankName: brandKit?.banking?.bankName || organization?.banking?.bankName || '',
+            accountName: brandKit?.banking?.accountName || organization?.banking?.accountName || '',
+            accountNumber: brandKit?.banking?.accountNumber || organization?.banking?.accountNumber || '',
+            ifscCode: brandKit?.banking?.ifscCode || organization?.banking?.ifscCode || '',
+            upiId: brandKit?.banking?.upiId || organization?.banking?.upiId || '',
+            gstNumber: organization?.tax?.gstin || '',
+            pan: organization?.tax?.pan || '',
+            signatureName: organization?.signatory?.name || user?.name || ''
+        });
         const [isGenerating, setIsGenerating] = useState(false);
+
+        // Pre-fill form with Organization/BrandKit data on mount
+        useEffect(() => {
+            if (organization || brandKit) {
+                setFormData(prev => ({
+                    ...prev,
+                    companyName: prev.companyName || organization?.name || brandKit?.brandName || '',
+                    companyAddress: prev.companyAddress || (organization?.registeredAddress ? 
+                        `${organization.registeredAddress.line1}${organization.registeredAddress.line2 ? ', ' + organization.registeredAddress.line2 : ''}, ${organization.registeredAddress.city}, ${organization.registeredAddress.state} - ${organization.registeredAddress.postalCode}` : 
+                        brandKit?.footer?.address || ''),
+                    bankName: prev.bankName || brandKit?.banking?.bankName || organization?.banking?.bankName || '',
+                    accountName: prev.accountName || brandKit?.banking?.accountName || organization?.banking?.accountName || '',
+                    accountNumber: prev.accountNumber || brandKit?.banking?.accountNumber || organization?.banking?.accountNumber || '',
+                    ifscCode: prev.ifscCode || brandKit?.banking?.ifscCode || organization?.banking?.ifscCode || '',
+                    upiId: prev.upiId || brandKit?.banking?.upiId || organization?.banking?.upiId || '',
+                    gstNumber: prev.gstNumber || organization?.tax?.gstin || '',
+                    pan: prev.pan || organization?.tax?.pan || '',
+                    signatureName: prev.signatureName || organization?.signatory?.name || user?.name || ''
+                }));
+            }
+        }, [organization, brandKit, user]);
 
 
         // Get form fields based on document type
         const getFormFields = () => {
             const commonFields = [
-                { id: 'companyName', label: 'Company Name', type: 'text', placeholder: 'e.g. Acme Technologies Pvt. Ltd.', required: true },
+                { id: 'companyName', label: 'Company Name', type: 'text', placeholder: 'e.g. Your Company Name', required: true },
                 { id: 'companyAddress', label: 'Company Address', type: 'textarea', placeholder: '123 Tech Park, Bangalore - 560001', required: true }
             ];
 
@@ -1889,7 +1926,7 @@ export default function Dashboard() {
                     { id: 'vendorAddress', label: 'Vendor Address', type: 'textarea', placeholder: 'Complete vendor address', required: true },
                     { id: 'vendorContact', label: 'Vendor Contact / Dept', type: 'text', placeholder: 'e.g. Sales Department', required: false },
                     { id: 'shipToName', label: 'Ship To (Name)', type: 'text', placeholder: 'e.g. Receiver Name', required: true },
-                    { id: 'shipToCompanyName', label: 'Ship To (Company)', type: 'text', placeholder: 'e.g. Acme Corp', required: false },
+                    { id: 'shipToCompanyName', label: 'Ship To (Company)', type: 'text', placeholder: 'e.g. Recipient Company', required: false },
                     { id: 'shipToAddress', label: 'Ship To Address', type: 'textarea', placeholder: 'Complete delivery address', required: true },
                     { id: 'shipToPhone', label: 'Ship To Phone', type: 'text', placeholder: 'e.g. +91-98765-43210', required: false },
                     { id: 'poNumber', label: 'Purchase Order #', type: 'text', placeholder: 'e.g. PO-2026-001', required: true },
@@ -2184,6 +2221,8 @@ PAY TO:
 ${formData.bankName || '[Bank Name]'}
 Account Name: ${formData.accountName || '[Account Name]'}
 Account No.: ${formData.accountNumber || '[Account Number]'}
+IFSC Code: ${formData.ifscCode || '[IFSC Code]'}
+${formData.upiId ? `UPI ID: ${formData.upiId}` : ''}
 
 DETAILS:
 Date: ${formData.invoiceDate || currentDate}
@@ -2261,6 +2300,10 @@ Quantity: ${formData.quantity || '1'}
 Rate: ₹${formData.rate ? Number(formData.rate).toLocaleString() : '[Rate]'}
 
 TOTAL AMOUNT: ₹${formData.totalAmount ? Number(formData.totalAmount).toLocaleString() : '[Total Amount]'}
+
+BANKING DETAILS:
+Bank: ${formData.bankName || '[Bank Name]'} | A/C: ${formData.accountNumber || '[Account Number]'}
+IFSC: ${formData.ifscCode || '[IFSC Code]'} | UPI: ${formData.upiId || '[UPI ID]'}
 
 TERMS & CONDITIONS:
 • ${formData.paymentTerms || 'Payment terms as agreed'}
@@ -3118,6 +3161,25 @@ Authorized Signatory              ${formData.consultantName || '[Name]'}
                                             <span style={{ color: '#111827' }}>TOTAL</span>
                                             <span style={{ color: greenPrimary }}>₹{total.toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
                                         </div>
+                                    </div>
+                                </div>
+
+                                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px', marginTop: '20px', borderTop: '1px solid #E5E7EB', paddingTop: '15px' }}>
+                                    <div>
+                                        <h4 style={{ margin: '0 0 5px 0', fontSize: '11px', fontWeight: 'bold', color: greenPrimary, textTransform: 'uppercase' }}>PAYMENT DETAILS</h4>
+                                        <div style={{ fontSize: '11px', lineHeight: '1.4' }}>
+                                            <p style={{ margin: '0' }}><strong>Bank:</strong> {formData.bankName || '[Bank Name]'}</p>
+                                            <p style={{ margin: '0' }}><strong>Account:</strong> {formData.accountName || '[Account Name]'}</p>
+                                            <p style={{ margin: '0' }}><strong>A/C No:</strong> {formData.accountNumber || '[Account Number]'}</p>
+                                            <p style={{ margin: '0' }}><strong>IFSC:</strong> {formData.ifscCode || '[IFSC Code]'}</p>
+                                            {formData.upiId && <p style={{ margin: '0' }}><strong>UPI:</strong> {formData.upiId}</p>}
+                                        </div>
+                                    </div>
+                                    <div style={{ textAlign: 'center' }}>
+                                        <div style={{ border: '1px solid #E5E7EB', padding: '10px', display: 'inline-block', borderRadius: '4px' }}>
+                                            <div style={{ width: '60px', height: '60px', backgroundColor: '#F3F4F6', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#9CA3AF', fontSize: '8px' }}>QR CODE</div>
+                                        </div>
+                                        <p style={{ margin: '5px 0 0 0', fontSize: '10px', color: '#6B7280' }}>Scan to Pay</p>
                                     </div>
                                 </div>
 

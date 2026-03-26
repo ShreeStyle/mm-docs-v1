@@ -396,21 +396,20 @@ const GSTFilingSummaryPage = () => {
     const [templateSource, setTemplateSource] = useState(DEFAULT_TEMPLATE);
 
     const [formData, setFormData] = useState({
-        companyName: 'ACME TRADING CORP',
-        mobile: '9876543210',
-        gstNo: '27ABCDE1234F1Z5',
-        dateRange: 'March 2025',
+        companyName: '',
+        mobile: '',
+        gstNo: '',
+        dateRange: `${new Date().toLocaleString('default', { month: 'long' })} ${new Date().getFullYear()}`,
         sales: [
-             { ...initialRow, gstin: '27AAAAA0000A1Z5', customerName: 'Retail Customer 1', invoiceDetails: { no: 'INV/001', date: '01-Mar', value: 50000 }, taxableValue: 50000, taxAmount: { central: 4500, state: 4500, integrated: 0, cess: 0 }, totalTax: 9000 },
-             { ...initialRow, gstin: '', customerName: '', invoiceDetails: { no: '', date: '', value: 0 } }
+             { ...initialRow }
         ],
         salesReturn: [],
         purchaseReturn: [],
-        summary: { totalTaxableValue: 50000, totalCGST: 4500, totalSGST: 4500, totalIGST: 0, totalTax: 9000, netPayable: 9000 },
-        authorizedSignatory: { name: 'AUTHORIZED SIGNATORY', designation: 'PROPRIETOR' }
+        summary: { totalTaxableValue: 0, totalCGST: 0, totalSGST: 0, totalIGST: 0, totalTax: 0, totalTaxableValue: 0, returnTax: 0, netPayable: 0 },
+        authorizedSignatory: { name: '', designation: '' }
     });
 
-    // 1. Fetch real template from DB & Existing Document if ID provided
+    // 1. Fetch real organization & brand kit data + template
     useEffect(() => {
         const init = async () => {
             try {
@@ -420,14 +419,32 @@ const GSTFilingSummaryPage = () => {
                     setTemplateSource(tRes.data.content);
                 }
 
-                // Fetch Document if ID exists
+                // Fetch Organization & Brand Kit for Autofill
+                const [org, brand] = await Promise.all([
+                    api.get('/organization'),
+                    api.get('/brand-kit')
+                ]);
+
+                if (org) {
+                    setFormData(prev => ({
+                        ...prev,
+                        companyName: org.name || brand?.brandName || '',
+                        gstNo: org.tax?.gstin || '',
+                        mobile: org.contact?.phone || '',
+                        authorizedSignatory: {
+                            name: org.signatory?.name || '',
+                            designation: org.signatory?.designation || ''
+                        }
+                    }));
+                }
+
+                // Fetch Document if ID exists (overwrites autofill)
                 if (id) {
                     const dRes = await api.get(`/documents/${id}`);
                     if (dRes && dRes.content) {
                         setFormData(prev => ({
                             ...prev,
                             ...dRes.content,
-                            // Ensure arrays exist
                             sales: dRes.content.sales || [],
                             salesReturn: dRes.content.salesReturn || [],
                             purchaseReturn: dRes.content.purchaseReturn || []

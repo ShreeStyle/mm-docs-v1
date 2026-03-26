@@ -76,8 +76,49 @@ const DocumentEditor = () => {
             setLoading(true);
             const response = await api.get(`/document-editor/${documentId}`);
             if (response.success) {
-                setDocument(response.data);
-                setFields(response.data.fields || []);
+                const doc = response.data;
+                const autofill = response.autofillMap || {};
+                
+                console.log('📦 Fetched document:', doc.title);
+                console.log('🤖 Applying autofill map:', Object.keys(autofill).length, 'keys');
+
+                // 1. Apply autofill to fields that are empty
+                const updatedFields = (doc.fields || []).map(field => {
+                    const mappingKey = field.label?.toLowerCase().replace(/\s+/g, '_');
+                    const autofillValue = autofill[mappingKey] || autofill[field.label];
+                    
+                    if (!field.value && autofillValue) {
+                        console.log(`✨ Autofilling field [${field.label}] with:`, autofillValue);
+                        return { ...field, value: autofillValue, completed: true };
+                    }
+                    return field;
+                });
+
+                // 2. Apply autofill to block content (Handlebars-style placeholders)
+                const updatedPages = (doc.pages || []).map(page => ({
+                    ...page,
+                    blocks: (page.blocks || []).map(block => {
+                        if (block.type === 'text' && block.content) {
+                            let newContent = block.content;
+                            // Simple regex to find and replace {{key}} with autofill[key]
+                            Object.entries(autofill).forEach(([key, val]) => {
+                                const regex = new RegExp(`{{${key}}}`, 'g');
+                                if (newContent.includes(`{{${key}}}`)) {
+                                    console.log(`✨ Replacing {{${key}}} in block with:`, val);
+                                    newContent = newContent.replace(regex, val);
+                                }
+                            });
+                            return { ...block, content: newContent };
+                        }
+                        return block;
+                    })
+                }));
+
+                setDocument({ ...doc, pages: updatedPages });
+                setFields(updatedFields);
+
+                // If changes were made, auto-save a few seconds later
+                // handleSave(); // Optional: or just let auto-save handle it
             }
         } catch (err) {
             console.error('Error fetching document:', err);

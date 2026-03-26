@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const {
     completeOnboarding,
+    saveOnboardingStep,
     getOnboardingStatus,
     getColorPresets,
     skipOnboarding,
@@ -12,6 +13,7 @@ const authMiddleware = require("../middleware/authMiddleware");
 router.use(authMiddleware);
 
 router.post("/complete", completeOnboarding);
+router.post("/step", saveOnboardingStep);     // NEW: multi-step progressive onboarding
 router.get("/status", getOnboardingStatus);
 router.get("/color-presets", getColorPresets);
 router.post("/skip", skipOnboarding);

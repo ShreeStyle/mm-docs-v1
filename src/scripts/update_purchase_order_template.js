@@ -30,7 +30,7 @@ async function createPurchaseOrderTemplate() {
         
         // Ship To Info
         { fieldName: 'shipToName', fieldType: 'text', label: 'Ship To (Name)', placeholder: 'e.g. Receiver Name', required: true },
-        { fieldName: 'shipToCompanyName', fieldType: 'text', label: 'Ship To (Company)', placeholder: 'e.g. Acme Corp', required: false },
+        { fieldName: 'shipToCompanyName', fieldType: 'text', label: 'Ship To (Company)', placeholder: 'e.g. Recipient Company', required: false },
         { fieldName: 'shipToAddress', fieldType: 'textarea', label: 'Ship To Address', placeholder: 'Complete delivery address', required: true },
         { fieldName: 'shipToPhone', fieldType: 'text', label: 'Ship To Phone', placeholder: 'e.g. +91-98765-43210', required: false },
         

@@ -1,0 +1,443 @@
+/* ── Onboarding Page ────────────────────────────────────────── */
+.onboarding-page {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #0a0a0f;
+    position: relative;
+    overflow: hidden;
+    padding: 20px;
+}
+
+.onboarding-bg {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+}
+
+.onboarding-container {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    max-width: 600px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 24px;
+}
+
+/* ── Progress Steps ─────────────────────────────────────────── */
+.onboarding-progress {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    margin-bottom: 8px;
+}
+
+.progress-step {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.progress-circle {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.06);
+    border: 2px solid rgba(255, 255, 255, 0.1);
+    color: rgba(255, 255, 255, 0.4);
+    transition: all 0.3s ease;
+}
+
+.progress-step.active .progress-circle {
+    background: #7C3AED;
+    border-color: #7C3AED;
+    color: white;
+    box-shadow: 0 0 20px rgba(124, 58, 237, 0.4);
+}
+
+.progress-step.done .progress-circle {
+    background: #10B981;
+    border-color: #10B981;
+    color: white;
+}
+
+.progress-label {
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.3);
+    font-weight: 500;
+    margin: 0 4px;
+}
+
+.progress-step.active .progress-label {
+    color: rgba(255, 255, 255, 0.9);
+}
+
+.progress-step.done .progress-label {
+    color: #10B981;
+}
+
+.progress-line {
+    width: 40px;
+    height: 2px;
+    background: rgba(255, 255, 255, 0.1);
+    margin: 0 2px;
+}
+
+.progress-step.done + .progress-step .progress-line,
+.progress-step.done .progress-line {
+    background: #10B981;
+}
+
+/* ── Card ───────────────────────────────────────────────────── */
+.onboarding-card {
+    width: 100%;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 20px;
+    padding: 36px;
+    backdrop-filter: blur(20px);
+}
+
+.step-header {
+    text-align: center;
+    margin-bottom: 28px;
+}
+
+.step-icon {
+    color: #7C3AED;
+    margin-bottom: 8px;
+}
+
+.step-header h2 {
+    font-size: 24px;
+    color: white;
+    margin: 0 0 6px;
+    font-weight: 700;
+}
+
+.step-header p {
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 14px;
+    margin: 0;
+}
+
+/* ── Form Fields ────────────────────────────────────────────── */
+.step-form {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.form-group label {
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.6);
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.step-form input,
+.step-form select {
+    padding: 12px 14px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.05);
+    color: white;
+    font-size: 14px;
+    outline: none;
+    transition: border-color 0.2s;
+    font-family: inherit;
+}
+
+.step-form input:focus,
+.step-form select:focus {
+    border-color: #7C3AED;
+    box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.15);
+}
+
+.step-form input::placeholder {
+    color: rgba(255, 255, 255, 0.25);
+}
+
+.step-form select option {
+    background: #1a1a2e;
+    color: white;
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+}
+
+/* ── Use Case Grid ──────────────────────────────────────────── */
+.use-case-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+}
+
+.use-case-btn {
+    padding: 12px 14px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.03);
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-align: left;
+}
+
+.use-case-btn:hover {
+    background: rgba(124, 58, 237, 0.1);
+    border-color: rgba(124, 58, 237, 0.3);
+}
+
+.use-case-btn.selected {
+    background: rgba(124, 58, 237, 0.15);
+    border-color: #7C3AED;
+    color: white;
+}
+
+/* ── Logo Upload ────────────────────────────────────────────── */
+.logo-upload-area {
+    border: 2px dashed rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    padding: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    min-height: 80px;
+}
+
+.logo-upload-area:hover {
+    border-color: rgba(124, 58, 237, 0.4);
+    background: rgba(124, 58, 237, 0.05);
+}
+
+.upload-placeholder {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    color: rgba(255, 255, 255, 0.4);
+}
+
+.upload-placeholder span {
+    font-size: 14px;
+}
+
+.upload-placeholder small {
+    font-size: 11px;
+    color: rgba(255, 255, 255, 0.25);
+}
+
+.logo-preview {
+    max-height: 60px;
+    max-width: 200px;
+    object-fit: contain;
+}
+
+/* ── Color Presets ──────────────────────────────────────────── */
+.color-presets {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+}
+
+.color-preset-btn {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.03);
+    cursor: pointer;
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 13px;
+    transition: all 0.2s;
+}
+
+.color-preset-btn:hover {
+    background: rgba(255, 255, 255, 0.06);
+}
+
+.color-preset-btn.selected {
+    border-color: #7C3AED;
+    background: rgba(124, 58, 237, 0.1);
+    color: white;
+}
+
+.preset-swatch {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+/* ── OCR Banner ─────────────────────────────────────────────── */
+.ocr-banner {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 16px;
+    border: 1px solid rgba(16, 185, 129, 0.2);
+    border-radius: 12px;
+    background: rgba(16, 185, 129, 0.06);
+    cursor: pointer;
+    transition: all 0.2s;
+    color: #10B981;
+}
+
+.ocr-banner:hover {
+    background: rgba(16, 185, 129, 0.1);
+    border-color: rgba(16, 185, 129, 0.4);
+}
+
+.ocr-banner strong {
+    font-size: 14px;
+    display: block;
+    margin-bottom: 2px;
+}
+
+.ocr-banner small {
+    font-size: 12px;
+    color: rgba(16, 185, 129, 0.7);
+}
+
+/* ── Navigation Buttons ─────────────────────────────────────── */
+.step-actions {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 28px;
+    gap: 12px;
+}
+
+.btn-next {
+    padding: 12px 28px;
+    border-radius: 10px;
+    background: #7C3AED;
+    color: white;
+    font-size: 14px;
+    font-weight: 600;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.2s;
+    margin-left: auto;
+}
+
+.btn-next:hover:not(:disabled) {
+    background: #6D28D9;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 20px rgba(124, 58, 237, 0.4);
+}
+
+.btn-next:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.btn-back,
+.btn-skip {
+    padding: 12px 20px;
+    border-radius: 10px;
+    background: transparent;
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 14px;
+    font-weight: 500;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.2s;
+}
+
+.btn-back:hover,
+.btn-skip:hover {
+    color: white;
+    border-color: rgba(255, 255, 255, 0.2);
+}
+
+.btn-back:disabled,
+.btn-skip:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.onboarding-time {
+    color: rgba(255, 255, 255, 0.3);
+    font-size: 12px;
+    text-align: center;
+}
+
+/* ── Auth Select (Signup Country) ───────────────────────────── */
+.auth-select {
+    padding: 12px 14px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.05);
+    color: white;
+    font-size: 14px;
+    outline: none;
+    transition: border-color 0.2s;
+    font-family: inherit;
+    width: 100%;
+    cursor: pointer;
+}
+
+.auth-select:focus {
+    border-color: #7C3AED;
+}
+
+.auth-select option {
+    background: #1a1a2e;
+    color: white;
+}
+
+/* ── Responsive ─────────────────────────────────────────────── */
+@media (max-width: 640px) {
+    .onboarding-card {
+        padding: 24px;
+    }
+
+    .form-row {
+        grid-template-columns: 1fr;
+    }
+
+    .use-case-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .color-presets {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .progress-label {
+        display: none;
+    }
+
+    .progress-line {
+        width: 24px;
+    }
+}

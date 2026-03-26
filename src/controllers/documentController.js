@@ -192,16 +192,35 @@ exports.generateDocument = async (req, res) => {
 
         // Import AI service
         const { generateContent } = require("../services/ai/aiService");
+        // Fetch Brand Kit for additional context (like description)
         const BrandKit = require("../models/BrandKit");
-
-        // Fetch user's brand kit
-        console.log("🔍 Fetching brand kit...");
         const brandKit = await BrandKit.findOne({ userId });
-        console.log(`🎨 Brand kit found: ${brandKit ? 'Yes' : 'No'}`);
+        // Fetch full autofill map for AI context
+        console.log("🔍 Fetching rich brand context via autofill map...");
+        const { buildAutofillMap } = require("../services/autofill/autofillService");
+        const autofillMap = await buildAutofillMap(userId, type);
 
-        const brandContext = brandKit
-            ? { name: brandKit.name, tone: "Professional", description: brandKit.description, logo: brandKit.logo }
-            : { name: "MM Docs", tone: "Professional" };
+        const brandContext = {
+            name: autofillMap.company_name || "MM Docs",
+            legalName: autofillMap.company_legal_name,
+            address: autofillMap.company_address,
+            email: autofillMap.email,
+            phone: autofillMap.phone,
+            website: autofillMap.company_website,
+            gstin: autofillMap.gstin,
+            banking: {
+                bankName: autofillMap.bank_name,
+                accountName: autofillMap.bank_account_name,
+                accountNumber: autofillMap.bank_account_number,
+                ifscCode: autofillMap.bank_ifsc,
+                upiId: autofillMap.bank_upi
+            },
+            tone: "Professional",
+            description: brandKit?.description || "Professional business documents",
+            logo: autofillMap.company_logo,
+            primaryColor: autofillMap.primary_color,
+            fontFamily: autofillMap.font_family
+        };
 
         // Generate AI content
         console.log(`🤖 Generating ${type} content...`);

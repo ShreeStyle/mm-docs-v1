@@ -49,6 +49,8 @@ const signatureRoutes = require("./routes/signatureRoutes");
 const workflowRoutes = require("./routes/workflowRoutes");
 const complianceRoutes = require("./routes/complianceRoutes");
 const emailRoutes = require("./routes/emailRoutes");
+const ocrRoutes = require("./routes/ocrRoutes");
+const organizationRoutes = require("./routes/organizationRoutes");
 
 app.use("/api/users", userRoutes);
 app.use("/api/auth", authRoutes);
@@ -72,6 +74,8 @@ app.use("/api/signatures", signatureRoutes);
 app.use("/api/workflows", workflowRoutes);
 app.use("/api/compliance", complianceRoutes);
 app.use("/api/email", emailRoutes);
+app.use("/api/ocr", ocrRoutes);
+app.use("/api/organization", organizationRoutes);
 
 // Health Check API with database status
 app.get("/api/health", async (req, res) => {

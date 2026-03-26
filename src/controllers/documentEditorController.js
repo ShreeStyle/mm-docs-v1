@@ -1,5 +1,6 @@
 const Document = require('../models/Document');
 const Template = require('../models/Template');
+const { buildAutofillMap } = require('../services/autofill/autofillService');
 
 // Create document from template with recipients
 exports.createFromTemplate = async (req, res) => {
@@ -16,6 +17,33 @@ exports.createFromTemplate = async (req, res) => {
             });
         }
 
+        // Fetch Autofill Map
+        console.log(`🤖 Building autofill map for userId: ${userId}, type: ${template.category}`);
+        const autofillMap = await buildAutofillMap(userId, template.category);
+
+        // Pre-fill fields from template requiredFields
+        const fields = (template.requiredFields || []).map(ref => {
+            // Check if this field maps to an autofill key
+            // Try fieldName, then label (slugified), then check common mappings
+            const mappingKey = ref.fieldName?.toLowerCase() || ref.label?.toLowerCase().replace(/\s+/g, '_');
+            const autofillValue = autofillMap[mappingKey] || autofillMap[ref.fieldName];
+
+            return {
+                fieldType: ref.fieldType === 'select' ? 'dropdown' : (ref.fieldType || 'text'),
+                label: ref.label,
+                page: 1, // Default to page 1 for now
+                position: { x: 100, y: 100 }, // Default position, will be adjusted in editor
+                size: { width: 200, height: 40 },
+                properties: {
+                    required: ref.required || false,
+                    assignedTo: 'SENDER', // Default to sender for pre-filled fields
+                    defaultValue: autofillValue || ref.placeholder || '',
+                    options: ref.options || []
+                },
+                value: autofillValue || '' // Pre-fill the value!
+            };
+        });
+
         // Create new document
         const document = new Document({
             userId,
@@ -24,11 +52,11 @@ exports.createFromTemplate = async (req, res) => {
             type: template.category,
             recipients: recipients || [],
             documentContent: {
-                originalPdf: null, // Will be set when PDF is uploaded
+                originalPdf: null, 
                 pages: 1,
                 annotations: []
             },
-            fields: [],
+            fields: fields,
             status: 'draft'
         });
 
@@ -36,8 +64,9 @@ exports.createFromTemplate = async (req, res) => {
 
         res.json({
             success: true,
-            message: 'Document created successfully',
-            data: document
+            message: 'Document created successfully with autofill! 🎉',
+            data: document,
+            autofillApplied: Object.keys(autofillMap).length
         });
     } catch (error) {
         console.error('Error creating document from template:', error);
@@ -67,9 +96,13 @@ exports.getDocument = async (req, res) => {
             });
         }
 
+        // Fetch latest autofill map to help frontend fill missing fields
+        const autofillMap = await buildAutofillMap(userId, document.type);
+
         res.json({
             success: true,
-            data: document
+            data: document,
+            autofillMap
         });
     } catch (error) {
         console.error('Error fetching document:', error);

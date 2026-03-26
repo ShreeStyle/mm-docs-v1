@@ -82,6 +82,7 @@ ${brandContext.website ? `- Company Website: ${brandContext.website}` : ''}
 ${brandContext.email ? `- Company Email: ${brandContext.email}` : ''}
 ${brandContext.phone ? `- Company Phone: ${brandContext.phone}` : ''}
 ${brandContext.address ? `- Company Address: ${brandContext.address}` : ''}
+${brandContext.banking ? `- Banking Details: ${JSON.stringify(brandContext.banking)}` : ''}
 
 CRITICAL: Use provided form data EXACTLY as given. PRIORITIZE PROVIDED FORM DATA over any generated placeholders.
 Return ONLY valid, richly detailed, FORMALLY WRITTEN JSON document content. No commentary.`;
@@ -2750,7 +2751,8 @@ We appreciate the cooperation and assistance provided by management and staff th
       partner2ProfitShare: providedData.partner2ProfitShare || "50%",
       partner1Responsibilities: providedData.partner1Responsibilities || "[Responsibility Details]",
       partner2Responsibilities: providedData.partner2Responsibilities || "[Responsibility Details]",
-      bankName: providedData.bankName || "[Bank Name]",
+      bankName: providedData.bankName || brandContext.banking?.bankName || "[Bank Name]",
+      accountNumber: providedData.accountNumber || brandContext.banking?.accountNumber || "",
       disputeResolution: providedData.disputeResolution || "In the event of a dispute, the partners agree to first attempt mediation through a professional mediator.",
       governingLaw: providedData.governingLaw || "This Agreement shall be governed by the laws of the State of [State].",
       entireAgreement: providedData.entireAgreement || "This Agreement constitutes the full agreement between the partners, overriding any prior agreements."
@@ -2787,9 +2789,11 @@ We appreciate the cooperation and assistance provided by management and staff th
       invoiceNumber: providedData.invoiceNumber || `INV-${Date.now().toString().slice(-6)}`,
       invoiceDate: providedData.invoiceDate || new Date().toLocaleDateString(),
       dueDate: providedData.dueDate || "",
-      bankName: providedData.bankName || "",
-      accountName: providedData.accountName || "",
-      accountNumber: providedData.accountNumber || "",
+      bankName: providedData.bankName || brandContext.banking?.bankName || "",
+      accountName: providedData.accountName || brandContext.banking?.accountName || "",
+      accountNumber: providedData.accountNumber || brandContext.banking?.accountNumber || "",
+      ifscCode: providedData.ifscCode || brandContext.banking?.ifscCode || "",
+      upiId: providedData.upiId || brandContext.banking?.upiId || "",
       items: items,
       subtotal: subtotal.toFixed(2),
       taxPercentage: taxPercentage,
@@ -2835,6 +2839,11 @@ We appreciate the cooperation and assistance provided by management and staff th
       invoiceNumber: providedData.invoiceNumber || `GST-${Date.now().toString().slice(-6)}`,
       invoiceDate: providedData.invoiceDate || new Date().toLocaleDateString(),
       dueDate: providedData.dueDate || "",
+      bankName: providedData.bankName || brandContext.banking?.bankName || "",
+      accountName: providedData.accountName || brandContext.banking?.accountName || "",
+      accountNumber: providedData.accountNumber || brandContext.banking?.accountNumber || "",
+      ifscCode: providedData.ifscCode || brandContext.banking?.ifscCode || "",
+      upiId: providedData.upiId || brandContext.banking?.upiId || "",
       customerId: providedData.customerId || "",
       items: items,
       subtotal: subtotal,
@@ -2879,7 +2888,7 @@ We appreciate the cooperation and assistance provided by management and staff th
       subtotal: subtotal.toFixed(2),
       tax: tax.toFixed(2),
       total: (subtotal + tax).toFixed(2),
-      bankInfo: providedData.bankInfo || "",
+      bankInfo: providedData.bankInfo || (brandContext.banking?.bankName ? `${brandContext.banking.bankName} - A/C: ${brandContext.banking.accountNumber}` : ""),
       terms: providedData.terms || "",
       footerPhone: providedData.footerPhone || "",
       footerEmail: providedData.footerEmail || "",

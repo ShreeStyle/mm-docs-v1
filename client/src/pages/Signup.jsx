@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Link, useNavigate } from 'react-router-dom';
-import { ArrowRight, User, Mail, Lock, CheckCircle2, X } from 'lucide-react';
+import { ArrowRight, User, Mail, Lock, CheckCircle2, X, Globe } from 'lucide-react';
 import { getApiUrl } from '../config/api';
 
 const LogoIcon = () => (
@@ -11,6 +11,17 @@ const LogoIcon = () => (
     </svg>
 );
 
+const COUNTRIES = [
+    { code: 'IN', name: 'India', flag: '🇮🇳' },
+    { code: 'US', name: 'United States', flag: '🇺🇸' },
+    { code: 'GB', name: 'United Kingdom', flag: '🇬🇧' },
+    { code: 'AE', name: 'UAE', flag: '🇦🇪' },
+    { code: 'SG', name: 'Singapore', flag: '🇸🇬' },
+    { code: 'AU', name: 'Australia', flag: '🇦🇺' },
+    { code: 'CA', name: 'Canada', flag: '🇨🇦' },
+    { code: 'DE', name: 'Germany', flag: '🇩🇪' },
+];
+
 export default function Signup() {
     const navigate = useNavigate();
     const [isLoading, setIsLoading] = useState(false);
@@ -19,7 +30,8 @@ export default function Signup() {
     const [formData, setFormData] = useState({
         name: '',
         email: '',
-        password: ''
+        password: '',
+        countryCode: 'IN'
     });
 
     const handleSubmit = async (e) => {
@@ -28,20 +40,15 @@ export default function Signup() {
         setError(null);
 
         try {
-            console.log('📝 Attempting signup to:', getApiUrl('/api/auth/signup'));
-            
             const response = await fetch(getApiUrl('/api/auth/signup'), {
                 method: 'POST',
-                headers: { 
+                headers: {
                     'Content-Type': 'application/json',
                     'Accept': 'application/json'
                 },
                 body: JSON.stringify(formData)
             });
 
-            console.log('📥 Response status:', response.status);
-
-            // Try to parse JSON response
             let data;
             const contentType = response.headers.get('content-type');
             if (contentType && contentType.includes('application/json')) {
@@ -53,11 +60,17 @@ export default function Signup() {
             }
 
             if (response.ok) {
-                console.log('✅ Signup successful');
                 setIsSuccess(true);
-                setTimeout(() => navigate('/login'), 2000);
+
+                // Auto-login: store token and redirect to onboarding
+                if (data.token) {
+                    localStorage.setItem('token', data.token);
+                    localStorage.setItem('user', JSON.stringify(data.user));
+                    setTimeout(() => navigate('/onboarding'), 1500);
+                } else {
+                    setTimeout(() => navigate('/login'), 2000);
+                }
             } else {
-                // Provide more helpful error messages
                 if (response.status === 400 && data.message?.includes('already registered')) {
                     throw new Error('This email is already registered. Please login instead.');
                 } else if (response.status === 500) {
@@ -75,7 +88,6 @@ export default function Signup() {
 
     return (
         <div className="landing-page login-page-container">
-            {/* Mesh Background */}
             <div className="bg-glow glow-1" />
             <div className="bg-glow glow-2" />
 
@@ -114,8 +126,8 @@ export default function Signup() {
                         animate={{ scale: 1, opacity: 1 }}
                     >
                         <CheckCircle2 size={64} color="#7C3AED" />
-                        <h2>Success!</h2>
-                        <p>Your account has been created. Redirecting to login...</p>
+                        <h2>Welcome aboard!</h2>
+                        <p>Setting up your workspace...</p>
                     </motion.div>
                 ) : (
                     <form onSubmit={handleSubmit} className="auth-form">
@@ -148,6 +160,18 @@ export default function Signup() {
                                 value={formData.password}
                                 onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                             />
+                        </div>
+                        <div className="input-group">
+                            <label><Globe size={16} /> Country</label>
+                            <select
+                                value={formData.countryCode}
+                                onChange={(e) => setFormData({ ...formData, countryCode: e.target.value })}
+                                className="auth-select"
+                            >
+                                {COUNTRIES.map(c => (
+                                    <option key={c.code} value={c.code}>{c.flag} {c.name}</option>
+                                ))}
+                            </select>
                         </div>
 
                         <button type="submit" className="auth-submit-btn" disabled={isLoading}>

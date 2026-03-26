@@ -391,24 +391,25 @@ exports.renderDocument = async (document, brandKit) => {
       template = loadTemplate("generic");
     }
 
-    const brandCSS = generateBrandCSS(brandKit);
-    const brandHeader = generateBrandHeader(brandKit);
-    const footerHTML = generateFooterHTML(brandKit);
-
     // Prepare data for template
     const docObj = document.toObject();
     const contentData = docObj.content || {};
+
+    // Fetch latest autofill map for final rendering injection
+    const { buildAutofillMap } = require("../autofill/autofillService");
+    const autofillMap = await buildAutofillMap(docObj.userId, docObj.type);
     
     const data = {
       _id: docObj._id,
       title: docObj.title,
       type: docObj.type,
-      ...contentData, // Spread the content fields to root level for Handlebars
+      ...autofillMap, // Inject all autofill keys as root level data
+      ...contentData, // Content fields (priority over autofill if explicitly set)
       brandKit: brandKit ? brandKit.toObject() : {},
       brandCSS,
       brandHeader,
       footerHTML,
-      brandName: brandKit?.brandName || 'My Company',
+      brandName: brandKit?.brandName || autofillMap.company_name || 'My Company',
       primaryColor: brandKit?.primaryColor || '#1e40af',
       secondaryColor: brandKit?.secondaryColor || '#64748b',
       accentColor: brandKit?.accentColor || '#3b82f6',
