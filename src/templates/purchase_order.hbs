@@ -257,13 +257,13 @@
 <body>
     <div class="header">
         <div class="company-info">
-            <div class="company-name">{{#if companyName}}{{companyName}}{{else}}[Company Name]{{/if}}</div>
+            <div class="company-name">{{#if company_name}}{{company_name}}{{else}}[Company Name]{{/if}}</div>
             <div class="company-details">
-                {{#if companyAddress}}{{{companyAddress}}}{{else}}[Street Address]
+                {{#if company_address}}{{{company_address}}}{{else}}[Street Address]
 [City, ST ZIP]{{/if}}
-                {{#if companyPhone}}Phone: {{companyPhone}}{{/if}}
-                {{#if companyFax}}Fax: {{companyFax}}{{/if}}
-                {{#if companyWebsite}}Website: {{companyWebsite}}{{/if}}
+                {{#if company_phone}}Phone: {{company_phone}}{{/if}}
+                {{#if company_fax}}Fax: {{company_fax}}{{/if}}
+                {{#if company_website}}Website: {{company_website}}{{/if}}
             </div>
         </div>
         <div class="doc-title-container">
@@ -271,11 +271,11 @@
             <table class="po-meta-table">
                 <tr>
                     <td class="label">DATE</td>
-                    <td class="value">{{#if poDate}}{{poDate}}{{else}}9/17/2015{{/if}}</td>
+                    <td class="value">{{#if document_date}}{{document_date}}{{else}}9/17/2015{{/if}}</td>
                 </tr>
                 <tr>
                     <td class="label">PO #</td>
-                    <td class="value">{{#if poNumber}}{{poNumber}}{{else}}[123456]{{/if}}</td>
+                    <td class="value">{{#if purchase_order_number}}{{purchase_order_number}}{{else}}[123456]{{/if}}</td>
                 </tr>
             </table>
         </div>
@@ -287,22 +287,22 @@
         <div class="party-box">
             <div class="party-header">VENDOR</div>
             <div class="party-content">
-                {{#if vendorName}}<strong>{{vendorName}}</strong>{{else}}[Company Name]{{/if}}
-                {{#if vendorContact}}{{{vendorContact}}}{{else}}[Contact or Department]{{/if}}
-                {{#if vendorAddress}}{{{vendorAddress}}}{{else}}[Street Address]
+                {{#if vendor_name}}<strong>{{vendor_name}}</strong>{{else}}[Company Name]{{/if}}
+                {{#if vendor_contact_person}}{{{vendor_contact_person}}}{{else}}[Contact or Department]{{/if}}
+                {{#if vendor_address}}{{{vendor_address}}}{{else}}[Street Address]
 [City, ST ZIP]{{/if}}
-                {{#if vendorPhone}}Phone: {{vendorPhone}}{{/if}}
-                {{#if vendorFax}}Fax: {{vendorFax}}{{/if}}
+                {{#if vendor_phone}}Phone: {{vendor_phone}}{{/if}}
+                {{#if vendor_fax}}Fax: {{vendor_fax}}{{/if}}
             </div>
         </div>
         <div class="party-box">
             <div class="party-header">SHIP TO</div>
             <div class="party-content">
-                {{#if shipToName}}<strong>{{shipToName}}</strong>{{else}}[Name]{{/if}}
-                {{#if shipToCompanyName}}{{{shipToCompanyName}}}{{else}}[Company Name]{{/if}}
-                {{#if shipToAddress}}{{{shipToAddress}}}{{else}}[Street Address]
+                {{#if ship_to_name}}<strong>{{ship_to_name}}</strong>{{else}}[Name]{{/if}}
+                {{#if ship_to_company_name}}{{{ship_to_company_name}}}{{else}}[Company Name]{{/if}}
+                {{#if ship_to_address}}{{{ship_to_address}}}{{else}}[Street Address]
 [City, ST ZIP]{{/if}}
-                {{#if shipToPhone}}Phone: {{shipToPhone}}{{/if}}
+                {{#if ship_to_phone}}Phone: {{ship_to_phone}}{{/if}}
             </div>
         </div>
     </div>
@@ -319,9 +319,9 @@
         <tbody>
             <tr>
                 <td>{{requisitioner}}</td>
-                <td>{{shipVia}}</td>
+                <td>{{ship_via}}</td>
                 <td>{{fob}}</td>
-                <td>{{shippingTerms}}</td>
+                <td>{{shipping_terms}}</td>
             </tr>
         </tbody>
     </table>
@@ -340,10 +340,10 @@
             {{#if items}}
                 {{#each items}}
                 <tr>
-                    <td class="col-item">{{this.itemNumber}}</td>
+                    <td class="col-item">{{this.item_number}}</td>
                     <td class="col-desc">{{this.description}}</td>
                     <td class="col-qty">{{this.quantity}}</td>
-                    <td class="col-price">{{this.unitPrice}}</td>
+                    <td class="col-price">{{this.unit_price}}</td>
                     <td class="col-total">{{this.total}}</td>
                 </tr>
                 {{/each}}
@@ -412,7 +412,7 @@
 
     <div class="footer">
         <div>If you have any questions about this purchase order, please contact</div>
-        <div class="footer-contact">[{{#if footerContactName}}{{footerContactName}}{{else}}Name{{/if}}, {{#if footerContactPhone}}{{footerContactPhone}}{{else}}Phone #{{/if}}, {{#if footerContactEmail}}{{footerContactEmail}}{{else}}E-mail{{/if}}]</div>
+        <div class="footer-contact">[{{#if company_contact_person}}{{company_contact_person}}{{else}}Name{{/if}}, {{#if company_phone}}{{company_phone}}{{else}}Phone #{{/if}}, {{#if company_email}}{{company_email}}{{else}}E-mail{{/if}}]</div>
     </div>
 </body>
 

@@ -164,9 +164,9 @@
             <div class="company-info">
                 <div class="logo-placeholder">LOGO</div>
                 <div class="company-details">
-                    <h2>{{companyName}}</h2>
-                    <p>{{companyAddress}}</p>
-                    <p><strong>GSTIN:</strong> {{gstNumber}}</p>
+                    <h2>{{company_name}}</h2>
+                    <p>{{company_address}}</p>
+                    <p><strong>GSTIN:</strong> {{gstin}}</p>
                 </div>
             </div>
             <h1 class="invoice-title">TAX INVOICE</h1>
@@ -176,19 +176,19 @@
             <table class="details-table">
                 <tr>
                     <td class="details-label">DATE</td>
-                    <td>{{invoiceDate}}</td>
+                    <td>{{invoice_date}}</td>
                 </tr>
                 <tr>
                     <td class="details-label">INVOICE #</td>
-                    <td style="font-weight: bold;">{{invoiceNumber}}</td>
+                    <td style="font-weight: bold;">{{invoice_number}}</td>
                 </tr>
                 <tr>
                     <td class="details-label">CUSTOMER ID</td>
-                    <td>{{customerId}}</td>
+                    <td>{{customer_id}}</td>
                 </tr>
                 <tr>
                     <td class="details-label">DUE DATE</td>
-                    <td>{{dueDate}}</td>
+                    <td>{{due_date}}</td>
                 </tr>
             </table>
         </div>
@@ -197,21 +197,21 @@
             <div>
                 <div class="section-header">BILL TO</div>
                 <div class="address-box">
-                    <strong>{{clientName}}</strong><br>
-                    {{#if billToAddress}}
-                        {{{billToAddress}}}
+                    <strong>{{client_name}}</strong><br>
+                    {{#if bill_to_address}}
+                        {{{bill_to_address}}}
                     {{/if}}
-                    {{#if clientGST}}
-                        <br><strong>GSTIN:</strong> {{clientGST}}
+                    {{#if client_gst}}
+                        <br><strong>GSTIN:</strong> {{client_gst}}
                     {{/if}}
                 </div>
             </div>
             <div>
                 <div class="section-header">SHIP TO</div>
                 <div class="address-box">
-                    <strong>{{shipToName}}</strong><br>
-                    {{#if shipToAddress}}
-                        {{{shipToAddress}}}
+                    <strong>{{ship_to_name}}</strong><br>
+                    {{#if ship_to_address}}
+                        {{{ship_to_address}}}
                     {{/if}}
                 </div>
             </div>
@@ -256,6 +256,15 @@
 
         <div class="summary-container">
             <div>
+                <div style="background-color: #10B981; color: white; padding: 5px 12px; font-weight: bold; font-size: 12px;">BANK DETAILS</div>
+                <div class="terms-box" style="min-height: auto; margin-bottom: 10px;">
+                    <strong>Bank:</strong> {{bank_name}}<br>
+                    <strong>A/C Name:</strong> {{bank_account_name}}<br>
+                    <strong>A/C No:</strong> {{bank_account_number}}<br>
+                    <strong>IFSC:</strong> {{bank_ifsc}}<br>
+                    {{#if bank_upi}}<strong>UPI:</strong> {{bank_upi}}{{/if}}
+                </div>
+
                 <div style="background-color: #10B981; color: white; padding: 5px 12px; font-weight: bold; font-size: 12px;">TERMS & CONDITIONS</div>
                 <div class="terms-box">
                     {{{terms}}}

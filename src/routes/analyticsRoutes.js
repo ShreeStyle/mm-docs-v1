@@ -9,6 +9,9 @@ router.use(authMiddleware);
 // Simple dashboard stats (for main Dashboard page)
 router.get('/stats', analyticsController.getDashboardStats);
 
+// Recommendations
+router.get('/recommendations', analyticsController.getRecommendations);
+
 // Dashboard analytics
 router.get('/dashboard', analyticsController.getDashboardAnalytics);
 

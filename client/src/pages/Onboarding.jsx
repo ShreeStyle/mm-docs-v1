@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import {
     Building2, Palette, FileText, ArrowRight, ArrowLeft, Check,
-    Upload, Globe, Users, Briefcase, Phone, Link2, SkipForward
+    Upload, Globe, Users, Briefcase, Phone, Link2, SkipForward, DollarSign
 } from 'lucide-react';
 import { getApiUrl } from '../config/api';
 import '../styles/Onboarding.css';
@@ -93,13 +93,52 @@ export default function Onboarding() {
     });
 
     useEffect(() => {
-        const storedUser = localStorage.getItem('user');
-        if (storedUser) {
-            const parsed = JSON.parse(storedUser);
-            setUser(parsed);
-            setCompanyData(prev => ({ ...prev, companyName: parsed.name + "'s Company" }));
-            setBrandData(prev => ({ ...prev, brandName: parsed.name + "'s Company" }));
-        }
+        const fetchInitialData = async () => {
+            const token = getToken();
+            const storedUser = localStorage.getItem('user');
+            
+            if (storedUser) {
+                const parsed = JSON.parse(storedUser);
+                setUser(parsed);
+                // Pre-fill defaults
+                setCompanyData(prev => ({ ...prev, companyName: prev.companyName || parsed.name + "'s Company" }));
+                setBrandData(prev => ({ ...prev, brandName: prev.brandName || parsed.name + "'s Company" }));
+            }
+
+            if (token) {
+                try {
+                    // Fetch existing brand kit if user already has one
+                    const res = await fetch(getApiUrl('/api/brand-kit'), {
+                        headers: { 'Authorization': `Bearer ${token}` }
+                    });
+                    if (res.ok) {
+                        const data = await res.json();
+                        if (data) {
+                            setBrandData(prev => ({
+                                ...prev,
+                                brandName: data.brandName || prev.brandName,
+                                logo: data.logo || prev.logo,
+                                primaryColor: data.primaryColor || prev.primaryColor,
+                                secondaryColor: data.secondaryColor || prev.secondaryColor,
+                                accentColor: data.accentColor || prev.accentColor,
+                                fontFamily: data.fontFamily || prev.fontFamily,
+                                phone: data.footer?.phone || prev.phone,
+                                website: data.footer?.website || prev.website,
+                                bankName: data.banking?.bankName || prev.bankName,
+                                accountName: data.banking?.accountName || prev.accountName,
+                                accountNumber: data.banking?.accountNumber || prev.accountNumber,
+                                ifscCode: data.banking?.ifscCode || prev.ifscCode,
+                                upiId: data.banking?.upiId || prev.upiId
+                            }));
+                        }
+                    }
+                } catch (err) {
+                    console.error('Error fetching initial brand kit:', err);
+                }
+            }
+        };
+
+        fetchInitialData();
     }, []);
 
     const getToken = () => localStorage.getItem('token');
@@ -115,7 +154,9 @@ export default function Onboarding() {
                 },
                 body: JSON.stringify({ step, data })
             });
+            console.log(`📡 Step ${step} response status:`, res.status);
             const result = await res.json();
+            console.log(`📦 Step ${step} result:`, result);
             if (!res.ok) throw new Error(result.message);
             return result;
         } catch (err) {
@@ -130,7 +171,18 @@ export default function Onboarding() {
     const handleNext = async () => {
         if (currentStep === 1) {
             const result = await saveStep(1, companyData);
-            if (result) setCurrentStep(2);
+            if (result) {
+                // Sync company name to brand name if brand name is still default or empty
+                const isDefault = !brandData.brandName || 
+                                 brandData.brandName.trim() === '' || 
+                                 brandData.brandName === "My Company" || 
+                                 brandData.brandName.includes("'s Company");
+                
+                if (isDefault) {
+                    setBrandData(prev => ({ ...prev, brandName: companyData.companyName }));
+                }
+                setCurrentStep(2);
+            }
         } else if (currentStep === 2) {
             const result = await saveStep(2, brandData);
             if (result) {

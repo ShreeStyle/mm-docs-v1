@@ -62,14 +62,8 @@ export default function Signup() {
             if (response.ok) {
                 setIsSuccess(true);
 
-                // Auto-login: store token and redirect to onboarding
-                if (data.token) {
-                    localStorage.setItem('token', data.token);
-                    localStorage.setItem('user', JSON.stringify(data.user));
-                    setTimeout(() => navigate('/onboarding'), 1500);
-                } else {
-                    setTimeout(() => navigate('/login'), 2000);
-                }
+                // Redirect to login page after successful registration
+                setTimeout(() => navigate('/login'), 1500);
             } else {
                 if (response.status === 400 && data.message?.includes('already registered')) {
                     throw new Error('This email is already registered. Please login instead.');
@@ -127,7 +121,7 @@ export default function Signup() {
                     >
                         <CheckCircle2 size={64} color="#7C3AED" />
                         <h2>Welcome aboard!</h2>
-                        <p>Setting up your workspace...</p>
+                        <p>Redirecting to login...</p>
                     </motion.div>
                 ) : (
                     <form onSubmit={handleSubmit} className="auth-form">

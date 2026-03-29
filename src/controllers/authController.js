@@ -110,7 +110,8 @@ exports.login = async (req, res) => {
 // Step 2: Verify OTP and complete login
 exports.verifyOTP = async (req, res) => {
   try {
-    const { email, otp } = req.body;
+    const { otp } = req.body;
+    const email = req.body?.email?.trim().toLowerCase();
 
     // Validate input
     if (!email || !otp) {
@@ -169,7 +170,13 @@ exports.verifyOTP = async (req, res) => {
 
 exports.signup = async (req, res) => {
   try {
-    const { name, email, password, countryCode } = req.body;
+    const { name, password, countryCode } = req.body;
+    const email = req.body?.email?.trim().toLowerCase();
+
+    // Validate input
+    if (!name || !email || !password) {
+      return res.status(400).json({ message: "Name, email, and password are required" });
+    }
 
     // check user exists
     const existingUser = await User.findOne({ email });

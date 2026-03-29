@@ -77,7 +77,8 @@ export default function BrandSettings() {
                     }
                 });  
                 if (data.logo) {
-                    setLogoPreview(`${BASE_URL}${data.logo}`);
+                    const previewUrl = data.logo.startsWith('data:') ? data.logo : `${BASE_URL}${data.logo}`;
+                    setLogoPreview(previewUrl);
                 }
             }
         } catch (error) {
@@ -160,7 +161,8 @@ export default function BrandSettings() {
                     footer: data.footer || brandKit.footer
                 });
                 if (data.logo) {
-                    setLogoPreview(`${BASE_URL}${data.logo}`);
+                    const previewUrl = data.logo.startsWith('data:') ? data.logo : `${BASE_URL}${data.logo}`;
+                    setLogoPreview(previewUrl);
                 }
                 setLogoFile(null);
                 setMessage({ type: 'success', text: 'Brand Kit saved successfully!' });
@@ -203,7 +205,7 @@ export default function BrandSettings() {
                         customText: ''
                     }
                 });
-                setLogoPreview(data.logo ? `${BASE_URL}${data.logo}` : '');
+                setLogoPreview(data.logo ? (data.logo.startsWith('data:') ? data.logo : `${BASE_URL}${data.logo}`) : '');
                 setLogoFile(null);
                 setMessage({ type: 'success', text: 'Brand Kit reset to default' });
             }

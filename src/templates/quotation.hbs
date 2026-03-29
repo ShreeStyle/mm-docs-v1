@@ -283,8 +283,8 @@
     <!-- Header -->
     <div class="header">
         <div>
-            <div class="company-name">{{{companyNameHtml}}}</div>
-            {{#if companySlogan}}<div class="company-slogan">{{companySlogan}}</div>{{/if}}
+            <div class="company-name">{{company_name}}</div>
+            {{#if company_slogan}}<div class="company-slogan">{{company_slogan}}</div>{{/if}}
         </div>
         <div class="doc-title">QUOTATION</div>
     </div>
@@ -294,30 +294,30 @@
         <div>
             <div class="meta-row">
                 <div class="meta-label">Quotation No:</div>
-                <div class="meta-value">#{{quotationNumber}}</div>
+                <div class="meta-value">#{{quotation_number}}</div>
             </div>
             <div class="meta-row">
                 <div class="meta-label">Customer ID:</div>
-                <div class="meta-value">{{customerId}}</div>
+                <div class="meta-value">{{customer_id}}</div>
             </div>
         </div>
         <div>
             <div class="meta-row">
                 <div class="meta-label">Date:</div>
-                <div class="meta-value">{{quotationDate}}</div>
+                <div class="meta-value">{{quotation_date}}</div>
             </div>
             <div class="meta-row">
                 <div class="meta-label">Valid Until:</div>
-                <div class="meta-value">{{validUntil}}</div>
+                <div class="meta-value">{{valid_until}}</div>
             </div>
         </div>
     </div>
 
     <!-- Client Details -->
     <div class="client-block">
-        <div class="client-name">{{clientName}}</div>
-        <div class="client-address">{{{clientAddress}}}</div>
-        {{#if clientPhone}}<div class="client-address">{{clientPhone}}</div>{{/if}}
+        <div class="client-name">{{client_name}}</div>
+        <div class="client-address">{{{client_address}}}</div>
+        {{#if client_phone}}<div class="client_address">{{client_phone}}</div>{{/if}}
     </div>
 
     <!-- Thick Separator -->
@@ -326,7 +326,7 @@
     <!-- Project Description -->
     <div class="project-grid">
         <div class="project-label">Project Description</div>
-        <div class="project-desc">{{projectDescription}}</div>
+        <div class="project-desc">{{project_description}}</div>
     </div>
 
     <!-- Items Table -->
@@ -344,8 +344,8 @@
             <tr>
                 <td>{{this.description}}</td>
                 <td>{{this.quantity}}</td>
-                <td>{{{../currencySymbol}}}{{this.rate}}</td>
-                <td>{{{../currencySymbol}}}{{this.amount}}</td>
+                <td>{{{../currency_symbol}}}{{this.rate}}</td>
+                <td>{{{../currency_symbol}}}{{this.amount}}</td>
             </tr>
             {{/each}}
         </tbody>
@@ -358,19 +358,19 @@
         <div class="totals-table">
             <div class="total-row">
                 <span>Subtotal</span>
-                <span>{{{currencySymbol}}}{{subtotal}}</span>
+                <span>{{{currency_symbol}}}{{subtotal}}</span>
             </div>
             <div class="total-row">
                 <span>Value-Added Tax</span>
-                <span>{{{currencySymbol}}}{{#if taxAmount}}{{taxAmount}}{{else}}0{{/if}}</span>
+                <span>{{{currency_symbol}}}{{#if tax_amount}}{{tax_amount}}{{else}}0{{/if}}</span>
             </div>
             <div class="total-row">
                 <span>Others</span>
-                <span>{{{currencySymbol}}}{{#if othersFee}}{{othersFee}}{{else}}0{{/if}}</span>
+                <span>{{{currency_symbol}}}{{#if others_fee}}{{others_fee}}{{else}}0{{/if}}</span>
             </div>
             <div class="total-row grand">
                 <span>Total</span>
-                <span>{{{currencySymbol}}}{{totalAmount}}</span>
+                <span>{{{currency_symbol}}}{{total_amount}}</span>
             </div>
         </div>
     </div>
@@ -379,10 +379,11 @@
     <div class="terms-block">
         <div class="terms-title">Commercial Terms & Conditions</div>
         <ul class="terms-list">
-            <li><strong>Validity:</strong> This quotation is valid for a period of {{#if validityDays}}{{validityDays}}{{else}}30{{/if}} days from the date of issuance.</li>
-            <li><strong>Execution & Delivery:</strong> {{#if deliveryTerms}}{{deliveryTerms}}{{else}}Project timelines and milestones will be strictly adhered to as mutually agreed upon prior to commencement.{{/if}}</li>
-            <li><strong>Payment Schedule:</strong> {{#if paymentTerms}}{{paymentTerms}}{{else}}Standard payment terms are 50% advance upon project initiation, with the remaining balance due strictly upon successful completion and handover.{{/if}}</li>
-            <li><strong>Confidentiality:</strong> The pricing structure and strategic information contained herein are classified as strictly confidential and proprietary to {{{companyNameHtml}}}.</li>
+            <li><strong>Bank Details:</strong> {{bank_name}} | A/C: {{bank_account_number}} | IFSC: {{bank_ifsc}}</li>
+            <li><strong>Validity:</strong> This quotation is valid for a period of {{#if validity_days}}{{validity_days}}{{else}}30{{/if}} days from the date of issuance.</li>
+            <li><strong>Execution & Delivery:</strong> {{#if delivery_terms}}{{delivery_terms}}{{else}}Project timelines and milestones will be strictly adhered to as mutually agreed upon prior to commencement.{{/if}}</li>
+            <li><strong>Payment Schedule:</strong> {{#if payment_terms}}{{payment_terms}}{{else}}Standard payment terms are 50% advance upon project initiation, with the remaining balance due strictly upon successful completion and handover.{{/if}}</li>
+            <li><strong>Confidentiality:</strong> The pricing structure and strategic information contained herein are classified as strictly confidential and proprietary to {{company_name}}.</li>
         </ul>
     </div>
 

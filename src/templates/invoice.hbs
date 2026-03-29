@@ -210,31 +210,31 @@
             <div class="left-info">
                 <div class="label-block">
                     <span class="section-label">ISSUED TO:</span>
-                    <span class="info-text">{{clientName}}</span>
-                    <span class="info-text">{{clientCompany}}</span>
-                    <span class="info-text">{{clientAddress}}</span>
+                    <span class="info-text">{{client_name}}</span>
+                    <span class="info-text">{{client_company}}</span>
+                    <span class="info-text">{{client_address}}</span>
                 </div>
 
                 <div class="label-block">
                     <span class="section-label">PAY TO:</span>
-                    <span class="info-text">{{bankName}}</span>
-                    <span class="info-text">Account Name: {{accountName}}</span>
-                    <span class="info-text">Account No.: {{accountNumber}}</span>
+                    <span class="info-text">{{bank_name}}</span>
+                    <span class="info-text">Account Name: {{bank_account_name}}</span>
+                    <span class="info-text">Account No.: {{bank_account_number}}</span>
                 </div>
             </div>
 
             <div class="right-info">
                 <div class="meta-row">
                     <div class="meta-label">INVOICE NO:</div>
-                    <div class="meta-value">{{invoiceNumber}}</div>
+                    <div class="meta-value">{{invoice_number}}</div>
                 </div>
                 <div class="meta-row">
                     <div class="meta-label">DATE:</div>
-                    <div class="meta-value">{{invoiceDate}}</div>
+                    <div class="meta-value">{{invoice_date}}</div>
                 </div>
                 <div class="meta-row">
                     <div class="meta-label">DUE DATE:</div>
-                    <div class="meta-value">{{dueDate}}</div>
+                    <div class="meta-value">{{due_date}}</div>
                 </div>
             </div>
         </div>
@@ -253,15 +253,15 @@
                 {{#each items}}
                 <tr>
                     <td>{{description}}</td>
-                    <td class="unit-price">{{unitPrice}}</td>
+                    <td class="unit-price">{{unit_price}}</td>
                     <td class="qty">{{qty}}</td>
                     <td class="total-col">₹{{total}}</td>
                 </tr>
-        {{/each}}
-    </tbody>
-</table>
+                {{/each}}
+            </tbody>
+        </table>
 
-<!-- Totals -->
+        <!-- Totals -->
         <div class="totals-container">
             <div class="total-row">
                 <div class="label">SUBTOTAL</div>
@@ -269,19 +269,21 @@
             </div>
             <div class="total-row">
                 <div class="label" style="text-align: right; padding-right: 40px; text-transform: none; font-weight: 400; color: #666;">Tax</div>
-                <div class="label" style="width: auto; text-align: left; text-transform: none; font-weight: 400; color: #666;">{{taxPercentage}}%</div>
-                <div class="value" style="color: #666;">₹{{taxAmount}}</div>
+                <div class="label" style="width: auto; text-align: left; text-transform: none; font-weight: 400; color: #666;">{{tax_percentage}}%</div>
+                <div class="value" style="color: #666;">₹{{tax_amount}}</div>
             </div>
             <div class="total-row grand-total">
                 <div class="label">TOTAL</div>
-                <div class="value">₹{{totalAmount}}</div>
+                <div class="value">₹{{total_amount}}</div>
             </div>
         </div>
 
         <!-- Signature -->
         <div class="signature-container">
-            <div class="signature-img">{{signatureName}}</div>
+            <div class="signature-img">{{signatory_name}}</div>
         </div>
     </div>
 </body>
+</html>
+
 </html>

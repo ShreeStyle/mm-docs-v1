@@ -6,6 +6,9 @@ const complianceController = require('../controllers/complianceController');
 // All routes require authentication
 router.use(authMiddleware);
 
+// Check compliance for a draft document
+router.post('/check-draft', complianceController.checkDraftCompliance);
+
 // Run compliance check on all documents
 router.get('/check', complianceController.checkCompliance);
 

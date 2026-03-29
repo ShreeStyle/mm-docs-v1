@@ -367,33 +367,33 @@
         <div class="cover-page">
             <div class="cover-header">
                 <div class="cover-brand">
-                    {{#if companyName}}{{companyName}}{{else}}Company Name{{/if}}
+                    {{#if company_name}}{{company_name}}{{else}}Company Name{{/if}}
                 </div>
                 <div class="cover-date">
-                    {{#if proposalDate}}{{proposalDate}}{{else}}Date{{/if}}
+                    {{#if proposal_date}}{{proposal_date}}{{else}}{{document_date}}{{/if}}
                 </div>
                 
                 <h1 class="cover-title">Project<br>Proposal</h1>
                 <div class="cover-subtitle">
-                    {{#if projectTitle}}{{projectTitle}}{{else}}Project Title{{/if}}
+                    {{#if project_title}}{{project_title}}{{else}}Project Title{{/if}}
                 </div>
             </div>
 
             <div class="prepared-section">
                 <div class="prepared-block">
                     <div class="prepared-label">Prepared By :</div>
-                    <div class="prepared-name">{{#if companyName}}{{companyName}}{{else}}Company Name{{/if}}</div>
+                    <div class="prepared-name">{{#if company_name}}{{company_name}}{{else}}Company Name{{/if}}</div>
                     <div class="prepared-details">
-                        {{#if companyAddress}}{{companyAddress}}{{/if}}
-                        {{#if companyEmail}}<br>{{companyEmail}}{{/if}}
-                        {{#if companyPhone}}<br>{{companyPhone}}{{/if}}
+                        {{#if company_address}}{{company_address}}{{/if}}
+                        {{#if company_email}}<br>{{company_email}}{{/if}}
+                        {{#if company_phone}}<br>{{company_phone}}{{/if}}
                     </div>
                 </div>
                 <div class="prepared-block">
                     <div class="prepared-label">Prepared For :</div>
-                    <div class="prepared-name">{{#if clientName}}{{clientName}}{{else}}Client Name{{/if}}</div>
+                    <div class="prepared-name">{{#if client_name}}{{client_name}}{{else}}Client Name{{/if}}</div>
                     <div class="prepared-details">
-                        {{#if clientCompany}}<br>{{clientCompany}}{{/if}}
+                        {{#if client_company}}{{client_company}}{{/if}}
                     </div>
                 </div>
             </div>
@@ -404,8 +404,8 @@
     <div class="page">
         <div class="page-header">
             <div class="page-brand">
-                {{#if companyName}}{{companyName}}{{else}}Company Name{{/if}}
-                <span>{{#if proposalDate}}{{proposalDate}}{{else}}Date{{/if}}</span>
+                {{#if company_name}}{{company_name}}{{else}}Company Name{{/if}}
+                <span>{{#if proposal_date}}{{proposal_date}}{{else}}{{document_date}}{{/if}}</span>
             </div>
             <div class="page-title">
                 Summary
@@ -414,19 +414,19 @@
         </div>
 
         <div class="content-highlight white-space-pre">
-            {{#if projectDescription}}{{projectDescription}}{{else}}Provide a comprehensive summary of the project goals, vision, and strategic approach.{{/if}}
+            {{#if project_description}}{{project_description}}{{else}}Provide a comprehensive summary of the project goals, vision, and strategic approach.{{/if}}
         </div>
 
         <h3 style="margin-top: 40px; margin-bottom: 20px; font-size: 24px;">Project Objectives</h3>
-        <div class="content-text white-space-pre">{{#if problemStatement}}{{problemStatement}}{{else}}Define specific goals and objectives.{{/if}}</div>
+        <div class="content-text white-space-pre">{{#if problem_statement}}{{problem_statement}}{{else}}Define specific goals and objectives.{{/if}}</div>
     </div>
 
     <!-- Methodology & Scope Page -->
     <div class="page">
         <div class="page-header">
             <div class="page-brand">
-                {{#if companyName}}{{companyName}}{{else}}Company Name{{/if}}
-                <span>{{#if proposalDate}}{{proposalDate}}{{else}}Date{{/if}}</span>
+                {{#if company_name}}{{company_name}}{{else}}Company Name{{/if}}
+                <span>{{#if proposal_date}}{{proposal_date}}{{else}}{{document_date}}{{/if}}</span>
             </div>
             <div class="page-title">
                 Methodology & Scope
@@ -437,17 +437,17 @@
         <div class="grid-2">
             <div class="card">
                 <div class="card-title">Proposed Solution / Methodology</div>
-                <div class="content-text white-space-pre">{{#if proposedSolution}}{{proposedSolution}}{{else}}Detailed methodology.{{/if}}</div>
+                <div class="content-text white-space-pre">{{#if proposed_solution}}{{proposed_solution}}{{else}}Detailed methodology.{{/if}}</div>
             </div>
             <div class="card" style="background: var(--brand-dark); color: white;">
                 <div class="card-title" style="color: white;">Scope (Inclusions)</div>
-                <div class="content-text white-space-pre" style="color: #e5e7eb;">{{#if targetAudience}}{{targetAudience}}{{else}}List project inclusions.{{/if}}</div>
+                <div class="content-text white-space-pre" style="color: #e5e7eb;">{{#if target_audience}}{{target_audience}}{{else}}List project inclusions.{{/if}}</div>
             </div>
         </div>
 
-        {{#if keyFeatures}}
+        {{#if key_features}}
         <h3 style="margin-top: 40px; margin-bottom: 20px; font-size: 20px;">Scope Limitations & Exclusions</h3>
-        <div class="content-text white-space-pre">{{keyFeatures}}</div>
+        <div class="content-text white-space-pre">{{key_features}}</div>
         {{/if}}
         
         {{#if deliverables}}
@@ -460,8 +460,8 @@
     <div class="page">
         <div class="page-header">
             <div class="page-brand">
-                {{#if companyName}}{{companyName}}{{else}}Company Name{{/if}}
-                <span>{{#if proposalDate}}{{proposalDate}}{{else}}Date{{/if}}</span>
+                {{#if company_name}}{{company_name}}{{else}}Company Name{{/if}}
+                <span>{{#if proposal_date}}{{proposal_date}}{{else}}{{document_date}}{{/if}}</span>
             </div>
             <div class="page-title">
                 Timeline & Budget
@@ -470,7 +470,7 @@
         </div>
 
         <h3 style="margin-bottom: 20px; font-size: 24px;">Project Timeline</h3>
-        <div class="content-text white-space-pre">{{#if projectTimeline}}{{projectTimeline}}{{else}}Detailed timeline.{{/if}}</div>
+        <div class="content-text white-space-pre">{{#if project_timeline}}{{project_timeline}}{{else}}Detailed timeline.{{/if}}</div>
 
         <h3 style="margin-top: 50px; margin-bottom: 20px; font-size: 24px;">Estimated Budget</h3>
         <table class="budget-table">
@@ -483,19 +483,19 @@
             <tbody>
                 <tr>
                     <td>Project Budget Estimate (Total)</td>
-                    <td>₹{{#if projectBudget}}{{projectBudget}}{{else}}0.00{{/if}}</td>
+                    <td>₹{{#if project_budget}}{{project_budget}}{{else}}0.00{{/if}}</td>
                 </tr>
             </tbody>
         </table>
 
-        {{#if teamMembers}}
+        {{#if team_members}}
         <h3 style="margin-top: 50px; margin-bottom: 20px; font-size: 24px;">Key Stakeholders & Team</h3>
-        <div class="content-text white-space-pre">{{teamMembers}}</div>
+        <div class="content-text white-space-pre">{{team_members}}</div>
         {{/if}}
 
-        {{#if specialNotes}}
+        {{#if special_notes}}
         <h3 style="margin-top: 40px; margin-bottom: 20px; font-size: 20px;">Risk Assessment & Notes</h3>
-        <div class="content-text white-space-pre">{{specialNotes}}</div>
+        <div class="content-text white-space-pre">{{special_notes}}</div>
         {{/if}}
 
         <div class="contact-footer">
@@ -503,10 +503,10 @@
                 Let's Work<br>Together
             </div>
             <div class="contact-info">
-                {{#if companyPhone}}<p class="phone">{{companyPhone}}</p>{{/if}}
+                {{#if company_phone}}<p class="phone">{{company_phone}}</p>{{/if}}
                 <p>Contact Us</p>
-                {{#if companyEmail}}<p>{{companyEmail}}</p>{{/if}}
-                {{#if companyWebsite}}<p>{{companyWebsite}}</p>{{/if}}
+                {{#if company_email}}<p>{{company_email}}</p>{{/if}}
+                {{#if company_website}}<p>{{company_website}}</p>{{/if}}
             </div>
         </div>
     </div>

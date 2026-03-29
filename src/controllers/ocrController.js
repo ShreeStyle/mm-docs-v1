@@ -41,7 +41,8 @@ exports.extractFromDocument = async (req, res) => {
         const prompts = {
             gst_certificate: `Extract the following fields from this GST registration certificate. Return ONLY valid JSON with keys: gstin, legalName, tradeName, registeredAddress (with line1, city, state, postalCode), gstRegistrationType, pan. If any field is not found, set it to "".`,
             pan_card: `Extract the following fields from this PAN card image. Return ONLY valid JSON with keys: pan, nameOnPan. If any field is not found, set it to "".`,
-            letterhead: `Extract the following company details from this letterhead or invoice image. Return ONLY valid JSON with keys: companyName, address (full text), phone, email, website, gstin, pan. If any field is not found, set it to "".`
+            letterhead: `Extract the following company details from this letterhead or invoice image. Return ONLY valid JSON with keys: companyName, address (full text), phone, email, website, gstin, pan. If any field is not found, set it to "".`,
+            general_document: `Extract data for the following fields from this document. Return ONLY valid JSON where keys match the field names provided. Field Names: ${req.body.fields || ""}. If any field is not found, set it to "".`
         };
 
         const prompt = prompts[docType];
@@ -107,12 +108,15 @@ exports.extractFromDocument = async (req, res) => {
             if (extracted.address) updateData["registeredAddress.line1"] = extracted.address;
         }
 
-        // Auto-save to org if org exists for this user
-        const org = await Organization.findOneAndUpdate(
-            { "members.userId": userId },
-            { $set: updateData },
-            { new: true }
-        );
+        // Auto-save to org if org exists for this user (only for org-related docs)
+        let org = null;
+        if (Object.keys(updateData).length > 0) {
+            org = await Organization.findOneAndUpdate(
+                { "members.userId": userId },
+                { $set: updateData },
+                { new: true }
+            );
+        }
 
         return res.json({
             message: "Extraction successful",

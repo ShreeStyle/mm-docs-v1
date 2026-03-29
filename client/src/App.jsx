@@ -17,6 +17,7 @@ import DocumentRecipients from './pages/DocumentRecipients';
 import DocumentEditor from './pages/DocumentEditor';
 import SignatureTest from './pages/SignatureTest';
 import GSTFilingSummaryPage from './pages/GSTFilingSummaryPage';
+import BulkCreate from './pages/BulkCreate';
 import './styles/Dashboard.css';
 
 function App() {
@@ -44,6 +45,7 @@ function App() {
           <Route path="/document/editor/:documentId" element={<DocumentEditor />} />
           <Route path="/settings/brand" element={<BrandSettings />} />
           <Route path="/gst-filing-summary" element={<GSTFilingSummaryPage />} />
+          <Route path="/bulk-create/:templateId" element={<BulkCreate />} />
         </Routes>
       </Router>
     </AuthProvider>

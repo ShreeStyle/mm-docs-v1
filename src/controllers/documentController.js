@@ -202,10 +202,9 @@ exports.generateDocument = async (req, res) => {
 
         const brandContext = {
             name: autofillMap.company_name || "MM Docs",
-            legalName: autofillMap.company_legal_name,
             address: autofillMap.company_address,
-            email: autofillMap.email,
-            phone: autofillMap.phone,
+            email: autofillMap.company_email,
+            phone: autofillMap.company_phone,
             website: autofillMap.company_website,
             gstin: autofillMap.gstin,
             banking: {

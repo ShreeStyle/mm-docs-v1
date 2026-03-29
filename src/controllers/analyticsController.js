@@ -6,6 +6,7 @@ const DocumentChat = require("../models/DocumentChat");
 const User = require("../models/User");
 const Template = require("../models/Template");
 const mongoose = require("mongoose");
+const activityService = require("../services/activityService");
 
 // Get simple dashboard stats (for main Dashboard page)
 exports.getDashboardStats = async (req, res) => {
@@ -360,5 +361,21 @@ exports.exportAnalytics = async (req, res) => {
     } catch (error) {
         console.error("Error exporting analytics:", error);
         res.status(500).json({ message: "Error exporting analytics", error: error.message });
+    }
+};
+
+// Get proactive recommendations for the user
+exports.getRecommendations = async (req, res) => {
+    try {
+        const userId = req.user.id;
+        const recommendations = await activityService.getProactiveRecommendations(userId);
+        
+        res.status(200).json({
+            success: true,
+            data: recommendations
+        });
+    } catch (error) {
+        console.error("Error fetching recommendations:", error);
+        res.status(500).json({ message: "Error fetching recommendations", error: error.message });
     }
 };

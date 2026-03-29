@@ -216,7 +216,7 @@
         <div class="content-layer">
             
             <div class="header-area">
-                <div class="company-name">{{companyName}}</div>
+                <div class="company-name">{{company_name}}</div>
                 <div class="doc-title-wrapper">
                     <div class="doc-title">JOB OFFER LETTER</div>
                 </div>
@@ -225,16 +225,16 @@
             <div class="info-block">
                 <div class="info-row">
                     <div class="info-label">Date:</div>
-                    <div class="info-value">{{date}}</div>
+                    <div class="info-value">{{document_date}}</div>
                 </div>
                 <div class="info-row">
                     <div class="info-label">To:</div>
-                    <div class="info-value">{{candidateName}}</div>
+                    <div class="info-value">{{candidate_name}}</div>
                 </div>
-                {{#if candidateAddress}}
+                {{#if candidate_address}}
                 <div class="info-row">
                     <div class="info-label">Address:</div>
-                    <div class="info-value">{{{candidateAddress}}}</div>
+                    <div class="info-value">{{{candidate_address}}}</div>
                 </div>
                 {{/if}}
                 <div class="info-row">
@@ -244,13 +244,13 @@
             </div>
 
             <div class="body-text">
-                <p>Dear <strong>{{candidateName}}</strong>,</p>
+                <p>Dear <strong>{{candidate_name}}</strong>,</p>
                 
-                <p>We are delighted to extend this offer of employment for the position of <strong>{{position}}</strong> with <strong>{{companyName}}</strong>. Having reviewed your background and discussed your career aspirations, we are confident that your expertise and vision will be a vital addition to our team.</p>
+                <p>We are delighted to extend this offer of employment for the position of <strong>{{position}}</strong> with <strong>{{company_name}}</strong>. Having reviewed your background and discussed your career aspirations, we are confident that your expertise and vision will be a vital addition to our team.</p>
 
-                <p>In this capacity, you will report directly to <strong>{{reportingTo}}</strong> and your primary place of work will be based in <strong>{{workLocation}}</strong>. We are excited about the prospect of you joining us and sincerely hope you will commence your professional journey with our company on <strong>{{startDate}}</strong>.</p>
+                <p>In this capacity, you will report directly to <strong>{{reporting_to}}</strong> and your primary place of work will be based in <strong>{{work_location}}</strong>. We are excited about the prospect of you joining us and sincerely hope you will commence your professional journey with our company on <strong>{{start_date}}</strong>.</p>
 
-                <p>As per the details elaborated during our discussions, your starting compensation package will consist of an annual CTC of <strong>{{#if salaryInWords}}₹{{salary}} ({{salaryInWords}}){{else}}₹{{salary}} per annum{{/if}}</strong>. In addition to this, you will be eligible for health insurance, paid leave, and comprehensive employee benefits in accordance with the standard policies of the company.</p>
+                <p>As per the details elaborated during our discussions, your starting compensation package will consist of an annual CTC of <strong>{{#if salary_in_words}}₹{{salary}} ({{salary_in_words}}){{else}}₹{{salary}} per annum{{/if}}</strong>. In addition to this, you will be eligible for health insurance, paid leave, and comprehensive employee benefits in accordance with the standard policies of the company.</p>
 
                 <p>We firmly believe that this represents a foundational step towards a mutually beneficial and highly rewarding association. We look forward to proudly welcoming you aboard and collaborating to achieve outstanding success.</p>
                 
@@ -259,39 +259,39 @@
 
             <div class="signature-area">
                 <div class="signature-block">
-                    <div class="sig-label">FOR &amp; ON BEHALF OF {{companyName}}</div>
+                    <div class="sig-label">FOR &amp; ON BEHALF OF {{company_name}}</div>
                     <div class="sig-line">
-                        <div class="sender-name">{{#if hrContactPerson}}{{hrContactPerson}}{{else}}HR Manager{{/if}}</div>
-                        <div class="sender-title">Authorised Signatory</div>
+                        <div class="sender-name">{{signatory_name}}</div>
+                        <div class="sender-title">{{signatory_designation}}</div>
                     </div>
                 </div>
                 
                 <div class="signature-block">
                     <div class="sig-label">ACCEPTANCE BY CANDIDATE</div>
                     <div class="sig-line">
-                        <div class="sender-name">{{candidateName}}</div>
+                        <div class="sender-name">{{candidate_name}}</div>
                         <div class="sender-title">Date: _________________</div>
                     </div>
                 </div>
             </div>
 
             <div class="contact-footer">
-                {{#if companyPhone}}
+                {{#if company_phone}}
                 <div class="contact-item">
                     <div class="contact-icon">✆</div>
-                    <div>{{companyPhone}}</div>
+                    <div>{{company_phone}}</div>
                 </div>
                 {{/if}}
-                {{#if companyWebsite}}
+                {{#if company_website}}
                 <div class="contact-item">
                     <div class="contact-icon">🌐</div>
-                    <div>{{companyWebsite}}</div>
+                    <div>{{company_website}}</div>
                 </div>
                 {{/if}}
-                {{#if companyAddress}}
+                {{#if company_address}}
                 <div class="contact-item">
                     <div class="contact-icon">✉</div>
-                    <div>{{{companyAddress}}}</div>
+                    <div>{{{company_address}}}</div>
                 </div>
                 {{/if}}
             </div>

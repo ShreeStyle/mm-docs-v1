@@ -1,4 +1,5 @@
 const BrandKit = require("../models/BrandKit");
+const Organization = require("../models/Organization");
 const { deleteLogoFile } = require("../middleware/uploadMiddleware");
 
 // Get or Create Brand Kit (Single endpoint for simplicity)
@@ -10,7 +11,7 @@ exports.getBrandKit = async (req, res) => {
             // Create default brand kit if none exists
             brandKit = await BrandKit.create({
                 userId: req.user.id,
-                brandName: req.user.name || "My Company",
+                brandName: (req.user && req.user.name) ? `${req.user.name}'s Company` : "My Company",
                 primaryColor: "#7C3AED",
                 secondaryColor: "#64748B",
                 accentColor: "#3B82F6",
@@ -24,6 +25,24 @@ exports.getBrandKit = async (req, res) => {
                     customText: ""
                 }
             });
+        }
+        
+        // If brand name is default, try to sync from Organization
+        const isDefault = !brandKit.brandName || 
+                         brandKit.brandName === "My Company" || 
+                         brandKit.brandName === (req.user?.name || "");
+        
+        if (isDefault) {
+            const org = await Organization.findOne({ "members.userId": req.user.id });
+            if (org && org.name) {
+                brandKit.brandName = org.name;
+                // Also sync logo if missing
+                if (!brandKit.logo && org.branding?.logo) {
+                    brandKit.logo = org.branding.logo;
+                }
+                await brandKit.save();
+                console.log(`🔄 Auto-synced brand name from Organization: ${org.name}`);
+            }
         }
         
         res.status(200).json(brandKit);

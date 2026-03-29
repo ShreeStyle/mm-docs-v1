@@ -38,6 +38,8 @@ export default function Dashboard() {
     const [error, setError] = useState(null);
     const [generatedDoc, setGeneratedDoc] = useState(null);
     const [searchQuery, setSearchQuery] = useState('');
+    const [recommendations, setRecommendations] = useState([]);
+    const [loadingRecs, setLoadingRecs] = useState(false);
 
     // Form states
     // Validation state
@@ -140,7 +142,21 @@ export default function Dashboard() {
                 }
             }
         };
+
+        const fetchRecommendations = async () => {
+            setLoadingRecs(true);
+            try {
+                const res = await api.get('/analytics/recommendations');
+                if (res.success) setRecommendations(res.data);
+            } catch (err) {
+                console.error("Error fetching recommendations:", err);
+            } finally {
+                setLoadingRecs(false);
+            }
+        };
+
         fetchData();
+        fetchRecommendations();
     }, [token]);
 
     // Set initial view based on URL path
@@ -786,106 +802,175 @@ export default function Dashboard() {
                     </div>
                 </div>
 
-                {/* Quick Actions */}
-                <div style={{
-                    backgroundColor: 'white',
-                    borderRadius: '16px',
-                    border: '1px solid #E5E7EB',
-                    boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)',
-                    height: 'fit-content'
-                }}>
-                    <div style={{ padding: '24px', borderBottom: '1px solid #E5E7EB' }}>
-                        <h3 style={{
-                            fontSize: '18px',
-                            fontWeight: '600',
-                            color: '#111827',
-                            margin: 0
-                        }}>Quick Actions</h3>
-                        <p style={{
-                            fontSize: '14px',
-                            color: '#6B7280',
-                            margin: '4px 0 0 0'
-                        }}>Popular document templates</p>
+                {/* Sidebar Column: Recommendations & Quick Actions */}
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
+                    {/* Agentic Behavior: Smart Recommendations */}
+                    <div style={{
+                        backgroundColor: 'white',
+                        borderRadius: '16px',
+                        border: '1px solid #E5E7EB',
+                        boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)',
+                        overflow: 'hidden',
+                        display: 'flex',
+                        flexDirection: 'column'
+                    }}>
+                        <div style={{ padding: '24px', borderBottom: '1px solid #E5E7EB', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                            <div>
+                                <h3 style={{ fontSize: '18px', fontWeight: '600', color: '#111827', margin: 0 }}>Smart Recommendations</h3>
+                                <p style={{ fontSize: '13px', color: '#6B7280', margin: '4px 0 0 0' }}>AI-powered next steps for your business</p>
+                            </div>
+                            <Bot size={20} color="#F97316" />
+                        </div>
+                        <div style={{ padding: '16px', display: 'grid', gap: '12px' }}>
+                            {recommendations.length > 0 ? (
+                                recommendations.map((rec, i) => (
+                                    <div key={i} style={{ 
+                                        padding: '16px', 
+                                        backgroundColor: rec.priority === 'high' ? '#FFF7ED' : '#F9FAFB', 
+                                        borderRadius: '12px', 
+                                        border: `1px solid ${rec.priority === 'high' ? '#FFEDD5' : '#E5E7EB'}`,
+                                        cursor: 'pointer',
+                                        transition: 'transform 0.2s ease'
+                                    }}
+                                    onClick={() => navigate(rec.action)}
+                                    onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-2px)'}
+                                    onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}
+                                    >
+                                        <div style={{ display: 'flex', gap: '12px' }}>
+                                            <div style={{ 
+                                                width: '32px', 
+                                                height: '32px', 
+                                                borderRadius: '8px', 
+                                                backgroundColor: rec.priority === 'high' ? '#F97316' : '#6B7280', 
+                                                display: 'flex', 
+                                                alignItems: 'center', 
+                                                justifyContent: 'center',
+                                                color: 'white'
+                                            }}>
+                                                <Zap size={16} />
+                                            </div>
+                                            <div style={{ flex: 1 }}>
+                                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                                    <span style={{ fontSize: '14px', fontWeight: '700', color: '#111827' }}>{rec.title}</span>
+                                                    {rec.priority === 'high' && (
+                                                        <span style={{ fontSize: '10px', backgroundColor: '#F97316', color: 'white', padding: '2px 6px', borderRadius: '10px', fontWeight: 'bold' }}>PRIORITY</span>
+                                                    )}
+                                                </div>
+                                                <p style={{ fontSize: '12px', color: '#4B5563', margin: '4px 0 0 0' }}>{rec.message}</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                ))
+                            ) : (
+                                <div style={{ textAlign: 'center', padding: '24px', color: '#9CA3AF' }}>
+                                    <Clock size={32} style={{ margin: '0 auto 12px auto', opacity: 0.5 }} />
+                                    <p style={{ fontSize: '13px' }}>Collecting insights...</p>
+                                </div>
+                            )}
+                        </div>
                     </div>
 
-                    <div style={{ padding: '24px' }}>
-                        <button
-                            onClick={() => setCurrentView('create')}
-                            style={{
-                                width: '100%',
-                                padding: '16px',
-                                backgroundColor: '#F97316',
-                                color: 'white',
-                                border: 'none',
-                                borderRadius: '12px',
-                                fontSize: '16px',
+                    {/* Quick Actions */}
+                    <div style={{
+                        backgroundColor: 'white',
+                        borderRadius: '16px',
+                        border: '1px solid #E5E7EB',
+                        boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)',
+                        height: 'fit-content'
+                    }}>
+                        <div style={{ padding: '24px', borderBottom: '1px solid #E5E7EB' }}>
+                            <h3 style={{
+                                fontSize: '18px',
                                 fontWeight: '600',
-                                cursor: 'pointer',
-                                marginBottom: '16px',
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                gap: '8px',
-                                transition: 'all 0.2s ease'
-                            }}
-                            onMouseEnter={(e) => {
-                                e.target.style.backgroundColor = '#EA580C';
-                                e.target.style.transform = 'translateY(-1px)';
-                            }}
-                            onMouseLeave={(e) => {
-                                e.target.style.backgroundColor = '#F97316';
-                                e.target.style.transform = 'translateY(0)';
-                            }}
-                        >
-                            <Plus size={20} />
-                            New Document
-                        </button>
+                                color: '#111827',
+                                margin: 0
+                            }}>Quick Actions</h3>
+                            <p style={{
+                                fontSize: '14px',
+                                color: '#6B7280',
+                                margin: '4px 0 0 0'
+                            }}>Popular document templates</p>
+                        </div>
 
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                            {[
-                                { label: 'Create Offer Letter', category: 'hr', type: 'offer_letter' },
-                                { label: 'Generate Invoice', category: 'finance', type: 'invoice' },
-                                { label: 'GST Filing Summary', category: 'finance', type: 'gst_filing_summary', customPath: '/gst-filing-summary' },
-                                { label: 'Create NDA', category: 'legal', type: 'nda' },
-                                { label: 'Business Proposal', category: 'sales', type: 'proposal' }
-                            ].map((action, index) => (
-                                <button
-                                    key={index}
-                                    onClick={() => {
-                                        if (action.customPath) {
-                                            navigate(action.customPath);
-                                            return;
-                                        }
-                                        setCurrentView('create');
-                                        setSelectedDocType(action.type);
-                                    }}
-                                    style={{
-                                        width: '100%',
-                                        padding: '12px 16px',
-                                        backgroundColor: 'transparent',
-                                        color: '#6B7280',
-                                        border: '1px solid #E5E7EB',
-                                        borderRadius: '8px',
-                                        fontSize: '14px',
-                                        fontWeight: '500',
-                                        cursor: 'pointer',
-                                        textAlign: 'left',
-                                        transition: 'all 0.2s ease'
-                                    }}
-                                    onMouseEnter={(e) => {
-                                        e.target.style.borderColor = '#F97316';
-                                        e.target.style.color = '#F97316';
-                                        e.target.style.backgroundColor = '#FEF3E2';
-                                    }}
-                                    onMouseLeave={(e) => {
-                                        e.target.style.borderColor = '#E5E7EB';
-                                        e.target.style.color = '#6B7280';
-                                        e.target.style.backgroundColor = 'transparent';
-                                    }}
-                                >
-                                    {action.label}
-                                </button>
-                            ))}
+                        <div style={{ padding: '24px' }}>
+                            <button
+                                onClick={() => setCurrentView('create')}
+                                style={{
+                                    width: '100%',
+                                    padding: '16px',
+                                    backgroundColor: '#F97316',
+                                    color: 'white',
+                                    border: 'none',
+                                    borderRadius: '12px',
+                                    fontSize: '16px',
+                                    fontWeight: '600',
+                                    cursor: 'pointer',
+                                    marginBottom: '16px',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    gap: '8px',
+                                    transition: 'all 0.2s ease'
+                                }}
+                                onMouseEnter={(e) => {
+                                    e.target.style.backgroundColor = '#EA580C';
+                                    e.target.style.transform = 'translateY(-1px)';
+                                }}
+                                onMouseLeave={(e) => {
+                                    e.target.style.backgroundColor = '#F97316';
+                                    e.target.style.transform = 'translateY(0)';
+                                }}
+                            >
+                                <Plus size={20} />
+                                New Document
+                            </button>
+
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                                {[
+                                    { label: 'Create Offer Letter', category: 'hr', type: 'offer_letter' },
+                                    { label: 'Generate Invoice', category: 'finance', type: 'invoice' },
+                                    { label: 'GST Filing Summary', category: 'finance', type: 'gst_filing_summary', customPath: '/gst-filing-summary' },
+                                    { label: 'Create NDA', category: 'legal', type: 'nda' },
+                                    { label: 'Business Proposal', category: 'sales', type: 'proposal' }
+                                ].map((action, index) => (
+                                    <button
+                                        key={index}
+                                        onClick={() => {
+                                            if (action.customPath) {
+                                                navigate(action.customPath);
+                                                return;
+                                            }
+                                            setCurrentView('create');
+                                            setSelectedDocType(action.type);
+                                        }}
+                                        style={{
+                                            width: '100%',
+                                            padding: '12px 16px',
+                                            backgroundColor: 'transparent',
+                                            color: '#6B7280',
+                                            border: '1px solid #E5E7EB',
+                                            borderRadius: '8px',
+                                            fontSize: '14px',
+                                            fontWeight: '500',
+                                            cursor: 'pointer',
+                                            textAlign: 'left',
+                                            transition: 'all 0.2s ease'
+                                        }}
+                                        onMouseEnter={(e) => {
+                                            e.target.style.borderColor = '#F97316';
+                                            e.target.style.color = '#F97316';
+                                            e.target.style.backgroundColor = '#FEF3E2';
+                                        }}
+                                        onMouseLeave={(e) => {
+                                            e.target.style.borderColor = '#E5E7EB';
+                                            e.target.style.color = '#6B7280';
+                                            e.target.style.backgroundColor = 'transparent';
+                                        }}
+                                    >
+                                        {action.label}
+                                    </button>
+                                ))}
+                            </div>
                         </div>
                     </div>
                 </div>

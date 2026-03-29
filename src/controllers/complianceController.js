@@ -1,4 +1,7 @@
 const Document = require("../models/Document");
+const { OpenAI } = require("openai");
+
+const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
 /**
  * Run compliance check on documents
@@ -120,28 +123,33 @@ exports.checkDocumentCompliance = async (req, res) => {
             });
         }
         
-        // Basic document-level checks
-        const checks = {
-            formatting: {
-                status: "passed",
-                message: "Document formatting is correct"
-            },
-            requiredFields: {
-                status: "passed",
-                message: "All required fields are present"
-            },
-            legalCompliance: {
-                status: "passed",
-                message: "Document meets legal requirements"
-            }
-        };
+        // AI Powered Compliance Check
+        const response = await openai.chat.completions.create({
+            model: "gpt-4o",
+            messages: [{
+                role: "system",
+                content: "You are a legal and compliance expert. Analyze the provided document JSON and identify any missing mandatory fields, legal risks, or formatting issues. Return ONLY valid JSON with keys: score (0-100), status ('compliant', 'warning', 'critical'), and issues (array of objects with { label, description, severity })."
+            }, {
+                role: "user",
+                content: JSON.stringify(document.content)
+            }],
+            max_tokens: 500
+        });
+
+        let analysis = { score: 100, status: 'compliant', issues: [] };
+        try {
+            const raw = response.choices[0].message.content;
+            const jsonMatch = raw.match(/\{[\s\S]*\}/);
+            if (jsonMatch) analysis = JSON.parse(jsonMatch[0]);
+        } catch (err) {
+            console.error("AI Compliance Parse Error:", err);
+        }
         
         res.json({
             success: true,
             data: {
                 documentId,
-                checks,
-                overallStatus: "compliant"
+                ...analysis
             }
         });
     } catch (error) {
@@ -151,6 +159,43 @@ exports.checkDocumentCompliance = async (req, res) => {
             message: "Error checking document compliance", 
             error: error.message 
         });
+    }
+};
+
+/**
+ * POST /api/compliance/check-draft
+ * Body: { content: { ... } }
+ */
+exports.checkDraftCompliance = async (req, res) => {
+    try {
+        const { content } = req.body;
+        if (!content) return res.status(400).json({ success: false, message: "Content is required" });
+
+        const response = await openai.chat.completions.create({
+            model: "gpt-4o",
+            messages: [{
+                role: "system",
+                content: "You are a legal and compliance expert. Analyze the provided document JSON and identify any missing mandatory fields, legal risks, or formatting issues. Return ONLY valid JSON with keys: score (0-100), status ('compliant', 'warning', 'critical'), and issues (array of objects with { label, description, severity })."
+            }, {
+                role: "user",
+                content: JSON.stringify(content)
+            }],
+            max_tokens: 500
+        });
+
+        let analysis = { score: 100, status: 'compliant', issues: [] };
+        try {
+            const raw = response.choices[0].message.content;
+            const jsonMatch = raw.match(/\{[\s\S]*\}/);
+            if (jsonMatch) analysis = JSON.parse(jsonMatch[0]);
+        } catch (err) {
+            console.error("AI Compliance Parse Error:", err);
+        }
+
+        res.json({ success: true, data: analysis });
+    } catch (error) {
+        console.error("Error checking draft compliance:", error);
+        res.status(500).json({ success: false, error: error.message });
     }
 };
 

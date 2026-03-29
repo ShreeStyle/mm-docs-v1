@@ -51,6 +51,8 @@ const complianceRoutes = require("./routes/complianceRoutes");
 const emailRoutes = require("./routes/emailRoutes");
 const ocrRoutes = require("./routes/ocrRoutes");
 const organizationRoutes = require("./routes/organizationRoutes");
+const autofillRoutes = require("./routes/autofillRoutes");
+const bulkRoutes = require("./routes/bulkRoutes");
 
 app.use("/api/users", userRoutes);
 app.use("/api/auth", authRoutes);
@@ -76,6 +78,8 @@ app.use("/api/compliance", complianceRoutes);
 app.use("/api/email", emailRoutes);
 app.use("/api/ocr", ocrRoutes);
 app.use("/api/organization", organizationRoutes);
+app.use("/api/autofill", autofillRoutes);
+app.use("/api/bulk", bulkRoutes);
 
 // Health Check API with database status
 app.get("/api/health", async (req, res) => {

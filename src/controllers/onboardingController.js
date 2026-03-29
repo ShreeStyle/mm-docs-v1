@@ -75,6 +75,8 @@ exports.saveOnboardingStep = async (req, res) => {
     try {
         const userId = req.user.id;
         const { step, data } = req.body;
+        console.log(`📥 Onboarding Step ${step} Request for User: ${userId}`);
+        console.log("📦 Data:", JSON.stringify(data, null, 2));
 
         if (!step || !data) {
             return res.status(400).json({ message: "step and data are required" });
@@ -121,7 +123,24 @@ exports.saveOnboardingStep = async (req, res) => {
             user.onboardingStep = 1;
             await user.save();
 
-            return res.json({ message: "Step 1 saved", step: 1, org });
+            // Sync to BrandKit so it's not "My Company" in settings
+            let brandKit = await BrandKit.findOne({ userId });
+            if (!brandKit) {
+                await BrandKit.create({
+                    userId,
+                    brandName: data.companyName,
+                    primaryColor: "#7C3AED",
+                    secondaryColor: "#64748B",
+                    accentColor: "#3B82F6",
+                    fontFamily: "Inter"
+                });
+            } else if (!brandKit.brandName || brandKit.brandName === "My Company" || brandKit.brandName === user.name) {
+                brandKit.brandName = data.companyName;
+                await brandKit.save();
+            }
+
+            console.log(`✅ Step 1 complete for user ${userId}`);
+            return res.status(200).json({ success: true, message: "Step 1 saved", organization: org });
         }
 
         // ── Step 2: Brand Kit ──────────────────────────────────────
@@ -157,11 +176,32 @@ exports.saveOnboardingStep = async (req, res) => {
                 await brandKit.save();
             }
 
-            // Also update org contact info
+            // Also update org settings and branding
             const org = await Organization.findOne({ "members.userId": userId });
             if (org) {
+                org.name = brandData.brandName || org.name;
                 org.contact.phone = data.phone || org.contact.phone;
                 org.contact.website = data.website || org.contact.website;
+                
+                // Sync banking details
+                if (brandData.banking) {
+                    org.banking = {
+                        ...org.banking.toObject(),
+                        bankName: brandData.banking.bankName || org.banking.bankName,
+                        accountName: brandData.banking.accountName || org.banking.accountName,
+                        accountNumber: brandData.banking.accountNumber || org.banking.accountNumber,
+                        ifscCode: brandData.banking.ifscCode || org.banking.ifscCode,
+                        upiId: brandData.banking.upiId || org.banking.upiId
+                    };
+                }
+
+                // Sync branding
+                org.branding = {
+                    ...org.branding,
+                    logo: brandData.logo || org.branding?.logo,
+                    primaryColor: brandData.primaryColor || org.branding?.primaryColor
+                };
+
                 await org.save();
             }
 

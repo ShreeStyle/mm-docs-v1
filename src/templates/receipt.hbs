@@ -154,14 +154,14 @@
     <div class="container">
         <div class="header">
             <div class="header-left">
-                <h1>{{companyName}}</h1>
-                <p>{{companyAddress}}</p>
+                <h1>{{company_name}}</h1>
+                <p>{{company_address}}</p>
             </div>
             <div class="header-right">
                 <div class="receipt-label">Receipt Number</div>
-                <div class="receipt-number">{{receiptNumber}}</div>
+                <div class="receipt-number">{{receipt_number}}</div>
                 <div class="receipt-label" style="margin-top: 15px;">Date</div>
-                <div class="receipt-number" style="font-size: 16px;">{{receiptDate}}</div>
+                <div class="receipt-number" style="font-size: 16px;">{{receipt_date}}</div>
             </div>
         </div>
 
@@ -169,8 +169,8 @@
             <div class="meta-grid">
                 <div class="meta-section">
                     <h3>Sent To</h3>
-                    <p>{{customerName}}</p>
-                    <p style="font-weight: 400; color: #666; font-size: 14px;">{{customerAddress}}</p>
+                    <p>{{client_name}}</p>
+                    <p style="font-weight: 400; color: #666; font-size: 14px;">{{client_address}}</p>
                 </div>
                 <div class="meta-section">
                     <!-- Placeholder or additional info if needed -->
@@ -191,8 +191,8 @@
                     <tr>
                         <td>{{qty}}</td>
                         <td>{{description}}</td>
-                        <td class="text-right">₹{{unitPrice}}</td>
-                        <td class="text-right">₹{{total}}</td>
+                        <td class="text-right">{{currency_symbol}}{{unit_price}}</td>
+                        <td class="text-right">{{currency_symbol}}{{total}}</td>
                     </tr>
                     {{/each}}
                 </tbody>
@@ -214,12 +214,16 @@
             </div>
 
             <div class="extra-info">
-                {{#if bankInfo}}
                 <div class="extra-info-box">
                     <h4>Bank Information</h4>
-                    <p>{{bankInfo}}</p>
+                    <p>
+                        <strong>Bank:</strong> {{bank_name}}<br>
+                        <strong>A/C Name:</strong> {{bank_account_name}}<br>
+                        <strong>A/C No:</strong> {{bank_account_number}}<br>
+                        <strong>IFSC:</strong> {{bank_ifsc}}<br>
+                        {{#if bank_upi}}<strong>UPI:</strong> {{bank_upi}}{{/if}}
+                    </p>
                 </div>
-                {{/if}}
                 {{#if terms}}
                 <div class="extra-info-box">
                     <h4>Terms & Conditions</h4>
