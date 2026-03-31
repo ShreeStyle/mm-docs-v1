@@ -42,6 +42,39 @@ handlebars.registerHelper("calc", function(v1, v2) {
     return (parseFloat(v1 || 0) - parseFloat(v2 || 0)).toFixed(2);
 });
 
+// Helper to normalize template data keys (camelCase -> snake_case)
+// This ensures AI-generated content (camelCase) matches professional templates (snake_case)
+const normalizeTemplateData = (data) => {
+  if (!data || typeof data !== 'object') return data;
+  
+  const normalized = Array.isArray(data) ? [] : {};
+  
+  if (Array.isArray(data)) {
+    return data.map(v => (typeof v === 'object' ? normalizeTemplateData(v) : v));
+  }
+
+  Object.keys(data).forEach(key => {
+    // Generate snake_case version of the key
+    const snakeKey = key.replace(/([A-Z])/g, "_$1").toLowerCase();
+    const value = data[key];
+    
+    // Recurse for nested objects
+    const finalValue = (value && typeof value === 'object') ? normalizeTemplateData(value) : value;
+    
+    // Add both original and normalized key for maximum safety
+    normalized[key] = finalValue;
+    normalized[snakeKey] = finalValue;
+    
+    // Alias common fields for specific templates
+    if (snakeKey === 'candidate_name' && !normalized['employee_name']) normalized['employee_name'] = finalValue;
+    if (snakeKey === 'employee_name' && !normalized['candidate_name']) normalized['candidate_name'] = finalValue;
+    if (snakeKey === 'start_date' && !normalized['appointment_date']) normalized['appointment_date'] = finalValue;
+    if (snakeKey === 'appointment_date' && !normalized['start_date']) normalized['start_date'] = finalValue;
+  });
+
+  return normalized;
+};
+
 // Load template function
 const loadTemplate = (templateName) => {
   const templatePath = path.join(__dirname, "../../templates", `${templateName}.hbs`);
@@ -399,6 +432,11 @@ exports.renderDocument = async (document, brandKit) => {
     const { buildAutofillMap } = require("../autofill/autofillService");
     const autofillMap = await buildAutofillMap(docObj.userId, docObj.type);
     
+    // Generate branding assets
+    const brandCSS = generateBrandCSS(brandKit);
+    const brandHeader = generateBrandHeader(brandKit);
+    const footerHTML = generateFooterHTML(brandKit);
+    
     const data = {
       _id: docObj._id,
       title: docObj.title,
@@ -414,8 +452,13 @@ exports.renderDocument = async (document, brandKit) => {
       secondaryColor: brandKit?.secondaryColor || '#64748b',
       accentColor: brandKit?.accentColor || '#3b82f6',
       fontFamily: brandKit?.fontFamily || 'Inter',
-      generatedDate: new Date().toLocaleDateString()
+      generatedDate: new Date().toLocaleDateString(),
+      document_date: new Date().toLocaleDateString('en-IN', { day: '2-digit', month: '2-digit', year: 'numeric' })
     };
+
+    // Normalize and merge contentData to match snake_case Handlebars placeholders
+    const normalizedContent = normalizeTemplateData(contentData);
+    Object.assign(data, normalizedContent);
 
     // Parse finance document items from text format (textarea inputs from Dashboard)
     
@@ -569,6 +612,6 @@ exports.renderDocument = async (document, brandKit) => {
 
   } catch (error) {
     console.error("Rendering Error:", error);
-    throw new Error("Failed to render document");
+    throw new Error(`Failed to render document: ${error.message}`);
   }
 };

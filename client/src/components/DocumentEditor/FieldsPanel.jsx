@@ -11,7 +11,7 @@ import {
     Stamp
 } from 'lucide-react';
 
-const FieldsPanel = ({ onFieldDragStart, onFieldClick }) => {
+const FieldsPanel = ({ onAddBlock }) => {
     const fieldTypes = [
         {
             type: 'signature',
@@ -28,69 +28,36 @@ const FieldsPanel = ({ onFieldDragStart, onFieldClick }) => {
         {
             type: 'text',
             icon: Type,
-            label: 'Text Field',
-            description: 'Single or multi-line text'
+            label: 'Text block',
+            description: 'Add a new text block'
         },
         {
-            type: 'date',
-            icon: Calendar,
-            label: 'Date',
-            description: 'Date picker field'
-        },
-        {
-            type: 'file-upload',
+            type: 'image',
             icon: Upload,
-            label: 'File Upload',
-            description: 'Attachment field'
+            label: 'Image',
+            description: 'Upload an image'
         },
         {
-            type: 'radio',
-            icon: Circle,
-            label: 'Radio Buttons',
-            description: 'Single choice'
-        },
-        {
-            type: 'checkbox',
-            icon: CheckSquare,
-            label: 'Checkbox',
-            description: 'Multiple choice'
-        },
-        {
-            type: 'dropdown',
-            icon: ChevronDown,
-            label: 'Dropdown',
-            description: 'Select menu'
-        },
-        {
-            type: 'card-details',
-            icon: CreditCard,
-            label: 'Card Details',
-            description: 'Payment information'
-        },
-        {
-            type: 'stamp',
-            icon: Stamp,
-            label: 'Stamp',
-            description: 'Approval/rejection'
+            type: 'textfield',
+            icon: Type,
+            label: 'Text Field',
+            description: 'Fillable text area'
         }
     ];
 
     const handleDragStart = (e, field) => {
-        e.dataTransfer.setData('field', JSON.stringify(field));
-        onFieldDragStart?.(field);
-    };
-
-    const handleFieldClick = (field) => {
-        onFieldClick?.(field);
+        e.dataTransfer.setData('text/plain', field.type);
+        e.dataTransfer.effectAllowed = 'copy';
     };
 
     return (
         <div className="fields-panel">
             <div className="panel-header">
-                <h3>Add Fillable Fields</h3>
+                <h3>Add Elements</h3>
+                <p style={{ fontSize: '12px', color: '#64748b', marginTop: '4px' }}>Click or drag to add to document</p>
             </div>
 
-            <div className="fields-list">
+            <div className="fields-list" style={{ padding: '16px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
                 {fieldTypes.map((field) => {
                     const Icon = field.icon;
                     return (
@@ -99,32 +66,46 @@ const FieldsPanel = ({ onFieldDragStart, onFieldClick }) => {
                             className="field-item"
                             draggable
                             onDragStart={(e) => handleDragStart(e, field)}
-                            onClick={() => handleFieldClick(field)}
-                            style={{ cursor: 'pointer' }}
+                            onClick={() => onAddBlock(field.type)}
+                            style={{ 
+                                cursor: 'pointer',
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '12px',
+                                padding: '12px',
+                                borderRadius: '10px',
+                                border: '1px solid #e2e8f0',
+                                background: 'white',
+                                transition: 'all 0.2s'
+                            }}
+                            onMouseEnter={e => {
+                                e.currentTarget.style.borderColor = '#6366f1';
+                                e.currentTarget.style.backgroundColor = '#f5f7ff';
+                            }}
+                            onMouseLeave={e => {
+                                e.currentTarget.style.borderColor = '#e2e8f0';
+                                e.currentTarget.style.backgroundColor = 'white';
+                            }}
                         >
-                            <div className="field-icon">
-                                <Icon size={20} />
+                            <div className="field-icon" style={{
+                                width: '36px',
+                                height: '36px',
+                                borderRadius: '8px',
+                                background: '#f1f5f9',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                color: '#6366f1'
+                            }}>
+                                <Icon size={18} />
                             </div>
                             <div className="field-info">
-                                <h4>{field.label}</h4>
-                                <p>{field.description}</p>
+                                <h4 style={{ fontSize: '13px', fontWeight: 600, color: '#1e293b', margin: 0 }}>{field.label}</h4>
+                                <p style={{ fontSize: '11px', color: '#64748b', margin: '2px 0 0' }}>{field.description}</p>
                             </div>
                         </div>
                     );
                 })}
-            </div>
-
-            <div className="panel-header" style={{ marginTop: '1rem' }}>
-                <h3>More Actions</h3>
-            </div>
-
-            <div className="fields-list">
-                <button className="action-item">
-                    <span>Manage Recipients</span>
-                </button>
-                <button className="action-item">
-                    <span>Review Steps</span>
-                </button>
             </div>
         </div>
     );

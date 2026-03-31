@@ -5,7 +5,13 @@ const authMiddleware = (req, res, next) => {
     const authHeader = req.header("Authorization");
     console.log("🔍 Received Auth Header:", authHeader);
 
-    const token = authHeader?.replace("Bearer ", "");
+    let token = authHeader?.replace("Bearer ", "");
+    
+    // Fallback to query parameter token for iframes and downloads
+    if (!token && req.query && req.query.token) {
+        token = req.query.token;
+    }
+
     console.log("🔑 Extracted Token:", token ? `${token.substring(0, 20)}...` : 'None');
 
     if (!token) {

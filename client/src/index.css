@@ -32,7 +32,7 @@
 
 body {
   font-family: var(--font-primary);
-  background-color: var(--color-white);
+  background-color: #FAFAFF;
   color: var(--color-slate-900);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;

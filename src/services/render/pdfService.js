@@ -40,7 +40,12 @@ exports.generatePDF = async (html, user = null) => {
         }
 
         const page = await browser.newPage();
-        await page.setContent(html, { waitUntil: 'networkidle0' });
+        
+        // Use networkidle2 instead of networkidle0 to prevent timeouts from continuous external resource loading
+        await page.setContent(html, { 
+            waitUntil: 'networkidle2', 
+            timeout: 15000 
+        });
 
         const pdf = await page.pdf({
             format: 'A4',

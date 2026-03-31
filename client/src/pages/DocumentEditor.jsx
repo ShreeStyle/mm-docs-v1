@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Eye, Send, Loader2, Save, X, Pencil, Type, Upload, Trash2, Check, ChevronLeft, ChevronRight, GripVertical } from 'lucide-react';
+import { Eye, Send, Loader2, Save, X, Pencil, Type, Undo, Redo, Upload, Trash2, Check, ChevronLeft, ChevronRight, ChevronDown, GripVertical } from 'lucide-react';
 import { api } from '../utils/api';
+import { getApiUrl } from '../config/api';
 import Canvas from '../components/DocumentEditor/Canvas';
 import FieldsPanel from '../components/DocumentEditor/FieldsPanel';
 import PropertiesSidebar from '../components/DocumentEditor/PropertiesSidebar';
@@ -10,7 +11,8 @@ import '../styles/DocumentEditor.css';
 const DocumentEditor = () => {
     const { documentId } = useParams();
     const navigate = useNavigate();
-    const [document, setDocument] = useState(null);
+    const [docData, setDocData] = useState(null);
+    const saveTimeoutRef = useRef(null);
     const [fields, setFields] = useState([]);
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
@@ -18,6 +20,8 @@ const DocumentEditor = () => {
     const [selectedField, setSelectedField] = useState(null);
     const [activeTool, setActiveTool] = useState('pencil');
     const [activeColor, setActiveColor] = useState('#000000');
+    const [history, setHistory] = useState([]);
+    const [historyIndex, setHistoryIndex] = useState(-1);
 
     // Signature Modal State
     const [showSignatureModal, setShowSignatureModal] = useState(false);
@@ -48,6 +52,18 @@ const DocumentEditor = () => {
     // Upload Tab State
     const [uploadedImage, setUploadedImage] = useState(null);
 
+    // Recipient Modal State
+    const [showRecipientModal, setShowRecipientModal] = useState(false);
+    const [recipientForm, setRecipientForm] = useState({
+        documentName: '',
+        recipientName: '',
+        recipientEmail: '',
+        senderName: '',
+        senderEmail: ''
+    });
+    const [sending, setSending] = useState(false);
+    const [sendSuccess, setSendSuccess] = useState(false);
+
     // Draw Tab State
     const signatureCanvasRef = useRef(null);
     const [isDrawing, setIsDrawing] = useState(false);
@@ -55,6 +71,71 @@ const DocumentEditor = () => {
     useEffect(() => {
         fetchDocument();
     }, [documentId]);
+
+    // Handle History Initialization
+    useEffect(() => {
+        if (docData && history.length === 0) {
+            const initialSnapshot = { docData: JSON.parse(JSON.stringify(docData)), fields: JSON.parse(JSON.stringify(fields)) };
+            setHistory([initialSnapshot]);
+            setHistoryIndex(0);
+        }
+    }, [docData, fields]);
+
+    const pushToHistory = (newDocData, newFields) => {
+        const snapshot = {
+            docData: JSON.parse(JSON.stringify(newDocData)),
+            fields: JSON.parse(JSON.stringify(newFields))
+        };
+        
+        setHistory(prev => {
+            const newHistory = prev.slice(0, historyIndex + 1);
+            // Limit history to 50 steps
+            if (newHistory.length >= 50) newHistory.shift();
+            newHistory.push(snapshot);
+            return newHistory;
+        });
+        setHistoryIndex(prev => Math.min(prev + 1, 49));
+    };
+
+    const handleUndo = useCallback(() => {
+        if (historyIndex > 0) {
+            const prevIndex = historyIndex - 1;
+            const prevState = history[prevIndex];
+            setDocData(prevState.docData);
+            setFields(prevState.fields);
+            setHistoryIndex(prevIndex);
+            autoSave(prevState.docData);
+        }
+    }, [history, historyIndex]);
+
+    const handleRedo = useCallback(() => {
+        if (historyIndex < history.length - 1) {
+            const nextIndex = historyIndex + 1;
+            const nextState = history[nextIndex];
+            setDocData(nextState.docData);
+            setFields(nextState.fields);
+            setHistoryIndex(nextIndex);
+            autoSave(nextState.docData);
+        }
+    }, [history, historyIndex]);
+
+    // Keyboard Shortcuts
+    useEffect(() => {
+        const handleKeyDown = (e) => {
+            if ((e.metaKey || e.ctrlKey) && e.key === 'z') {
+                if (e.shiftKey) {
+                    handleRedo();
+                } else {
+                    handleUndo();
+                }
+            } else if ((e.metaKey || e.ctrlKey) && e.key === 'y') {
+                handleRedo();
+            }
+        };
+
+        window.addEventListener('keydown', handleKeyDown);
+        return () => window.removeEventListener('keydown', handleKeyDown);
+    }, [handleUndo, handleRedo]);
 
     // Initialize signature canvas when modal opens
     const canvasInitialized = useRef(false);
@@ -71,42 +152,92 @@ const DocumentEditor = () => {
         }
     }, [showSignatureModal, signatureTab]);
 
+    // Helper to convert legacy HTML Preview into editable blocks for Canva-like editing
+    const convertHtmlToBlocks = async (url) => {
+        try {
+            console.log('🔄 Deep-scanning HTML for blocks from:', url);
+            const token = localStorage.getItem('token');
+            const response = await fetch(getApiUrl(url), {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            const html = await response.text();
+            
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(html, 'text/html');
+            const body = doc.body;
+            
+            let yOffset = 40; 
+            const margin = 60;
+            const pageWidth = 816;
+            const contentWidth = pageWidth - (margin * 2);
+            const blocks = [];
+
+            // 1. Extract and inject CSS from the original template
+            const styles = doc.querySelectorAll('style');
+            styles.forEach((styleTag, sIdx) => {
+                const id = `doc-injected-style-${sIdx}`;
+                if (!document.getElementById(id)) {
+                    const newStyle = document.createElement('style');
+                    newStyle.id = id;
+                    newStyle.textContent = styleTag.textContent;
+                    document.head.appendChild(newStyle);
+                }
+            });
+
+            // 2. Clean up script/style tags from body before capturing innerHTML
+            const internalStyles = doc.querySelectorAll('style');
+            internalStyles.forEach(node => node.remove());
+
+            const contentHTML = body.innerHTML;
+
+            // 3. Create a single, unified master block wrapping the entire document content
+            blocks.push({
+                id: `gen-block-main`,
+                type: 'text',
+                content: contentHTML.trim(),
+                x: 0,
+                y: 0,
+                width: pageWidth,
+                height: 'auto', // Allow native browser flow for the entire height
+                style: { 
+                    lineHeight: '1.6',
+                    marginBottom: '0px',
+                    padding: '60px' // Add the margin internally so the block occupies the full canvas
+                }
+            });
+
+            return blocks;
+        } catch (err) {
+            console.error('❌ HTML conversion failed:', err);
+            return [];
+        }
+    };
+
     const fetchDocument = async () => {
         try {
             setLoading(true);
-            const response = await api.get(`/document-editor/${documentId}`);
-            if (response.success) {
-                const doc = response.data;
-                const autofill = response.autofillMap || {};
+            const editorResponse = await api.get(`/document-editor/${documentId}`);
+            if (editorResponse.success) {
+                const doc = editorResponse.data;
+                const autofill = editorResponse.autofillMap || {};
                 
-                console.log('📦 Fetched document:', doc.title);
-                console.log('🤖 Applying autofill map:', Object.keys(autofill).length, 'keys');
-
-                // 1. Apply autofill to fields that are empty
+                // 1. Process Autofill for Fields
                 const updatedFields = (doc.fields || []).map(field => {
                     const mappingKey = field.label?.toLowerCase().replace(/\s+/g, '_');
                     const autofillValue = autofill[mappingKey] || autofill[field.label];
-                    
-                    if (!field.value && autofillValue) {
-                        console.log(`✨ Autofilling field [${field.label}] with:`, autofillValue);
-                        return { ...field, value: autofillValue, completed: true };
-                    }
+                    if (!field.value && autofillValue) return { ...field, value: autofillValue, completed: true };
                     return field;
                 });
 
-                // 2. Apply autofill to block content (Handlebars-style placeholders)
-                const updatedPages = (doc.pages || []).map(page => ({
+                // 2. Process Blocks
+                let updatedPages = (doc.pages || []).map(page => ({
                     ...page,
                     blocks: (page.blocks || []).map(block => {
                         if (block.type === 'text' && block.content) {
                             let newContent = block.content;
-                            // Simple regex to find and replace {{key}} with autofill[key]
                             Object.entries(autofill).forEach(([key, val]) => {
                                 const regex = new RegExp(`{{${key}}}`, 'g');
-                                if (newContent.includes(`{{${key}}}`)) {
-                                    console.log(`✨ Replacing {{${key}}} in block with:`, val);
-                                    newContent = newContent.replace(regex, val);
-                                }
+                                if (newContent.includes(`{{${key}}}`)) newContent = newContent.replace(regex, val);
                             });
                             return { ...block, content: newContent };
                         }
@@ -114,11 +245,24 @@ const DocumentEditor = () => {
                     })
                 }));
 
-                setDocument({ ...doc, pages: updatedPages });
-                setFields(updatedFields);
+                // 3. Fallback/Conversion for AI generated legacy documents
+                if ((updatedPages.length === 0 || updatedPages[0]?.blocks?.length === 0) && doc.content) {
+                    const token = localStorage.getItem('token') || '';
+                    const previewUrl = `/api/documents/${doc._id || doc.id}/preview?token=${token}`;
+                    
+                    // Convert the HTML into individual blocks!
+                    const generatedBlocks = await convertHtmlToBlocks(previewUrl);
+                    
+                    updatedPages = [{
+                        id: 'page-1',
+                        width: 816,
+                        height: Math.max(1056, generatedBlocks.reduce((acc, b) => Math.max(acc, b.y + b.height), 0) + 100),
+                        blocks: generatedBlocks
+                    }];
+                }
 
-                // If changes were made, auto-save a few seconds later
-                // handleSave(); // Optional: or just let auto-save handle it
+                setDocData({ ...doc, pages: updatedPages });
+                setFields(updatedFields);
             }
         } catch (err) {
             console.error('Error fetching document:', err);
@@ -149,51 +293,44 @@ const DocumentEditor = () => {
 
         setFields(prev => {
             const updated = [...prev, newField];
+            pushToHistory(docData, updated);
             autoSave(updated);
             return updated;
         });
     };
 
-    const handleFieldSelect = (field) => {
-        setSelectedField(field);
-        setSelectedFieldId(field.id || field._id);
-        const fieldId = field.id || field._id;
+    const handleFieldSelect = (block) => {
+        if (!block) {
+            setSelectedBlockId(null);
+            return;
+        }
+        setSelectedBlockId(block.id);
+    };
 
-        // If signature or initials field is selected, open signature modal
-        if (field.fieldType === 'signature' || field.fieldType === 'initials') {
-            setCurrentSignatureField(field);
+    const handleBlockAction = (block) => {
+        if (!block) return;
+        
+        setSelectedBlockId(block.id);
+
+        // If signature or initials field is selected
+        if (block.type === 'signature' || block.type === 'initials') {
+            setCurrentSignatureField(block);
             setShowSignatureModal(true);
-        } else if (field.fieldType === 'textfield' || field.fieldType === 'text') {
-            const newValue = prompt('Enter text:', field.value || '');
-            if (newValue !== null) {
-                updateField(fieldId, { value: newValue, completed: true });
-            }
-        } else if (field.fieldType === 'checkbox' || field.fieldType === 'radio') {
-            updateField(fieldId, { value: !field.value, completed: true });
-        } else if (field.fieldType === 'dropdown') {
-            const options = ['Option 1', 'Option 2', 'Option 3'];
-            const selected = prompt(`Select one (${options.join(', ')}):`, field.value || options[0]);
-            if (selected) updateField(fieldId, { value: selected, completed: true });
-        } else if (field.fieldType === 'card' || field.fieldType === 'card-details') {
-            const cardNum = prompt('Enter card number (last 4 digits):', '1234');
-            if (cardNum) updateField(fieldId, { value: cardNum, completed: true });
-        } else if (field.fieldType === 'fileupload' || field.fieldType === 'file-upload') {
+        } else if (block.type === 'image') {
             const fileInput = document.createElement('input');
             fileInput.type = 'file';
+            fileInput.accept = 'image/*';
             fileInput.onchange = (e) => {
                 const file = e.target.files[0];
                 if (file) {
                     const reader = new FileReader();
                     reader.onload = (event) => {
-                        updateField(fieldId, { value: event.target.result, completed: true });
+                        handleUpdateBlock(block.id, { content: event.target.result });
                     };
                     reader.readAsDataURL(file);
                 }
             };
             fileInput.click();
-        } else if (field.fieldType === 'stamp') {
-            const stampText = prompt('Enter stamp text:', 'APPROVED');
-            if (stampText) updateField(fieldId, { value: stampText, completed: true });
         }
     };
 
@@ -202,6 +339,7 @@ const DocumentEditor = () => {
             const newFields = prev.map(f =>
                 (f.id === fieldId || f._id === fieldId) ? { ...f, ...updates } : f
             );
+            pushToHistory(docData, newFields);
             autoSave(newFields);
             return newFields;
         });
@@ -210,6 +348,7 @@ const DocumentEditor = () => {
     const deleteField = (fieldId) => {
         setFields(prev => {
             const newFields = prev.filter(f => f.id !== fieldId && f._id !== fieldId);
+            pushToHistory(docData, newFields);
             autoSave(newFields);
             return newFields;
         });
@@ -295,11 +434,11 @@ const DocumentEditor = () => {
             return;
         }
 
-        // Update the field with signature data
-        const fieldId = currentSignatureField?.id || currentSignatureField?._id;
-        if (fieldId) {
-            updateField(fieldId, {
-                value: signatureValue,
+        // Update the block with signature data
+        const blockId = currentSignatureField?.id;
+        if (blockId) {
+            handleUpdateBlock(blockId, {
+                content: signatureValue,
                 completed: true
             });
         }
@@ -328,8 +467,8 @@ const DocumentEditor = () => {
     const handleResizeStart = (e) => {
         e.preventDefault();
         setIsResizingSidebar(true);
-        document.addEventListener('mousemove', handleResizeMove);
-        document.addEventListener('mouseup', handleResizeEnd);
+        window.document.addEventListener('mousemove', handleResizeMove);
+        window.document.addEventListener('mouseup', handleResizeEnd);
     };
 
     const handleResizeMove = (e) => {
@@ -342,15 +481,15 @@ const DocumentEditor = () => {
 
     const handleResizeEnd = () => {
         setIsResizingSidebar(false);
-        document.removeEventListener('mousemove', handleResizeMove);
-        document.removeEventListener('mouseup', handleResizeEnd);
+        window.document.removeEventListener('mousemove', handleResizeMove);
+        window.document.removeEventListener('mouseup', handleResizeEnd);
     };
 
     const [selectedBlockId, setSelectedBlockId] = useState(null);
     const [zoom, setZoom] = useState(1);
 
     const handleUpdateBlock = (blockId, updates) => {
-        setDocument(prev => {
+        setDocData(prev => {
             const newPages = prev.pages.map(page => ({
                 ...page,
                 blocks: page.blocks.map(block => 
@@ -358,47 +497,56 @@ const DocumentEditor = () => {
                 )
             }));
             const updated = { ...prev, pages: newPages };
+            pushToHistory(updated, fields);
             autoSave(updated);
             return updated;
         });
     };
 
     const handleDeleteBlock = (blockId) => {
-        setDocument(prev => {
+        setDocData(prev => {
             const newPages = prev.pages.map(page => ({
                 ...page,
                 blocks: page.blocks.filter(block => block.id !== blockId)
             }));
             const updated = { ...prev, pages: newPages };
+            pushToHistory(updated, fields);
             autoSave(updated);
             return updated;
         });
         setSelectedBlockId(null);
     };
 
-    const handleAddBlock = (type, pageId = document.pages[0].id) => {
+    const handleAddBlock = (type, x = 100, y = 100, pageId = null) => {
+        const targetPageId = pageId || docData?.pages?.[0]?.id;
+        
         const newBlock = {
             id: 'block-' + Date.now(),
             type,
-            x: 100,
-            y: 100,
-            width: type === 'image' ? 300 : 200,
-            height: type === 'image' ? 200 : 50,
+            x: x,
+            y: y,
+            width: type === 'image' ? 300 : (type === 'signature' ? 200 : 200),
+            height: type === 'image' ? 200 : (type === 'signature' ? 80 : 50),
             content: type === 'text' ? 'New Text Block' : '',
             style: {
                 fontSize: '16px',
-                color: '#1e293b'
+                color: '#1e293b',
+                fontFamily: 'Inter, sans-serif'
             }
         };
 
-        setDocument(prev => {
-            const newPages = prev.pages.map(page => 
-                page.id === pageId 
-                    ? { ...page, blocks: [...page.blocks, newBlock] }
-                    : page
-            );
-            return { ...prev, pages: newPages };
+        setDocData(prev => {
+            const newPages = prev.pages.map(page => {
+                if (page.id === targetPageId) {
+                    return { ...page, blocks: [...(page.blocks || []), newBlock] };
+                }
+                return page;
+            });
+            const updated = { ...prev, pages: newPages };
+            pushToHistory(updated, fields);
+            return updated;
         });
+        
         setSelectedBlockId(newBlock.id);
     };
 
@@ -419,7 +567,7 @@ const DocumentEditor = () => {
     const handleSave = async () => {
         try {
             setSaving(true);
-            await api.put(`/document-editor/${documentId}`, document);
+            await api.put(`/document-editor/${documentId}`, docData);
             alert('Document saved successfully!');
         } catch (err) {
             console.error('Error saving document:', err);
@@ -429,17 +577,98 @@ const DocumentEditor = () => {
         }
     };
 
-    const handleSend = async () => {
+    const handleDownload = async () => {
         try {
             setSaving(true);
-            await api.post(`/document-editor/${documentId}/send`, document);
-            alert('Document sent successfully!');
-            navigate('/dashboard/documents');
+            const token = localStorage.getItem('token');
+            
+            // Grab the actual rendered editor page from the DOM
+            const editorPage = document.querySelector('.document-pages-container');
+            if (!editorPage) throw new Error('Could not find document pages');
+
+            // Clone to avoid mutating the real DOM
+            const clone = editorPage.cloneNode(true);
+            
+            // Clean up UI-only elements (selection dashed borders, resize handles)
+            clone.querySelectorAll('.block-border, .resize-handle').forEach(el => el.remove());
+
+            // Generate full HTML payload including styles
+            const styles = Array.from(document.querySelectorAll('style'))
+                .map(s => s.outerHTML)
+                .join('\n');
+
+            const finalHtml = `
+                ${styles}
+                <div style="background: #e8eaed; min-height: 100vh; padding: 40px; display: flex; flex-direction: column; align-items: center; gap: 40px;">
+                    ${clone.innerHTML}
+                </div>
+            `;
+
+            const response = await fetch(getApiUrl(`/api/document-editor/${documentId}/pdf`), {
+                method: 'POST',
+                headers: { 
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ html: finalHtml })
+            });
+
+            if (!response.ok) throw new Error('Download failed');
+            const blob = await response.blob();
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `${safeDocument?.title || 'document'}.pdf`;
+            document.body.appendChild(a);
+            a.click();
+            window.URL.revokeObjectURL(url);
+            document.body.removeChild(a);
         } catch (err) {
-            console.error('Error sending document:', err);
-            setError('Failed to send document');
+            console.error('Download failed:', err);
+            alert('Download failed. Please try again.');
         } finally {
             setSaving(false);
+        }
+    };
+
+    const handleOpenRecipientModal = () => {
+        setRecipientForm(prev => ({
+            ...prev,
+            documentName: safeDocument?.title || 'Document'
+        }));
+        setSendSuccess(false);
+        setShowRecipientModal(true);
+    };
+
+    const handleSendWithRecipients = async () => {
+        if (!recipientForm.recipientEmail) {
+            alert('Please enter the recipient email.');
+            return;
+        }
+        try {
+            setSending(true);
+            // Save first to capture latest edits
+            await api.put(`/document-editor/${documentId}`, docData);
+            // Then send
+            await api.post(`/document-editor/${documentId}/send`, {
+                ...docData,
+                recipients: [{
+                    name: recipientForm.recipientName,
+                    email: recipientForm.recipientEmail,
+                    role: 'signer'
+                }],
+                sender: {
+                    name: recipientForm.senderName,
+                    email: recipientForm.senderEmail
+                },
+                documentName: recipientForm.documentName
+            });
+            setSendSuccess(true);
+        } catch (err) {
+            console.error('Error sending document:', err);
+            alert('Failed to send document. Please try again.');
+        } finally {
+            setSending(false);
         }
     };
 
@@ -462,10 +691,36 @@ const DocumentEditor = () => {
     }
 
     // Default document initialization if none exists
-    const safeDocument = document || {
+    const safeDocument = docData || {
         id: documentId,
         title: 'Untitled Document',
         pages: [{ id: 'page-1', width: 816, height: 1056, blocks: [] }]
+    };
+
+    // Keep iframe correctly sized
+    const handleHtmlIframeLoad = (e) => {
+        try {
+            const iframeDoc = e.target.contentWindow.document;
+            const scrollHeight = iframeDoc.body.scrollHeight;
+            if (scrollHeight > 1056) {
+               // Notify the canvas to resize the page by updating the safeDocument in state
+               setDocData(prev => {
+                   if (!prev) return prev;
+                   const updated = { ...prev };
+                   updated.pages = updated.pages.map(p => {
+                       if (p.id === 'page-1') {
+                           return { 
+                               ...p, 
+                               height: scrollHeight + 100,
+                               blocks: p.blocks.map(b => b.type === 'html' ? { ...b, height: scrollHeight + 100 } : b)
+                           };
+                       }
+                       return p;
+                   });
+                   return updated;
+               });
+            }
+        } catch (err) {}
     };
 
     const selectedBlock = safeDocument.pages.flatMap(p => p.blocks).find(b => b.id === selectedBlockId);
@@ -480,15 +735,26 @@ const DocumentEditor = () => {
                     </button>
                     <h1 className="editor-title">{safeDocument.title}</h1>
                 </div>
-                <div className="editor-actions">
-                    <button className="btn-secondary" onClick={() => setZoom(prev => Math.max(0.5, prev - 0.1))}>-</button>
+                <div className="zoom-controls">
+                    <button className="zoom-btn" title="Undo (Cmd+Z)" disabled={historyIndex <= 0} onClick={handleUndo}>
+                        <Undo size={16} />
+                    </button>
+                    <button className="zoom-btn" title="Redo (Cmd+Shift+Z)" disabled={historyIndex >= history.length - 1} onClick={handleRedo}>
+                        <Redo size={16} />
+                    </button>
+                    <div className="zoom-divider" />
+                    <button className="zoom-btn" onClick={() => setZoom(prev => Math.max(0.5, prev - 0.1))}>-</button>
                     <span className="zoom-label">{Math.round(zoom * 100)}%</span>
                     <button className="btn-secondary" onClick={() => setZoom(prev => Math.min(2, prev + 0.1))}>+</button>
                     <button className="btn-secondary" onClick={handleSave} disabled={saving}>
                         <Save size={16} />
                         {saving ? 'Saving...' : 'Save'}
                     </button>
-                    <button className="btn-primary" onClick={handleSend}>
+                    <button className="btn-secondary" onClick={handleDownload}>
+                        <ChevronDown size={16} />
+                        Download
+                    </button>
+                    <button className="btn-primary" onClick={handleOpenRecipientModal}>
                         <Send size={16} />
                         Review and Send
                     </button>
@@ -501,9 +767,11 @@ const DocumentEditor = () => {
                 <Canvas
                     document={safeDocument}
                     selectedBlockId={selectedBlockId}
-                    onSelectBlock={setSelectedBlockId}
+                    onSelectBlock={handleFieldSelect}
+                    onBlockAction={handleBlockAction}
                     onUpdateBlock={handleUpdateBlock}
                     onDeleteBlock={handleDeleteBlock}
+                    onAddBlock={handleAddBlock}
                     zoom={zoom}
                 />
 
@@ -743,6 +1011,108 @@ const DocumentEditor = () => {
                                 Accept and sign
                             </button>
                         </div>
+                    </div>
+                </div>
+            )}
+            {/* Recipient Modal */}
+            {showRecipientModal && (
+                <div className="signature-modal-overlay" onClick={() => setShowRecipientModal(false)}>
+                    <div className="signature-modal" style={{ maxWidth: 580, width: '95%' }} onClick={e => e.stopPropagation()}>
+                        {/* Header */}
+                        <div className="signature-modal-header">
+                            {sendSuccess ? (
+                                <h2 style={{ color: '#16a34a' }}>✅ Document Sent!</h2>
+                            ) : (
+                                <h2>Add document recipients</h2>
+                            )}
+                            <button className="close-modal-btn" onClick={() => setShowRecipientModal(false)}>
+                                <X size={20} />
+                            </button>
+                        </div>
+
+                        {sendSuccess ? (
+                            <div style={{ padding: '32px', textAlign: 'center' }}>
+                                <div style={{ fontSize: 48, marginBottom: 16 }}>🎉</div>
+                                <p style={{ color: '#374151', fontSize: 15, marginBottom: 8 }}>
+                                    Your document has been sent to <strong>{recipientForm.recipientEmail}</strong>.
+                                </p>
+                                <p style={{ color: '#6b7280', fontSize: 13 }}>They will receive an email with a link to review and sign.</p>
+                                <button className="btn-primary" style={{ marginTop: 24, width: '100%' }} onClick={() => navigate('/dashboard/documents')}>
+                                    Back to Documents
+                                </button>
+                            </div>
+                        ) : (
+                            <div style={{ padding: '24px', display: 'flex', flexDirection: 'column', gap: 20 }}>
+                                <p style={{ color: '#6b7280', fontSize: 13, marginTop: -8 }}>
+                                    This template includes roles, which help assign fields to recipients automatically.
+                                </p>
+
+                                {/* Document Name */}
+                                <div>
+                                    <label style={{ display: 'block', fontSize: 13, fontWeight: 600, marginBottom: 6, color: '#374151' }}>
+                                        Document name <span style={{ color: '#ef4444' }}>*</span>
+                                    </label>
+                                    <input
+                                        type="text"
+                                        value={recipientForm.documentName}
+                                        onChange={e => setRecipientForm(prev => ({ ...prev, documentName: e.target.value }))}
+                                        style={{
+                                            width: '100%', padding: '10px 14px', border: '2px solid #16a34a',
+                                            borderRadius: 8, fontSize: 14, outline: 'none', boxSizing: 'border-box'
+                                        }}
+                                    />
+                                </div>
+
+                                {/* Recipient Block */}
+                                <div style={{ border: '1px solid #e5e7eb', borderRadius: 10, padding: 16, borderLeft: '4px solid #f97316' }}>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
+                                        <span style={{ fontSize: 13, fontWeight: 700, color: '#374151' }}>Add recipient</span>
+                                        <span style={{ fontSize: 10, fontWeight: 800, color: '#f97316', background: '#fff7ed', padding: '2px 8px', borderRadius: 20, letterSpacing: 1 }}>CLIENT</span>
+                                    </div>
+                                    <input type="text" placeholder="Recipient name"
+                                        value={recipientForm.recipientName}
+                                        onChange={e => setRecipientForm(prev => ({ ...prev, recipientName: e.target.value }))}
+                                        style={{ width: '100%', padding: '10px 14px', border: '1px solid #e5e7eb', borderRadius: 8, fontSize: 14, marginBottom: 10, outline: 'none', boxSizing: 'border-box' }}
+                                    />
+                                    <input type="email" placeholder="Recipient email *"
+                                        value={recipientForm.recipientEmail}
+                                        onChange={e => setRecipientForm(prev => ({ ...prev, recipientEmail: e.target.value }))}
+                                        style={{ width: '100%', padding: '10px 14px', border: '1px solid #e5e7eb', borderRadius: 8, fontSize: 14, outline: 'none', boxSizing: 'border-box' }}
+                                    />
+                                </div>
+
+                                {/* Sender Block */}
+                                <div style={{ border: '1px solid #e5e7eb', borderRadius: 10, padding: 16, borderLeft: '4px solid #6366f1' }}>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
+                                        <span style={{ fontSize: 13, fontWeight: 700, color: '#374151' }}>Add recipient</span>
+                                        <span style={{ fontSize: 10, fontWeight: 800, color: '#6366f1', background: '#eef2ff', padding: '2px 8px', borderRadius: 20, letterSpacing: 1 }}>SENDER</span>
+                                    </div>
+                                    <input type="text" placeholder="Your name"
+                                        value={recipientForm.senderName}
+                                        onChange={e => setRecipientForm(prev => ({ ...prev, senderName: e.target.value }))}
+                                        style={{ width: '100%', padding: '10px 14px', border: '1px solid #e5e7eb', borderRadius: 8, fontSize: 14, marginBottom: 10, outline: 'none', boxSizing: 'border-box' }}
+                                    />
+                                    <input type="email" placeholder="Your email"
+                                        value={recipientForm.senderEmail}
+                                        onChange={e => setRecipientForm(prev => ({ ...prev, senderEmail: e.target.value }))}
+                                        style={{ width: '100%', padding: '10px 14px', border: '1px solid #e5e7eb', borderRadius: 8, fontSize: 14, outline: 'none', boxSizing: 'border-box' }}
+                                    />
+                                </div>
+
+                                {/* Footer Actions */}
+                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 4 }}>
+                                    <button style={{ background: 'none', border: 'none', color: '#6b7280', fontSize: 14, cursor: 'pointer', padding: 0 }}
+                                        onClick={() => setShowRecipientModal(false)}>
+                                        Skip
+                                    </button>
+                                    <button className="btn-primary" onClick={handleSendWithRecipients} disabled={sending}
+                                        style={{ minWidth: 120, justifyContent: 'center' }}>
+                                        {sending ? <Loader2 size={16} className="spinner" /> : <Send size={14} />}
+                                        {sending ? 'Sending...' : 'Continue'}
+                                    </button>
+                                </div>
+                            </div>
+                        )}
                     </div>
                 </div>
             )}

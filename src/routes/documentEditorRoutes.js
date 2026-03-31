@@ -21,6 +21,9 @@ router.post('/:documentId/recipients', auth, documentEditorController.updateReci
 // Send document to recipients
 router.post('/:documentId/send', auth, documentEditorController.sendDocument);
 
+// Generate WYSIWYG PDF from Canvas HTML
+router.post('/:documentId/pdf', auth, documentEditorController.generateEditorPDF);
+
 // Delete document
 router.delete('/:documentId', auth, documentEditorController.deleteDocument);
 

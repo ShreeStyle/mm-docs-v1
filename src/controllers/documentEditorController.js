@@ -1,7 +1,7 @@
 const Document = require('../models/Document');
 const Template = require('../models/Template');
 const { buildAutofillMap } = require('../services/autofill/autofillService');
-
+const pdfService = require('../services/render/pdfService');
 // Create document from template with recipients
 exports.createFromTemplate = async (req, res) => {
     try {
@@ -291,3 +291,59 @@ exports.deleteDocument = async (req, res) => {
         });
     }
 };
+
+// Generate WYSIWYG PDF from Editor HTML
+exports.generateEditorPDF = async (req, res) => {
+    try {
+        const { documentId } = req.params;
+        const userId = req.user.id;
+        const { html } = req.body;
+
+        if (!html) {
+            return res.status(400).json({ success: false, message: 'HTML payload is required' });
+        }
+
+        const document = await Document.findOne({ _id: documentId, userId });
+        if (!document) {
+            return res.status(404).json({ success: false, message: 'Document not found' });
+        }
+
+        // The exact HTML is already generated in the frontend. We just wrap it safely for Puppeteer.
+        // We add styles to normalize margins so the injected HTML matches the page bounds perfectly.
+        const pdfHtml = `
+            <!DOCTYPE html>
+            <html>
+                <head>
+                    <meta charset="utf-8">
+                    <title>${document.title}</title>
+                    <style>
+                        body { margin: 0; padding: 0; background-color: white; }
+                        * { box-sizing: border-box; }
+                        /* Ensure the canvas area prints scaled correctly */
+                        @page { size: auto; margin: 0mm; } 
+                    </style>
+                </head>
+                <body>
+                    ${html}
+                </body>
+            </html>
+        `;
+
+        const user = req.userModel || null; 
+        const pdf = await pdfService.generatePDF(pdfHtml, user);
+
+        const filename = `${document.title.replace(/[^a-z0-9]/gi, '_')}.pdf`;
+        res.setHeader('Content-Type', 'application/pdf');
+        res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
+        res.send(pdf);
+
+    } catch (error) {
+        console.error('Error generating editor PDF:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Failed to generate PDF',
+            error: error.message
+        });
+    }
+};
+

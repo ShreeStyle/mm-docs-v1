@@ -405,7 +405,7 @@ const GSTFilingSummaryPage = () => {
         ],
         salesReturn: [],
         purchaseReturn: [],
-        summary: { totalTaxableValue: 0, totalCGST: 0, totalSGST: 0, totalIGST: 0, totalTax: 0, totalTaxableValue: 0, returnTax: 0, netPayable: 0 },
+        summary: { totalTaxableValue: 0, totalCGST: 0, totalSGST: 0, totalIGST: 0, totalTax: 0, returnTax: 0, netPayable: 0 },
         authorizedSignatory: { name: '', designation: '' }
     });
 

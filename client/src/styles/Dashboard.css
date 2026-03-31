@@ -54,19 +54,54 @@ body {
   box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
 }
 
-/* Orange Theme Colors */
+/* Design System Tokens */
 :root {
+  /* Primary — Indigo */
+  --primary-50: #EEF2FF;
+  --primary-100: #E0E7FF;
+  --primary-200: #C7D2FE;
+  --primary-300: #A5B4FC;
+  --primary-400: #818CF8;
+  --primary-500: #6366F1;
+  --primary-600: #5C67F2;
+  --primary-700: #4F46E5;
+  --primary-800: #4338CA;
+  --primary-900: #3730A3;
+
+  /* Legacy Orange (kept for any remaining references) */
   --orange-50: #FFF7ED;
   --orange-100: #FFEDD5;
-  --orange-200: #FED7AA;
-  --orange-300: #FDBA74;
-  --orange-400: #FB923C;
   --orange-500: #F97316;
   --orange-600: #EA580C;
-  --orange-700: #C2410C;
-  --orange-800: #9A3412;
-  --orange-900: #7C2D12;
+
+  /* Background */
+  --bg-page: #F8F9FB;
+  --bg-card: #FFFFFF;
+
+  /* Text */
+  --text-primary: #111827;
+  --text-muted: #6B7280;
+  --text-subtle: #9CA3AF;
+
+  /* Border */
+  --border: #E5E7EB;
 }
+
+/* Auth Split-Panel Responsive */
+.auth-left-panel {
+  display: flex !important;
+}
+
+@media (max-width: 768px) {
+  .auth-left-panel {
+    display: none !important;
+  }
+  .auth-mobile-logo {
+    display: flex !important;
+  }
+}
+
+
 
 /* Status Badge Styles */
 .status-badge {
