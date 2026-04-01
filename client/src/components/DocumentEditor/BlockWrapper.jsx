@@ -17,13 +17,28 @@ const BlockWrapper = ({
 
     const handleMouseDown = (e) => {
         // Don't start drag on resize handles, buttons or delete btn
+        const isInteractive = e.target.closest('.interactive-element') || 
+                            e.target.closest('input') || 
+                            e.target.closest('select') || 
+                            e.target.closest('textarea');
+
         if (e.target.closest('.block-action-btn') || 
             e.target.closest('.block-delete-btn') ||
             e.target.closest('.resize-handle')) {
             return;
         }
 
-        e.preventDefault();
+        // If it's an interactive element AND the block is already selected, 
+        // allow the event to pass through to the children
+        if (isInteractive && isSelected) {
+            return;
+        }
+
+        // Only prevent default if we're actually going to start a drag
+        if (!isInteractive) {
+            e.preventDefault();
+        }
+        
         e.stopPropagation();
 
         // Select the block on mouse down
@@ -159,7 +174,18 @@ const BlockWrapper = ({
                         fontSize: '11px', fontWeight: 700, pointerEvents: 'auto',
                         border: '1px solid #e2e8f0'
                     }}>
-                        <span style={{ display: 'flex', alignItems: 'center', gap: 4, color: '#94a3b8' }}>
+                        <span 
+                            className="drag-handle"
+                            style={{ 
+                                display: 'flex', 
+                                alignItems: 'center', 
+                                gap: 4, 
+                                color: '#94a3b8', 
+                                cursor: 'grab', 
+                                padding: '0 4px',
+                                pointerEvents: 'auto' // Crucial: Allow handle to receive clicks
+                            }}
+                        >
                             <GripVertical size={11} /> {block.type.toUpperCase()}
                         </span>
 

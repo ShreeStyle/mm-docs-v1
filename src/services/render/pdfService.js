@@ -48,13 +48,14 @@ exports.generatePDF = async (html, user = null) => {
         });
 
         const pdf = await page.pdf({
-            format: 'A4',
+            preferCSSPageSize: true,
             printBackground: true,
+            format: 'A4', // Fallback only if @page is missing
             margin: {
-                top: '20px',
-                right: '20px',
-                bottom: '20px',
-                left: '20px'
+                top: 0,
+                right: 0,
+                bottom: 0,
+                left: 0
             }
         });
 

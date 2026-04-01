@@ -38,18 +38,18 @@ const PropertiesSidebar = ({ block, onUpdate }) => {
             </div>
 
             <div className="sidebar-content">
-                {/* Content Section (for text blocks) */}
-                {(block.type === 'text' || block.type === 'heading') && (
+                {/* Content/Label Section */}
+                {['text', 'heading', 'textfield', 'date', 'checkbox', 'radio', 'dropdown'].includes(block.type) && (
                     <div className="property-group">
                         <label className="property-label">
                             <Type size={14} />
-                            Content
+                            {['checkbox', 'radio'].includes(block.type) ? 'Label' : 'Placeholder / Content'}
                         </label>
                         <textarea
                             className="property-textarea"
                             value={block.content || ''}
                             onChange={(e) => onUpdate(block.id, { content: e.target.value })}
-                            placeholder="Enter text content..."
+                            placeholder={['checkbox', 'radio'].includes(block.type) ? 'Enter label...' : 'Enter text content...'}
                         />
                     </div>
                 )}

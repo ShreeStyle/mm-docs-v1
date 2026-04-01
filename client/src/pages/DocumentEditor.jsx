@@ -72,12 +72,16 @@ const DocumentEditor = () => {
         fetchDocument();
     }, [documentId]);
 
+    // Track history index accurately using a ref for inner closures
+    const historyIndexRef = useRef(-1);
+
     // Handle History Initialization
     useEffect(() => {
         if (docData && history.length === 0) {
             const initialSnapshot = { docData: JSON.parse(JSON.stringify(docData)), fields: JSON.parse(JSON.stringify(fields)) };
             setHistory([initialSnapshot]);
             setHistoryIndex(0);
+            historyIndexRef.current = 0;
         }
     }, [docData, fields]);
 
@@ -87,14 +91,21 @@ const DocumentEditor = () => {
             fields: JSON.parse(JSON.stringify(newFields))
         };
         
+        // Capture synchronous history index 
+        const currentIndex = historyIndexRef.current;
+        let newIndex = currentIndex + 1;
+        if (newIndex >= 50) newIndex = 49;
+        
+        // Advance sync ref immediately for rapid sequential calls
+        historyIndexRef.current = newIndex;
+        setHistoryIndex(newIndex);
+        
         setHistory(prev => {
-            const newHistory = prev.slice(0, historyIndex + 1);
-            // Limit history to 50 steps
+            const newHistory = prev.slice(0, currentIndex + 1);
             if (newHistory.length >= 50) newHistory.shift();
             newHistory.push(snapshot);
             return newHistory;
         });
-        setHistoryIndex(prev => Math.min(prev + 1, 49));
     };
 
     const handleUndo = useCallback(() => {
@@ -103,6 +114,7 @@ const DocumentEditor = () => {
             const prevState = history[prevIndex];
             setDocData(prevState.docData);
             setFields(prevState.fields);
+            historyIndexRef.current = prevIndex;
             setHistoryIndex(prevIndex);
             autoSave(prevState.docData);
         }
@@ -114,6 +126,7 @@ const DocumentEditor = () => {
             const nextState = history[nextIndex];
             setDocData(nextState.docData);
             setFields(nextState.fields);
+            historyIndexRef.current = nextIndex;
             setHistoryIndex(nextIndex);
             autoSave(nextState.docData);
         }
@@ -122,13 +135,20 @@ const DocumentEditor = () => {
     // Keyboard Shortcuts
     useEffect(() => {
         const handleKeyDown = (e) => {
-            if ((e.metaKey || e.ctrlKey) && e.key === 'z') {
+            // Do not intercept if user is typing text natively
+            const isTyping = e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.isContentEditable;
+            
+            if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'z') {
+                if (isTyping) return; // Let browser handle text undo
+                e.preventDefault(); // Prevent native browser undo collision for canvas actions
                 if (e.shiftKey) {
                     handleRedo();
                 } else {
                     handleUndo();
                 }
-            } else if ((e.metaKey || e.ctrlKey) && e.key === 'y') {
+            } else if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'y') {
+                if (isTyping) return;
+                e.preventDefault();
                 handleRedo();
             }
         };
@@ -256,7 +276,10 @@ const DocumentEditor = () => {
                     updatedPages = [{
                         id: 'page-1',
                         width: 816,
-                        height: Math.max(1056, generatedBlocks.reduce((acc, b) => Math.max(acc, b.y + b.height), 0) + 100),
+                        height: Math.max(1056, generatedBlocks.reduce((acc, b) => {
+                            const h = typeof b.height === 'number' ? b.height : 2500;
+                            return Math.max(acc, b.y + h);
+                        }, 0) + 100),
                         blocks: generatedBlocks
                     }];
                 }
@@ -525,9 +548,27 @@ const DocumentEditor = () => {
             type,
             x: x,
             y: y,
-            width: type === 'image' ? 300 : (type === 'signature' ? 200 : 200),
-            height: type === 'image' ? 200 : (type === 'signature' ? 80 : 50),
-            content: type === 'text' ? 'New Text Block' : '',
+            width: 
+                type === 'image' ? 300 : 
+                type === 'signature' ? 200 : 
+                type === 'initials' ? 100 :
+                type === 'date' ? 160 :
+                type === 'checkbox' || type === 'radio' ? 140 :
+                type === 'dropdown' ? 200 :
+                type === 'stamp' ? 120 :
+                type === 'payment' ? 240 :
+                200,
+            height: 
+                type === 'image' ? 200 : 
+                type === 'signature' ? 80 : 
+                type === 'initials' ? 50 :
+                type === 'date' ? 40 :
+                type === 'checkbox' || type === 'radio' ? 30 :
+                type === 'dropdown' ? 40 :
+                type === 'stamp' ? 120 :
+                type === 'payment' ? 60 :
+                50,
+            content: type === 'text' ? 'New Text Block' : (type === 'checkbox' || type === 'radio' ? 'Option' : ''),
             style: {
                 fontSize: '16px',
                 color: '#1e293b',
@@ -592,14 +633,40 @@ const DocumentEditor = () => {
             // Clean up UI-only elements (selection dashed borders, resize handles)
             clone.querySelectorAll('.block-border, .resize-handle').forEach(el => el.remove());
 
+            // Adjust page height to exact content height to output single-page PDF
+            const realPages = document.querySelectorAll('.canvas-page');
+            clone.querySelectorAll('.canvas-page').forEach((pageClone, index) => {
+                const realPage = realPages[index];
+                if (realPage) {
+                    let maxHeight = 0;
+                    Array.from(realPage.children).forEach(child => {
+                        const bottom = child.offsetTop + child.scrollHeight;
+                        if (bottom > maxHeight) maxHeight = bottom;
+                    });
+                    
+                    pageClone.style.height = Math.max(1056, maxHeight) + 'px';
+                    // Clean up Editor styles so they don't print in the PDF
+                    pageClone.style.boxShadow = 'none';
+                    pageClone.style.margin = '0';
+                }
+            });
+
             // Generate full HTML payload including styles
             const styles = Array.from(document.querySelectorAll('style'))
                 .map(s => s.outerHTML)
                 .join('\n');
 
+            let customPageOverride = '';
+            if (realPages.length > 0) {
+                const w = clone.querySelector('.canvas-page').style.width || '816px';
+                const h = clone.querySelector('.canvas-page').style.height || '1056px';
+                customPageOverride = `<style>@page { size: ${w} ${h} !important; margin: 0 !important; }</style>`;
+            }
+
             const finalHtml = `
                 ${styles}
-                <div style="background: #e8eaed; min-height: 100vh; padding: 40px; display: flex; flex-direction: column; align-items: center; gap: 40px;">
+                ${customPageOverride}
+                <div style="background: white; width: max-content; margin: 0; padding: 0; display: flex; flex-direction: column; align-items: flex-start; gap: 0;">
                     ${clone.innerHTML}
                 </div>
             `;

@@ -1,5 +1,14 @@
 import React, { useRef } from 'react';
-import { PenTool, Upload } from 'lucide-react';
+import { 
+    PenTool, 
+    Upload, 
+    Calendar, 
+    CheckSquare, 
+    Circle, 
+    ChevronDown, 
+    Stamp, 
+    CreditCard 
+} from 'lucide-react';
 import BlockWrapper from './BlockWrapper';
 import { getApiUrl } from '../../config/api';
 
@@ -137,7 +146,6 @@ const renderBlockContent = (block, onUpdate) => {
 
         case 'text':
         case 'textfield':
-        case 'html':
             return (
                 <div
                     className={block.className || ''} 
@@ -148,7 +156,7 @@ const renderBlockContent = (block, onUpdate) => {
                         height: '100%',
                         outline: 'none',
                         wordBreak: 'break-word',
-                        padding: '4px 6px',
+                        padding: block.id === 'gen-block-main' ? '0' : '4px 6px',
                         userSelect: 'text',
                         pointerEvents: 'auto',
                         ...block.style
@@ -215,6 +223,122 @@ const renderBlockContent = (block, onUpdate) => {
                             <span style={{ fontSize: 11, fontWeight: 600 }}>Click SIGN above</span>
                         </div>
                     )}
+                </div>
+            );
+
+        case 'date':
+            return (
+                <div 
+                    className="interactive-element"
+                    style={{
+                        width: '100%', height: '100%', display: 'flex', alignItems: 'center', 
+                        padding: '0 12px', border: '1px solid #cbd5e1', borderRadius: '6px',
+                        background: '#f8fafc', color: '#1e293b', fontSize: '13px', gap: '10px',
+                        cursor: 'pointer', pointerEvents: 'auto'
+                    }}
+                    onClick={(e) => {
+                        e.stopPropagation();
+                        // Trigger a native date picker
+                        const input = e.currentTarget.querySelector('input');
+                        if (input) input.showPicker ? input.showPicker() : input.focus();
+                    }}
+                >
+                    <Calendar size={14} color="#6366f1" />
+                    <span>{block.value || block.content || 'Select Date'}</span>
+                    <input 
+                        type="date" 
+                        style={{ position: 'absolute', opacity: 0, width: 0, height: 0, pointerEvents: 'none' }}
+                        onChange={(e) => onUpdateBlock(block.id, { value: e.target.value })}
+                    />
+                </div>
+            );
+
+        case 'checkbox':
+        case 'radio':
+            const isChecked = !!block.value;
+            return (
+                <div 
+                    className="interactive-element"
+                    style={{
+                        width: '100%', height: '100%', display: 'flex', alignItems: 'center', 
+                        gap: '10px', padding: '0 8px', cursor: 'pointer', pointerEvents: 'auto'
+                    }}
+                    onClick={(e) => {
+                        e.stopPropagation();
+                        onUpdateBlock(block.id, { value: !isChecked });
+                    }}
+                >
+                    <div style={{
+                        width: '20px', height: '20px', 
+                        border: '2px solid #6366f1', 
+                        borderRadius: block.type === 'radio' ? '50%' : '4px',
+                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        background: isChecked ? '#6366f1' : 'white',
+                        transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)'
+                    }}>
+                        {isChecked && (
+                            block.type === 'checkbox' 
+                                ? <CheckSquare size={14} color="white" /> 
+                                : <div style={{ width: 8, height: 8, background: 'white', borderRadius: '50%' }} />
+                        )}
+                    </div>
+                    <span style={{ fontSize: '13.5px', color: '#1e293b', fontWeight: 500 }}>{block.content || 'Option'}</span>
+                </div>
+            );
+
+        case 'dropdown':
+            return (
+                <div 
+                    className="interactive-element"
+                    style={{ width: '100%', height: '100%', position: 'relative', pointerEvents: 'auto' }}>
+                    <select
+                        className="interactive-element"
+                        style={{
+                            width: '100%', height: '100%', padding: '0 12px', border: '1px solid #cbd5e1',
+                            borderRadius: '6px', background: 'white', color: '#1e293b', fontSize: '13px',
+                            appearance: 'none', cursor: 'pointer', outline: 'none'
+                        }}
+                        value={block.value || ''}
+                        onChange={(e) => onUpdateBlock(block.id, { value: e.target.value })}
+                        onClick={(e) => e.stopPropagation()}
+                    >
+                        <option value="" disabled>Select option...</option>
+                        <option value="option1">Option 1</option>
+                        <option value="option2">Option 2</option>
+                        <option value="option3">Option 3</option>
+                    </select>
+                    <ChevronDown 
+                        size={14} 
+                        color="#64748b" 
+                        style={{ position: 'absolute', right: 12, top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none' }} 
+                    />
+                </div>
+            );
+
+        case 'stamp':
+            return (
+                <div style={{
+                    width: '100%', height: '100%', display: 'flex', flexDirection: 'column',
+                    alignItems: 'center', justifyContent: 'center', border: '2px dashed #94a3b8',
+                    borderRadius: '50%', background: '#f1f5f9', color: '#64748b', opacity: 0.8
+                }}>
+                    <Stamp size={32} strokeWidth={1.5} />
+                    <span style={{ fontSize: '10px', fontWeight: 700, marginTop: '4px' }}>STAMP HERE</span>
+                </div>
+            );
+
+        case 'payment':
+            return (
+                <div style={{
+                    width: '100%', height: '100%', display: 'flex', alignItems: 'center', 
+                    gap: '12px', padding: '0 16px', border: '1px solid #e2e8f0', 
+                    borderRadius: '8px', background: '#f8fafc', color: '#1e293b'
+                }}>
+                    <CreditCard size={20} color="#6366f1" />
+                    <div style={{ display: 'flex', flexDirection: 'column' }}>
+                        <span style={{ fontSize: '12px', fontWeight: 600 }}>Payment Field</span>
+                        <span style={{ fontSize: '10px', color: '#64748b' }}>Configure in properties</span>
+                    </div>
                 </div>
             );
 
