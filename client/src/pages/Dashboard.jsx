@@ -249,34 +249,29 @@ export default function Dashboard() {
                 {/* upgrade banner */}
                 {showUpgradeBanner && (
                     <div style={{
-                        margin: '0 10px 16px', padding: '16px 14px',
-                        border: '1px solid #E5E7EB', borderRadius: 14,
-                        background: '#fff', position: 'relative',
-                        boxShadow: '0 2px 8px rgba(0,0,0,0.04)'
+                        margin: 'auto 12px 16px', padding: '16px',
+                        border: '1px solid #E5E7EB', borderRadius: 12,
+                        background: '#fff', position: 'relative'
                     }}>
                         <button onClick={() => setShowUpgradeBanner(false)} style={{
-                            position: 'absolute', top: 10, right: 10,
-                            background: 'none', border: 'none', cursor: 'pointer', color: '#9CA3AF', padding: 2
-                        }}><X size={13} /></button>
+                            position: 'absolute', top: 12, right: 12,
+                            background: 'none', border: 'none', cursor: 'pointer', color: '#9CA3AF'
+                        }}><X size={14} /></button>
                         <div style={{
-                            display: 'inline-flex', alignItems: 'center', gap: 5,
-                            background: 'rgba(92,103,242,0.1)', color: '#5C67F2',
-                            borderRadius: 20, padding: '4px 10px', fontSize: 11, fontWeight: 700, marginBottom: 8
+                            display: 'inline-flex', alignItems: 'center', gap: 6,
+                            background: '#5C67F2', color: '#fff',
+                            borderRadius: 6, padding: '6px 12px', fontSize: 11, fontWeight: 700, marginBottom: 16
                         }}>
-                            <Zap size={12} fill="#5C67F2" /> 20 days left
+                            <Zap size={13} fill="#fff" /> 20 days left
                         </div>
-                        <p style={{ fontSize: 11, color: '#6B7280', lineHeight: 1.6, margin: '0 0 12px', fontWeight: 500 }}>
+                        <p style={{ fontSize: 11, color: '#6B7280', lineHeight: 1.5, margin: '0 0 12px', fontWeight: 500 }}>
                             Upgrade to premium and enjoy the benefits for a long time
                         </p>
                         <button style={{
-                            width: '100%', padding: '9px', background: '#fff',
-                            border: '1px solid #E5E7EB', borderRadius: 9,
-                            fontSize: 12, fontWeight: 700, color: '#374151', cursor: 'pointer',
-                            transition: 'background 0.15s'
-                        }}
-                            onMouseEnter={e => e.currentTarget.style.background = '#F9FAFB'}
-                            onMouseLeave={e => e.currentTarget.style.background = '#fff'}
-                        >View Plan</button>
+                            width: '100%', padding: '10px', background: 'transparent',
+                            border: '1px solid #E5E7EB', borderRadius: 10,
+                            fontSize: 12, fontWeight: 700, color: '#374151', cursor: 'pointer'
+                        }}>View Plan</button>
                     </div>
                 )}
             </aside>
@@ -410,7 +405,6 @@ export default function Dashboard() {
 
         return (
             <div style={{ padding: isMobile ? '16px' : '24px 28px', fontFamily: 'Inter, sans-serif' }}>
-
                 {/* ── Stat Cards ─────────────────────────────────────────── */}
                 <motion.div 
                     initial={{ opacity: 0, y: 20 }}
@@ -424,10 +418,10 @@ export default function Dashboard() {
                     }}
                 >
                     {[
-                        { label: 'Total Documents Created', value: totalDocs || 12, icon: FileText, color: '#6366F1', bg: '#EEF2FF', trend: '+15%' },
-                        { label: 'Monthly Revenue', value: '$150', icon: DollarSign, color: '#10B981', bg: '#ECFDF5', badge: '+10.2%' },
-                        { label: 'Most Used Category', value: mostUsedLabel, icon: Star, color: '#8B5CF6', bg: '#F5F3FF', trend: 'Trending' },
-                        { label: 'Estimated Time Saved', value: `${Math.max(1, Math.floor(totalDocs * 0.5))} hrs`, icon: Clock, color: '#F59E0B', bg: '#FFFBEB', badge: '+2 hrs' },
+                        { label: 'Total Documents Created', value: totalDocs || 12, icon: FileText, color: '#6366F1', bg: '#EEF2FF' },
+                        { label: 'Monthly Revenue', value: '$150', icon: DollarSign, color: '#10B981', bg: '#ECFDF5', badge: '10.2%' },
+                        { label: 'Most Used Category', value: mostUsedLabel, icon: Star, color: '#8B5CF6', bg: '#F3E8FF' },
+                        { label: 'Estimated Time Saved', value: `${Math.max(12, Math.floor(totalDocs * 0.5))} hrs`, icon: Clock, color: '#F59E0B', bg: '#FFEDD5' },
                     ].map((card, i) => {
                         const Icon = card.icon;
                         return (
@@ -436,53 +430,48 @@ export default function Dashboard() {
                                 initial={{ opacity: 0, scale: 0.95 }}
                                 animate={{ opacity: 1, scale: 1 }}
                                 transition={{ delay: i * 0.1 }}
-                                whileHover={{ y: -5, boxShadow: '0 10px 25px rgba(0,0,0,0.08)' }}
+                                whileHover={{ y: -2, boxShadow: '0 8px 24px rgba(0,0,0,0.06)' }}
                                 style={{
-                                    background: 'rgba(255, 255, 255, 0.8)',
-                                    backdropFilter: 'blur(12px)',
-                                    borderRadius: 16, 
-                                    padding: '20px',
-                                    border: '1px solid rgba(229, 231, 235, 0.5)',
-                                    boxShadow: '0 4px 6px rgba(0,0,0,0.02)',
+                                    background: '#fff',
+                                    borderRadius: 12, 
+                                    padding: '24px',
+                                    border: '1px solid #E5E7EB',
+                                    boxShadow: '0 1px 3px rgba(0,0,0,0.02)',
                                     cursor: 'default',
-                                    position: 'relative',
-                                    overflow: 'hidden'
+                                    display: 'flex',
+                                    flexDirection: 'column',
+                                    gap: 16
                                 }}
                             >
-                                {/* Decorative gradient blob */}
-                                <div style={{
-                                    position: 'absolute', top: -20, right: -20, width: 80, height: 80,
-                                    background: `radial-gradient(circle, ${card.color}20 0%, transparent 70%)`,
-                                    borderRadius: '50%'
-                                }} />
-
-                                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 16 }}>
+                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                                     <div style={{
-                                        width: 40, height: 40, borderRadius: 10,
+                                        width: 42, height: 42, borderRadius: 8,
                                         background: card.bg, color: card.color,
                                         display: 'flex', alignItems: 'center', justifyContent: 'center'
                                     }}>
                                         <Icon size={20} />
                                     </div>
-                                    <div style={{ color: '#9CA3AF', cursor: 'pointer', padding: 4, borderRadius: 6 }}>
-                                        <MoreHorizontal size={16} />
+                                    <div style={{ 
+                                        color: '#9CA3AF', cursor: 'pointer', padding: '4px', 
+                                        borderRadius: 6, border: '1px solid #F3F4F6'
+                                    }}>
+                                        <MoreHorizontal size={14} />
                                     </div>
                                 </div>
-                                <div style={{ fontSize: isMobile ? 22 : 28, fontWeight: 800, color: '#111827', letterSpacing: '-0.02em', display: 'flex', alignItems: 'center', gap: 6 }}>
-                                    {card.value}
-                                    {(card.badge || card.trend) && (
-                                        <span style={{ fontSize: 11, fontWeight: 700, color: card.badge ? '#10B981' : '#6366F1', display: 'flex', alignItems: 'center', gap: 2, background: card.badge ? '#ECFDF5' : '#EEF2FF', padding: '2px 8px', borderRadius: 12 }}>
-                                            {card.badge && <ArrowUp size={11} />}
-                                            {card.badge || card.trend}
-                                        </span>
-                                    )}
+                                <div>
+                                    <div style={{ fontSize: 26, fontWeight: 700, color: '#111827', display: 'flex', alignItems: 'center', gap: 8 }}>
+                                        {card.value}
+                                        {card.badge && (
+                                            <span style={{ fontSize: 11, fontWeight: 600, color: '#10B981', display: 'flex', alignItems: 'center' }}>
+                                                <ArrowUp size={11} style={{ marginRight: 2 }}/>
+                                                {card.badge.replace('+', '')}
+                                            </span>
+                                        )}
+                                    </div>
+                                    <div style={{ fontSize: 13, color: '#9CA3AF', fontWeight: 500, marginTop: 4 }}>
+                                        {card.label}
+                                    </div>
                                 </div>
-                                <div style={{ fontSize: 12, color: '#6B7280', fontWeight: 600, marginTop: 4 }}>{card.label}</div>
-                                
-                                {/* Tiny sparkline placeholder */}
-                                <svg width="100%" height="20" viewBox="0 0 100 20" style={{ marginTop: 12, opacity: 0.5 }}>
-                                    <path d="M0,15 Q10,5 20,10 T40,10 T60,5 T80,12 T100,5" fill="none" stroke={card.color} strokeWidth="2" strokeLinecap="round" />
-                                </svg>
                             </motion.div>
                         );
                     })}
@@ -501,43 +490,47 @@ export default function Dashboard() {
                     }}
                 >
                     {/* Recent Documents hero */}
-                    <div style={{ background: '#fff', borderRadius: 20, border: '1px solid #E5E7EB', padding: '24px', boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}>
+                    <div style={{ background: '#fff', borderRadius: 16, border: '1px solid #E5E7EB', padding: '24px', boxShadow: '0 1px 3px rgba(0,0,0,0.02)' }}>
                         <h3 style={{ fontSize: 16, fontWeight: 700, color: '#111827', margin: '0 0 20px' }}>Recent Documents</h3>
                         <div style={{
-                            background: 'linear-gradient(160deg, #F8F9FF 0%, #F3F4FF 100%)',
-                            border: '1px dashed #C7D2FE', borderRadius: 14,
-                            padding: '36px 24px', display: 'flex', flexDirection: 'column',
-                            alignItems: 'center', textAlign: 'center'
+                            background: '#FAF5FF',
+                            borderRadius: 12,
+                            padding: '40px 24px', display: 'flex', flexDirection: 'column',
+                            alignItems: 'center', textAlign: 'center', position: 'relative', overflow: 'hidden'
                         }}>
-                            <div style={{
-                                width: 56, height: 56, borderRadius: 14, background: '#EEF2FF',
-                                display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 16
-                            }}>
-                                <FileText size={28} color="#6366F1" />
+                             {/* Faint decorative wave representation */}
+                            <svg style={{ position: 'absolute', bottom: 0, left: 0, right: 0, width: '100%', height: '50%' }} viewBox="0 0 1440 320" preserveAspectRatio="none">
+                                <path fill="#F3E8FF" fillOpacity="0.5" d="M0,160L80,149.3C160,139,320,117,480,128C640,139,800,181,960,192C1120,203,1280,181,1360,170.7L1440,160L1440,320L1360,320C1280,320,1120,320,960,320C800,320,640,320,480,320C320,320,160,320,80,320L0,320Z"></path>
+                            </svg>
+                            <div style={{ position: 'relative', zIndex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                                <div style={{
+                                    display: 'flex', alignItems: 'center', gap: 12, marginBottom: 12, color: '#6366F1'
+                                }}>
+                                    <FileText size={32} strokeWidth={1.5} />
+                                    <h4 style={{ fontSize: 22, fontWeight: 600, color: '#111827', margin: 0 }}>
+                                        Create Your First Document
+                                    </h4>
+                                </div>
+                                <p style={{ fontSize: 13, color: '#6B7280', margin: '0 0 24px', maxWidth: 380, lineHeight: 1.6 }}>
+                                    Generate contracts, invoices, or HR documents in seconds.
+                                </p>
+                                <button onClick={() => navigate('/documents/create')} style={{
+                                    padding: '12px 28px', background: '#5C67F2', color: '#fff',
+                                    border: 'none', borderRadius: 8, fontSize: 13, fontWeight: 600,
+                                    cursor: 'pointer', transition: 'all 0.2s', boxShadow: '0 2px 8px rgba(92,103,242,0.2)'
+                                }}
+                                    onMouseEnter={e => { e.currentTarget.style.background = '#4F59E3'; }}
+                                    onMouseLeave={e => { e.currentTarget.style.background = '#5C67F2'; }}
+                                >
+                                    Generate Document
+                                </button>
                             </div>
-                            <h4 style={{ fontSize: 20, fontWeight: 700, color: '#111827', margin: '0 0 8px' }}>
-                                {docs.length === 0 ? 'Create Your First Document' : 'Generate a New Document'}
-                            </h4>
-                            <p style={{ fontSize: 13, color: '#6B7280', margin: '0 0 24px', maxWidth: 340, lineHeight: 1.6 }}>
-                                Generate contracts, invoices, or HR documents in seconds.
-                            </p>
-                            <button onClick={() => navigate('/documents/create')} style={{
-                                padding: '12px 28px', background: '#5C67F2', color: '#fff',
-                                border: 'none', borderRadius: 10, fontSize: 14, fontWeight: 700,
-                                cursor: 'pointer', boxShadow: '0 4px 14px rgba(92,103,242,0.35)',
-                                transition: 'all 0.2s'
-                            }}
-                                onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = '0 8px 20px rgba(92,103,242,0.4)'; }}
-                                onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = '0 4px 14px rgba(92,103,242,0.35)'; }}
-                            >
-                                Generate Document
-                            </button>
                         </div>
                     </div>
 
                     {/* AI Assistant */}
-                    <div style={{ background: '#fff', borderRadius: 20, border: '1px solid #E5E7EB', padding: '24px', boxShadow: '0 1px 4px rgba(0,0,0,0.04)', display: 'flex', flexDirection: 'column' }}>
-                        <h3 style={{ fontSize: 16, fontWeight: 700, color: '#111827', margin: '0 0 16px' }}>AI Assistant</h3>
+                    <div style={{ background: '#fff', borderRadius: 16, border: '1px solid #E5E7EB', padding: '24px', boxShadow: '0 1px 3px rgba(0,0,0,0.02)', display: 'flex', flexDirection: 'column' }}>
+                        <h3 style={{ fontSize: 16, fontWeight: 700, color: '#111827', margin: '0 0 20px' }}>AI Assistant</h3>
                         <div style={{ display: 'flex', flexDirection: 'column', gap: 10, flex: 1 }}>
                             {[
                                 'Create HR offer letter',
@@ -547,112 +540,67 @@ export default function Dashboard() {
                                 <div key={i}
                                     onClick={() => navigate('/documents/create')}
                                     style={{
-                                        padding: '13px 16px', background: '#F5F3FF',
-                                        borderRadius: 12, display: 'flex', alignItems: 'center', gap: 10,
-                                        cursor: 'pointer', transition: 'all 0.18s', border: '1px solid transparent'
+                                        padding: '12px 16px', background: '#F8F9FB',
+                                        borderRadius: 8, display: 'flex', alignItems: 'center', gap: 10,
+                                        cursor: 'pointer', transition: 'all 0.18s'
                                     }}
-                                    onMouseEnter={e => { e.currentTarget.style.background = '#EDE9FE'; e.currentTarget.style.borderColor = '#C4B5FD'; }}
-                                    onMouseLeave={e => { e.currentTarget.style.background = '#F5F3FF'; e.currentTarget.style.borderColor = 'transparent'; }}
+                                    onMouseEnter={e => { e.currentTarget.style.background = '#F3F4F6'; }}
+                                    onMouseLeave={e => { e.currentTarget.style.background = '#F8F9FB'; }}
                                 >
-                                    <span style={{ width: 8, height: 8, borderRadius: '50%', background: '#6366F1', flexShrink: 0 }} />
-                                    <span style={{ fontSize: 13, fontWeight: 600, color: '#4B5563' }}>{action}</span>
+                                    <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#9CA3AF', flexShrink: 0 }} />
+                                    <span style={{ fontSize: 13, fontWeight: 500, color: '#4B5563' }}>{action}</span>
                                 </div>
                             ))}
                         </div>
                         <button onClick={() => navigate('/documents/create')} style={{
-                            marginTop: 16, padding: '13px', background: '#5C67F2', color: '#fff',
-                            border: 'none', borderRadius: 10, fontSize: 14, fontWeight: 700,
+                            marginTop: 16, padding: '12px', background: '#7E85F5', color: '#fff',
+                            border: 'none', borderRadius: 8, fontSize: 13, fontWeight: 600,
                             display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
-                            cursor: 'pointer', transition: 'opacity 0.2s'
+                            cursor: 'pointer', transition: 'opacity 0.2s', boxShadow: '0 2px 8px rgba(92,103,242,0.2)'
                         }}
                             onMouseEnter={e => e.currentTarget.style.opacity = '0.9'}
                             onMouseLeave={e => e.currentTarget.style.opacity = '1'}
                         >
-                            <Wand2 size={16} /> Ask AI
+                            Ask AI <Edit3 size={14} />
                         </button>
                     </div>
                 </motion.div>
 
-                {/* ── Bottom Row: Recent Docs list + Chart + Live Activity ──────────────── */}
+                {/* ── Bottom Row: Recent Docs list + Chart ──────────────── */}
                 <motion.div 
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.3 }}
                     style={{
                         display: 'grid',
-                        gridTemplateColumns: isMobile ? '1fr' : '1.2fr 1.5fr 1fr',
+                        gridTemplateColumns: isMobile ? '1fr' : '2fr 1fr',
                         gap: 20
                     }}
                 >
-                    {/* Live Activity Feed */}
-                    <div style={{ background: '#fff', borderRadius: 20, border: '1px solid #E5E7EB', padding: '24px', boxShadow: '0 1px 4px rgba(0,0,0,0.04)', display: 'flex', flexDirection: 'column' }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
-                            <h3 style={{ fontSize: 16, fontWeight: 700, color: '#111827', margin: 0, display: 'flex', alignItems: 'center', gap: 8 }}>
-                                <span style={{ width: 8, height: 8, borderRadius: '50%', background: '#10B981', display: 'inline-block', flexShrink: 0, padding: 0 }} />
-                                Live Activity
-                            </h3>
-                        </div>
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: 16, flex: 1, position: 'relative' }}>
-                            {/* vertical line */}
-                            <div style={{ position: 'absolute', left: 15, top: 15, bottom: 15, width: 2, background: '#F3F4F6', zIndex: 0 }} />
-                            
-                            {[
-                                { action: 'Document Generated', target: 'Offer Letter', time: 'Just now', icon: FilePlus, color: '#10B981', bg: '#D1FAE5' },
-                                { action: 'Template Viewed', target: 'NDA Standard', time: '10 mins ago', icon: Eye, color: '#8B5CF6', bg: '#EDE9FE' },
-                                { action: 'Draft Saved', target: 'Service Agreement', time: '1 hour ago', icon: Save, color: '#F59E0B', bg: '#FEF3C7' },
-                                { action: 'Login Successful', target: user?.name || 'User', time: '2 hours ago', icon: Shield, color: '#6366F1', bg: '#E0E7FF' },
-                            ].map((act, i) => {
-                                const Icon = act.icon;
-                                return (
-                                    <motion.div 
-                                        key={i}
-                                        initial={{ opacity: 0, x: -20 }}
-                                        animate={{ opacity: 1, x: 0 }}
-                                        transition={{ delay: 0.4 + i * 0.1 }}
-                                        style={{ display: 'flex', gap: 12, position: 'relative', zIndex: 1 }}
-                                    >
-                                        <div style={{ width: 32, height: 32, borderRadius: '50%', background: act.bg, color: act.color, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, border: '2px solid #fff' }}>
-                                            <Icon size={14} strokeWidth={2.5} />
-                                        </div>
-                                        <div style={{ flex: 1, marginTop: 4 }}>
-                                            <div style={{ fontSize: 13, fontWeight: 600, color: '#374151', lineHeight: 1.3 }}>
-                                                {act.action} <span style={{ color: '#111827', fontWeight: 700 }}>{act.target}</span>
-                                            </div>
-                                            <div style={{ fontSize: 11, color: '#9CA3AF', marginTop: 2 }}>{act.time}</div>
-                                        </div>
-                                    </motion.div>
-                                );
-                            })}
-                        </div>
-                    </div>
-
                     {/* Recent Documents list */}
-                    <div style={{ background: '#fff', borderRadius: 20, border: '1px solid #E5E7EB', padding: '24px', boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}>
+                    <div style={{ background: '#fff', borderRadius: 16, border: '1px solid #E5E7EB', padding: '24px', boxShadow: '0 1px 3px rgba(0,0,0,0.02)' }}>
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
                             <h3 style={{ fontSize: 16, fontWeight: 700, color: '#111827', margin: 0 }}>Recent Documents</h3>
-                            <button onClick={() => navigate('/documents')} style={{
-                                background: 'none', border: 'none', color: '#6366F1', fontSize: 13, fontWeight: 600, cursor: 'pointer'
-                            }}>View all</button>
                         </div>
                         <div style={{ display: 'flex', flexDirection: 'column', gap: 0 }}>
                             {displayedRecentDocs.map((doc, i) => {
-                                const Icon = doc.icon || FileText;
+                                const Icon = doc.title.includes('Offer') ? Edit3 : doc.title.includes('Invoice') ? FileSpreadsheet : FileText;
                                 return (
                                     <div key={i} style={{
                                         display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-                                        padding: '12px 0',
+                                        padding: '16px 0',
                                         borderBottom: i < displayedRecentDocs.length - 1 ? '1px solid #F3F4F6' : 'none'
                                     }}>
-                                        <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
                                             <div style={{
-                                                width: 42, height: 42, borderRadius: 10, background: '#EEF2FF',
+                                                width: 40, height: 40, borderRadius: 8, background: '#fff', border: '1px solid #E5E7EB',
                                                 display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#6366F1', flexShrink: 0
                                             }}>
                                                 <Icon size={18} />
                                             </div>
                                             <div>
-                                                <div style={{ fontSize: 14, fontWeight: 600, color: '#111827' }}>{doc.title}</div>
-                                                <div style={{ fontSize: 12, color: '#9CA3AF', marginTop: 2 }}>{doc.status}</div>
+                                                <div style={{ fontSize: 14, fontWeight: 600, color: '#374151', marginBottom: 4 }}>{doc.title}</div>
+                                                <div style={{ fontSize: 12, color: '#9CA3AF' }}>{doc.status}</div>
                                             </div>
                                         </div>
                                         <div style={{ fontSize: 12, color: '#9CA3AF', fontWeight: 500, whiteSpace: 'nowrap' }}>{doc.time}</div>
@@ -663,30 +611,30 @@ export default function Dashboard() {
                     </div>
 
                     {/* Weekly Chart */}
-                    <div style={{ background: '#fff', borderRadius: 20, border: '1px solid #E5E7EB', padding: '24px', boxShadow: '0 1px 4px rgba(0,0,0,0.04)', display: 'flex', flexDirection: 'column' }}>
-                        <h3 style={{ fontSize: 15, fontWeight: 700, color: '#111827', margin: '0 0 20px' }}>Documents Generated This Week</h3>
-                        <div style={{ flex: 1, minHeight: 200 }}>
-                            <ResponsiveContainer width="100%" height={200}>
-                                <AreaChart data={weekData} margin={{ top: 5, right: 5, left: -24, bottom: 0 }}>
+                    <div style={{ background: '#fff', borderRadius: 16, border: '1px solid #E5E7EB', padding: '24px', boxShadow: '0 1px 3px rgba(0,0,0,0.02)', display: 'flex', flexDirection: 'column' }}>
+                        <h3 style={{ fontSize: 16, fontWeight: 700, color: '#111827', margin: '0 0 20px' }}>Documents Generated This Week</h3>
+                        <div style={{ flex: 1, minHeight: 220 }}>
+                            <ResponsiveContainer width="100%" height={220}>
+                                <AreaChart data={weekData} margin={{ top: 10, right: 10, left: -24, bottom: 0 }}>
                                     <defs>
                                         <linearGradient id="docGrad" x1="0" y1="0" x2="0" y2="1">
-                                            <stop offset="5%" stopColor="#6366F1" stopOpacity={0.4} />
-                                            <stop offset="95%" stopColor="#6366F1" stopOpacity={0.0} />
+                                            <stop offset="5%" stopColor="#818CF8" stopOpacity={0.6} />
+                                            <stop offset="95%" stopColor="#818CF8" stopOpacity={0.1} />
                                         </linearGradient>
                                     </defs>
-                                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#F3F4F6" />
-                                    <XAxis dataKey="day" axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: '#9CA3AF', fontWeight: 600 }} dy={10} />
-                                    <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: '#9CA3AF' }} allowDecimals={false} dx={-10} />
+                                    <CartesianGrid strokeDasharray="3 3" vertical={true} horizontal={true} stroke="#E5E7EB" />
+                                    <XAxis dataKey="day" axisLine={false} tickLine={false} tick={{ fontSize: 11, fill: '#6B7280' }} dy={10} />
+                                    <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 11, fill: '#6B7280' }} allowDecimals={false} dx={-10} ticks={[5, 10, 15, 20]} tickFormatter={(val) => val + '%'} />
                                     <Tooltip
-                                        contentStyle={{ background: 'rgba(255, 255, 255, 0.9)', backdropFilter: 'blur(8px)', border: 'none', borderRadius: 12, fontSize: 12, fontWeight: 600, boxShadow: '0 10px 25px rgba(0,0,0,0.1)' }}
-                                        cursor={{ stroke: '#6366F1', strokeWidth: 1, strokeDasharray: '4 4' }}
+                                        contentStyle={{ background: '#fff', border: '1px solid #E5E7EB', borderRadius: 8, fontSize: 12, fontWeight: 500, boxShadow: '0 4px 6px rgba(0,0,0,0.05)' }}
+                                        cursor={{ stroke: '#818CF8', strokeWidth: 1, strokeDasharray: '4 4' }}
                                     />
                                     <Area
-                                        type="monotone" dataKey="count"
-                                        stroke="#6366F1" strokeWidth={3}
+                                        type="linear" dataKey="count"
+                                        stroke="#818CF8" strokeWidth={2}
                                         fill="url(#docGrad)"
-                                        dot={{ fill: '#fff', stroke: '#6366F1', strokeWidth: 2, r: 4 }}
-                                        activeDot={{ r: 6, fill: '#6366F1', stroke: '#fff', strokeWidth: 3 }}
+                                        dot={{ fill: '#fff', stroke: '#818CF8', strokeWidth: 2, r: 4 }}
+                                        activeDot={{ r: 6, fill: '#818CF8', stroke: '#fff', strokeWidth: 2 }}
                                         animationDuration={1500}
                                     />
                                 </AreaChart>

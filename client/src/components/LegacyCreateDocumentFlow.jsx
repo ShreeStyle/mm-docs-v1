@@ -1,11 +1,15 @@
-
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import {
+    Search, FileText, Plus, Star, Clock, DollarSign,
+    Bell, MoreHorizontal, ArrowUp, X, Zap, Wand2,
+    LayoutGrid, FilePlus, Layers, Package, GitBranch,
+    BarChart, Menu, ChevronRight, Edit3, Download,
+    Filter, Eye, AlertCircle, Users, TrendingUp,
+    CheckSquare, Shield, Settings, LogOut, FileSpreadsheet, Save, Check, Calculator, Handshake
+} from 'lucide-react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { api } from '../utils/api';
 import { getApiUrl } from '../config/api';
-import {
-    Users, TrendingUp, DollarSign, CheckSquare, ChevronRight, FileText, ChevronLeft, Send, Sparkles, Image as ImageIcon, Briefcase, Stamp, Building2, HelpCircle
-} from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 export default function LegacyCreateDocumentFlow({ 
@@ -17,42 +21,111 @@ export default function LegacyCreateDocumentFlow({
     setError, token
 }) {
     const navigate = useNavigate();
+    const [selectedCategory, setSelectedCategory] = useState(null);
+
+    // ── Components ────────────────────────────────────────────────────────────
+
+    const StepIndicator = ({ currentStep }) => {
+        const steps = [
+            { id: 1, label: 'Select Category' },
+            { id: 2, label: 'Smart Form Input' },
+            { id: 3, label: 'View Document' }
+        ];
+
+        return (
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 60, marginBottom: 60, marginTop: 20 }}>
+                {steps.map((step, idx) => {
+                    const isCompleted = currentStep > step.id;
+                    const isActive = currentStep === step.id;
+                    
+                    // Colors from mockup
+                    const activeColor = '#6366F1';
+                    const completedColor = '#6366F1';
+                    const inactiveColor = '#A3A3A3';
+
+                    return (
+                        <div key={idx} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12, position: 'relative' }}>
+                            <div style={{
+                                width: 44,
+                                height: 44,
+                                borderRadius: '50%',
+                                background: isCompleted ? activeColor : isActive ? `linear-gradient(135deg, ${activeColor}, #8B5CF6)` : '#BCBCBC',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                color: '#fff',
+                                fontSize: 16,
+                                fontWeight: 600,
+                                zIndex: 2,
+                                boxShadow: isActive ? `0 0 0 6px ${activeColor}20` : 'none',
+                                transition: 'all 0.3s ease'
+                            }}>
+                                {isCompleted ? <Check size={22} strokeWidth={3} /> : step.id}
+                            </div>
+                            <span style={{ 
+                                fontSize: 12, 
+                                fontWeight: 600, 
+                                color: isActive || isCompleted ? '#1F2937' : '#9CA3AF',
+                                whiteSpace: 'nowrap' 
+                            }}>{step.label}</span>
+                            
+                            {/* Connector line */}
+                            {idx < steps.length - 1 && (
+                                <div style={{
+                                    position: 'absolute',
+                                    top: 22,
+                                    left: 70,
+                                    width: 100,
+                                    height: 1,
+                                    background: currentStep > step.id ? activeColor : '#E5E7EB',
+                                    zIndex: 1
+                                }} />
+                            )}
+                        </div>
+                    );
+                })}
+            </div>
+        );
+    };
 
     const CreateDocumentPage = () => {
         // Document categories definition
         const categories = [
             {
                 id: 'hr',
-                name: 'HR Documents',
+                name: 'HR',
                 icon: Users,
-                description: 'Employment letters and HR forms',
+                description: 'Employee contracts, offer letters, and HR policies.',
                 color: '#6366F1',
-                bgColor: '#EEF2FF'
+                bgColor: '#F5F7FF',
+                miniIcons: [Users, Star, Shield]
             },
-
             {
                 id: 'sales',
-                name: 'Sales Documents',
+                name: 'Sales',
                 icon: TrendingUp,
-                description: 'Proposals and sales agreements',
-                color: '#0EA5E9',
-                bgColor: '#F0F9FF'
+                description: 'Sales proposals, contracts, and business deals.',
+                color: '#F97316',
+                bgColor: '#FFF8F1',
+                miniIcons: [TrendingUp, Handshake, Bell]
             },
             {
                 id: 'finance',
-                name: 'Finance Documents',
+                name: 'Finance',
                 icon: DollarSign,
-                description: 'Invoices and financial records',
+                description: 'Invoices, payment records, and financial documentation.',
                 color: '#10B981',
-                bgColor: '#F0FDF4'
+                bgColor: '#F2FDF9',
+                miniIcons: [FileSpreadsheet, DollarSign, Calculator]
             },
             {
                 id: 'compliance',
-                name: 'Compliance Documents',
+                name: 'Compliance',
                 icon: CheckSquare,
-                description: 'Regulatory and compliance filings',
+                description: 'Audit reports, policies, and regulatory documentation.',
                 color: '#F59E0B',
-                bgColor: '#FFFBEB'
+                bgColor: '#FFFBF2',
+                miniIcons: [Shield, CheckSquare, Clock]
             }
         ];
 
@@ -206,102 +279,197 @@ export default function LegacyCreateDocumentFlow({
             );
         }
 
-        // Otherwise, show category selection (Step 1)
+        // Determine current step
+        const step = currentView === 'generate-document' ? 2 : currentView === 'view-document' ? 3 : 1;
+
         return (
             <div style={{
-                padding: isMobile ? '16px' : '32px',
-                maxWidth: '1000px',
-                margin: '0 auto'
+                padding: isMobile ? '16px' : '24px 40px',
+                maxWidth: '1200px',
+                margin: '0 auto',
+                fontFamily: 'Inter, sans-serif'
             }}>
-                <div style={{ 
-                    marginBottom: '32px',
-                    textAlign: 'center'
-                }}>
-                    <h2 style={{
-                        fontSize: '28px',
-                        fontWeight: '700',
-                        color: '#111827',
-                        margin: '0 0 8px 0',
-                        letterSpacing: '-0.02em'
-                    }}>Create Document</h2>
-                    <p style={{
-                        fontSize: '16px',
-                        color: '#6B7280',
-                        margin: 0
-                    }}>Select a document category to get started</p>
+                <StepIndicator currentStep={step} />
+
+                <div style={{ marginBottom: 40 }}>
+                    <h2 style={{ fontSize: 32, fontWeight: 700, color: '#111827', margin: 0, letterSpacing: '-0.02em' }}>1. Select Category</h2>
                 </div>
 
                 <div style={{
                     display: 'grid',
-                    gridTemplateColumns: isMobile ? '1fr' : isTablet ? 'repeat(2, 1fr)' : 'repeat(3, 1fr)',
-                    gap: '20px'
+                    gridTemplateColumns: isMobile ? '1fr' : 'repeat(4, 1fr)',
+                    gap: 12,
+                    marginBottom: 32
                 }}>
-                    {categories.map((category) => {
-                        const CategoryIcon = category.icon;
+                    {categories.map((cat) => {
+                        const Icon = cat.icon;
+                        const isSelected = selectedCategory === cat.id;
+
                         return (
-                            <button
-                                key={category.id}
-                                onClick={() => setCurrentView(category.id)}
+                            <motion.div
+                                key={cat.id}
+                                whileHover={{ y: -3, boxShadow: '0 6px 12px -4px rgba(0,0,0,0.08)' }}
+                                onClick={() => setSelectedCategory(cat.id)}
                                 style={{
-                                    padding: '28px 24px',
-                                    backgroundColor: 'white',
-                                    border: '1px solid #E5E7EB',
-                                    borderRadius: '12px',
+                                    background: '#fff',
+                                    border: `1px solid ${isSelected ? cat.color : '#E5E7EB'}`,
+                                    borderRadius: 12,
+                                    padding: '0 0 12px 0',
                                     cursor: 'pointer',
-                                    textAlign: 'left',
-                                    transition: 'all 0.2s ease',
+                                    transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                                    boxShadow: isSelected ? `0 0 0 2px ${cat.color}15, 0 4px 10px -6px rgba(0,0,0,0.06)` : '0 1px 2px rgba(0,0,0,0.01)',
+                                    overflow: 'hidden',
+                                    position: 'relative',
                                     display: 'flex',
                                     flexDirection: 'column',
-                                    gap: '16px',
-                                    boxShadow: '0 1px 2px rgba(0, 0, 0, 0.05)'
-                                }}
-                                onMouseEnter={(e) => {
-                                    e.currentTarget.style.borderColor = category.color;
-                                    e.currentTarget.style.backgroundColor = category.bgColor;
-                                    e.currentTarget.style.transform = 'translateY(-4px)';
-                                    e.currentTarget.style.boxShadow = '0 8px 16px rgba(0, 0, 0, 0.1)';
-                                }}
-                                onMouseLeave={(e) => {
-                                    e.currentTarget.style.borderColor = '#E5E7EB';
-                                    e.currentTarget.style.backgroundColor = 'white';
-                                    e.currentTarget.style.transform = 'translateY(0)';
-                                    e.currentTarget.style.boxShadow = '0 1px 2px rgba(0, 0, 0, 0.05)';
+                                    minHeight: 240
                                 }}
                             >
+                                {/* Illustration Area */}
                                 <div style={{
-                                    width: '56px',
-                                    height: '56px',
-                                    borderRadius: '12px',
-                                    backgroundColor: category.bgColor,
+                                    height: 110,
+                                    background: `radial-gradient(circle at center, ${cat.bgColor}, #fff)`,
+                                    position: 'relative',
                                     display: 'flex',
                                     alignItems: 'center',
                                     justifyContent: 'center',
-                                    color: category.color
+                                    overflow: 'hidden'
                                 }}>
-                                    <CategoryIcon size={28} strokeWidth={2} />
+                                    {/* Circular Waves (CSS Radar) */}
+                                    {[1, 2, 3].map(i => (
+                                        <motion.div 
+                                            key={i}
+                                            animate={{
+                                                scale: [1, 1.02, 1],
+                                                opacity: [0.15, 0.3, 0.15]
+                                            }}
+                                            transition={{
+                                                duration: 4,
+                                                repeat: Infinity,
+                                                delay: i * 0.5,
+                                                ease: "linear"
+                                            }}
+                                            style={{
+                                                position: 'absolute',
+                                                width: 40 + (i * 30),
+                                                height: 40 + (i * 30),
+                                                border: `1px solid ${cat.color}${i === 1 ? '25' : '10'}`,
+                                                borderRadius: '50%',
+                                            }} 
+                                        />
+                                    ))}
+
+                                    {/* Central Icon */}
+                                    <div style={{
+                                        width: 44, height: 44, borderRadius: 10,
+                                        background: '#fff', color: cat.color,
+                                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                        boxShadow: '0 3px 8px -2px rgba(0,0,0,0.08)', zIndex: 10,
+                                        border: `1px solid ${cat.color}08`
+                                    }}>
+                                        <Icon size={20} strokeWidth={1.5} />
+                                    </div>
+
+                                    {/* Floating Mini Icons */}
+                                    {cat.miniIcons.map((MIcon, idx) => {
+                                        const pos = [
+                                            { top: '12%', left: '12%' },
+                                            { top: '8%', right: '18%' },
+                                            { top: '22%', right: '6%' }
+                                        ][idx];
+                                        return (
+                                            <motion.div 
+                                                key={idx}
+                                                animate={{
+                                                    y: [0, -3, 0]
+                                                }}
+                                                transition={{
+                                                    duration: 3 + idx,
+                                                    repeat: Infinity,
+                                                    ease: "easeInOut"
+                                                }}
+                                                style={{
+                                                    position: 'absolute', 
+                                                    ...pos,
+                                                    width: 26, height: 26, borderRadius: '50%',
+                                                    background: '#fff', color: cat.color,
+                                                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                                    boxShadow: '0 3px 6px -2px rgba(0,0,0,0.05)',
+                                                    zIndex: 5,
+                                                    border: `1px solid ${cat.color}05`
+                                                }}
+                                            >
+                                                <MIcon size={12} strokeWidth={2} />
+                                            </motion.div>
+                                        );
+                                    })}
+
+                                    {/* Selection Checkmark */}
+                                    <AnimatePresence>
+                                        {isSelected && (
+                                            <motion.div
+                                                initial={{ scale: 0, opacity: 0 }}
+                                                animate={{ scale: 1, opacity: 1 }}
+                                                exit={{ scale: 0, opacity: 0 }}
+                                                style={{
+                                                    position: 'absolute',
+                                                    top: 8,
+                                                    right: 8,
+                                                    width: 20,
+                                                    height: 20,
+                                                    borderRadius: '50%',
+                                                    background: cat.color,
+                                                    color: '#fff',
+                                                    display: 'flex',
+                                                    alignItems: 'center',
+                                                    justifyContent: 'center',
+                                                    zIndex: 20,
+                                                    boxShadow: `0 2px 6px ${cat.color}20`
+                                                }}
+                                            >
+                                                <Check size={12} strokeWidth={3} />
+                                            </motion.div>
+                                        )}
+                                    </AnimatePresence>
                                 </div>
-                                <div>
-                                    <h4 style={{
-                                        fontSize: '18px',
-                                        fontWeight: '600',
-                                        color: '#111827',
-                                        margin: '0 0 6px 0',
-                                        letterSpacing: '-0.01em'
-                                    }}>{category.name}</h4>
-                                    <p style={{
-                                        fontSize: '14px',
-                                        color: '#6B7280',
-                                        margin: 0,
-                                        lineHeight: '1.5'
-                                    }}>{category.description}</p>
+
+                                {/* Content Area */}
+                                <div style={{ padding: '12px 12px 0', flex: 1 }}>
+                                    <h3 style={{ fontSize: 16, fontWeight: 700, color: '#111827', margin: '0 0 4px', letterSpacing: '-0.01em' }}>{cat.name}</h3>
+                                    <p style={{ fontSize: 11, color: '#6B7280', lineHeight: 1.3, margin: 0, fontWeight: 400 }}>{cat.description}</p>
                                 </div>
-                            </button>
+                            </motion.div>
                         );
                     })}
+                </div>
+
+                <div style={{ display: 'flex', justifyContent: 'flex-end', borderTop: '1px solid #F3F4F6', paddingTop: 40 }}>
+                    <button
+                        disabled={!selectedCategory}
+                        onClick={() => {
+                            if (selectedCategory) setCurrentView(selectedCategory);
+                        }}
+                        style={{
+                            padding: '16px 64px',
+                            background: selectedCategory ? '#4F46E5' : '#F3F4F6',
+                            color: selectedCategory ? '#fff' : '#9CA3AF',
+                            border: 'none',
+                            borderRadius: 12,
+                            fontSize: 18,
+                            fontWeight: 700,
+                            cursor: selectedCategory ? 'pointer' : 'not-allowed',
+                            transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                            boxShadow: selectedCategory ? '0 8px 24px -6px rgba(79, 70, 229, 0.4)' : 'none',
+                            transform: selectedCategory ? 'scale(1)' : 'scale(0.98)'
+                        }}
+                    >
+                        Continue
+                    </button>
                 </div>
             </div>
         );
     };
+
 
     const DocumentGenerationPage = () => {
         const [validationErrors, setValidationErrors] = useState([]);
